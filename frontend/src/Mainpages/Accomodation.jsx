@@ -211,7 +211,7 @@ const Accomodation = () => {
                 <h1 className='font-semibold text-3xl text-color1 mb-8'>Accommodations in Sorsogon</h1>
 
                 {/* Toggle Button for Filters */}
-                <div className="lg:hidden mb-4 sticky top-[7.5rem] z-40 bg-white">
+                <div className="lg:hidden mb-4  bg-white">
                     <Button onClick={toggleFilters} className="w-full bg-color1 text-color3">
                         {showFilters ? 'Hide Filters' : 'Show Filters'}
                     </Button>

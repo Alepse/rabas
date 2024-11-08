@@ -48,7 +48,7 @@ export default function PlanTripSection() {
             {images.map((image, index) => (
               <motion.div
                 key={index}
-                className={image.className}
+                className={`${image.className} transition-transform hover:shadow-xl hover:shadow-color2 duration-500 `}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}

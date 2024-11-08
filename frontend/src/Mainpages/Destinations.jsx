@@ -1,15 +1,14 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, lazy, Suspense } from 'react'
 import Nav from '../components/nav'
 import Footer from '../components/Footer'
 import Hero from '../components/herodestination'
-import { Link } from 'react-router-dom'; 
 import Bulusan from '../assets/bulusan-destination.jpg'
 import Bulan from '../assets/bulan.webp'
 import Barcelona from '../assets/barcelona.jpg'
 import Casiguran from '../assets/casiguran.jpg'
 import Castilla from '../assets/castilla.jpg'
 import Donsol from '../assets/donsol.jpg'
-import Gubat from '../assets/gubat.jpg'
+import Gubat from '../assets/gubatpic4.jpg'
 import Irosin from '../assets/irosin.jpg'
 import Juban from '../assets/juban.jpg'
 import Magallanes from '../assets/magallanes.jpg'
@@ -21,7 +20,6 @@ import Sorso from '../assets/sorsogon city.jpg'
 import Search from '@/components/Search';
 import { Spinner } from '@nextui-org/react'; // Add this import
 import { motion } from 'framer-motion'; // Import Framer Motion
-
 
 
 const Destinations = () => {
@@ -59,6 +57,25 @@ const Destinations = () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
+  const [selectedDestination, setSelectedDestination] = useState(null);
+
+  const handleDestinationClick = (destination) => {
+    setSelectedDestination(destination);
+  };
+
+  const renderDestinationSection = () => {
+    if (!selectedDestination) return null;
+
+    const DestinationComponent = lazy(() =>
+      import(`./DestinationsSectioncomponent/${selectedDestination}`)
+    );
+
+    return (
+      <Suspense fallback={<Spinner size='lg' label="Loading destination..." color="primary" className='flex justify-center items-center h-20' />}>
+        <DestinationComponent />
+      </Suspense>
+    );
+  };
 
   if (loading) {
     return <Spinner className='flex justify-center items-center h-screen' size='lg' label="Loading..." color="primary" />;
@@ -88,217 +105,130 @@ const Destinations = () => {
   
    {/** Municipalities */}
 <div className='bg-color3 text-sm grid grid-cols-1 sm:grid-cols-2 font-font1 md:grid-cols-4 lg:grid-cols-5 gap-4'>
-  <div className="relative h-[200px] w-full border-2">
+  <div className="relative h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer" onClick={() => handleDestinationClick('Bulusan')}>
     <img
       className="h-full w-full object-cover rounded-sm shadow-md"
       src={Bulusan}
       alt="Bulusan"
     />
-    <Link
-      to="/destination-page" // Replace with your destination route
-      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md "
-    >
-    Explore
-    </Link>
-    <div className="absolute bottom-0 left-0 right-0 bg-dark/60   text-white rounded-lg p-1  text-md text-center w-full  ">Bulusan</div>
+    <div className="absolute bottom-0 left-0 right-0 bg-dark/60 text-white rounded-lg p-1 text-md text-center w-full">Bulusan</div>
   </div>
-  <div className="relative h-[200px] w-full border-2">
+  <div className="relative h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer" onClick={() => handleDestinationClick('Bulan')}>
     <img
       className="h-full w-full object-cover rounded-sm shadow-md"
       src={Bulan}
       alt="Bulan"
     />
-    <Link
-      to="/destination-page" // Replace with your destination route
-      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md "
-    >
-    Explore 
-    </Link>
-    <div className="absolute bottom-0 left-0 right-0  bg-dark/60  text-white rounded-lg p-1 text-md text-center w-full  ">Bulan</div>
+    <div className="absolute bottom-0 left-0 right-0 bg-dark/60 text-white rounded-lg p-1 text-md text-center w-full">Bulan</div>
   </div>
-  <div className="relative h-[200px] w-full border-2">
+  <div className="relative h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer" onClick={() => handleDestinationClick('Barcelona')}>
     <img
       className="h-full w-full object-cover rounded-sm shadow-md"
       src={Barcelona}
       alt="Barcelona"
     />
-    <Link
-      to="/destination-page" // Replace with your destination route
-      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md "
-    >
-    Explore 
-    </Link>
-    <div className="absolute bottom-0  left-0 right-0 bg-dark/60  text-white rounded-lg p-1 text-md text-center w-full   ">Barcelona</div>
+    <div className="absolute bottom-0 left-0 right-0 bg-dark/60 text-white rounded-lg p-1 text-md text-center w-full">Barcelona</div>
   </div>
-  <div className="relative h-[200px] w-full border-2">
+  <div className="relative h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer" onClick={() => handleDestinationClick('Casiguran')}>
     <img
       className="h-full w-full object-cover rounded-sm shadow-md"
       src={Casiguran}
       alt="Casiguran"
     />
-    <Link
-      to="/destination-page" // Replace with your destination route
-      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md "
-    >
-    Explore
-    </Link>
-    <div className="absolute bottom-0  left-0 right-0 bg-dark/60  text-white rounded-lg p-1 text-md text-center w-full ">Casiguran</div>
+    <div className="absolute bottom-0 left-0 right-0 bg-dark/60 text-white rounded-lg p-1 text-md text-center w-full">Casiguran</div>
   </div>
-  <div className="relative h-[200px] w-full border-2">
+  <div className="relative h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer" onClick={() => handleDestinationClick('Castilla')}>
     <img
       className="h-full w-full object-cover rounded-sm shadow-md"
       src={Castilla}
       alt="Castilla"
     />
-    <Link
-      to="/destination-page" // Replace with your destination route
-      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md "
-    >
-    Explore
-    </Link>
-    <div className="absolute bottom-0  left-0 right-0 bg-dark/60  text-white rounded-lg p-1 text-md text-center w-full ">Castilla</div>
+    <div className="absolute bottom-0 left-0 right-0 bg-dark/60 text-white rounded-lg p-1 text-md text-center w-full">Castilla</div>
   </div>
-  <div className="relative h-[200px] w-full border-2">
+  <div className="relative h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer" onClick={() => handleDestinationClick('Donsol')}>
     <img
       className="h-full w-full object-cover rounded-sm shadow-md"
       src={Donsol}
       alt="Donsol"
     />
-    <Link
-      to="/destination-page" // Replace with your destination route
-      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md "
-    >
-    Explore 
-    </Link>
-    <div className="absolute bottom-0  left-0 right-0 bg-dark/60  text-white rounded-lg p-1 text-md text-center w-full   ">Donsol</div>
+    <div className="absolute bottom-0 left-0 right-0 bg-dark/60 text-white rounded-lg p-1 text-md text-center w-full">Donsol</div>
   </div>
-  <div className="relative h-[200px] w-full border-2">
+  <div className="relative h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer" onClick={() => handleDestinationClick('Gubat')}>
     <img
       className="h-full w-full object-cover rounded-sm shadow-md"
       src={Gubat}
       alt="Gubat"
     />
-    <Link
-      to="/destination-page" // Replace with your destination route
-      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md "
-    >
-   Explore
-    </Link>
-    <div className="absolute bottom-0  left-0 right-0 bg-dark/60  text-white rounded-lg p-1 text-md text-center w-full   ">Gubat</div>
+    <div className="absolute bottom-0 left-0 right-0 bg-dark/60 text-white rounded-lg p-1 text-md text-center w-full">Gubat</div>
   </div>
-  <div className="relative h-[200px] w-full border-2">
+  <div className="relative h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer" onClick={() => handleDestinationClick('Irosin')}>
     <img
       className="h-full w-full object-cover rounded-sm shadow-md"
       src={Irosin}
       alt="Irosin"
     />
-    <Link
-      to="/destination-page" // Replace with your destination route
-      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md "
-    >
- Explore
-    </Link>
-    <div className="absolute bottom-0  left-0 right-0 bg-dark/60  text-white rounded-lg p-1 text-md text-center w-full  ">Irosin</div>
+    <div className="absolute bottom-0 left-0 right-0 bg-dark/60 text-white rounded-lg p-1 text-md text-center w-full">Irosin</div>
   </div>
-  <div className="relative h-[200px] w-full border-2">
+  <div className="relative h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer" onClick={() => handleDestinationClick('Juban')}>
     <img
       className="h-full w-full object-cover rounded-sm shadow-md"
       src={Juban}
       alt="Juban"
     />
-    <Link
-      to="/destination-page" // Replace with your destination route
-      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md "
-    >
-    Explore 
-    </Link>
-    <div className="absolute bottom-0  left-0 right-0 bg-dark/60  text-white rounded-lg p-1 text-md text-center w-full   ">Juban</div>
+    <div className="absolute bottom-0 left-0 right-0 bg-dark/60 text-white rounded-lg p-1 text-md text-center w-full">Juban</div>
   </div>
-  <div className="relative h-[200px] w-full border-2">
+  <div className="relative h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer" onClick={() => handleDestinationClick('Magallanes')}>
     <img
       className="h-full w-full object-cover rounded-sm shadow-md"
       src={Magallanes}
       alt="Magallanes"
     />
-    <Link
-      to="/destination-page" // Replace with your destination route
-      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md "
-    >
-Explore
-    </Link>
-    <div className="absolute bottom-0  left-0 right-0 bg-dark/60  text-white rounded-lg p-1 text-md text-center w-full ">Magallanes</div>
+    <div className="absolute bottom-0 left-0 right-0 bg-dark/60 text-white rounded-lg p-1 text-md text-center w-full">Magallanes</div>
   </div>
-  <div className="relative h-[200px] w-full border-2">
+  <div className="relative h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer" onClick={() => handleDestinationClick('Matnog')}>
     <img
       className="h-full w-full object-cover rounded-sm shadow-md"
       src={Matnog}
       alt="Matnog"
     />
-    <Link
-      to="/destination-page" // Replace with your destination route
-      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md "
-    >
-    Explore
-    </Link>
-    <div className="absolute bottom-0  left-0 right-0 bg-dark/60  text-white rounded-lg p-1 text-md text-center w-full  ">Matnog</div>
+    <div className="absolute bottom-0 left-0 right-0 bg-dark/60 text-white rounded-lg p-1 text-md text-center w-full">Matnog</div>
   </div>
-  <div className="relative h-[200px] w-full border-2">
+  <div className="relative h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer" onClick={() => handleDestinationClick('Pilar')}>
     <img
       className="h-full w-full object-cover rounded-sm shadow-md"
       src={Pilar}
       alt="Pilar"
     />
-    <Link
-      to="/destination-page" // Replace with your destination route
-      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md "
-    >
-   Explore
-    </Link>
-    <div className="absolute bottom-0  left-0 right-0 bg-dark/60  text-white rounded-lg p-1 text-md text-center w-full   ">Pilar</div>
+    <div className="absolute bottom-0 left-0 right-0 bg-dark/60 text-white rounded-lg p-1 text-md text-center w-full">Pilar</div>
   </div>
-  <div className="relative h-[200px] w-full border-2">
+  <div className="relative h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer" onClick={() => handleDestinationClick('PrietoDiaz')}>
     <img
       className="h-full w-full object-cover rounded-sm shadow-md"
       src={Prieto}
       alt="Prieto"
     />
-    <Link
-      to="/destination-page" // Replace with your destination route
-      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md "
-    >
-    Explore 
-    </Link>
-    <div className="absolute bottom-0  left-0 right-0 bg-dark/60  text-white rounded-lg p-1 text-md text-center w-full  ">Prieto Diaz</div>
+    <div className="absolute bottom-0 left-0 right-0 bg-dark/60 text-white rounded-lg p-1 text-md text-center w-full">Prieto Diaz</div>
   </div>
-  <div className="relative h-[200px] w-full border-2">
+  <div className="relative h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer" onClick={() => handleDestinationClick('StaMagdalena')}>
     <img
       className="h-full w-full object-cover rounded-sm shadow-md"
       src={Santa}
-      alt="Santa"
+      alt="Sta"
     />
-    <Link
-      to="/destination-page" // Replace with your destination route
-      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md "
-    >
-    Explore
-    </Link>
-    <div className="absolute bottom-0  left-0 right-0 bg-dark/60  text-white rounded-lg p-1 text-md text-center w-full   ">Sta. Magdalena</div>
+    <div className="absolute bottom-0 left-0 right-0 bg-dark/60 text-white rounded-lg p-1 text-md text-center w-full">Sta. Magdalena</div>
   </div>
-  <div className="relative h-[200px] w-full border-2">
+  <div className="relative h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer" onClick={() => handleDestinationClick('Sorsogon')}>
     <img
       className="h-full w-full object-cover rounded-sm shadow-md"
       src={Sorso}
       alt="Sorsogon City"
     />
-    <Link
-      to="/destination-page" // Replace with your destination route
-      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md "
-    >
-   Explore
-    </Link>
-    <div className="absolute bottom-0  left-0 right-0 bg-dark/60  text-white rounded-lg p-1 text-md text-center w-full  ">Sorsogon City</div>
+    <div className="absolute bottom-0 left-0 right-0 bg-dark/60 text-white rounded-lg p-1 text-md text-center w-full">Sorsogon City</div>
   </div>  
 </div>
+
+  {renderDestinationSection()}
+
   </div>
        
   {/** Footer */}

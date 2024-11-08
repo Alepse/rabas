@@ -1,10 +1,10 @@
 import React from 'react';
 import Logo from '../assets/rabas.png';
-import { FaFacebookF, FaInstagram, FaYoutube, FaEnvelope, FaPhoneAlt } from 'react-icons/fa';
+
 
 const Footer = () => {
   return (
-    <footer className="bg-color1 text-color3 py-10 h-full ">
+    <footer className="bg-color1 text-color3  py-10 h-full ">
       <div className="max-w-7xl mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Left Column */}

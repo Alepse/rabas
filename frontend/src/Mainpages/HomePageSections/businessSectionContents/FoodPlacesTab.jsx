@@ -41,15 +41,17 @@ const foodPlaceDetails = [
 
 const FoodPlacesTab = () => (
   <div>
-    <div className="p-4 md:p-6 ">
-      <div className='flex justify-between items-center'>
-      <h1 className='text-xl md:text-2xl font-bold mb-4 md:mb-6 text-center lg:text-start'>Culinary Delights: Must-Try Food Spots</h1>
-      <Link to='/foodplaces' target='_blank'>
-      <h1 className='text-md font-semibold text-color1 hover:tracking-wide duration-300 hover:underline cursor-pointer'>
-          See More ⥬
+    <div className="p-4 md:p-6">
+      <div className='flex flex-col md:flex-row justify-between items-center'>
+        <h1 className='text-xl md:text-2xl font-bold mb-4 md:mb-6 text-center lg:text-start'>
+          Culinary Delights: Must-Try Food Spots
         </h1>
+        <Link to='/foodplaces' target='_blank' className='mb-4 md:mb-0'>
+          <h1 className='text-md font-semibold text-color1 hover:tracking-wide duration-300 hover:underline cursor-pointer'>
+            See More ⥬
+          </h1>
         </Link>
-    </div>
+      </div>
       <Swiper
         modules={[Navigation]}
         navigation={{ nextEl: '.custom-next', prevEl: '.custom-prev' }}
@@ -66,7 +68,7 @@ const FoodPlacesTab = () => (
       >
         {foodPlaceDetails.map((foodPlace, index) => (
           <SwiperSlide key={index} className='flex justify-center'>
-            <div className='bg-white rounded-md hover:shadow-lg transform transition-all duration-500 p-4 w-full max-w-[280px] md:max-w-[320px] h-[380px] flex flex-col'>
+            <div className='bg-white rounded-md shadow-md hover:shadow-xl   transform transition-all duration-500 p-4 w-full max-w-[280px] md:max-w-[320px] h-[380px] flex flex-col'>
               <div className='relative w-full h-40 md:h-44'>
                 <img
                   src={foodPlace.image || 'path/to/placeholder.jpg'}
@@ -128,14 +130,16 @@ const FoodPlacesTab = () => (
     </div>
 
     <div className="p-4 md:p-6">
-      <div className='flex justify-between items-center'>
-      <h1 className='text-xl md:text-2xl font-bold mb-4 md:mb-6 text-center lg:text-start'>Taste-Tested: Most Reviewed Eateries</h1>
-      <Link to='/foodplaces' target='_blank'>
-      <h1 className='text-md font-semibold text-color1 hover:tracking-wide duration-300 hover:underline cursor-pointer'>
-          See More ⥬
+      <div className='flex flex-col md:flex-row justify-between items-center'>
+        <h1 className='text-xl md:text-2xl font-bold mb-4 md:mb-6 text-center lg:text-start'>
+          Taste-Tested: Most Reviewed Eateries
         </h1>
+        <Link to='/foodplaces' target='_blank' className='mb-4 md:mb-0'>
+          <h1 className='text-md font-semibold text-color1 hover:tracking-wide duration-300 hover:underline cursor-pointer'>
+            See More ⥬
+          </h1>
         </Link>
-    </div>
+      </div>
       <Swiper
         modules={[Navigation]}
         navigation={{ nextEl: '.custom-next', prevEl: '.custom-prev' }}
@@ -152,7 +156,7 @@ const FoodPlacesTab = () => (
       >
         {foodPlaceDetails.map((foodPlace, index) => (
           <SwiperSlide key={index} className='flex justify-center'>
-            <div className='bg-white rounded-md hover:shadow-lg transform transition-all duration-500 p-4 w-full max-w-[280px] md:max-w-[320px] h-[380px] flex flex-col'>
+            <div className='bg-white rounded-md shadow-md hover:shadow-xl  transform transition-all duration-500 p-4 w-full max-w-[280px] md:max-w-[320px] h-[380px] flex flex-col'>
               <div className='relative w-full h-40 md:h-44'>
                 <img
                   src={foodPlace.image || 'path/to/placeholder.jpg'}
@@ -214,14 +218,16 @@ const FoodPlacesTab = () => (
     </div>
 
     <div className="p-4 md:p-6">
-      <div className='flex justify-between items-center'>
-      <h1 className='text-xl md:text-2xl font-bold mb-4 md:mb-6 text-center lg:text-start'>Savor the Savings: Top Food Offers</h1>
-      <Link to='/foodplaces' target='_blank'>
-      <h1 className='text-md font-semibold text-color1 hover:tracking-wide duration-300 hover:underline cursor-pointer'>
-          See More ⥬
+      <div className='flex flex-col md:flex-row justify-between items-center'>
+        <h1 className='text-xl md:text-2xl font-bold mb-4 md:mb-6 text-center lg:text-start'>
+          Savor the Savings: Top Food Offers
         </h1>
+        <Link to='/foodplaces' target='_blank' className='mb-4 md:mb-0'>
+          <h1 className='text-md font-semibold text-color1 hover:tracking-wide duration-300 hover:underline cursor-pointer'>
+            See More ⥬
+          </h1>
         </Link>
-    </div>
+      </div>
       <Swiper
         modules={[Navigation]}
         navigation={{ nextEl: '.custom-next', prevEl: '.custom-prev' }}
@@ -238,7 +244,7 @@ const FoodPlacesTab = () => (
       >
         {foodPlaceDetails.map((foodPlace, index) => (
           <SwiperSlide key={index} className='flex justify-center'>
-            <div className='bg-white rounded-md hover:shadow-lg transform transition-all duration-500 p-4 w-full max-w-[280px] md:max-w-[320px] h-[380px] flex flex-col'>
+            <div className='bg-white rounded-md shadow-md hover:shadow-xl  transform transition-all duration-500 p-4 w-full max-w-[280px] md:max-w-[320px] h-[380px] flex flex-col'>
               <div className='relative w-full h-40 md:h-44'>
                 <img
                   src={foodPlace.image || 'path/to/placeholder.jpg'}

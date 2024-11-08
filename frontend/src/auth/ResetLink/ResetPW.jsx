@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Input, Spacer } from '@nextui-org/react';
 import Swal from 'sweetalert2';
-import Logo2 from '@/assets/Rabas.png';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const ResetPW = () => {

@@ -237,9 +237,9 @@ const ProductCard = ({ product, openBookingModal, onOpen }) => {
   const discountedPrice = product.price - (product.price * (product.discount || 0) / 100);
 
   return (
-    <Card variant="shadow" className="border-0 rounded-lg mb-4 overflow-hidden">
-      <CardBody className="flex flex-col">
-        <div className="relative w-full h-[200px] md:h-[250px]">
+    <Card variant="shadow" className="border-0 rounded-lg mb-4 overflow-hidden  ">
+      <CardBody className="flex flex-col ">
+        <div className="relative w-full h-[250px] md:h-[300px]">
           <img
             src={product.imageUrl}
             alt={product.title}
@@ -519,10 +519,10 @@ const BusinessAllproducts = () => {
   }
 
   return (
-    <div className="min-h-screen container mx-auto p-4 md:p-6 bg-white  rounded-md shadow-md mb-4">
+    <div className="min-h-screen container mx-auto p-4 bg-white  rounded-md shadow-md mb-4">
       <div className="text-3xl font-semibold mb-6 text-gray-800">What We Offer</div>
 
-      <div className="flex flex-col lg:flex-row gap-8">
+      <div className="flex flex-col lg:flex-row gap-2">
         {/* Filter Section */}
         <div className="w-full lg:w-1/4 bg-white p-6 rounded-lg shadow-md">
           <Filters
@@ -536,7 +536,7 @@ const BusinessAllproducts = () => {
         </div>
 
         {/* Main Content Area */}
-        <div className="flex flex-col w-full bg-white  p-9 rounded-lg shadow-md">
+        <div className="flex flex-col w-full bg-white  p-5 rounded-lg shadow-md">
           {/* Tabs */}
           <Tabs
             aria-label="Business Offerings"
@@ -553,7 +553,7 @@ const BusinessAllproducts = () => {
           </Tabs>
 
           {/* Content */}
-          <div className="p-4 max-h-[800px] overflow-y-auto  scrollbar-custom">
+          <div className="p-2 max-h-[800px] overflow-y-auto  scrollbar-custom">
             {loading ? (
               <LoadingSpinner />
             ) : filteredData.length > 0 ? (
@@ -573,7 +573,7 @@ const BusinessAllproducts = () => {
         onOpenChange={onOpenChange}
         scrollBehavior="inside"
         size="5xl"
-        className='max-h-[90vh]'
+        className='max-h-[100%]'
       >
         <ModalContent>
           {(onClose) => (
@@ -615,7 +615,7 @@ const BusinessAllproducts = () => {
             <img
               src={previewImage}
               alt="Preview"
-              className="w-auto h-[80vh] object-contain rounded-md shadow-lg"
+              className="w-auto h-auto object-contain rounded-md shadow-lg"
             />
             {previewIndex !== null && images[previewIndex] && (
               <div className="absolute bottom-4 left-0 right-0 text-center text-black text-2xl font-semibold py-2">

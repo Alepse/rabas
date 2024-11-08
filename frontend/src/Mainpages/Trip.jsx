@@ -213,9 +213,9 @@ const Trip = () => {
           {trips.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {trips.map((trip, index) => (
-                <div key={index} className="flex border rounded-lg shadow-md overflow-hidden">
-                  <img src="https://via.placeholder.com/150" alt="Trip" className="w-1/3 object-cover" />
-                  <div className="p-4 flex flex-col justify-between w-2/3">
+                <div key={index} className="flex flex-col md:flex-row border rounded-lg shadow-md overflow-hidden">
+                  <img src="https://via.placeholder.com/150" alt="Trip" className="w-full md:w-1/3 object-cover" />
+                  <div className="p-4 flex flex-col justify-between w-full md:w-2/3">
                     <div>
                       <h2 className="text-xl font-semibold">{trip.tripName}</h2>
                       <p className="text-gray-600">{trip.startDate} - {trip.endDate}</p>
@@ -244,21 +244,20 @@ const Trip = () => {
 
       {showButton && (
         <motion.button
-           className="fixed bottom-5 right-2 p-3 rounded-full shadow-lg z-10"
+          className="fixed bottom-5 right-2 p-3 rounded-full shadow-lg z-10"
           onClick={scrollToTop}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           animate={{ y: [0, -10, 0] }}
           transition={{ duration: 0.6, repeat: Infinity, repeatType: "loop" }}
           style={{
-            background: 'linear-gradient(135deg, #688484  0%, #092635 100%)', // Gradient color
+            background: 'linear-gradient(135deg, #688484  0%, #092635 100%)',
             color: 'white',
           }}
         >
           ↑
         </motion.button>
       )}
-
 
       <Modal hideCloseButton isOpen={isOpen} onClose={() => {}} className="rounded-lg shadow-lg mx-auto p-3 max-h-screen max-w-[1200px]">
         <ModalContent className="rounded-lg overflow-y-auto scrollbar-custom">
@@ -282,14 +281,14 @@ const Trip = () => {
                   <h2 className="text-2xl font-semibold text-primary">Introduction</h2>
                   <p className="text-gray-600 mt-2">Let’s start planning your trip! Answer a few questions to help us tailor the best experience for you.</p>
                   <div className='flex justify-center flex-col items-center mt-3 '>
-                  <h1 className='text-lg font-medium'>Trip Name</h1>
-                  <Input
-                  placeholder="Name your trip"
-                  value={tripName}
-                  onChange={(e) => setTripName(e.target.value)}
-                  className="mt-4 max-w-[200px]"
-                  style={{ textAlign: 'center', fontSize: '14px',}}
-                />
+                    <h1 className='text-lg font-medium'>Trip Name</h1>
+                    <Input
+                      placeholder="Name your trip"
+                      value={tripName}
+                      onChange={(e) => setTripName(e.target.value)}
+                      className="mt-4 max-w-[200px]"
+                      style={{ textAlign: 'center', fontSize: '14px',}}
+                    />
                   </div>
                 </>
               )}
@@ -398,8 +397,6 @@ const Trip = () => {
         trip={selectedTrip}
         onUpdateTrip={updateTripDetails}
       />
-
-      
     </div>
   );
 };

@@ -7,7 +7,7 @@ import ShopsTab from './businessSectionContents/ShopsTab';
 
 const BusinessSection = () => {
   return (
-    <div className="container mx-auto p-4 md:p-8  mb-8">
+    <div className="container mx-auto p-4 md:p-8 bg-white  mb-8">
       <div className="text-center mb-10">
         <h1 className="text-3xl md:text-5xl font-bold text-[#092635]">
           Explore Sorsogon

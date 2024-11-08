@@ -5,7 +5,7 @@ import Logo2 from '../assets/Rabasorso.png';
 import { Avatar, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Badge } from "@nextui-org/react";
 import { CiSquareInfo } from "react-icons/ci";
 import { TbNotes } from "react-icons/tb";
-import LoginSignup from '@/auth/loginSignup';
+import LoginSignup from '@/auth/LoginSignup';
 import { PiJeep } from "react-icons/pi";
 import {
   NavigationMenu,
@@ -15,14 +15,14 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
-import { FaHome, FaBars, FaTimes, FaSearch, FaHiking, FaBed, FaUtensils, FaShoppingBag, FaMapMarkerAlt } from 'react-icons/fa';
+import { FaHome, FaBars, FaTimes, FaSearch, FaMapMarkerAlt } from 'react-icons/fa';
 import { GiPositionMarker } from "react-icons/gi";
 import { FaRegCircleUser } from "react-icons/fa6";
 import { FaPersonWalking } from "react-icons/fa6";
 import { Modal, ModalContent, ModalBody, useDisclosure } from "@nextui-org/react";
 import { Link } from 'react-router-dom';
 import UserChatModal from '@/user/userChatSystem/UserChatModal';
-import { Tabs, Tab } from '@nextui-org/react';
+
 
 const Nav = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

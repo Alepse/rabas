@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Tabs, Tab, Button, Input} from "@nextui-org/react";
 import { FaEye, FaEyeSlash, FaGoogle, FaEnvelope, FaArrowLeft } from 'react-icons/fa';
-import Logo2 from '../assets/Rabas.png';
+import Logo2 from '../assets/rabas.png';
 import Swal from 'sweetalert2'; // Change import to sweetalert2
 import { Link } from 'react-router-dom';
 
