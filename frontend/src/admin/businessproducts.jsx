@@ -42,7 +42,7 @@ const BusinessProducts = () => {
     // Title Tab
     useEffect(() => {
       document.title = 'BusinessName | Admin products';
-      });
+    });
 
 
   return (

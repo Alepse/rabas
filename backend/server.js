@@ -1359,51 +1359,67 @@ app.post('/add-product', upload.array('productImages', 5), async (req, res) => {
       ? termsAndConditions.map(item => JSON.parse(item)) // Assuming this is already in the correct format
       : [];
 
-    const query = `
-      INSERT INTO products (product_category, user_id, type, name, description, price, pricing_unit, booking_operation, inclusions, termsAndConditions, images)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
-
-    const values = [
-      category || null,
-      user_id || null, 
-      type || null, 
-      name || null, 
-      description || null,
-      price || null, 
-      pricing_unit || null,
-      parseInt(booking_operation) || 0,
-      JSON.stringify(inclusionsArray) || [], // Convert inclusions to JSON
-      JSON.stringify(termsArray) || [], // Convert termsAndConditions to JSON
-      JSON.stringify(parsedImages) || [], // Store images as JSON array with id, path, and title
-    ];
-
-    connection.query(query, values, (err, results) => {
-      if (err) {
-        console.error('Error adding product:', err);
-        return res.status(500).json({ success: false, message: 'Failed to add product' });
+    // Query to get the business_id based on user_id
+    const queryGetBusinessId = `SELECT business_id FROM businesses WHERE user_id = ?`;
+    
+    connection.query(queryGetBusinessId, [user_id], (err, results) => {
+      if (err || results.length === 0) {
+        console.error('Error fetching business_id:', err || 'No business found for user');
+        return res.status(500).json({ success: false, message: 'Failed to fetch business ID' });
       }
 
-      // Return all relevant data about the newly added product
-      const addedProduct = {
-        success: true,
-        message: 'Product added successfully',
-        product_id: results.insertId,
-        category,
-        user_id,
-        type,
-        name,
-        description,
-        price,
-        pricing_unit: pricing_unit || '',
-        booking_operation: parseInt(booking_operation) || 0,
-        inclusions: inclusionsArray, // Return the original array
-        termsAndConditions: termsArray, // Return the original array
-        images: parsedImages, // Each image will have id, path, and title
-      };
-      console.log(addedProduct);
-      res.json(addedProduct);
+      const business_id = results[0].business_id;
+
+      // Now insert the product with the retrieved business_id
+      const query = `
+        INSERT INTO products (business_id, product_category, user_id, type, name, description, price, pricing_unit, booking_operation, inclusions, termsAndConditions, images)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `;
+
+      const values = [
+        business_id,
+        category || null,
+        user_id, 
+        type || null, 
+        name || null, 
+        description || null,
+        price || null, 
+        pricing_unit || null,
+        parseInt(booking_operation) || 0,
+        JSON.stringify(inclusionsArray), // Convert inclusions to JSON
+        JSON.stringify(termsArray), // Convert termsAndConditions to JSON
+        JSON.stringify(parsedImages), // Store images as JSON array with id, path, and title
+      ];
+
+      connection.query(query, values, (err, results) => {
+        if (err) {
+          console.error('Error adding product:', err);
+          return res.status(500).json({ success: false, message: 'Failed to add product' });
+        }
+
+        // Return all relevant data about the newly added product
+        const addedProduct = {
+          success: true,
+          message: 'Product added successfully',
+          product_id: results.insertId,
+          business_id,
+          category,
+          user_id,
+          type,
+          name,
+          description,
+          price,
+          pricing_unit: pricing_unit || '',
+          booking_operation: parseInt(booking_operation) || 0,
+          inclusions: inclusionsArray, // Return the original array
+          termsAndConditions: termsArray, // Return the original array
+          images: parsedImages, // Each image will have id, path, and title
+        };
+        // console.log(addedProduct);
+        res.json(addedProduct);
+      });
     });
+    
   } catch (error) {
     console.error('Error adding product:', error);
     res.status(500).json({ success: false, message: 'Internal server error' });
@@ -1623,8 +1639,8 @@ app.post('/add-deals', async (req, res) => {
   const { category, productId, discount, expirationDate } = req.body;
   const userId = req.session?.user?.user_id;
 
-  console.log('Request Body:', req.body);
-  console.log('User ID:', userId);
+  // console.log('Request Body:', req.body);
+  // console.log('User ID:', userId);
 
 
   if(!userId || !category || !productId || !discount || !expirationDate) {
@@ -1651,7 +1667,7 @@ app.post('/add-deals', async (req, res) => {
         return res.status(500).json({ success: false, message: 'Failed to add product' });
       }
 
-      console.log('resulttttttt: ', result);
+      // console.log('resulttttttt: ', result);
 
       // Return all relevant data about the newly added product
       const addedDeal = {
@@ -1664,7 +1680,7 @@ app.post('/add-deals', async (req, res) => {
         discount,
         expirationDate
       };
-      console.log('Added deal: ', addedDeal);
+      // console.log('Added deal: ', addedDeal);
       res.json(addedDeal);
     });
   } catch (error) {
@@ -1679,8 +1695,8 @@ app.put('/update-deal', async (req, res) => {
   const { dealId, discount, expirationDate } = req.body; // Match the key names in the destructure
   const userId = req.session?.user?.user_id; // Get user ID from the session
 
-  console.log('Request Body:', req.body);
-  console.log('User ID:', userId);
+  // console.log('Request Body:', req.body);
+  // console.log('User ID:', userId);
 
   // Validate the incoming data
   if (!userId || !dealId || discount === undefined || !expirationDate) {
@@ -1715,7 +1731,7 @@ app.put('/update-deal', async (req, res) => {
         expirationDate,
       };
 
-      console.log('Updated deal:', updatedDeal);
+      // console.log('Updated deal:', updatedDeal);
       res.json(updatedDeal); // Respond with the updated deal
     });
   } catch (error) {
@@ -1752,6 +1768,280 @@ app.delete('/delete-deals/:dealId', async (req, res) => {
     });
   } catch (error) {
     console.error('Error processing delete request:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+// endpoint for booking
+app.post('/book-accommodation', async (req, res) => {
+  const { 
+    business_id,
+    user_id,
+    product_id,
+    firstName,
+    lastName,
+    productName,
+    email,
+    phone,
+    type,
+    checkInOutDates,
+    amount,
+    specialRequests,
+    numberOfGuests
+  } = req.body;
+
+  console.log('Request Body Data:', req.body);
+  
+  // const user_id = req.session?.user?.user_id;
+
+  if (!firstName || !lastName || !email || !checkInOutDates || !checkInOutDates.start || !checkInOutDates.end) {
+    return res.status(400).json({ success: false, message: 'Missing required fields' });
+  }
+
+  // Convert checkInOutDates to MySQL-compatible datetime format
+  const formatDate = ({ year, month, day }) => 
+    `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')} 00:00:00`;
+  
+  const dateIn = formatDate(checkInOutDates.start);
+  const dateOut = formatDate(checkInOutDates.end);
+
+  try {
+    const query = `
+      INSERT INTO bookings (
+        user_id, business_id, product_id, customerName, productName, numberOfGuests, email, phone, type, dateIn, dateOut, specialRequests, amount
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const values = [
+      user_id,
+      business_id,
+      product_id,
+      `${firstName} ${lastName}`,      // combined name
+      productName,
+      numberOfGuests,
+      email,
+      phone,
+      type,  
+      dateIn,
+      dateOut || null,
+      specialRequests || '',
+      amount
+    ];
+
+    connection.query(query, values, (err, result) => {
+      if (err) {
+        console.error('Error on booking:', err);
+        return res.status(500).json({ success: false, message: 'Failed to book the product' });
+      }
+
+      res.json({
+        success: true,
+        message: 'Booking added successfully',
+        booking_id: result.insertId,
+        user_id: user_id,
+        business_id: business_id,
+        customerName: `${firstName} ${lastName}`,
+        productName: productName,
+        numberOfGuests,
+        email,
+        phone,
+        type: type,
+        dateIn,
+        dateOut,
+        specialRequests,
+        amount,
+        status: 0
+      });
+    });
+    
+  } catch (error) {
+    console.error('Error on booking:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+app.post('/book-table', async (req, res) => {
+  const {
+    business_id,
+    user_id,
+    product_id,
+    firstName,
+    lastName,
+    productName,
+    email,
+    phone,
+    reservationDate,
+    reservationTime,
+    amount,
+    specialRequests,
+    numberOfGuests,
+    type,
+  } = req.body;
+
+  if (
+    !business_id || 
+    !user_id || 
+    !product_id || 
+    !firstName || 
+    !lastName || 
+    !productName || 
+    !email || 
+    !phone || 
+    !reservationDate || 
+    !reservationTime || 
+    !type
+  ) {
+    return res.status(400).json({ success: false, message: 'Missing required fields' });
+  }
+
+  // Combine reservation date and time into a single datetime string
+  const formatDate = ({ year, month, day }) => 
+    `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  const dateIn = `${formatDate(reservationDate)} ${reservationTime}:00`;
+
+  const customerName = `${firstName} ${lastName}`;
+
+  try {
+    const query = `
+      INSERT INTO bookings (
+        user_id, business_id, product_id, customerName, productName, numberOfGuests, email, phone, type, dateIn, dateOut, specialRequests, amount
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const values = [
+      user_id,
+      business_id,
+      product_id,
+      customerName,
+      productName,
+      numberOfGuests,
+      email,
+      phone,
+      type,
+      dateIn,
+      null, // dateOut is null for single-date reservations
+      specialRequests || '',
+      amount,
+    ];
+
+    connection.query(query, values, (err, result) => {
+      if (err) {
+        console.error('Error booking table:', err);
+        return res.status(500).json({ success: false, message: 'Failed to book table' });
+      }
+
+      res.json({
+        success: true,
+        message: 'Table booked successfully',
+        booking_id: result.insertId,
+        user_id,
+        business_id,
+        product_id,
+        customerName,
+        productName,
+        numberOfGuests,
+        email,
+        phone,
+        type,
+        dateIn,
+        specialRequests,
+        amount,
+      });
+    });
+  } catch (error) {
+    console.error('Error booking table:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+app.post('/book-activity', async (req, res) => {
+  const {
+    business_id,
+    user_id,
+    product_id,
+    firstName,
+    lastName,
+    email,
+    phone,
+    visitDate,
+    activityTime,
+    amount,
+    type,
+    specialRequests,
+    numberOfGuests,
+    productName
+  } = req.body;
+
+  if (
+    !user_id ||
+    !firstName ||
+    !lastName ||
+    !email ||
+    !phone ||
+    !visitDate ||
+    !activityTime ||
+    !type ||
+    !productName
+  ) {
+    return res.status(400).json({ success: false, message: 'Missing required fields' });
+  }
+
+  // Combine visit date and time into a single datetime string
+  const formatDate = ({ year, month, day }) => 
+    `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  const dateIn = `${formatDate(visitDate)} ${activityTime}:00`;
+
+  const customerName = `${firstName} ${lastName}`;
+
+  try {
+    const query = `
+      INSERT INTO bookings (
+        user_id, business_id, product_id, customerName, productName, numberOfGuests, email, phone, type, dateIn, dateOut, specialRequests, amount
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const values = [
+      user_id,
+      business_id || null,
+      product_id || null,
+      customerName,
+      productName,
+      numberOfGuests,
+      email,
+      phone,
+      type,
+      dateIn,
+      null, // dateOut is null for single-date activity bookings
+      specialRequests || '',
+      amount
+    ];
+
+    connection.query(query, values, (err, result) => {
+      if (err) {
+        console.error('Error booking activity:', err);
+        return res.status(500).json({ success: false, message: 'Failed to book activity' });
+      }
+
+      res.json({
+        success: true,
+        message: 'Activity booked successfully',
+        booking_id: result.insertId,
+        user_id,
+        business_id,
+        product_id,
+        customerName,
+        productName,
+        numberOfGuests,
+        email,
+        phone,
+        type,
+        dateIn,
+        specialRequests,
+        amount,
+      });
+    });
+  } catch (error) {
+    console.error('Error booking activity:', error);
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
 });
@@ -1995,6 +2285,12 @@ app.put('/updateStatus-businessApplications/:id', async (req, res) => {
     console.error('Error updating status:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
+});
+
+app.use((req, res, next) => {
+  console.log('Api request: ');
+  console.log(`${req.method} ${req.url} - ${JSON.stringify(req.body)}`);
+  next();
 });
 
 const PORT = process.env.PORT || 5000;

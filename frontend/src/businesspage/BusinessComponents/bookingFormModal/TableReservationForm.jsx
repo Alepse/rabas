@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Modal,
   ModalContent,
@@ -15,9 +15,14 @@ import { today, isWeekend, getLocalTimeZone } from '@internationalized/date';
 import { useLocale } from '@react-aria/i18n';
 
 const TableReservationForm = ({ isOpen, onClose, product = {} }) => {
+  const [userId, setUserId] = useState(null);
   const [formData, setFormData] = useState({
+    business_id: product.business_id || 1,
+    user_id: null,
+    product_id: product.product_id || null,
     firstName: '',
     lastName: '',
+    productName: product.title || '',
     email: '',
     phone: '',
     reservationDate: null, // Change to store a single date
@@ -27,6 +32,45 @@ const TableReservationForm = ({ isOpen, onClose, product = {} }) => {
     specialRequests: '',
     numberOfGuests: 1, // Default to 1 guest
   });
+
+  // Fetching user data
+  const fetchUserData = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/get-userData', {
+        method: 'GET',
+        credentials: 'include' // Include cookies
+      });
+      const data = await response.json();
+      setUserId(data.userData?.user_id || null);
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
+  // Update formData.user_id after userId is fetched
+  useEffect(() => {
+    if (userId) {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        user_id: parseInt(userId),
+      }));
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      business_id: product.business_id || null,
+      productName: product.title || '',
+      amount: product.price || 0,
+      type: product.type || '',
+    }));
+  }, [product]);
+
   const [isPolicyModalOpen, setPolicyModalOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
 
@@ -67,7 +111,7 @@ const TableReservationForm = ({ isOpen, onClose, product = {} }) => {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!formData.agreeToTerms) {
       Swal.fire({
         title: 'Terms Not Agreed',
@@ -77,7 +121,7 @@ const TableReservationForm = ({ isOpen, onClose, product = {} }) => {
       });
       return;
     }
-
+  
     // Check if the selected time is unavailable
     if (unavailableTimes.includes(formData.reservationTime)) {
       Swal.fire({
@@ -88,16 +132,40 @@ const TableReservationForm = ({ isOpen, onClose, product = {} }) => {
       });
       return;
     }
-
-    Swal.fire({
-      title: 'Reservation Confirmed!',
-      text: `You have successfully reserved: ${product.title} for ₱${formData.amount}.`,
-      icon: 'success',
-      confirmButtonColor: '#0BDA51'
-    }).then(() => {
-      onClose(); // Close the modal only after successful submission
-    });
-  };
+  
+    try {
+      const response = await fetch(`http://localhost:5000/book-table`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData), // Convert formData to JSON format
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to create booking');
+      }
+  
+      const data = await response.json();
+      
+      Swal.fire({
+        title: 'Reservation Confirmed!',
+        text: `You have successfully reserved: ${product.title} for ₱${formData.amount}.`,
+        icon: 'success',
+        confirmButtonColor: '#0BDA51'
+      }).then(() => {
+        onClose(); // Close the modal only after successful submission
+      });
+    } catch (error) {
+      console.error('Error submitting reservation:', error);
+      Swal.fire({
+        title: 'Reservation Failed',
+        text: 'There was an issue completing your reservation. Please try again later.',
+        icon: 'error',
+        confirmButtonColor: '#0BDA51'
+      });
+    }
+  };  
 
   const handleCheckboxChange = (e) => {
     const isChecked = e.target.checked;

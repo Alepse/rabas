@@ -29,6 +29,8 @@ import AttractionActivitiesBookingForm from './bookingFormModal/AttractionActivi
 const mockData = {
   activities: [
     {
+      product_id: 1,
+      business_id: 2,
       title: 'Hiking Adventure',
       description: 'Explore scenic mountain trails. Guide and equipment included.',
       price: 1500,
@@ -40,6 +42,8 @@ const mockData = {
       expiration: '10/4/2024', // Added expiration date
     },
     {
+      product_id: 2,
+      business_id: 2,
       title: 'Snorkeling Tour',
       description: 'Discover the underwater world with a guided snorkeling tour.',
       price: 1200,
@@ -53,6 +57,9 @@ const mockData = {
   ],
   accommodations: [
     {
+      product_id: 1,
+      business_id: 2,
+      product_category: 'accommodation',
       title: 'Luxury Mountain Cabin',
       description: 'Stay in a cozy cabin with scenic views and modern amenities.',
       price: 5000,
@@ -64,6 +71,9 @@ const mockData = {
       expiration: '12/31/2024', // Added expiration date
     },
     {
+      product_id: 2,
+      business_id: 2,
+      product_category: 'accommodation',
       title: 'Beachfront Resort',
       description: 'Relax in a luxury resort right on the beach.',
       price: 8000,
@@ -77,6 +87,8 @@ const mockData = {
   ],
   restaurant: [
     {
+      product_id: 1,
+      business_id: 2,
       title: 'Mountain View Dining',
       description: 'Experience local cuisine with a view of the mountains.',
       price: 1000,
@@ -88,6 +100,8 @@ const mockData = {
       expiration: '10/4/2024', // Added expiration date
     },
     {
+      product_id: 2,
+      business_id: 2,
       title: 'Coastal Seafood Feast',
       description: 'Indulge in fresh seafood dishes by the shore.',
       price: 1500,

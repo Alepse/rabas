@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Modal,
   ModalContent,
@@ -13,24 +13,70 @@ import {
 import Swal from 'sweetalert2';
 
 const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
+  const [userId, setUserId] = useState(null);
   const [formData, setFormData] = useState({
+    business_id: product.business_id || null,
+    user_id: null,
+    product_id: product.product_id || null,
     firstName: '',
     lastName: '',
+    productName: product.title || '',
     email: '',
     phone: '',
-    checkInOutDates: null, // Storing date range
-    amount: product.price || 0, // Default to 0 if product.price is undefined
+    checkInOutDates: null,
+    amount: product.price || 0,
+    type: product.type || '',
     agreeToTerms: false,
     specialRequests: '',
-    numberOfGuests: 1, // Default to 1 guest
+    numberOfGuests: 1,
   });
+
+  // Fetching user data
+  const fetchUserData = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/get-userData', {
+        method: 'GET',
+        credentials: 'include' // Include cookies
+      });
+      const data = await response.json();
+      setUserId(data.userData?.user_id || null);
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
+  // Update formData.user_id after userId is fetched
+  useEffect(() => {
+    if (userId) {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        user_id: parseInt(userId),
+      }));
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      business_id: product.business_id || null,
+      productName: product.title || '',
+      amount: product.price || 0,
+      type: product.type || '',
+    }));
+  }, [product]);
+
   const [isPolicyModalOpen, setPolicyModalOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
 
   const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
   const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 0));
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    console.log('Submit fromData: ', formData);
     if (!formData.agreeToTerms) {
       Swal.fire({
         title: 'Terms Not Agreed',
@@ -40,13 +86,36 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
       });
       return;
     }
-    Swal.fire({
-      title: 'Booking Confirmed!',
-      text: `You have successfully booked: ${product.title} for ₱${formData.amount}.`,
-      icon: 'success',
-      confirmButtonColor: '#0BDA51'
-    });
-    onClose();
+    try {
+      const response = await fetch(`http://localhost:5000/book-accommodation`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData), // Convert formData to JSON format
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to create booking');
+      }
+  
+      Swal.fire({
+        title: 'Reservation Confirmed!',
+        text: `You have successfully reserved: ${product.title} for ₱${formData.amount}.`,
+        icon: 'success',
+        confirmButtonColor: '#0BDA51'
+      }).then(() => {
+        onClose(); // Close the modal only after successful submission
+      });
+    } catch (error) {
+      console.error('Error submitting reservation:', error);
+      Swal.fire({
+        title: 'Reservation Failed',
+        text: 'There was an issue completing your reservation. Please try again later.',
+        icon: 'error',
+        confirmButtonColor: '#0BDA51'
+      });
+    }
   };
 
   const handleCheckboxChange = (e) => {
