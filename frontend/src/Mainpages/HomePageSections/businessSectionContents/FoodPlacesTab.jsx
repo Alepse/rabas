@@ -68,7 +68,7 @@ const FoodPlacesTab = () => (
       >
         {foodPlaceDetails.map((foodPlace, index) => (
           <SwiperSlide key={index} className='flex justify-center'>
-            <div className='bg-white rounded-md hover:shadow-lg transform transition-all duration-500 p-4 w-full max-w-[280px] md:max-w-[320px] h-[380px] flex flex-col'>
+            <div className='bg-white rounded-md shadow-md hover:shadow-xl   transform transition-all duration-500 p-4 w-full max-w-[280px] md:max-w-[320px] h-[380px] flex flex-col'>
               <div className='relative w-full h-40 md:h-44'>
                 <img
                   src={foodPlace.image || 'path/to/placeholder.jpg'}
@@ -156,7 +156,7 @@ const FoodPlacesTab = () => (
       >
         {foodPlaceDetails.map((foodPlace, index) => (
           <SwiperSlide key={index} className='flex justify-center'>
-            <div className='bg-white rounded-md hover:shadow-lg transform transition-all duration-500 p-4 w-full max-w-[280px] md:max-w-[320px] h-[380px] flex flex-col'>
+            <div className='bg-white rounded-md shadow-md hover:shadow-xl  transform transition-all duration-500 p-4 w-full max-w-[280px] md:max-w-[320px] h-[380px] flex flex-col'>
               <div className='relative w-full h-40 md:h-44'>
                 <img
                   src={foodPlace.image || 'path/to/placeholder.jpg'}
@@ -244,7 +244,7 @@ const FoodPlacesTab = () => (
       >
         {foodPlaceDetails.map((foodPlace, index) => (
           <SwiperSlide key={index} className='flex justify-center'>
-            <div className='bg-white rounded-md hover:shadow-lg transform transition-all duration-500 p-4 w-full max-w-[280px] md:max-w-[320px] h-[380px] flex flex-col'>
+            <div className='bg-white rounded-md shadow-md hover:shadow-xl  transform transition-all duration-500 p-4 w-full max-w-[280px] md:max-w-[320px] h-[380px] flex flex-col'>
               <div className='relative w-full h-40 md:h-44'>
                 <img
                   src={foodPlace.image || 'path/to/placeholder.jpg'}

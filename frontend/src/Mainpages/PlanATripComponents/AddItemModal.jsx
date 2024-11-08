@@ -476,7 +476,7 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
             size='full'
         >
             <ModalContent>
-                <ModalHeader className='w-full text-white flex justify-center bg-color2'>
+                <ModalHeader className='w-full text-white flex justify-center bg-color1'>
                     <h1 className="text-center text-lg md:text-xl lg:text-2xl">Your Travel Itinerary: Must-Do Activities, Stay Options, Food Spots & Shopping Spots</h1>
                 </ModalHeader>
                 <ModalBody className='bg-light'>
