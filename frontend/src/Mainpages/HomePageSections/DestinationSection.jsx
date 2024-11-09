@@ -24,21 +24,21 @@ import { Link } from 'react-router-dom'
 
 
 const destinations = [
-    { name: 'Barcelona', image: Barcelona, link: '/destinations/barcelona' },
-    { name: 'Bulan', image: Bulan, link: '/destinations/bulan' },
-    { name: 'Bulusan', image: Bulusan, link: '/destinations/bulusan' },
-    { name: 'Casiguran', image: Casiguran, link: '/destinations/casiguran' },
-    { name: 'Castilla', image: Castilla, link: '/destinations/castilla' },
-    { name: 'Donsol', image: Donsol, link: '/destinations/donsol' },
-    { name: 'Gubat', image: Gubat, link: '/destinations/gubat' },
-    { name: 'Irosin', image: Irosin, link: '/destinations/irosin' },
-    { name: 'Juban', image: Juban, link: '/destinations/juban' },
-    { name: 'Magallanes', image: Magallanes, link: '/destinations/magallanes' },
-    { name: 'Matnog', image: Matnog, link: '/destinations/matnog' },
-    { name: 'Pilar', image: Pilar, link: '/destinations/pilar' },
-    { name: 'Prieto Diaz', image: Prieto, link: '/destinations/prieto-diaz' },
-    { name: 'Santa Magdalena', image: Santa, link: '/destinations/santa-magdalena' },
-    { name: 'Sorsogon City', image: Sorso, link: '/destinations/sorsogon-city' },
+    { name: 'Barcelona', image: Barcelona },
+    { name: 'Bulan', image: Bulan },
+    { name: 'Bulusan', image: Bulusan },
+    { name: 'Casiguran', image: Casiguran },
+    { name: 'Castilla', image: Castilla },
+    { name: 'Donsol', image: Donsol },
+    { name: 'Gubat', image: Gubat },
+    { name: 'Irosin', image: Irosin },
+    { name: 'Juban', image: Juban },
+    { name: 'Magallanes', image: Magallanes },
+    { name: 'Matnog', image: Matnog },
+    { name: 'Pilar', image: Pilar },
+    { name: 'Prieto Diaz', image: Prieto },
+    { name: 'Santa Magdalena', image: Santa },
+    { name: 'Sorsogon City', image: Sorso },
 ]
   
 
@@ -83,7 +83,7 @@ const DestinationSection = () => {
       >
         {destinations.map((destination, index) => (
           <SwiperSlide key={index}>
-            <a href={destination.link} target="_blank">
+            <Link to={`/destinations?name=${destination.name}`}>
               <motion.div
                 className='relative overflow-hidden rounded-lg shadow-lg'
                 whileHover={{ scale: 1.05 }}
@@ -106,7 +106,7 @@ const DestinationSection = () => {
                   <h3 className='text-lg font-semibold'>{destination.name}</h3>
                 </motion.div>
               </motion.div>
-            </a>
+            </Link>
           </SwiperSlide>
         ))}
       </Swiper>

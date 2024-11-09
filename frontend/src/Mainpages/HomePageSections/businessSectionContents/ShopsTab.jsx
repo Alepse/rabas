@@ -218,11 +218,6 @@ const ShopsTab = () => (
     <div className="p-4 md:p-6">
       <div className='flex flex-col md:flex-row justify-between items-center'>
         <h1 className='text-xl md:text-2xl font-bold mb-4 md:mb-6 text-center lg:text-start'>Retail Therapy: Top Shopping Offers</h1>
-        <Link to='/shops' target='_blank' className='mb-4 md:mb-0'>
-          <h1 className='text-md font-semibold text-color1 hover:tracking-wide duration-300 hover:underline cursor-pointer'>
-            See More ⥬
-          </h1>
-        </Link>
       </div>
       <Swiper
         modules={[Navigation]}

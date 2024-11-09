@@ -196,8 +196,8 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
           </ModalHeader>
           <ModalBody className="space-y-6">
             {steps[currentStep]}
-            <div className="flex justify-between mt-4">
-              <div>
+            <div className="flex justify-between  mt-4">
+              <div className='flex flex-wrap gap-3'>
                 <Button auto flat color="danger" onClick={onClose} className="mr-2">
                   Cancel
                 </Button>

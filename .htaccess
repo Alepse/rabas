@@ -8,8 +8,5 @@ RewriteBase /
 RewriteCond %{REQUEST_FILENAME} !-f  
 RewriteCond %{REQUEST_FILENAME} !-d  
 
-# Example: Redirect requests for /external to external.html
-RewriteRule ^external/?$ external.html [L]
-
-# Rewrite all other requests to index.html  
-RewriteRule ^.*$ index.html [L]
+# Redirect all requests to index.html for client-side routing
+RewriteRule ^ index.html [L] 

@@ -317,21 +317,21 @@ const Nav = () => {
                     <NavigationMenuLink>
                       <div className="p-9 w-max bg-light shadow-md">
                         <ul className="space-y-2 text-dark text-sm">
-                          <a href=''><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Barcelona</li></a>             
-                          <a href=''><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Bulan</li></a>
-                          <a href=''><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Bulusan</li></a>
-                          <a href=''><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Casiguran</li></a>
-                          <a href=''><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Castilla</li></a>
-                          <a href=''><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Donsol</li></a>
-                          <a href=''><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Gubat</li></a>
-                          <a href=''><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Irosin</li></a>
-                          <a href=''><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Juban</li></a>
-                          <a href=''><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Magallanes</li></a>
-                          <a href=''><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Matnog</li></a>
-                          <a href=''><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Pilar</li></a>
-                          <a href=''><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Prieto Diaz</li></a>
-                          <a href=''><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Sta. Magdalena</li></a>
-                          <a href=''><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Sorsogon City</li></a>
+                          <Link to='/destinations?name=Barcelona'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Barcelona</li></Link>
+                          <Link to='/destinations?name=Bulan'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Bulan</li></Link>
+                          <Link to='/destinations?name=Bulusan'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Bulusan</li></Link>
+                          <Link to='/destinations?name=Casiguran'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Casiguran</li></Link>
+                          <Link to='/destinations?name=Castilla'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Castilla</li></Link>
+                          <Link to='/destinations?name=Donsol'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Donsol</li></Link>
+                          <Link to='/destinations?name=Gubat'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Gubat</li></Link>
+                          <Link to='/destinations?name=Irosin'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Irosin</li></Link>
+                          <Link to='/destinations?name=Juban'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Juban</li></Link>
+                          <Link to='/destinations?name=Magallanes'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Magallanes</li></Link>
+                          <Link to='/destinations?name=Matnog'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Matnog</li></Link>
+                          <Link to='/destinations?name=Pilar'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Pilar</li></Link>
+                          <Link to='/destinations?name=PrietoDiaz'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Prieto Diaz</li></Link>
+                          <Link to='/destinations?name=StaMagdalena'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Sta. Magdalena</li></Link>
+                          <Link to='/destinations?name=Sorsogon'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Sorsogon City</li></Link>
                         </ul>
                       </div>
                     </NavigationMenuLink>
@@ -524,21 +524,21 @@ const Nav = () => {
                     <NavigationMenuLink>
                       <div className="p-9 w-max bg-light shadow-md">
                         <ul className="space-y-2 text-dark text-sm">
-                          <a href=''><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Barcelona</li></a>             
-                          <a href=''><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Bulan</li></a>
-                          <a href=''><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Bulusan</li></a>
-                          <a href=''><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Casiguran</li></a>
-                          <a href=''><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Castilla</li></a>
-                          <a href=''><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Donsol</li></a>
-                          <a href=''><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Gubat</li></a>
-                          <a href=''><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Irosin</li></a>
-                          <a href=''><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Juban</li></a>
-                          <a href=''><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Magallanes</li></a>
-                          <a href=''><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Matnog</li></a>
-                          <a href=''><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Pilar</li></a>
-                          <a href=''><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Prieto Diaz</li></a>
-                          <a href=''><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Sta. Magdalena</li></a>
-                          <a href=''><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Sorsogon City</li></a>
+                          <Link to='/destinations?name=Barcelona'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Barcelona</li></Link>
+                          <Link to='/destinations?name=Bulan'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Bulan</li></Link>
+                          <Link to='/destinations?name=Bulusan'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Bulusan</li></Link>
+                          <Link to='/destinations?name=Casiguran'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Casiguran</li></Link>
+                          <Link to='/destinations?name=Castilla'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Castilla</li></Link>
+                          <Link to='/destinations?name=Donsol'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Donsol</li></Link>
+                          <Link to='/destinations?name=Gubat'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Gubat</li></Link>
+                          <Link to='/destinations?name=Irosin'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Irosin</li></Link>
+                          <Link to='/destinations?name=Juban'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Juban</li></Link>
+                          <Link to='/destinations?name=Magallanes'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Magallanes</li></Link>
+                          <Link to='/destinations?name=Matnog'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Matnog</li></Link>
+                          <Link to='/destinations?name=Pilar'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Pilar</li></Link>
+                          <Link to='/destinations?name=PrietoDiaz'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Prieto Diaz</li></Link>
+                          <Link to='/destinations?name=StaMagdalena'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Sta. Magdalena</li></Link>
+                          <Link to='/destinations?name=Sorsogon'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Sorsogon City</li></Link>
                         </ul>
                       </div>
                     </NavigationMenuLink>

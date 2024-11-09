@@ -180,7 +180,7 @@ const StaMagdalena = () => {
                     </p>
                     <Link to="/business" target='_blank'>
                       <Button className='bg-color1 text-color3 hover:bg-color2 px-4 py-2 text-xs'>
-                       View
+                      Explore More
                       </Button>
                     </Link>
                   </div>
@@ -272,7 +272,7 @@ const StaMagdalena = () => {
                     </p>
                     <Link to="/business" target='_blank'>
                       <Button className='bg-color1 text-color3 hover:bg-color2 px-4 py-2 text-xs'>
-                       View
+                      Explore More
                       </Button>
                     </Link>
                   </div>
@@ -296,7 +296,7 @@ const StaMagdalena = () => {
         <h1 className='text-xl md:text-2xl font-bold  p-2 text-center lg:text-start'>
         Eateries Worth Exploring Nearby
         </h1>
-        <Link to='/accomodations' target='_blank' className='mb-4 md:mb-0'>
+        <Link to='/foodplaces' target='_blank' className='mb-4 md:mb-0'>
           <h1 className='text-md font-semibold text-color1 hover:tracking-wide duration-300 hover:underline cursor-pointer'>
             See More ⥬
           </h1>
@@ -364,7 +364,7 @@ const StaMagdalena = () => {
                     </p>
                     <Link to="/business" target='_blank'>
                       <Button className='bg-color1 text-color3 hover:bg-color2 px-4 py-2 text-xs'>
-                       View
+                      Explore More
                       </Button>
                     </Link>
                   </div>
@@ -387,7 +387,7 @@ const StaMagdalena = () => {
         <h1 className='text-xl md:text-2xl font-bold  p-2 text-center lg:text-start'>
         Explore Local Shops
         </h1>
-        <Link to='/accomodations' target='_blank' className='mb-4 md:mb-0'>
+        <Link to='/shops' target='_blank' className='mb-4 md:mb-0'>
           <h1 className='text-md font-semibold text-color1 hover:tracking-wide duration-300 hover:underline cursor-pointer'>
             See More ⥬
           </h1>
@@ -455,7 +455,7 @@ const StaMagdalena = () => {
                     </p>
                     <Link to="/business" target='_blank'>
                       <Button className='bg-color1 text-color3 hover:bg-color2 px-4 py-2 text-xs'>
-                       View
+                      Explore More
                       </Button>
                     </Link>
                   </div>
