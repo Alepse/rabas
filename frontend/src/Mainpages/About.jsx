@@ -1,15 +1,12 @@
 import { useEffect, useState } from 'react';
 import Nav from '@/components/nav';
 import Search from '../components/Search';
-import {  Card,  CardBody, CardHeader, Spinner,  } from '@nextui-org/react';
+import { Card, CardBody, CardHeader, Spinner } from '@nextui-org/react';
 import { motion } from 'framer-motion';
 import Hero from '@/components/heroabout';
 import Footer from '@/components/Footer';
 import Logo from '@/assets/rabas.png';
-// Import icons from react-icons
-import { Users, MapPin, Heart, Compass, Coffee } from 'lucide-react'
-
-
+import { Users, MapPin, Heart, Compass, Coffee } from 'lucide-react';
 
 const About = () => {
   const [loading, setLoading] = useState(true);
@@ -57,22 +54,22 @@ const About = () => {
           >
             <Card>
               <CardBody className="p-6 sm:p-10">
-                <div className="grid md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-5">
                   <div className="space-y-6">
                     <h2 className="text-3xl font-bold text-primary">About Us</h2>
                     <p className="text-lg text-gray-600 leading-relaxed">
-                    Welcome to Rabasorsogon, your trusted guide to experiencing the vibrant and unique culture of Sorsogon, a province brimming with natural beauty, rich heritage, and warm hospitality. Our mission is to connect you with the heart of Sorsogon, unveiling its hidden gems, local flavors, and authentic experiences that make this place truly special
+                      Welcome to Rabasorsogon, your trusted guide to experiencing the vibrant and unique culture of Sorsogon, a province brimming with natural beauty, rich heritage, and warm hospitality. Our mission is to connect you with the heart of Sorsogon, unveiling its hidden gems, local flavors, and authentic experiences that make this place truly special.
                     </p>
-                    <p className="text-lg text-gray-600 leading-relaxed">
                     <h2 className="text-3xl font-bold text-primary">Our Story</h2>
-                    Founded with a passion for Sorsogon and its thriving tourism potential, Rabasorsogon was established to celebrate and promote the wonders of our beloved province. We believe that tourism is more than sightseeing—it’s about immersing yourself in the stories, people, and places that create lifelong memories.
+                    <p className="text-lg text-gray-600 leading-relaxed">
+                      Founded with a passion for Sorsogon and its thriving tourism potential, Rabasorsogon was established to celebrate and promote the wonders of our beloved province. We believe that tourism is more than sightseeing—it’s about immersing yourself in the stories, people, and places that create lifelong memories.
                     </p>
                   </div>
-                  <div className="relative flex justify-center items-center hover:scale-80 duration-500  rounded-lg overflow-hidden">
+                  <div className="relative p-4 flex justify-center items-center hover:scale-105 duration-500 rounded-lg overflow-hidden">
                     <img
                       src={Logo}
                       alt="RabaSorsogon Logo"
-                      className="object-cover  max-h-[400px] max-w-[400px] "
+                      className="object-cover h-full w-full"
                     />
                   </div>
                 </div>
@@ -93,11 +90,10 @@ const About = () => {
                 { icon: Users, title: 'Local Expertise', description: 'Our team of college students brings a fresh, youthful perspective to what makes Sorsogon truly special.' },
                 { icon: MapPin, title: 'Hidden Gems', description: 'As locals who love exploring our own province, we offer authentic insights into Sorsogon\'s hidden treasures.' },
                 { icon: Heart, title: 'Sustainable Tourism', description: 'We promote responsible travel that respects our heritage and uplifts our community.' },
-          
                 { icon: Compass, title: 'Tailored Experiences', description: 'We craft unique itineraries that cater to diverse interests and travel styles.' },
                 { icon: Coffee, title: 'Local Connections', description: 'Our partnerships with local businesses ensure you get the most authentic Sorsogon experience.' },
               ].map((item, index) => (
-                <Card key={index} className="hover:shadow-lg transition-shadow max-h-56 max-w-48 justify-center flex items-center">
+                <Card key={index} className="hover:shadow-lg transition-shadow max-h-56 max-w-xs flex items-center">
                   <CardHeader className="flex gap-3">
                     <item.icon className="w-8 h-8 text-primary" />
                     <p className="text-md font-semibold">{item.title}</p>
@@ -110,29 +106,26 @@ const About = () => {
             </div>
           </motion.div>
         </section>
-
-        
-        </main>
+      </main>
 
       <Footer />
 
       {showButton && (
         <motion.button
-           className="fixed bottom-5 right-2 p-3 rounded-full shadow-lg z-10"
+          className="fixed bottom-5 right-2 p-3 rounded-full shadow-lg z-10"
           onClick={scrollToTop}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           animate={{ y: [0, -10, 0] }}
           transition={{ duration: 0.6, repeat: Infinity, repeatType: "loop" }}
           style={{
-            background: 'linear-gradient(135deg, #688484  0%, #092635 100%)', // Gradient color
+            background: 'linear-gradient(135deg, #688484  0%, #092635 100%)',
             color: 'white',
           }}
         >
           ↑
         </motion.button>
       )}
-
     </div>
   );
 };
