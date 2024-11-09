@@ -1,4 +1,4 @@
-import React, { useState, useEffect, lazy, Suspense } from 'react'
+import React, { useState, useEffect, lazy, Suspense, useRef } from 'react'
 import Nav from '../components/nav'
 import Footer from '../components/Footer'
 import Hero from '../components/herodestination'
@@ -20,6 +20,7 @@ import Sorso from '../assets/sorsogon city.jpg'
 import Search from '@/components/Search';
 import { Spinner } from '@nextui-org/react'; // Add this import
 import { motion } from 'framer-motion'; // Import Framer Motion
+import { useLocation } from 'react-router-dom'; // Import useLocation
 
 
 const Destinations = () => {
@@ -57,18 +58,54 @@ const Destinations = () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-  const [selectedDestination, setSelectedDestination] = useState(null);
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const initialDestination = queryParams.get('name');
+
+  const [selectedDestination, setSelectedDestination] = useState(initialDestination);
+  const destinationSectionRef = useRef(null); // Create a ref for the destination section
+
+  useEffect(() => {
+    if (initialDestination) {
+      setSelectedDestination(initialDestination);
+    }
+  }, [initialDestination]);
+
+  useEffect(() => {
+    if (selectedDestination && destinationSectionRef.current) {
+      destinationSectionRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [selectedDestination]); // Scroll to the section when selectedDestination changes
 
   const handleDestinationClick = (destination) => {
     setSelectedDestination(destination);
   };
 
+  const destinationComponents = {
+    Bulusan: './DestinationsSectioncomponent/Bulusan.jsx',
+    Bulan: './DestinationsSectioncomponent/Bulan.jsx',
+    Barcelona: './DestinationsSectioncomponent/Barcelona.jsx',
+    Casiguran: './DestinationsSectioncomponent/Casiguran.jsx',
+    Castilla: './DestinationsSectioncomponent/Castilla.jsx',
+    Donsol: './DestinationsSectioncomponent/Donsol.jsx',
+    Gubat: './DestinationsSectioncomponent/Gubat.jsx',
+    Irosin: './DestinationsSectioncomponent/Irosin.jsx',
+    Juban: './DestinationsSectioncomponent/Juban.jsx',
+    Magallanes: './DestinationsSectioncomponent/Magallanes.jsx',
+    Matnog: './DestinationsSectioncomponent/Matnog.jsx',
+    Pilar: './DestinationsSectioncomponent/Pilar.jsx',
+    PrietoDiaz: './DestinationsSectioncomponent/PrietoDiaz.jsx',
+    StaMagdalena: './DestinationsSectioncomponent/StaMagdalena.jsx',
+    Sorsogon: './DestinationsSectioncomponent/Sorsogon.jsx',
+  };
+
   const renderDestinationSection = () => {
     if (!selectedDestination) return null;
 
-    const DestinationComponent = lazy(() =>
-      import(`./DestinationsSectioncomponent/${selectedDestination}`)
-    );
+    const componentPath = destinationComponents[selectedDestination];
+    if (!componentPath) return null;
+
+    const DestinationComponent = lazy(() => import(/* @vite-ignore */ `${componentPath}`));
 
     return (
       <Suspense fallback={<Spinner size='lg' label="Loading destination..." color="primary" className='flex justify-center items-center h-20' />}>
@@ -227,7 +264,9 @@ const Destinations = () => {
   </div>  
 </div>
 
-  {renderDestinationSection()}
+  <div ref={destinationSectionRef}>
+    {renderDestinationSection()}
+  </div>
 
   </div>
        
