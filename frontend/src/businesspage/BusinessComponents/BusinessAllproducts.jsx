@@ -241,8 +241,12 @@ const ProductCard = ({ product, openBookingModal, onOpen }) => {
       <CardBody className="flex flex-col ">
         <div className="relative w-full h-[250px] md:h-[300px]">
           <img
-            src={product.imageUrl}
-            alt={product.title}
+            src={
+              product.images.length > 0 && product.images[0].path
+                ? `http://localhost:5000/${product.images[0].path}`
+                : product.fileUrl || ''
+            }
+            alt={product.images.length > 0 ? product.images[0].title : product.name}
             className="object-cover w-full h-full rounded-t-lg"
           />
           {product.discount > 0 && (
@@ -358,6 +362,7 @@ const Filters = ({ activeTab, setSelectedType, setRatingFilter, budgetRange, set
         <label className="flex items-center">
           <input
             type="checkbox"
+            label="Ratings"
             onChange={() => handleRatingClick('All')}
             checked={ratingFilter.length === 0}
             className="form-checkbox text-color2"
@@ -368,6 +373,7 @@ const Filters = ({ activeTab, setSelectedType, setRatingFilter, budgetRange, set
           <label key={star} className="flex items-center">
             <input
               type="checkbox"
+              label="start"
               onChange={() => handleRatingClick(star)}
               checked={ratingFilter.includes(star)}
               className="form-checkbox text-color2"
@@ -422,6 +428,21 @@ const BusinessAllproducts = () => {
     shop: []
   });
 
+  const [allProducts, setAllProducts] = useState([]);
+  const [activeTab, setActiveTab] = useState('all');
+  const [selectedType, setSelectedType] = useState('All');
+  const [ratingFilter, setRatingFilter] = useState([]);
+  const [budgetRange, setBudgetRange] = useState([0, 10000]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalImages, setModalImages] = useState([]);
+  const [activeModal, setActiveModal] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
+  const [previewIndex, setPreviewIndex] = useState(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const { isOpen, onOpen, onOpenChange } = useDisclosure(); // Ensure this is included
+
   const categories = ['activity', 'accommodation', 'restaurant', 'shop'];
 
   // Fetch data for each category from the backend
@@ -433,19 +454,18 @@ const BusinessAllproducts = () => {
 
         if (contentType && contentType.includes("application/json")) {
           const data = await response.json();
-          console.log('Data:', data);
 
           if (data.success) {
-            // Add logging to check category matching
-            console.log(`Fetching data for category: ${category}`);
+            // Log to check category matching
+            // console.log(`Fetching data for category: ${category}`);
 
             // Filter products based on their category to ensure they match the current category
             const filteredProducts = data.businessProducts.filter((product) => {
-              console.log(`Category: ${category}, Product Category: ${product.product_category}`);
+              // console.log(`Category: ${category}, Product Category: ${product.product_category}`);
               return product.product_category === category;
             });
 
-            console.log('FilteredProducts:', filteredProducts);
+            // console.log('FilteredProducts:', filteredProducts);
 
             // Map backend categories to state keys
             const categoryKey = category === 'activity' ? 'activities' :
@@ -473,29 +493,17 @@ const BusinessAllproducts = () => {
     });
   }, []);
 
-  // Combine all products across categories
-  const allProducts = [
-    ...mockData.activities,
-    ...mockData.accommodations,
-    ...mockData.restaurant,
-    ...mockData.shop,
-  ];
+   // Update `allProducts` whenever category data changes
+   useEffect(() => {
+    setAllProducts([
+      ...mockData.activities,
+      ...mockData.accommodations,
+      ...mockData.restaurant,
+      ...mockData.shop,
+    ]);
+  }, [mockData.activities, mockData.accommodations, mockData.restaurant, mockData.shop]);
 
-  console.log('All products', allProducts);
-
-  const [activeTab, setActiveTab] = useState('all');
-  const [selectedType, setSelectedType] = useState('All');
-  const [ratingFilter, setRatingFilter] = useState([]);
-  const [budgetRange, setBudgetRange] = useState([0, 10000]);
-  const [filteredData, setFilteredData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalImages, setModalImages] = useState([]);
-  const [activeModal, setActiveModal] = useState(null);
-  const [previewImage, setPreviewImage] = useState(null);
-  const [previewIndex, setPreviewIndex] = useState(null);
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const { isOpen, onOpen, onOpenChange } = useDisclosure(); // Ensure this is included
+  // console.log('All products', allProducts);
 
   const openBookingModal = (product) => {
     if (product.type === 'Cabins' || product.type === 'Resorts') {
@@ -549,7 +557,7 @@ const BusinessAllproducts = () => {
 
     setFilteredData(data);
     setLoading(false);
-  }, [activeTab, selectedType, ratingFilter, budgetRange]);
+  }, [activeTab, selectedType, ratingFilter, budgetRange, allProducts]);
 
   useEffect(() => {
     // Simulate data fetching

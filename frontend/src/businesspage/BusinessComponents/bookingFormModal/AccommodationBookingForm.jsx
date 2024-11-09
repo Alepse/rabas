@@ -63,7 +63,7 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
       business_id: product.business_id || null,
-      productName: product.title || '',
+      productName: product.name || '',
       amount: product.price || 0,
       type: product.type || '',
     }));
@@ -192,7 +192,7 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
       <Modal hideCloseButton isOpen={isOpen} onClose={() => {}} className="max-w-2xl p-8 bg-white rounded-lg shadow-2xl">
         <ModalContent className="rounded-lg">
           <ModalHeader className="text-3xl font-bold text-gray-800 border-b pb-4">
-            Accommodation Booking - {product.title}
+            Accommodation Booking - {product.name}
           </ModalHeader>
           <ModalBody className="space-y-6">
             {steps[currentStep]}
