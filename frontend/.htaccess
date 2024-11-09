@@ -8,8 +8,8 @@ RewriteBase /
 RewriteCond %{REQUEST_FILENAME} !-f  
 RewriteCond %{REQUEST_FILENAME} !-d  
 
-# Rewrite requests to blank.html if the URL contains 'blank'
-RewriteRule ^blank$ blank.html [L]
+# Example: Redirect requests for /external to external.html
+RewriteRule ^external/?$ external.html [L]
 
 # Rewrite all other requests to index.html  
-RewriteRule ^ index.html [L]
+RewriteRule ^.*$ index.html [L]
