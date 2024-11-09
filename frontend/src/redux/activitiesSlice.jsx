@@ -36,6 +36,7 @@ export const addProduct = createAsyncThunk(
       activityName: product.name,
       pricing: product.price,
       pricingUnit: product.pricing_unit,
+      description: product.description,
       hasBooking: parseInt(product.booking_operation) === 1, // Convert to number and compare
       inclusions: (product.inclusions || []).map((inclusion) => ({
         id: inclusion.id,
@@ -82,6 +83,7 @@ export const handleUpdateActivity = createAsyncThunk(
         activityName: product.name,
         pricing: product.price,
         pricingUnit: product.pricing_unit,
+        description: product.description,
         hasBooking: parseInt(product.booking_operation) === 1,
         inclusions: (product.inclusions || []).map((inclusion) => ({
           id: inclusion.id,
@@ -128,6 +130,7 @@ const activitySlice = createSlice({
         activityName: newActivity.activityName || "N/A",
         pricing: newActivity.pricing || "0",
         pricingUnit: newActivity.pricingUnit || "per night",
+        description: newActivity.description || "",
         hasBooking: newActivity.hasBooking || false,
         inclusions: newActivity.inclusions.map(inclusion => ({
           id: inclusion.id,
@@ -163,6 +166,7 @@ const activitySlice = createSlice({
           activityName: updatedActivity.activityName || "N/A",
           pricing: updatedActivity.pricing || "0",
           pricingUnit: updatedActivity.pricingUnit || "per night",
+          description: updatedActivity.description || "",
           hasBooking: updatedActivity.hasBooking || false,
           inclusions: updatedActivity.inclusions.map(inclusion => ({
             id: inclusion.id,
@@ -200,6 +204,7 @@ const activitySlice = createSlice({
           activityName: product.name,
           pricing: product.price,
           pricingUnit: product.pricing_unit,
+          description: product.description,
           hasBooking: product.booking_operation === 1,
           inclusions: product.inclusions || [],
           termsAndConditions: product.termsAndConditions || [],

@@ -16,6 +16,7 @@ const ActivitySections = () => {
   const [activityName, setActivityName] = useState('');
   const [pricing, setPricing] = useState('');
   const [pricingUnit, setPricingUnit] = useState('');
+  const [description, setDescription] = useState('');
   const [hasBooking, setHasBooking] = useState(false);
   const [inclusions, setInclusions] = useState('');
   const [inclusionList, setInclusionList] = useState([]);
@@ -180,6 +181,7 @@ const ActivitySections = () => {
         name: activityName,
         price: pricing,
         pricing_unit: pricingUnit,
+        description: description,
         booking_operation: hasBooking ? 1 : 0,
         inclusions: inclusionList,
         termsAndConditions: termsList,
@@ -228,6 +230,7 @@ const ActivitySections = () => {
       formData.append('name', newActivity.name);
       formData.append('price', newActivity.price);
       formData.append('pricing_unit', newActivity.pricing_unit);
+      formData.append('description', newActivity.description);
       formData.append('booking_operation', newActivity.booking_operation.toString());
   
       // Append inclusions
@@ -312,6 +315,7 @@ const ActivitySections = () => {
     setActivityName('');
     setPricing('');
     setPricingUnit('');
+    setDescription('');
     setInclusionList([]);
     setImages([]);
     setHasBooking(false);
@@ -327,6 +331,7 @@ const ActivitySections = () => {
     setActivityName(activity.activityName);
     setPricing(activity.pricing);
     setPricingUnit(activity.pricingUnit);
+    setDescription(activity.description);
     setInclusionList(activity.inclusions);
     setImages(activity.images || []);
     setHasBooking(activity.hasBooking);
@@ -432,6 +437,9 @@ const ActivitySections = () => {
               <h2 className="text-sm font-bold">Activity Name: {activity.activityName}</h2>
               <p className="text-sm">
                 <strong>Price:</strong> ₱{activity.pricing} {activity.pricingUnit}
+              </p>
+              <p className="text-sm">
+                <strong>Description:</strong> {activity.description}
               </p>
               <p className="text-sm">
                 <strong>Booking Option:</strong> {activity.hasBooking ? 'Yes' : 'No'}
@@ -580,6 +588,17 @@ const ActivitySections = () => {
                         required
                       />
                     </div>
+                  </div>
+
+                  {/* Description */}
+                  <div className="mb-4">
+                    <Input
+                      label="Description"
+                      placeholder="Enter Activity description"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      fullWidth
+                    />
                   </div>
 
                   {/* Booking Option */}

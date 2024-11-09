@@ -16,6 +16,7 @@ const AccommodationSection = () => {
   const [accommodationName, setAccommodationName] = useState('');
   const [pricing, setPricing] = useState('');
   const [pricingUnit, setPricingUnit] = useState('');
+  const [description, setDescription] = useState('');
   const [hasBooking, setHasBooking] = useState(false);
   const [inclusions, setInclusions] = useState('');
   const [inclusionList, setInclusionList] = useState([]);
@@ -180,6 +181,7 @@ const AccommodationSection = () => {
         name: accommodationName,
         price: pricing,
         pricing_unit: pricingUnit,
+        description: description,
         booking_operation: hasBooking ? 1 : 0,
         inclusions: inclusionList,
         termsAndConditions: termsList,
@@ -228,6 +230,7 @@ const AccommodationSection = () => {
       formData.append('name', newAccommodation.name);
       formData.append('price', newAccommodation.price);
       formData.append('pricing_unit', newAccommodation.pricing_unit);
+      formData.append('description', newAccommodation.description);
       formData.append('booking_operation', newAccommodation.booking_operation.toString());
   
       // Append inclusions
@@ -312,6 +315,7 @@ const AccommodationSection = () => {
     setAccommodationName('');
     setPricing('');
     setPricingUnit('');
+    setDescription('');
     setInclusionList([]);
     setImages([]);
     setHasBooking(false);
@@ -327,6 +331,7 @@ const AccommodationSection = () => {
     setAccommodationName(accommodation.accommodationName);
     setPricing(accommodation.pricing);
     setPricingUnit(accommodation.pricingUnit);
+    setDescription(accommodation.description);
     setInclusionList(accommodation.inclusions);
     setImages(accommodation.images || []);
     setHasBooking(accommodation.hasBooking);
@@ -432,6 +437,9 @@ const AccommodationSection = () => {
               <h2 className="text-sm font-bold">Accommodation Name: {accommodation.accommodationName}</h2>
               <p className="text-sm">
                 <strong>Price:</strong> ₱{accommodation.pricing} {accommodation.pricingUnit}
+              </p>
+              <p className="text-sm">
+                <strong>Description:</strong> {accommodation.description}
               </p>
               <p className="text-sm">
                 <strong>Booking Option:</strong> {accommodation.hasBooking ? 'Yes' : 'No'}
@@ -580,6 +588,17 @@ const AccommodationSection = () => {
                         required
                       />
                     </div>
+                  </div>
+
+                  {/* Description */}
+                  <div className="mb-4">
+                    <Input
+                      label="Description"
+                      placeholder="Enter Accommodation description"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      fullWidth
+                    />
                   </div>
 
                   {/* Booking Option */}

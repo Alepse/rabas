@@ -16,6 +16,7 @@ const RestaurantSection = () => {
   const [restaurantName, setRestaurantName] = useState('');
   const [pricing, setPricing] = useState('');
   const [pricingUnit, setPricingUnit] = useState('');
+  const [description, setDescription] = useState('');
   const [hasBooking, setHasBooking] = useState(false);
   const [inclusions, setInclusions] = useState('');
   const [inclusionList, setInclusionList] = useState([]);
@@ -180,6 +181,7 @@ const RestaurantSection = () => {
         name: restaurantName,
         price: pricing,
         pricing_unit: pricingUnit,
+        description: description,
         booking_operation: hasBooking ? 1 : 0,
         inclusions: inclusionList,
         termsAndConditions: termsList,
@@ -228,6 +230,7 @@ const RestaurantSection = () => {
       formData.append('name', newRestaurant.name);
       formData.append('price', newRestaurant.price);
       formData.append('pricing_unit', newRestaurant.pricing_unit);
+      formData.append('description', newRestaurant.description);
       formData.append('booking_operation', newRestaurant.booking_operation.toString());
   
       // Append inclusions
@@ -312,6 +315,7 @@ const RestaurantSection = () => {
     setRestaurantName('');
     setPricing('');
     setPricingUnit('');
+    setDescription('');
     setInclusionList([]);
     setImages([]);
     setHasBooking(false);
@@ -327,6 +331,7 @@ const RestaurantSection = () => {
     setRestaurantName(restaurant.restaurantName);
     setPricing(restaurant.pricing);
     setPricingUnit(restaurant.pricingUnit);
+    setDescription(restaurant.description);
     setInclusionList(restaurant.inclusions);
     setImages(restaurant.images || []);
     setHasBooking(restaurant.hasBooking);
@@ -432,6 +437,9 @@ const RestaurantSection = () => {
               <h2 className="text-sm font-bold">Restaurant Service Name: {restaurant.restaurantName}</h2>
               <p className="text-sm">
                 <strong>Price:</strong> ₱{restaurant.pricing} {restaurant.pricingUnit}
+              </p>
+              <p className="text-sm">
+                <strong>Description:</strong> {restaurant.description}
               </p>
               <p className="text-sm">
                 <strong>Booking Option:</strong> {restaurant.hasBooking ? 'Yes' : 'No'}
@@ -580,6 +588,17 @@ const RestaurantSection = () => {
                         required
                       />
                     </div>
+                  </div>
+
+                  {/* Description */}
+                  <div className="mb-4">
+                    <Input
+                      label="Description"
+                      placeholder="Enter Restaurant service description"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      fullWidth
+                    />
                   </div>
 
                   {/* Booking Option */}

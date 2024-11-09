@@ -1270,6 +1270,21 @@ app.delete('/businessCoverPhoto/:id', (req, res) => {
   });
 });
 
+// Endpoint to get all business product
+app.get('/getAllBusinessProduct', (req, res) => {
+  const sql = `SELECT * FROM products`;
+
+  connection.query(sql, (err, results) => { // Removed extra parameters
+    if (err) {
+      console.error('Error executing SQL query:', err);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+
+    return res.json({ success: true, businessProducts: results.length > 0 ? results : [] });
+  });
+});
+
+
 // Endpoint to get business product
 app.get('/getBusinessProduct', (req, res) => {
   // console.log('Session:', req.session);
@@ -1971,6 +1986,8 @@ app.post('/book-activity', async (req, res) => {
     numberOfGuests,
     productName
   } = req.body;
+
+  // console.log("Req.body: ", req.body);
 
   if (
     !user_id ||

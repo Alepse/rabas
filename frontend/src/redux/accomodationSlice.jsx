@@ -36,6 +36,7 @@ export const addProduct = createAsyncThunk(
       accommodationName: product.name,
       pricing: product.price,
       pricingUnit: product.pricing_unit,
+      description: product.description,
       hasBooking: parseInt(product.booking_operation) === 1, // Convert to number and compare
       inclusions: (product.inclusions || []).map((inclusion) => ({
         id: inclusion.id,
@@ -81,6 +82,7 @@ export const handleUpdateAccommodation = createAsyncThunk(
         accommodationName: product.name,
         pricing: product.price,
         pricingUnit: product.pricing_unit,
+        description: product.description,
         hasBooking: parseInt(product.booking_operation) === 1,
         inclusions: (product.inclusions || []).map((inclusion) => ({
           id: inclusion.id,
@@ -127,6 +129,7 @@ const accommodationSlice = createSlice({
         accommodationName: newAccommodation.accommodationName || "N/A",
         pricing: newAccommodation.pricing || "0",
         pricingUnit: newAccommodation.pricingUnit || "per night",
+        description: newAccommodation.description || "",
         hasBooking: newAccommodation.hasBooking || false,
         inclusions: newAccommodation.inclusions.map(inclusion => ({
           id: inclusion.id,
@@ -162,6 +165,7 @@ const accommodationSlice = createSlice({
           accommodationName: updatedAccommodation.accommodationName || "N/A",
           pricing: updatedAccommodation.pricing || "0",
           pricingUnit: updatedAccommodation.pricingUnit || "per night",
+          description: updatedAccommodation.description || "",
           hasBooking: updatedAccommodation.hasBooking || false,
           inclusions: updatedAccommodation.inclusions.map(inclusion => ({
             id: inclusion.id,
@@ -199,6 +203,7 @@ const accommodationSlice = createSlice({
           accommodationName: product.name,
           pricing: product.price,
           pricingUnit: product.pricing_unit,
+          description: product.description,
           hasBooking: product.booking_operation === 1,
           inclusions: product.inclusions || [],
           termsAndConditions: product.termsAndConditions || [],

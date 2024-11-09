@@ -36,6 +36,7 @@ export const addProduct = createAsyncThunk(
       restaurantName: product.name,
       pricing: product.price,
       pricingUnit: product.pricing_unit,
+      description: product.description,
       hasBooking: parseInt(product.booking_operation) === 1, // Convert to number and compare
       inclusions: (product.inclusions || []).map((inclusion) => ({
         id: inclusion.id,
@@ -82,6 +83,7 @@ export const handleUpdateRestaurant = createAsyncThunk(
         restaurantName: product.name,
         pricing: product.price,
         pricingUnit: product.pricing_unit,
+        description: product.description,
         hasBooking: parseInt(product.booking_operation) === 1,
         inclusions: (product.inclusions || []).map((inclusion) => ({
           id: inclusion.id,
@@ -99,7 +101,7 @@ export const handleUpdateRestaurant = createAsyncThunk(
         restaurantType: product.type || "Unknown",        
       };
 
-      console.log('aaaaaaaaaaaaaaaa', restaurantData);
+      // console.log('aaaaaaaaaaaaaaaa', restaurantData);
       // Dispatch action to update restaurant to the state
       dispatch(updateRestaurant(restaurantData));
 
@@ -128,6 +130,7 @@ const restaurantSlice = createSlice({
         restaurantName: newRestaurant.restaurantName || "N/A",
         pricing: newRestaurant.pricing || "0",
         pricingUnit: newRestaurant.pricingUnit || "per night",
+        description: newRestaurant.description || "",
         hasBooking: newRestaurant.hasBooking || false,
         inclusions: newRestaurant.inclusions.map(inclusion => ({
           id: inclusion.id,
@@ -163,6 +166,7 @@ const restaurantSlice = createSlice({
           restaurantName: updatedRestaurant.restaurantName || "N/A",
           pricing: updatedRestaurant.pricing || "0",
           pricingUnit: updatedRestaurant.pricingUnit || "per night",
+          description: updatedRestaurant.description || "",
           hasBooking: updatedRestaurant.hasBooking || false,
           inclusions: updatedRestaurant.inclusions.map(inclusion => ({
             id: inclusion.id,
@@ -200,6 +204,7 @@ const restaurantSlice = createSlice({
           restaurantName: product.name,
           pricing: product.price,
           pricingUnit: product.pricing_unit,
+          description: product.description,
           hasBooking: product.booking_operation === 1,
           inclusions: product.inclusions || [],
           termsAndConditions: product.termsAndConditions || [],
