@@ -65,7 +65,7 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
       business_id: product.business_id || null,
-      productName: product.title || '',
+      productName: product.name || '',
       amount: product.price || 0,
       type: product.type || '',
     }));
@@ -262,7 +262,7 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
       >
         <ModalContent className="rounded-lg">
           <ModalHeader className="text-3xl font-bold text-gray-800 border-b pb-4">
-            Activity Booking - {product.title}
+            Activity Booking - {product.name}
           </ModalHeader>
           <ModalBody className="space-y-6">
             {steps[currentStep]}

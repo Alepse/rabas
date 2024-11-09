@@ -76,7 +76,7 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
   const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 0));
 
   const handleSubmit = async () => {
-    console.log('Submit fromData: ', formData);
+    // console.log('Submit fromData: ', formData);
     if (!formData.agreeToTerms) {
       Swal.fire({
         title: 'Terms Not Agreed',
