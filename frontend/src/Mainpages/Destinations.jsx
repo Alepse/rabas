@@ -22,23 +22,38 @@ import pilar from '../assets/pilar.jpg';
 import prieto from '../assets/prieto.jpg';
 import santa from '../assets/santa.jpg';
 import Sorso from '../assets/sorsogon city.jpg';
+import Bulusan from './DestinationsSectioncomponent/Bulusan';
+import Bulan from './DestinationsSectioncomponent/Bulan';
+import Barcelona from './DestinationsSectioncomponent/Barcelona';
+import Casiguran from './DestinationsSectioncomponent/Casiguran';
+import Castilla from './DestinationsSectioncomponent/Castilla';
+import Donsol from './DestinationsSectioncomponent/Donsol';
+import Gubat from './DestinationsSectioncomponent/Gubat';
+import Irosin from './DestinationsSectioncomponent/Irosin';
+import Juban from './DestinationsSectioncomponent/Juban';
+import Magallanes from './DestinationsSectioncomponent/Magallanes';
+import Matnog from './DestinationsSectioncomponent/Matnog';
+import Pilar from './DestinationsSectioncomponent/Pilar';
+import PrietoDiaz from './DestinationsSectioncomponent/PrietoDiaz';
+import StaMagdalena from './DestinationsSectioncomponent/StaMagdalena';
+import Sorsogon from './DestinationsSectioncomponent/Sorsogon';
 
 const destinationComponents = {
-  Bulusan: lazy(() => import('./DestinationsSectioncomponent/Bulusan')),
-  Bulan: lazy(() => import('./DestinationsSectioncomponent/Bulan')),
-  Barcelona: lazy(() => import('./DestinationsSectioncomponent/Barcelona')),
-  Casiguran: lazy(() => import('./DestinationsSectioncomponent/Casiguran')),
-  Castilla: lazy(() => import('./DestinationsSectioncomponent/Castilla')),
-  Donsol: lazy(() => import('./DestinationsSectioncomponent/Donsol')),
-  Gubat: lazy(() => import('./DestinationsSectioncomponent/Gubat')),
-  Irosin: lazy(() => import('./DestinationsSectioncomponent/Irosin')),
-  Juban: lazy(() => import('./DestinationsSectioncomponent/Juban')),
-  Magallanes: lazy(() => import('./DestinationsSectioncomponent/Magallanes')),
-  Matnog: lazy(() => import('./DestinationsSectioncomponent/Matnog')),
-  Pilar: lazy(() => import('./DestinationsSectioncomponent/Pilar')),
-  PrietoDiaz: lazy(() => import('./DestinationsSectioncomponent/PrietoDiaz')),
-  StaMagdalena: lazy(() => import('./DestinationsSectioncomponent/StaMagdalena')),
-  Sorsogon: lazy(() => import('./DestinationsSectioncomponent/Sorsogon')),
+  Bulusan,
+  Bulan,
+  Barcelona,
+  Casiguran,
+  Castilla,
+  Donsol,
+  Gubat,
+  Irosin,
+  Juban,
+  Magallanes,
+  Matnog,
+  Pilar,
+  PrietoDiaz,
+  StaMagdalena,
+  Sorsogon,
 };
 
 const Destinations = () => {
