@@ -2,25 +2,41 @@ import React, { useState, useEffect, lazy, Suspense, useRef } from 'react'
 import Nav from '../components/nav'
 import Footer from '../components/Footer'
 import Hero from '../components/herodestination'
-import Bulusan from '../assets/bulusan-destination.jpg'
-import Bulan from '../assets/bulan.webp'
-import Barcelona from '../assets/barcelona.jpg'
-import Casiguran from '../assets/casiguran.jpg'
-import Castilla from '../assets/castilla.jpg'
-import Donsol from '../assets/donsol.jpg'
-import Gubat from '../assets/gubatpic4.jpg'
-import Irosin from '../assets/irosin.jpg'
-import Juban from '../assets/juban.jpg'
-import Magallanes from '../assets/magallanes.jpg'
-import Matnog from '../assets/matnog.webp'
-import Pilar from '../assets/pilar.jpg'
-import Prieto from '../assets/prieto.jpg'
-import Santa from '../assets/santa.jpg'
+import bulusan from '../assets/bulusan-destination.jpg'
+import bulan from '../assets/bulan.webp'
+import barcelona from '../assets/barcelona.jpg'
+import casiguran from '../assets/casiguran.jpg'
+import castilla from '../assets/castilla.jpg'
+import donsol from '../assets/donsol.jpg'
+import gubat from '../assets/gubatpic4.jpg'
+import irosin from '../assets/irosin.jpg'
+import juban from '../assets/juban.jpg'
+import magallanes from '../assets/magallanes.jpg'
+import matnog from '../assets/matnog.webp'
+import pilar from '../assets/pilar.jpg'
+import prieto from '../assets/prieto.jpg'
+import santa from '../assets/santa.jpg'
 import Sorso from '../assets/sorsogon city.jpg'
 import Search from '@/components/Search';
 import { Spinner } from '@nextui-org/react'; // Add this import
 import { motion } from 'framer-motion'; // Import Framer Motion
 import { useLocation } from 'react-router-dom'; // Import useLocation
+import Bulusan from './DestinationsSectioncomponent/Bulusan.jsx';
+import Bulan from './DestinationsSectioncomponent/Bulan.jsx';
+import Barcelona from './DestinationsSectioncomponent/Barcelona.jsx';
+import Casiguran from './DestinationsSectioncomponent/Casiguran.jsx';
+import Castilla from './DestinationsSectioncomponent/Castilla.jsx';
+import Donsol from './DestinationsSectioncomponent/Donsol.jsx';
+import Gubat from './DestinationsSectioncomponent/Gubat.jsx';
+import Irosin from './DestinationsSectioncomponent/Irosin.jsx';
+import Juban from './DestinationsSectioncomponent/Juban.jsx';
+import Magallanes from './DestinationsSectioncomponent/Magallanes.jsx';
+import Matnog from './DestinationsSectioncomponent/Matnog.jsx';
+import Pilar from './DestinationsSectioncomponent/Pilar.jsx';
+import PrietoDiaz from './DestinationsSectioncomponent/PrietoDiaz.jsx';
+import StaMagdalena from './DestinationsSectioncomponent/StaMagdalena.jsx';
+import Sorsogon from './DestinationsSectioncomponent/Sorsogon.jsx';
+
 
 
 const Destinations = () => {
@@ -82,30 +98,28 @@ const Destinations = () => {
   };
 
   const destinationComponents = {
-    Bulusan: './DestinationsSectioncomponent/Bulusan.jsx',
-    Bulan: './DestinationsSectioncomponent/Bulan.jsx',
-    Barcelona: './DestinationsSectioncomponent/Barcelona.jsx',
-    Casiguran: './DestinationsSectioncomponent/Casiguran.jsx',
-    Castilla: './DestinationsSectioncomponent/Castilla.jsx',
-    Donsol: './DestinationsSectioncomponent/Donsol.jsx',
-    Gubat: './DestinationsSectioncomponent/Gubat.jsx',
-    Irosin: './DestinationsSectioncomponent/Irosin.jsx',
-    Juban: './DestinationsSectioncomponent/Juban.jsx',
-    Magallanes: './DestinationsSectioncomponent/Magallanes.jsx',
-    Matnog: './DestinationsSectioncomponent/Matnog.jsx',
-    Pilar: './DestinationsSectioncomponent/Pilar.jsx',
-    PrietoDiaz: './DestinationsSectioncomponent/PrietoDiaz.jsx',
-    StaMagdalena: './DestinationsSectioncomponent/StaMagdalena.jsx',
-    Sorsogon: './DestinationsSectioncomponent/Sorsogon.jsx',
+    Bulusan,
+    Bulan,
+    Barcelona,
+    Casiguran,
+    Castilla,
+    Donsol,
+    Gubat,
+    Irosin,
+    Juban,
+    Magallanes,
+    Matnog,
+    Pilar,
+    PrietoDiaz,
+    StaMagdalena,
+    Sorsogon,
   };
 
   const renderDestinationSection = () => {
     if (!selectedDestination) return null;
 
-    const componentPath = destinationComponents[selectedDestination];
-    if (!componentPath) return null;
-
-    const DestinationComponent = lazy(() => import(/* @vite-ignore */ `${componentPath}`));
+    const DestinationComponent = destinationComponents[selectedDestination];
+    if (!DestinationComponent) return null;
 
     return (
       <Suspense fallback={<Spinner size='lg' label="Loading destination..." color="primary" className='flex justify-center items-center h-20' />}>
@@ -145,7 +159,7 @@ const Destinations = () => {
   <div className="relative h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer" onClick={() => handleDestinationClick('Bulusan')}>
     <img
       className="h-full w-full object-cover rounded-sm shadow-md"
-      src={Bulusan}
+      src={bulusan}
       alt="Bulusan"
     />
     <div className="absolute bottom-0 left-0 right-0 bg-dark/60 text-white rounded-lg p-1 text-md text-center w-full">Bulusan</div>
@@ -153,7 +167,7 @@ const Destinations = () => {
   <div className="relative h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer" onClick={() => handleDestinationClick('Bulan')}>
     <img
       className="h-full w-full object-cover rounded-sm shadow-md"
-      src={Bulan}
+      src={bulan}
       alt="Bulan"
     />
     <div className="absolute bottom-0 left-0 right-0 bg-dark/60 text-white rounded-lg p-1 text-md text-center w-full">Bulan</div>
@@ -161,7 +175,7 @@ const Destinations = () => {
   <div className="relative h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer" onClick={() => handleDestinationClick('Barcelona')}>
     <img
       className="h-full w-full object-cover rounded-sm shadow-md"
-      src={Barcelona}
+      src={barcelona}
       alt="Barcelona"
     />
     <div className="absolute bottom-0 left-0 right-0 bg-dark/60 text-white rounded-lg p-1 text-md text-center w-full">Barcelona</div>
@@ -169,7 +183,7 @@ const Destinations = () => {
   <div className="relative h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer" onClick={() => handleDestinationClick('Casiguran')}>
     <img
       className="h-full w-full object-cover rounded-sm shadow-md"
-      src={Casiguran}
+      src={casiguran}
       alt="Casiguran"
     />
     <div className="absolute bottom-0 left-0 right-0 bg-dark/60 text-white rounded-lg p-1 text-md text-center w-full">Casiguran</div>
@@ -177,7 +191,7 @@ const Destinations = () => {
   <div className="relative h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer" onClick={() => handleDestinationClick('Castilla')}>
     <img
       className="h-full w-full object-cover rounded-sm shadow-md"
-      src={Castilla}
+      src={castilla}
       alt="Castilla"
     />
     <div className="absolute bottom-0 left-0 right-0 bg-dark/60 text-white rounded-lg p-1 text-md text-center w-full">Castilla</div>
@@ -185,7 +199,7 @@ const Destinations = () => {
   <div className="relative h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer" onClick={() => handleDestinationClick('Donsol')}>
     <img
       className="h-full w-full object-cover rounded-sm shadow-md"
-      src={Donsol}
+      src={donsol}
       alt="Donsol"
     />
     <div className="absolute bottom-0 left-0 right-0 bg-dark/60 text-white rounded-lg p-1 text-md text-center w-full">Donsol</div>
@@ -193,7 +207,7 @@ const Destinations = () => {
   <div className="relative h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer" onClick={() => handleDestinationClick('Gubat')}>
     <img
       className="h-full w-full object-cover rounded-sm shadow-md"
-      src={Gubat}
+      src={gubat}
       alt="Gubat"
     />
     <div className="absolute bottom-0 left-0 right-0 bg-dark/60 text-white rounded-lg p-1 text-md text-center w-full">Gubat</div>
@@ -201,7 +215,7 @@ const Destinations = () => {
   <div className="relative h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer" onClick={() => handleDestinationClick('Irosin')}>
     <img
       className="h-full w-full object-cover rounded-sm shadow-md"
-      src={Irosin}
+      src={irosin}
       alt="Irosin"
     />
     <div className="absolute bottom-0 left-0 right-0 bg-dark/60 text-white rounded-lg p-1 text-md text-center w-full">Irosin</div>
@@ -209,7 +223,7 @@ const Destinations = () => {
   <div className="relative h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer" onClick={() => handleDestinationClick('Juban')}>
     <img
       className="h-full w-full object-cover rounded-sm shadow-md"
-      src={Juban}
+      src={juban}
       alt="Juban"
     />
     <div className="absolute bottom-0 left-0 right-0 bg-dark/60 text-white rounded-lg p-1 text-md text-center w-full">Juban</div>
@@ -217,7 +231,7 @@ const Destinations = () => {
   <div className="relative h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer" onClick={() => handleDestinationClick('Magallanes')}>
     <img
       className="h-full w-full object-cover rounded-sm shadow-md"
-      src={Magallanes}
+      src={magallanes}
       alt="Magallanes"
     />
     <div className="absolute bottom-0 left-0 right-0 bg-dark/60 text-white rounded-lg p-1 text-md text-center w-full">Magallanes</div>
@@ -225,7 +239,7 @@ const Destinations = () => {
   <div className="relative h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer" onClick={() => handleDestinationClick('Matnog')}>
     <img
       className="h-full w-full object-cover rounded-sm shadow-md"
-      src={Matnog}
+      src={matnog}
       alt="Matnog"
     />
     <div className="absolute bottom-0 left-0 right-0 bg-dark/60 text-white rounded-lg p-1 text-md text-center w-full">Matnog</div>
@@ -233,7 +247,7 @@ const Destinations = () => {
   <div className="relative h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer" onClick={() => handleDestinationClick('Pilar')}>
     <img
       className="h-full w-full object-cover rounded-sm shadow-md"
-      src={Pilar}
+      src={pilar}
       alt="Pilar"
     />
     <div className="absolute bottom-0 left-0 right-0 bg-dark/60 text-white rounded-lg p-1 text-md text-center w-full">Pilar</div>
@@ -241,7 +255,7 @@ const Destinations = () => {
   <div className="relative h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer" onClick={() => handleDestinationClick('PrietoDiaz')}>
     <img
       className="h-full w-full object-cover rounded-sm shadow-md"
-      src={Prieto}
+      src={prieto}
       alt="Prieto"
     />
     <div className="absolute bottom-0 left-0 right-0 bg-dark/60 text-white rounded-lg p-1 text-md text-center w-full">Prieto Diaz</div>
@@ -249,7 +263,7 @@ const Destinations = () => {
   <div className="relative h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer" onClick={() => handleDestinationClick('StaMagdalena')}>
     <img
       className="h-full w-full object-cover rounded-sm shadow-md"
-      src={Santa}
+      src={santa}
       alt="Sta"
     />
     <div className="absolute bottom-0 left-0 right-0 bg-dark/60 text-white rounded-lg p-1 text-md text-center w-full">Sta. Magdalena</div>
