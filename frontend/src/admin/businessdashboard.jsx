@@ -112,19 +112,21 @@ const BusinessDashboard = () => {
       });
 
   return (
-    <div className="flex min-h-screen bg-gray-50 font-sans">
+    <div className="flex max-lg:flex-col min-h-screen bg-gray-50 font-sans">
       <Sidebar />
-      <div className="flex-1 p-8 max-h-screen overflow-y-auto">
-        <h1 className="text-4xl font-bold mb-8 text-gray-800">Dashboard</h1>
+      <div className="flex-1 p-4 md:p-6 lg:p-8 max-h-screen overflow-y-auto">
+        <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-8 text-gray-800">Dashboard</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <DashboardCard title="My Events" value={5} icon="📅" />
           <DashboardCard title="My Deals" value={3} icon="💼" />
           <DashboardCard title="My Products" value={12} icon="📦" />
           <DashboardCard title="My Rate" value={4.5} icon="⭐" />
         </div>
+        
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          <ChartSection title="Page Visitation">
-            <LineChart width={400} height={200} data={data}>
+        <div className='flex justify-center '>
+          <ChartSection title="Page Visitation" >
+            <LineChart width={700} height={200} data={data}>
               <Line type="monotone" dataKey="visits" stroke="#4f46e5" />
               <CartesianGrid stroke="#e5e7eb" />
               <XAxis dataKey="name" />
@@ -132,8 +134,10 @@ const BusinessDashboard = () => {
               <Tooltip />
             </LineChart>
           </ChartSection>
+          </div>
+          <div className='flex justify-center '>
           <ChartSection title="Tourist Statistical Review">
-            <BarChart width={400} height={200} data={reviewData}>
+            <BarChart width={700} height={200} data={reviewData}>
               <Bar dataKey="reviews" fill="#10b981" />
               <CartesianGrid stroke="#e5e7eb" />
               <XAxis dataKey="year" />
@@ -141,6 +145,7 @@ const BusinessDashboard = () => {
               <Tooltip />
             </BarChart>
           </ChartSection>
+          </div>
         </div>
         <div className="grid grid-cols-1 gap-8">
           <MostReviewedProducts products={sampleMostReviewedProducts} />
