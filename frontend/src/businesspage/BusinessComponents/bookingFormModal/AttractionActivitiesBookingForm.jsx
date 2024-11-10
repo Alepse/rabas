@@ -14,6 +14,14 @@ import Swal from 'sweetalert2';
 import { today, isWeekend, getLocalTimeZone } from '@internationalized/date';
 import { useLocale } from '@react-aria/i18n';
 
+const formatDate = (date) => {
+  if (!date) return '';
+  if (typeof date === 'object' && date.year && date.month && date.day) {
+    return `${date.year}-${String(date.month).padStart(2, '0')}-${String(date.day).padStart(2, '0')}`;
+  }
+  return date.toString();
+};
+
 const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
   const [userId, setUserId] = useState(null);
   const [formData, setFormData] = useState({
@@ -26,7 +34,11 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
     phone: '',
     visitDate: null, // Change to store a single date
     activityTime: '10:00', // Default to 10:00 AM
-    amount: product.price || 0, // Default to 0 if product.price is undefined
+    originalPrice: Number(product.price) || 0,
+    discount: Number(product.discount) || 0,
+    discountedPrice: product.discount ? 
+      Number(product.price) - (Number(product.price) * Number(product.discount) / 100) : 
+      Number(product.price) || 0,
     type: product.type || '',
     agreeToTerms: false,
     specialRequests: '',
@@ -65,8 +77,12 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
       business_id: product.business_id || null,
-      productName: product.name || '',
-      amount: product.price || 0,
+      product_id: product.product_id || null,
+      originalPrice: Number(product.price) || 0,
+      discount: Number(product.discount) || 0,
+      discountedPrice: product.discount ? 
+        Number(product.price) - (Number(product.price) * Number(product.discount) / 100) : 
+        Number(product.price) || 0,
       type: product.type || '',
     }));
   }, [product]);
@@ -112,6 +128,17 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
   };
 
   const handleSubmit = async () => {
+    if (!formData.firstName || !formData.lastName || !formData.email || 
+        !formData.phone || !formData.visitDate || !formData.activityTime) {
+      Swal.fire({
+        title: 'Missing Information',
+        text: 'Please fill in all required fields.',
+        icon: 'warning',
+        confirmButtonColor: '#0BDA51'
+      });
+      return;
+    }
+
     if (!formData.agreeToTerms) {
       Swal.fire({
         title: 'Terms Not Agreed',
@@ -122,43 +149,46 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
       return;
     }
 
-    // Check if the selected time is unavailable
-    if (unavailableTimes.includes(formData.activityTime)) {
-      Swal.fire({
-        title: 'Time Unavailable',
-        text: 'The selected activity time is unavailable. Please choose a different time.',
-        icon: 'error',
-        confirmButtonColor: '#0BDA51'
-      });
-      return;
-    }
-
     try {
+      console.log('Sending booking data:', {
+        ...formData,
+        originalPrice: Number(formData.originalPrice),
+        discount: Number(formData.discount),
+        discountedPrice: Number(formData.discountedPrice)
+      });
+
       const response = await fetch(`http://localhost:5000/book-activity`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData), // Convert formData to JSON format
+        body: JSON.stringify({
+          ...formData,
+          originalPrice: Number(formData.originalPrice),
+          discount: Number(formData.discount),
+          discountedPrice: Number(formData.discountedPrice),
+          productName: product.name // Make sure product name is included
+        }),
       });
-  
+
       if (!response.ok) {
-        throw new Error('Failed to create booking');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to create booking');
       }
-  
+
       Swal.fire({
         title: 'Reservation Confirmed!',
-        text: `You have successfully reserved: ${product.title} for ₱${formData.amount}.`,
+        text: `You have successfully reserved: ${product.name} for ₱${Number(formData.discountedPrice).toFixed(2)}.`,
         icon: 'success',
         confirmButtonColor: '#0BDA51'
       }).then(() => {
-        onClose(); // Close the modal only after successful submission
+        onClose();
       });
     } catch (error) {
       console.error('Error submitting reservation:', error);
       Swal.fire({
         title: 'Reservation Failed',
-        text: 'There was an issue completing your reservation. Please try again later.',
+        text: error.message || 'There was an issue completing your reservation. Please try again later.',
         icon: 'error',
         confirmButtonColor: '#0BDA51'
       });
@@ -226,7 +256,14 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
       />
     </div>,
     <div key="step3" className="space-y-4">
-      <Input type="number" label="Amount to Pay" required fullWidth value={formData.amount} readOnly />
+      <Input 
+        type="number" 
+        label="Amount to Pay" 
+        required 
+        fullWidth 
+        value={formData.discountedPrice} 
+        readOnly 
+      />
       <Checkbox
         checked={formData.agreeToTerms}
         onChange={handleCheckboxChange}
@@ -241,12 +278,36 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
         <p><strong>Phone Number:</strong> {formData.phone}</p>
         <p><strong>Email Address:</strong> {formData.email}</p>
         {formData.visitDate && (
-          <p><strong>Visit Date:</strong> {formData.visitDate.toString()}</p>
+          <p><strong>Visit Date:</strong> {formatDate(formData.visitDate)}</p>
         )}
         <p><strong>Activity Time:</strong> {formData.activityTime}</p>
         <p><strong>Number of Guests:</strong> {formData.numberOfGuests}</p>
         <p><strong>Special Requests:</strong> {formData.specialRequests || 'None'}</p>
-        <p><strong>Total Amount:</strong> ₱{formData.amount}</p>
+        
+        {/* Price details section */}
+        <div className="mt-3 p-3 bg-gray-50 rounded-lg">
+          <h4 className="font-semibold mb-2">Price Details</h4>
+          <div className="space-y-1">
+            <p>
+              <strong>Original Price:</strong> 
+              <span className={Number(formData.discount) > 0 ? "line-through text-gray-500 ml-2" : "ml-2"}>
+                ₱{Number(formData.originalPrice).toFixed(2)}
+              </span>
+            </p>
+            {Number(formData.discount) > 0 && (
+              <>
+                <p className="text-green-600">
+                  <strong>Discount:</strong> 
+                  <span className="ml-2">{Number(formData.discount).toFixed(0)}% OFF</span>
+                </p>
+                <p className="font-bold text-lg">
+                  <strong>Final Price:</strong> 
+                  <span className="ml-2 text-green-600">₱{Number(formData.discountedPrice).toFixed(2)}</span>
+                </p>
+              </>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   ];

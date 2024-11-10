@@ -24,7 +24,11 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
     email: '',
     phone: '',
     checkInOutDates: null,
-    amount: product.price || 0,
+    originalPrice: Number(product.price) || 0,
+    discount: Number(product.discount) || 0,
+    discountedPrice: product.discount ? 
+      Number(product.price) - (Number(product.price) * Number(product.discount) / 100) : 
+      Number(product.price) || 0,
     type: product.type || '',
     agreeToTerms: false,
     specialRequests: '',
@@ -64,7 +68,11 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
       ...prevFormData,
       business_id: product.business_id || null,
       productName: product.name || '',
-      amount: product.price || 0,
+      originalPrice: Number(product.price) || 0,
+      discount: Number(product.discount) || 0,
+      discountedPrice: product.discount ? 
+        Number(product.price) - (Number(product.price) * Number(product.discount) / 100) : 
+        Number(product.price) || 0,
       type: product.type || '',
     }));
   }, [product]);
@@ -101,11 +109,11 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
   
       Swal.fire({
         title: 'Reservation Confirmed!',
-        text: `You have successfully reserved: ${product.title} for ₱${formData.amount}.`,
+        text: `You have successfully reserved: ${product.name} for ₱${Number(formData.discountedPrice).toFixed(2)}.`,
         icon: 'success',
         confirmButtonColor: '#0BDA51'
       }).then(() => {
-        onClose(); // Close the modal only after successful submission
+        onClose();
       });
     } catch (error) {
       console.error('Error submitting reservation:', error);
@@ -160,7 +168,14 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
       />
     </div>,
     <div key="step3" className="space-y-4">
-      <Input type="number" label="Amount to Pay" required fullWidth value={formData.amount} readOnly />
+      <Input 
+        type="number" 
+        label="Amount to Pay" 
+        required 
+        fullWidth 
+        value={formData.discountedPrice} 
+        readOnly 
+      />
       <Checkbox
         checked={formData.agreeToTerms}
         onChange={handleCheckboxChange}
@@ -182,7 +197,31 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
         )}
         <p><strong>Number of Guests:</strong> {formData.numberOfGuests}</p>
         <p><strong>Special Requests:</strong> {formData.specialRequests || 'None'}</p>
-        <p><strong>Total Amount:</strong> ₱{formData.amount}</p>
+        
+        {/* Price details section */}
+        <div className="mt-3 p-3 bg-gray-50 rounded-lg">
+          <h4 className="font-semibold mb-2">Price Details</h4>
+          <div className="space-y-1">
+            <p>
+              <strong>Original Price:</strong> 
+              <span className={Number(formData.discount) > 0 ? "line-through text-gray-500 ml-2" : "ml-2"}>
+                ₱{Number(formData.originalPrice).toFixed(2)}
+              </span>
+            </p>
+            {Number(formData.discount) > 0 && (
+              <>
+                <p className="text-green-600">
+                  <strong>Discount:</strong> 
+                  <span className="ml-2">{Number(formData.discount).toFixed(0)}% OFF</span>
+                </p>
+                <p className="font-bold text-lg">
+                  <strong>Final Price:</strong> 
+                  <span className="ml-2 text-green-600">₱{Number(formData.discountedPrice).toFixed(2)}</span>
+                </p>
+              </>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   ];

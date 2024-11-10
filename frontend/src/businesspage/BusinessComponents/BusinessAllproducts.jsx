@@ -236,9 +236,15 @@ const ProductCard = ({ product, openBookingModal, onOpen }) => {
 
   const discountedPrice = product.price - (product.price * (product.discount || 0) / 100);
 
+  // Create a separate handler for the View Images button
+  const handleViewImages = (e) => {
+    e.preventDefault(); // Prevent default button behavior
+    onOpen(product); // Pass the product object directly
+  };
+
   return (
-    <Card variant="shadow" className="border-0 rounded-lg mb-4 overflow-hidden  ">
-      <CardBody className="flex flex-col ">
+    <Card variant="shadow" className="border-0 rounded-lg mb-4 overflow-hidden">
+      <CardBody className="flex flex-col">
         <div className="relative w-full h-[250px] md:h-[300px]">
           <img
             src={
@@ -254,7 +260,11 @@ const ProductCard = ({ product, openBookingModal, onOpen }) => {
               {product.discount}% OFF
             </div>
           )}
-          <Button size="sm" className="absolute bottom-2 right-2 text-white bg-color1" onClick={onOpen}>
+          <Button 
+            size="sm" 
+            className="absolute bottom-2 right-2 text-white bg-color1" 
+            onClick={handleViewImages} // Use the new handler
+          >
             View Images
           </Button>
         </div>
@@ -281,17 +291,29 @@ const ProductCard = ({ product, openBookingModal, onOpen }) => {
           </div>
           <div className="flex justify-between items-center mt-auto">
             <div className="text-lg font-semibold">
-              {product.discount ? (
+              {product.discount > 0 ? (
                 <>
                   <span className="line-through text-gray-500">₱{product.price}</span>
                   <span className="text-red-500 ml-2">₱{discountedPrice}</span>
+                  {product.expiration && (
+                    <p className="text-xs text-red-500 mt-1">
+                      Discount expires on:{" "}
+                      {new Date(product.expiration).toLocaleString("en-US", {
+                        weekday: "long",  // optional: includes the weekday (e.g., 'Monday')
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: true,  // to get AM/PM format
+                      })}
+                    </p>
+                  )}
                 </>
               ) : (
                 `₱${product.price}`
               )}
-              {product.expiration && (
-              <p className="text-xs text-red-500 mt-1">Discount expires on: {product.expiration}</p>
-            )}
+              
               <div className="flex mt-4 gap-2">
                 <Button color="primary">Inquire</Button>
                 <Button color="success" className="text-white" onClick={() => openBookingModal(product)}>
@@ -409,15 +431,15 @@ const LoadingSpinner = () => (
   </div>
 );
 
-// Add the images array from BusinessHero
-const images = [
-  { url: 'https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80', title: 'Sunset Over the Hills' },
-  { url: 'https://images.unsplash.com/photo-1497366811353-6870744d04b2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80', title: 'Mountain Range' },
-  { url: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80', title: 'City Skyline' },
-  { url: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80', title: 'Forest Path' },
-  { url: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80', title: 'Ocean Waves' },
-  { url: 'https://images.unsplash.com/photo-1497215842964-222b430dc094?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80', title: 'Desert Dunes' },
-];
+// // Add the images array from BusinessHero
+// const images = [
+//   { url: 'https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80', title: 'Sunset Over the Hills' },
+//   { url: 'https://images.unsplash.com/photo-1497366811353-6870744d04b2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80', title: 'Mountain Range' },
+//   { url: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80', title: 'City Skyline' },
+//   { url: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80', title: 'Forest Path' },
+//   { url: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80', title: 'Ocean Waves' },
+//   { url: 'https://images.unsplash.com/photo-1497215842964-222b430dc094?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80', title: 'Desert Dunes' },
+// ];
 
 // Main Business All Products Component
 const BusinessAllproducts = () => {
@@ -435,13 +457,12 @@ const BusinessAllproducts = () => {
   const [budgetRange, setBudgetRange] = useState([0, 10000]);
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalImages, setModalImages] = useState([]);
   const [activeModal, setActiveModal] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
   const [previewIndex, setPreviewIndex] = useState(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const { isOpen, onOpen, onOpenChange } = useDisclosure(); // Ensure this is included
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const { isOpen, onOpen: originalOnOpen, onOpenChange } = useDisclosure();
 
   const categories = ['activity', 'accommodation', 'restaurant', 'shop'];
 
@@ -454,6 +475,8 @@ const BusinessAllproducts = () => {
 
         if (contentType && contentType.includes("application/json")) {
           const data = await response.json();
+
+          console.log('Products: ', data);
 
           if (data.success) {
             // Log to check category matching
@@ -494,7 +517,7 @@ const BusinessAllproducts = () => {
   }, []);
 
    // Update `allProducts` whenever category data changes
-   useEffect(() => {
+  useEffect(() => {
     setAllProducts([
       ...mockData.activities,
       ...mockData.accommodations,
@@ -565,9 +588,27 @@ const BusinessAllproducts = () => {
   }, []);
 
   const handleThumbnailClick = (index) => {
-    setPreviewImage(images[index].url);
-    setPreviewIndex(index);
-    setIsPreviewOpen(true);
+    if (selectedProduct && selectedProduct.images && selectedProduct.images[index]) {
+      setPreviewImage(`http://localhost:5000/${selectedProduct.images[index].path}`);
+      setPreviewIndex(index);
+      setIsPreviewOpen(true);
+    }
+  };
+
+  const goToPrevImage = () => {
+    if (selectedProduct && previewIndex > 0) {
+      const newIndex = previewIndex - 1;
+      setPreviewIndex(newIndex);
+      setPreviewImage(`http://localhost:5000/${selectedProduct.images[newIndex].path}`);
+    }
+  };
+
+  const goToNextImage = () => {
+    if (selectedProduct && selectedProduct.images && previewIndex < selectedProduct.images.length - 1) {
+      const newIndex = previewIndex + 1;
+      setPreviewIndex(newIndex);
+      setPreviewImage(`http://localhost:5000/${selectedProduct.images[newIndex].path}`);
+    }
   };
 
   const closePreview = () => {
@@ -576,17 +617,15 @@ const BusinessAllproducts = () => {
     setIsPreviewOpen(false);
   };
 
-  const goToPrevImage = () => {
-    if (previewIndex > 0) {
-      setPreviewIndex(previewIndex - 1);
-      setPreviewImage(images[previewIndex - 1].url);
-    }
-  };
-
-  const goToNextImage = () => {
-    if (previewIndex < images.length - 1) {
-      setPreviewIndex(previewIndex + 1);
-      setPreviewImage(images[previewIndex + 1].url);
+  const onOpen = (product) => {
+    console.log('Selected Product:', product);
+    console.log('Product Images:', product?.images);
+    
+    if (product && Array.isArray(product.images)) {
+      setSelectedProduct(product);
+      originalOnOpen();
+    } else {
+      console.warn('Invalid product data or missing images:', product);
     }
   };
 
@@ -657,20 +696,28 @@ const BusinessAllproducts = () => {
               <ModalHeader className="flex flex-col gap-1">Image Gallery</ModalHeader>
               <ModalBody>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 cursor-pointer">
-                  {images.map((image, index) => (
-                    <div
-                      key={index}
-                      className="relative group overflow-hidden rounded-lg shadow-md"
-                      onClick={() => handleThumbnailClick(index)}
-                    >
-                      <img
-                        src={image.url}
-                        alt={`Gallery image ${index + 1}`}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                      />
-                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-opacity duration-300"></div>
+                  {console.log('Modal Selected Product:', selectedProduct)}
+                  {console.log('Modal Images:', selectedProduct?.images)}
+                  {selectedProduct && selectedProduct.images && selectedProduct.images.length > 0 ? (
+                    selectedProduct.images.map((image, index) => (
+                      <div
+                        key={index}
+                        className="relative group overflow-hidden rounded-lg shadow-md"
+                        onClick={() => handleThumbnailClick(index)}
+                      >
+                        <img
+                          src={`http://localhost:5000/${image.path}`}
+                          alt={image.title || `Gallery image ${index + 1}`}
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-opacity duration-300"></div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="col-span-full text-center py-4 text-gray-500">
+                      No images available
                     </div>
-                  ))}
+                  )}
                 </div>
               
               </ModalBody>
@@ -679,55 +726,65 @@ const BusinessAllproducts = () => {
               </ModalFooter>
 
                {/* Single Image Preview Modal */}
-      <Modal 
-        isOpen={isPreviewOpen} 
-        onOpenChange={setIsPreviewOpen}
-        hideCloseButton
-        size="full"
-        className='z-50 bg-black bg-opacity-75 flex justify-center items-center'
-      >
-        <ModalContent className="relative flex justify-center items-center">
-          <ModalBody className="relative max-w-full h-full flex justify-center items-center bg-white">
-            <img
-              src={previewImage}
-              alt="Preview"
-              className="w-auto h-auto object-contain rounded-md shadow-lg"
-            />
-            {previewIndex !== null && images[previewIndex] && (
-              <div className="absolute bottom-4 left-0 right-0 text-center text-black text-2xl font-semibold py-2">
-                {images[previewIndex].title}
-              </div>
-            )}
-            <button
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-gray-800 bg-opacity-70 hover:bg-opacity-90 rounded-full p-3 transition-all duration-300"
-              onClick={goToPrevImage}
-              aria-label="Previous image"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6 text-white">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            <button
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-gray-800 bg-opacity-70 hover:bg-opacity-90 rounded-full p-3 transition-all duration-300"
-              onClick={goToNextImage}
-              aria-label="Next image"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6 text-white">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-            <button
-              className="absolute top-4 right-4 bg-red-500  bg-opacity-70 hover:bg-opacity-90 rounded-full p-2 transition-all duration-300"
-              onClick={closePreview}
-              aria-label="Close preview"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6 text-white">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+                <Modal 
+                  isOpen={isPreviewOpen} 
+                  onOpenChange={setIsPreviewOpen}
+                  hideCloseButton
+                  size="full"
+                  className='z-50 bg-black bg-opacity-75'
+                >
+                  <ModalContent className="relative w-full h-full flex justify-center items-center">
+                    <ModalBody className="relative w-full h-full flex justify-center items-center bg-transparent p-4">
+                      <div className="relative max-w-[90vw] max-h-[85vh] flex justify-center items-center">
+                        <img
+                          src={previewImage}
+                          alt="Preview"
+                          className="max-w-full max-h-[85vh] w-auto h-auto object-contain rounded-md"
+                          style={{
+                            minWidth: '300px',  // Minimum width for very small images
+                            minHeight: '200px', // Minimum height for very small images
+                          }}
+                        />
+                      </div>
+                      {previewIndex !== null && selectedProduct?.images[previewIndex] && (
+                        <div className="absolute bottom-4 left-0 right-0 text-center text-white text-xl font-semibold py-2 bg-black bg-opacity-50">
+                          {selectedProduct.images[previewIndex].title || `Image ${previewIndex + 1}`}
+                        </div>
+                      )}
+                      {previewIndex > 0 && (
+                        <button
+                          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-gray-800 bg-opacity-70 hover:bg-opacity-90 rounded-full p-3 transition-all duration-300"
+                          onClick={goToPrevImage}
+                          aria-label="Previous image"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6 text-white">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                          </svg>
+                        </button>
+                      )}
+                      {selectedProduct?.images && previewIndex < selectedProduct.images.length - 1 && (
+                        <button
+                          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-gray-800 bg-opacity-70 hover:bg-opacity-90 rounded-full p-3 transition-all duration-300"
+                          onClick={goToNextImage}
+                          aria-label="Next image"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6 text-white">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </button>
+                      )}
+                      <button
+                        className="absolute top-4 right-4 bg-red-500 bg-opacity-70 hover:bg-opacity-90 rounded-full p-2 transition-all duration-300"
+                        onClick={closePreview}
+                        aria-label="Close preview"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6 text-white">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </ModalBody>
+                  </ModalContent>
+                </Modal>
             </>
           )}
         </ModalContent>

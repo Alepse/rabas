@@ -31,11 +31,11 @@ const connection = mysql.createConnection({
 
 // Error handling for database connection
 connection.connect((err) => {
-if (err) {
-    console.error('Error connecting to database:', err);
-    return;
-}
-console.log('Connected to database');
+  if (err) {
+      console.error('Error connecting to database:', err);
+      return;
+  }
+  console.log('Connected to database');
 });
 
 // MySQL session store configuration
@@ -1272,9 +1272,25 @@ app.delete('/businessCoverPhoto/:id', (req, res) => {
 
 // Endpoint to get all business product
 app.get('/getAllBusinessProduct', (req, res) => {
-  const sql = `SELECT * FROM products`;
+  const sql = `
+    SELECT 
+        products.*, 
+        MAX(COALESCE(deals.discount, 0)) AS discount, 
+        MAX(COALESCE(deals.expirationDate, 'No Expiration')) AS expiration
+    FROM 
+        products
+    LEFT JOIN 
+        deals 
+    ON 
+        products.product_id = deals.product_id
+    GROUP BY 
+        products.product_id
+    ORDER BY 
+        expiration DESC
+    LIMIT 0, 1000
+  `;
 
-  connection.query(sql, (err, results) => { // Removed extra parameters
+  connection.query(sql, (err, results) => {
     if (err) {
       console.error('Error executing SQL query:', err);
       return res.status(500).json({ success: false, message: 'Internal server error' });
@@ -1283,7 +1299,6 @@ app.get('/getAllBusinessProduct', (req, res) => {
     return res.json({ success: true, businessProducts: results.length > 0 ? results : [] });
   });
 });
-
 
 // Endpoint to get business product
 app.get('/getBusinessProduct', (req, res) => {
@@ -1800,15 +1815,15 @@ app.post('/book-accommodation', async (req, res) => {
     phone,
     type,
     checkInOutDates,
-    amount,
+    originalPrice,    // Added
+    discount,         // Added
+    discountedPrice,  // Added
     specialRequests,
     numberOfGuests
   } = req.body;
 
   console.log('Request Body Data:', req.body);
   
-  // const user_id = req.session?.user?.user_id;
-
   if (!firstName || !lastName || !email || !checkInOutDates || !checkInOutDates.start || !checkInOutDates.end) {
     return res.status(400).json({ success: false, message: 'Missing required fields' });
   }
@@ -1823,8 +1838,10 @@ app.post('/book-accommodation', async (req, res) => {
   try {
     const query = `
       INSERT INTO bookings (
-        user_id, business_id, product_id, customerName, productName, numberOfGuests, email, phone, type, dateIn, dateOut, specialRequests, amount
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        user_id, business_id, product_id, customerName, productName, numberOfGuests, 
+        email, phone, type, dateIn, dateOut, specialRequests, 
+        originalPrice, discount, discountedPrice
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
@@ -1840,7 +1857,9 @@ app.post('/book-accommodation', async (req, res) => {
       dateIn,
       dateOut || null,
       specialRequests || '',
-      amount
+      originalPrice || 0,
+      discount || 0,
+      discountedPrice || originalPrice || 0
     ];
 
     connection.query(query, values, (err, result) => {
@@ -1864,7 +1883,9 @@ app.post('/book-accommodation', async (req, res) => {
         dateIn,
         dateOut,
         specialRequests,
-        amount,
+        originalPrice,
+        discount,
+        discountedPrice,
         status: 0
       });
     });
@@ -1887,7 +1908,9 @@ app.post('/book-table', async (req, res) => {
     phone,
     reservationDate,
     reservationTime,
-    amount,
+    originalPrice,    // Added
+    discount,         // Added
+    discountedPrice,  // Added
     specialRequests,
     numberOfGuests,
     type,
@@ -1919,8 +1942,10 @@ app.post('/book-table', async (req, res) => {
   try {
     const query = `
       INSERT INTO bookings (
-        user_id, business_id, product_id, customerName, productName, numberOfGuests, email, phone, type, dateIn, dateOut, specialRequests, amount
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        user_id, business_id, product_id, customerName, productName, numberOfGuests, 
+        email, phone, type, dateIn, dateOut, specialRequests, 
+        originalPrice, discount, discountedPrice
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
@@ -1936,7 +1961,9 @@ app.post('/book-table', async (req, res) => {
       dateIn,
       null, // dateOut is null for single-date reservations
       specialRequests || '',
-      amount,
+      Number(originalPrice) || 0,
+      Number(discount) || 0,
+      Number(discountedPrice) || originalPrice || 0
     ];
 
     connection.query(query, values, (err, result) => {
@@ -1960,7 +1987,9 @@ app.post('/book-table', async (req, res) => {
         type,
         dateIn,
         specialRequests,
-        amount,
+        originalPrice,
+        discount,
+        discountedPrice,
       });
     });
   } catch (error) {
@@ -1980,14 +2009,14 @@ app.post('/book-activity', async (req, res) => {
     phone,
     visitDate,
     activityTime,
-    amount,
+    originalPrice,    // Added
+    discount,         // Added
+    discountedPrice,  // Added
     type,
     specialRequests,
     numberOfGuests,
     productName
   } = req.body;
-
-  // console.log("Req.body: ", req.body);
 
   if (
     !user_id ||
@@ -2003,7 +2032,6 @@ app.post('/book-activity', async (req, res) => {
     return res.status(400).json({ success: false, message: 'Missing required fields' });
   }
 
-  // Combine visit date and time into a single datetime string
   const formatDate = ({ year, month, day }) => 
     `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
   const dateIn = `${formatDate(visitDate)} ${activityTime}:00`;
@@ -2013,8 +2041,10 @@ app.post('/book-activity', async (req, res) => {
   try {
     const query = `
       INSERT INTO bookings (
-        user_id, business_id, product_id, customerName, productName, numberOfGuests, email, phone, type, dateIn, dateOut, specialRequests, amount
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        user_id, business_id, product_id, customerName, productName, numberOfGuests, 
+        email, phone, type, dateIn, dateOut, specialRequests, 
+        originalPrice, discount, discountedPrice
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
@@ -2030,7 +2060,9 @@ app.post('/book-activity', async (req, res) => {
       dateIn,
       null, // dateOut is null for single-date activity bookings
       specialRequests || '',
-      amount
+      originalPrice || 0,
+      discount || 0,
+      discountedPrice || originalPrice || 0
     ];
 
     connection.query(query, values, (err, result) => {
@@ -2054,7 +2086,9 @@ app.post('/book-activity', async (req, res) => {
         type,
         dateIn,
         specialRequests,
-        amount,
+        originalPrice,
+        discount,
+        discountedPrice,
       });
     });
   } catch (error) {
