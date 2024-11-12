@@ -115,11 +115,12 @@ const bookingsSlice = createSlice({
       state.pendingBookings.push(action.payload);
     },
     markBookingAsActive: (state, action) => {
-      const booking = state.pendingBookings.find(b => b.id === action.payload);
+      const bookingId = action.payload;
+      const booking = state.pendingBookings.find(b => b.id === bookingId);
       if (booking) {
-        booking.status = 'Active';  // Use string status
+        booking.status = 'Active';
         state.activeBookings.push(booking);
-        state.pendingBookings = state.pendingBookings.filter(b => b.id !== action.payload);
+        state.pendingBookings = state.pendingBookings.filter(b => b.id !== bookingId);
       }
     },
     markBookingAsCompleted: (state, action) => {
@@ -175,6 +176,6 @@ const bookingsSlice = createSlice({
   }
 });
 
-export const { addChatMessage, markBookingAsCompleted, updateWalkInCustomerStatus, markWalkInAsCompleted } = bookingsSlice.actions;
+export const { addChatMessage, markBookingAsCompleted, updateWalkInCustomerStatus, markWalkInAsCompleted, markBookingAsActive } = bookingsSlice.actions;
 
 export default bookingsSlice.reducer;

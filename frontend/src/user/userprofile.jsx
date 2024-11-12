@@ -56,8 +56,11 @@ const MyBookingTab = ({ bookings, onCancelBooking }) => {
                     <li><strong>Status:</strong> {booking.status}</li>
                   </ul>
                 </div>
-                {(booking.status === 'pending' || booking.status === 'confirmed') && (
-                  <Button className="mt-2 bg-red-500 text-white" onClick={() => onCancelBooking(booking.booking_id)}>
+                {booking.status === 'pending' && (
+                  <Button 
+                    className="mt-2 bg-red-500 text-white hover:bg-red-600" 
+                    onClick={() => onCancelBooking(booking.booking_id)}
+                  >
                     Cancel Booking
                   </Button>
                 )}
@@ -80,6 +83,7 @@ const MyBookingTab = ({ bookings, onCancelBooking }) => {
                     <li><strong>Time:</strong> {new Date(booking.dateIn).toLocaleTimeString()}</li>
                     <li><strong>Special Requests:</strong> {booking.specialRequests}</li>
                     <li><strong>Amount:</strong> ₱{parseFloat(booking.priceDetails.discountedPrice).toLocaleString()}</li>
+                    <li><strong>Status:</strong> {booking.status}</li>
                   </ul>
                 </div>
               </div>
@@ -407,6 +411,31 @@ const UserProfile = ({ activities = [] }) => {
     fetchBookings();
   }, []);
 
+  const handleBusinessClick = async (businessId) => {
+    try {
+      const response = await fetch('http://localhost:5000/set-business-id', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ businessId })
+      });
+
+      console.log(businessId);
+
+      const data = await response.json();
+      if (!data.success) {
+        throw new Error(data.message || 'Failed to set business ID');
+      }
+
+      window.location.href = '/businessprofileadmin';
+    } catch (error) {
+      console.error('Error setting business ID:', error);
+      // Handle error (e.g., show a notification)
+    }
+  };
+
   if (loading) {
     return     <Spinner className='flex justify-center items-center h-screen ' size='lg' label="Loading..." color="primary" />;  // dapat may design to
   }
@@ -461,7 +490,7 @@ const UserProfile = ({ activities = [] }) => {
                     {/* <div className='max-h-[130px] bg-light shadow-md rounded-md shadow-slate-600 ring-gray-200 ring-1   p-3 flex flex-col gap-2 overflow-y-auto scrollbar-custom'>         */}
                       <button 
                       className='text-gray-500 hover:bg-color2 hover:text-white flex items-center p-2 rounded-lg gap-1'
-                      onClick={() => window.location.href = '/businessprofileadmin'}
+                      onClick={() => handleBusinessClick(businessData.business_id)}
                       key={application.application_id}>
                       <Avatar src=''/>
                         <p>{businessData.businessName}</p>

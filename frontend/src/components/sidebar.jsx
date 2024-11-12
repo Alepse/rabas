@@ -85,7 +85,7 @@ const Sidebar = () => {
             <TbWorld /> Go to Business Page
           </Button>
           </Link>
-          <Link to='/'>
+          <Link to='/userprofile'>
           <Button className="bg-red-500 text-white font-medium w-full flex items-center justify-center gap-2">
             <CgLogOut /> Logout
           </Button>

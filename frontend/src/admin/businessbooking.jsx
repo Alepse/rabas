@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { addChatMessage, markBookingAsCompleted, updateWalkInCustomerStatus, markWalkInAsCompleted, fetchBookings } from '@/redux/bookingSlice';
+import { addChatMessage, markBookingAsCompleted, markBookingAsActive, updateWalkInCustomerStatus, markWalkInAsCompleted, fetchBookings } from '@/redux/bookingSlice';
 import {
   Button,
   Badge,
@@ -21,7 +21,7 @@ import { Tabs, Tab } from "@nextui-org/tabs";
 import { FaSearch } from 'react-icons/fa';
 import ChatModal from './ChatSystem/ChatModal';
 import { today, getLocalTimeZone } from '@internationalized/date';
-import { MdPeople, MdEmail, MdPhone, MdDateRange, MdHotel, MdRestaurant, MdDirectionsRun } from 'react-icons/md';
+import { MdPeople, MdEmail, MdPhone, MdDateRange, MdHotel, MdRestaurant, MdDirectionsRun, MdCheck, MdDone } from 'react-icons/md';
 import Swal from 'sweetalert2';
 
 // Mock data similar to BusinessAllproducts.jsx
@@ -68,7 +68,7 @@ const showErrorAlert = (message) => {
 };
 
 // Booking card component for displaying individual bookings
-const BookingCard = ({ booking, onOpenChatModal, onMarkAsCompleted }) => (
+const BookingCard = ({ booking, onOpenChatModal, onMarkAsCompleted, onAcceptBooking }) => (
   <div className="p-3 bg-white shadow-md rounded-lg flex flex-col w-full gap-2 transition-shadow duration-300 ease-in-out hover:shadow-2xl">
     <div className='flex justify-between items-center'>
       <h2 className="text-lg font-semibold text-gray-800">{booking.customerName}</h2>
@@ -134,13 +134,30 @@ const BookingCard = ({ booking, onOpenChatModal, onMarkAsCompleted }) => (
       <Badge color={booking.status === 'Pending' ? 'warning' : booking.status === 'Active' ? 'success' : 'default'}>
         {booking.status}
       </Badge>
-      {booking.status === 'Active' && (
+      
+      {booking.status === 'Pending' ? (
+        <Button
+          auto
+          color="success"
+          onClick={() => onAcceptBooking(booking.id)}
+          className="px-4"
+        >
+          <div className="flex items-center gap-2">
+            <MdCheck className="text-lg" />
+            Accept Booking
+          </div>
+        </Button>
+      ) : booking.status === 'Active' && (
         <Button
           auto
           color="success"
           onClick={() => onMarkAsCompleted(booking.id)}
+          className="px-4"
         >
-          Mark as Completed
+          <div className="flex items-center gap-2">
+            <MdDone className="text-lg" />
+            Mark as Completed
+          </div>
         </Button>
       )}
     </div>
@@ -210,7 +227,35 @@ const BookingForm = ({ isOpen, onClose, title, products, onSubmit, type }) => (
 
 // Main business booking component
 const BusinessBooking = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  // Function to check login status
+  const checkLoginStatus = useCallback(async () => {
+    try {
+      const response = await fetch('http://localhost:5000/check-login', {
+        method: 'GET',
+        credentials: 'include' // Include cookies
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setIsLoggedIn(data.isLoggedIn); // Set login status
+
+        if (!data.isLoggedIn) {
+          window.location.href = '/';
+        }
+      } else {
+        setIsLoggedIn(false);
+      }
+    } catch (error) {
+      console.error('Error checking login status:', error);
+    }
+  }, []);
+  
+  useEffect(() => {
+    checkLoginStatus();
+  }, [checkLoginStatus]);
+
   const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(false);
   // log the state 
   console.log('State:', useSelector(state => state));
   const pendingBookings = useSelector(state => state.bookings.pendingBookings);
@@ -310,6 +355,60 @@ const BusinessBooking = () => {
     setWalkInHistory([...walkInHistory, completedBooking]);
   };
 
+  const handleAcceptBooking = async (bookingId) => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(`http://localhost:5000/update-booking-status/${bookingId}`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: 1 }) // Set status to 'Active'
+      });
+
+      const data = await response.json();
+      if (!data.success) {
+        throw new Error(data.message || 'Failed to accept booking');
+      }
+
+      dispatch(markBookingAsActive(bookingId));
+      showSuccessAlert('Booking accepted successfully!');
+    } catch (error) {
+      console.error('Error accepting booking:', error);
+      showErrorAlert(error.message || 'Failed to accept booking');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleMarkAsCompleted = async (bookingId) => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(`http://localhost:5000/update-booking-status/${bookingId}`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: 2 }) // Set status to 'Completed'
+      });
+
+      const data = await response.json();
+      if (!data.success) {
+        throw new Error(data.message || 'Failed to mark booking as completed');
+      }
+
+      dispatch(markBookingAsCompleted(bookingId));
+      showSuccessAlert('Booking marked as completed!');
+    } catch (error) {
+      console.error('Error marking booking as completed:', error);
+      showErrorAlert(error.message || 'Failed to mark booking as completed');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-gray-50 relative">
       <Sidebar />
@@ -329,6 +428,7 @@ const BusinessBooking = () => {
                 setSearchQuery={setSearchQuery}
                 openChatModal={openChatModal}
                 filteredBookingsByType={filteredBookingsByType}
+                onAcceptBooking={handleAcceptBooking}
               />
             </Tab>
 
@@ -339,7 +439,7 @@ const BusinessBooking = () => {
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
                 openChatModal={openChatModal}
-                onMarkAsCompleted={markAsCompleted}
+                onMarkAsCompleted={handleMarkAsCompleted}
                 filteredBookingsByType={filteredBookingsByType}
               />
             </Tab>
@@ -433,7 +533,7 @@ const BusinessBooking = () => {
 };
 
 // Booking section component
-const BookingSection = ({ title, bookings, openChatModal, onMarkAsCompleted }) => {
+const BookingSection = ({ title, bookings, openChatModal, onMarkAsCompleted, onAcceptBooking }) => {
   // Create separate search states for each type
   const [accommodationSearch, setAccommodationSearch] = useState('');
   const [tableSearch, setTableSearch] = useState('');
@@ -468,6 +568,7 @@ const BookingSection = ({ title, bookings, openChatModal, onMarkAsCompleted }) =
             setSearchQuery={searchStates[type].setter}
             openChatModal={openChatModal}
             onMarkAsCompleted={onMarkAsCompleted}
+            onAcceptBooking={onAcceptBooking}
           />
         ))}
       </div>
@@ -476,7 +577,7 @@ const BookingSection = ({ title, bookings, openChatModal, onMarkAsCompleted }) =
 };
 
 // Booking type section component
-const BookingTypeSection = ({ type, bookings, searchQuery, setSearchQuery, openChatModal, onMarkAsCompleted }) => {
+const BookingTypeSection = ({ type, bookings, searchQuery, setSearchQuery, openChatModal, onMarkAsCompleted, onAcceptBooking }) => {
   // console.log(`${type} Section - Received bookings:`, bookings);
 
   // Map API types to display types
@@ -530,10 +631,16 @@ const BookingTypeSection = ({ type, bookings, searchQuery, setSearchQuery, openC
               booking={booking}
               onOpenChatModal={() => openChatModal(booking)}
               onMarkAsCompleted={() => onMarkAsCompleted(booking.id)}
+              onAcceptBooking={() => onAcceptBooking(booking.id)}
             />
           ))
         ) : (
-          <div className="p-4 text-gray-500">No {type.toLowerCase()} bookings available</div>
+          <div className="p-4 text-gray-500">
+            {searchQuery 
+              ? `No ${type.toLowerCase()} bookings found matching "${searchQuery}"`
+              : `No ${type.toLowerCase()} bookings available`
+            }
+          </div>
         )}
       </div>
     </div>

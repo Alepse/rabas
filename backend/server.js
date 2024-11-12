@@ -104,7 +104,7 @@ app.post('/login', (req, res) => {
           req.session.user = {
             user_id: user.user_id
           };
-          console.log('User logged in:', req.session.user); // Log session use
+          // console.log('User logged in:', req.session.user); // Log session use
           return res.json({ success: true, message: 'Login successful' });
         } else {
           return res.status(401).json({ success: false, message: 'Invalid password' });
@@ -191,6 +191,17 @@ app.put('/update-profile', async (req, res) => {
     console.error('Error updating profile:', error);
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
+});
+
+// Endpoint to set business_id in session
+app.post('/set-business-id', (req, res) => {
+  const { businessId } = req.body;
+  if (!businessId) {
+    return res.status(400).json({ success: false, message: 'Business ID is required' });
+  }
+
+  req.session.user.business_id = businessId;
+  res.json({ success: true, message: 'Business ID set in session' });
 });
 
 // Multer configuration for storing uploaded images
@@ -2230,7 +2241,7 @@ app.put('/cancel-booking/:id', (req, res) => {
 
 // Get business bookings
 app.get('/business-bookings', (req, res) => {
-  const businessId = req.session?.user?.user_id;
+  const businessId = req.session?.user?.business_id;
 
   if (!businessId) {
     return res.status(401).json({ 
