@@ -162,153 +162,6 @@ const UserProfile = ({ activities = [] }) => {
     };
 
 
-  // Updated initialBookings with three samples for each status
-  const initialBookings = {
-    1: [
-      { 
-        id: 1, 
-        sender: 'Business One', 
-        status: 'active',
-        formDetails: {
-          productName: 'Hiking Adventure', 
-          numberOfGuests: 3, 
-          email: 'bobjohnson@example.com', 
-          phone: '321-654-9870', 
-          visitDate: '2024-11-01', 
-          activityTime: '10:00 AM', 
-          specialRequests: 'Need a guide, bring extra snacks', 
-          amount: '₱0'
-        }
-      },
-      { 
-        id: 2, 
-        sender: 'Business Four', 
-        status: 'active',
-        formDetails: {
-          productName: 'City Tour', 
-          numberOfGuests: 2, 
-          email: 'johndoe@example.com', 
-          phone: '123-456-7890', 
-          visitDate: '2024-11-05', 
-          activityTime: '2:00 PM', 
-          specialRequests: 'Wheelchair accessible', 
-          amount: '₱1500'
-        }
-      },
-      { 
-        id: 3, 
-        sender: 'Business Five', 
-        status: 'active',
-        formDetails: {
-          productName: 'Cooking Class', 
-          numberOfGuests: 1, 
-          email: 'janedoe@example.com', 
-          phone: '987-654-3210', 
-          visitDate: '2024-11-10', 
-          activityTime: '11:00 AM', 
-          specialRequests: 'Vegetarian options', 
-          amount: '₱500'
-        }
-      },
-    ],
-    2: [
-      { 
-        id: 4, 
-        sender: 'Business Two', 
-        status: 'completed',
-        formDetails: {
-          productName: 'Luxury Suite', 
-          numberOfGuests: 2, 
-          email: 'alice.smith@example.com', 
-          phone: '789-456-1230', 
-          checkInOutDates: { start: '2024-10-20', end: '2024-10-22' }, 
-          specialRequests: 'Late check-in', 
-          amount: '₱5000'
-        }
-      },
-      { 
-        id: 5, 
-        sender: 'Business Six', 
-        status: 'completed',
-        formDetails: {
-          productName: 'Spa Day', 
-          numberOfGuests: 1, 
-          email: 'mikebrown@example.com', 
-          phone: '654-321-0987', 
-          visitDate: '2024-10-25', 
-          activityTime: '3:00 PM', 
-          specialRequests: 'Aromatherapy', 
-          amount: '₱2000'
-        }
-      },
-      { 
-        id: 6, 
-        sender: 'Business Seven', 
-        status: 'completed',
-        formDetails: {
-          productName: 'Concert Tickets', 
-          numberOfGuests: 2, 
-          email: 'sarahjones@example.com', 
-          phone: '321-987-6543', 
-          visitDate: '2024-10-30', 
-          activityTime: '8:00 PM', 
-          specialRequests: 'Front row seats', 
-          amount: '₱3000'
-        }
-      },
-    ],
-    3: [
-      { 
-        id: 7, 
-        sender: 'Business Three', 
-        status: 'cancelled',
-        formDetails: {
-          productName: 'Mountain View Dining', 
-          numberOfGuests: 4, 
-          email: 'janedoe@example.com', 
-          phone: '123-456-7890', 
-          reservationDate: '2024-10-15', 
-          reservationTime: '6:00 PM', 
-          specialRequests: 'Window seat', 
-          amount: '₱2000'
-        }
-      },
-      { 
-        id: 8, 
-        sender: 'Business Eight', 
-        status: 'cancelled',
-        formDetails: {
-          productName: 'Yoga Retreat', 
-          numberOfGuests: 1, 
-          email: 'emilywhite@example.com', 
-          phone: '456-789-0123', 
-          reservationDate: '2024-10-18', 
-          reservationTime: '9:00 AM', 
-          specialRequests: 'Private session', 
-          amount: '₱2500'
-        }
-      },
-      { 
-        id: 9, 
-        sender: 'Business Nine', 
-        status: 'cancelled',
-        formDetails: {
-          productName: 'Wine Tasting', 
-          numberOfGuests: 2, 
-          email: 'davidgreen@example.com', 
-          phone: '789-012-3456', 
-          reservationDate: '2024-10-22', 
-          reservationTime: '4:00 PM', 
-          specialRequests: 'Include cheese platter', 
-          amount: '₱1000'
-        }
-      },
-    ],
-  };
-
-  // Flatten the bookings to get all accepted bookings
-  const acceptedBookings = Object.values(initialBookings).flat().filter(booking => booking.sender !== 'You');
-
   // Function to handle booking cancellation
   const handleCancelBooking = async (bookingId) => {
     try {
@@ -613,17 +466,6 @@ const UserProfile = ({ activities = [] }) => {
                       <Avatar src=''/>
                         <p>{businessData.businessName}</p>
                       </button>
-                      {/* <button 
-                      className='text-gray-500 hover:bg-color2 hover:text-white flex items-center p-2 rounded-lg gap-1'
-                      onClick={() => window.location.href = '/businessprofileadmin'}
-                      key={application.application_id}>
-                      <Avatar src=''/>
-                        <p>{businessData.businessName}</p>
-                      </button> */}
-                    {/* </div> */}
-                    {/* <Button className='text-white bg-color1 hover:bg-color2 mt-4'  > 
-                    + Add Another Business 
-                    </Button> */}
                   </div>
                 );
               } else if (application.status === -1) {
@@ -668,32 +510,6 @@ const UserProfile = ({ activities = [] }) => {
                         onChange={(e) => setUsername(e.target.value)}
                       />
                     </div>
-
-                    {/* <div>
-                      <h1 className='text-slate-500'>Change Profile Pic</h1>
-                      <div className='relative flex items-center w-28 h-28'>
-                        <Avatar 
-                          className='w-full h-full object-cover rounded-full' 
-                          src={profilePic ? 
-                                profilePic 
-                                : 
-                                (userData?.image_path ?
-                                  `http://localhost:5000/${userData.image_path}`
-                                  : 
-                                  `https://ui-avatars.com/api/?name=${firstLetter}`
-                                )
-                              }  
-                        />
-                        <input type='file' className='hidden' accept='image/*' onChange={handleFileChange} id='fileInput' />
-                        <div
-                          onClick={() => document.getElementById('fileInput').click()}
-                          className='absolute bottom-0 right-0 bg-color1 text-white rounded-full w-9 h-9 hover:bg-color2 flex justify-center items-center cursor-pointer'
-                        >
-                          +
-                        </div>
-                      </div>
-                    </div> */}
-
                     
                     {/* Email field */}
                     <div className='mb-6'>
