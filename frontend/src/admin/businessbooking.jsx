@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { addChatMessage, markBookingAsCompleted, updateWalkInCustomerStatus, markWalkInAsCompleted } from '@/redux/bookingSlice';
+import { addChatMessage, markBookingAsCompleted, updateWalkInCustomerStatus, markWalkInAsCompleted, fetchBookings } from '@/redux/bookingSlice';
 import {
   Button,
   Badge,
@@ -211,6 +211,8 @@ const BookingForm = ({ isOpen, onClose, title, products, onSubmit, type }) => (
 // Main business booking component
 const BusinessBooking = () => {
   const dispatch = useDispatch();
+  // log the state 
+  console.log('State:', useSelector(state => state));
   const pendingBookings = useSelector(state => state.bookings.pendingBookings);
   const activeBookings = useSelector(state => state.bookings.activeBookings);
   const bookingHistory = useSelector(state => state.bookings.bookingHistory);
@@ -232,11 +234,16 @@ const BusinessBooking = () => {
   const [walkInTableReservationSearchQuery, setWalkInTableReservationSearchQuery] = useState('');
   const [walkInActivitiesSearchQuery, setWalkInActivitiesSearchQuery] = useState('');
 
-    // Title Tab
-    useEffect(() => {
-      document.title = 'BusinessName | Admin booking';
-      });
+  // Title Tab
+  useEffect(() => {
+    document.title = 'BusinessName | Admin booking';
+  });
     
+  // log the fetchBookings
+  useEffect(() => {
+    // console.log('Fetching bookings...');
+    dispatch(fetchBookings());
+  }, [dispatch]);
 
   const openChatModal = (booking) => {
     setCurrentBookingDetails(booking);
@@ -447,7 +454,30 @@ const BookingSection = ({ title, bookings, searchQuery, setSearchQuery, openChat
 );
 
 // Booking type section component
-const BookingTypeSection = ({ type, bookings, searchQuery, setSearchQuery, openChatModal, onMarkAsCompleted, filteredBookingsByType }) => {
+const BookingTypeSection = ({ type, bookings, searchQuery, setSearchQuery, openChatModal, onMarkAsCompleted }) => {
+  // console.log(`${type} Section - Received bookings:`, bookings);
+
+  // Map API types to display types
+  const typeMapping = {
+    'Accommodation': ['Cabins'],
+    'Table Reservation': ['Buffet', 'Resorts'],
+    'Attraction': ['Hiking', 'Water Sports']
+  };
+
+  const filteredBookings = bookings.filter(booking => {
+    // console.log('Checking booking:', booking.type, 'against type:', type);
+    // Check if the booking type is in the allowed types for this section
+    const allowedTypes = typeMapping[type] || [];
+    const typeMatch = allowedTypes.includes(booking.type);
+    const searchMatch = !searchQuery || 
+      booking.customerName.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    // console.log('Type match:', typeMatch, 'Search match:', searchMatch);
+    return typeMatch && searchMatch;
+  });
+
+  // console.log(`${type} Section - Filtered bookings:`, filteredBookings);
+
   const iconMap = {
     'Accommodation': <MdHotel className="text-xl text-color1" />,
     'Table Reservation': <MdRestaurant className="text-xl text-color1" />,
@@ -471,13 +501,13 @@ const BookingTypeSection = ({ type, bookings, searchQuery, setSearchQuery, openC
         <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
       </div>
       <div className="bg-white max-h-[600px] w-full flex flex-col gap-3 overflow-y-auto rounded-lg p-4 shadow-inner">
-        {filteredBookingsByType(bookings, type, searchQuery).length > 0 ? (
-          filteredBookingsByType(bookings, type, searchQuery).map((booking) => (
+        {filteredBookings.length > 0 ? (
+          filteredBookings.map((booking) => (
             <BookingCard
               key={booking.id}
               booking={booking}
               onOpenChatModal={() => openChatModal(booking)}
-              onMarkAsCompleted={onMarkAsCompleted}
+              onMarkAsCompleted={() => onMarkAsCompleted(booking.id)}
             />
           ))
         ) : (

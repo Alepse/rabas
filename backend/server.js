@@ -2228,6 +2228,81 @@ app.put('/cancel-booking/:id', (req, res) => {
   });
 });
 
+// Get business bookings
+app.get('/business-bookings', (req, res) => {
+  const businessId = req.session?.user?.user_id;
+
+  if (!businessId) {
+    return res.status(401).json({ 
+      success: false, 
+      message: 'Not authorized' 
+    });
+  }
+
+  const sql = `
+    SELECT * FROM bookings 
+    WHERE business_id = ?
+    ORDER BY dateIn DESC
+  `;
+
+  connection.query(sql, [businessId], (err, results) => {
+    if (err) {
+      console.error('Error fetching business bookings:', err);
+      return res.status(500).json({ 
+        success: false, 
+        message: 'Failed to fetch bookings' 
+      });
+    }
+
+    res.json({ 
+      success: true, 
+      bookings: results 
+    });
+  });
+});
+
+// Update booking status
+app.put('/update-booking-status/:id', (req, res) => {
+  const bookingId = req.params.id;
+  const { status } = req.body;
+  const businessId = req.session?.user?.business_id;
+
+  if (!businessId) {
+    return res.status(401).json({ 
+      success: false, 
+      message: 'Not authorized' 
+    });
+  }
+
+  const sql = `
+    UPDATE bookings 
+    SET status = ?
+    WHERE booking_id = ? AND business_id = ?
+  `;
+
+  connection.query(sql, [status, bookingId, businessId], (err, result) => {
+    if (err) {
+      console.error('Error updating booking status:', err);
+      return res.status(500).json({ 
+        success: false, 
+        message: 'Failed to update booking status' 
+      });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Booking not found or not authorized' 
+      });
+    }
+
+    res.json({ 
+      success: true, 
+      message: 'Booking status updated successfully' 
+    });
+  });
+});
+
 //Para sa pag display ng accomodations
 // Endpoint to fetch accomodations
 app.get('/accomodations', (req, res) => {
