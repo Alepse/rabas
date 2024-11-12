@@ -433,25 +433,47 @@ const BusinessBooking = () => {
 };
 
 // Booking section component
-const BookingSection = ({ title, bookings, searchQuery, setSearchQuery, openChatModal, onMarkAsCompleted, filteredBookingsByType }) => (
-  <div>
-    <div className="text-xl font-bold mb-4 text-gray-700">{title}</div>
-    <div className="p-4 grid lg:grid-cols-2 xl:grid-cols-3 md:grid-cols-1 mt-3 gap-4">
-      {['Accommodation', 'Table Reservation', 'Attraction'].map((type) => (
-        <BookingTypeSection
-          key={type}
-          type={type}
-          bookings={bookings}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          openChatModal={openChatModal}
-          onMarkAsCompleted={onMarkAsCompleted}
-          filteredBookingsByType={filteredBookingsByType}
-        />
-      ))}
+const BookingSection = ({ title, bookings, openChatModal, onMarkAsCompleted }) => {
+  // Create separate search states for each type
+  const [accommodationSearch, setAccommodationSearch] = useState('');
+  const [tableSearch, setTableSearch] = useState('');
+  const [attractionSearch, setAttractionSearch] = useState('');
+
+  // Map of type to its search state and setter
+  const searchStates = {
+    'Accommodation': {
+      value: accommodationSearch,
+      setter: setAccommodationSearch
+    },
+    'Table Reservation': {
+      value: tableSearch,
+      setter: setTableSearch
+    },
+    'Attraction': {
+      value: attractionSearch,
+      setter: setAttractionSearch
+    }
+  };
+
+  return (
+    <div>
+      <div className="text-xl font-bold mb-4 text-gray-700">{title}</div>
+      <div className="p-4 grid lg:grid-cols-2 xl:grid-cols-3 md:grid-cols-1 mt-3 gap-4">
+        {['Accommodation', 'Table Reservation', 'Attraction'].map((type) => (
+          <BookingTypeSection
+            key={type}
+            type={type}
+            bookings={bookings}
+            searchQuery={searchStates[type].value}
+            setSearchQuery={searchStates[type].setter}
+            openChatModal={openChatModal}
+            onMarkAsCompleted={onMarkAsCompleted}
+          />
+        ))}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 // Booking type section component
 const BookingTypeSection = ({ type, bookings, searchQuery, setSearchQuery, openChatModal, onMarkAsCompleted }) => {
