@@ -18,7 +18,20 @@ const MyBookingTab = ({ bookings, onCancelBooking }) => {
   const [activeTab, setActiveTab] = useState("active");
 
   const filterBookings = (status) => {
-    return bookings.filter(booking => booking.status === status);
+    if (!Array.isArray(bookings)) return [];
+    
+    return bookings.filter(booking => {
+      switch(status) {
+        case "active":
+          return booking.status === 'confirmed' || booking.status === 'pending';
+        case "completed":
+          return booking.status === 'completed';
+        case "cancelled":
+          return booking.status === 'cancelled';
+        default:
+          return false;
+      }
+    });
   };
 
   return (
@@ -28,23 +41,26 @@ const MyBookingTab = ({ bookings, onCancelBooking }) => {
         <Tab key="active" title="Active">
           <div className="overflow-y-auto max-h-[450px] scrollbar-custom">
             {filterBookings("active").map((booking) => (
-              <div key={booking.id} className="bg-white shadow-lg p-4 rounded-lg mb-4">
+              <div key={booking.booking_id} className="bg-white shadow-lg p-4 rounded-lg mb-4">
                 <div className="p-3 bg-gray-50 rounded-lg text-sm text-black border border-gray-200">
                   <h4 className="font-semibold mb-2">Booking Details:</h4>
                   <ul className="space-y-1">
-                    <li><strong>Product:</strong> {booking.formDetails?.productName || 'Sample Product'}</li>
-                    <li><strong>Guests:</strong> {booking.formDetails?.numberOfGuests}</li>
-                    <li><strong>Email:</strong> {booking.formDetails?.email}</li>
-                    <li><strong>Phone:</strong> {booking.formDetails?.phone}</li>
-                    <li><strong>Date:</strong> {booking.formDetails?.visitDate || booking.formDetails?.checkInOutDates?.start}</li>
-                    <li><strong>Time:</strong> {booking.formDetails?.activityTime || booking.formDetails?.reservationTime}</li>
-                    <li><strong>Special Requests:</strong> {booking.formDetails?.specialRequests}</li>
-                    <li><strong>Amount:</strong> {booking.formDetails?.amount}</li>
+                    <li><strong>Product:</strong> {booking.productName}</li>
+                    <li><strong>Guests:</strong> {booking.numberOfGuests}</li>
+                    <li><strong>Email:</strong> {booking.email}</li>
+                    <li><strong>Phone:</strong> {booking.phone}</li>
+                    <li><strong>Date:</strong> {new Date(booking.dateIn).toLocaleDateString()}</li>
+                    <li><strong>Time:</strong> {new Date(booking.dateIn).toLocaleTimeString()}</li>
+                    <li><strong>Special Requests:</strong> {booking.specialRequests}</li>
+                    <li><strong>Amount:</strong> ₱{parseFloat(booking.priceDetails.discountedPrice).toLocaleString()}</li>
+                    <li><strong>Status:</strong> {booking.status}</li>
                   </ul>
                 </div>
-                <Button className="mt-2 bg-red-500 text-white" onClick={() => onCancelBooking(booking.id)}>
-                  Cancel Booking
-                </Button>
+                {(booking.status === 'pending' || booking.status === 'confirmed') && (
+                  <Button className="mt-2 bg-red-500 text-white" onClick={() => onCancelBooking(booking.booking_id)}>
+                    Cancel Booking
+                  </Button>
+                )}
               </div>
             ))}
           </div>
@@ -52,18 +68,18 @@ const MyBookingTab = ({ bookings, onCancelBooking }) => {
         <Tab key="completed" title="Completed">
           <div className="overflow-y-auto max-h-[500px] scrollbar-custom">
             {filterBookings("completed").map((booking) => (
-              <div key={booking.id} className="bg-white shadow-lg p-4 rounded-lg ">
+              <div key={booking.booking_id} className="bg-white shadow-lg p-4 rounded-lg ">
                 <div className="p-3 bg-gray-50 rounded-lg text-sm text-black border border-gray-200">
                   <h4 className="font-semibold mb-2">Booking Details:</h4>
                   <ul className="space-y-1">
-                    <li><strong>Product:</strong> {booking.formDetails?.productName || 'Sample Product'}</li>
-                    <li><strong>Guests:</strong> {booking.formDetails?.numberOfGuests}</li>
-                    <li><strong>Email:</strong> {booking.formDetails?.email}</li>
-                    <li><strong>Phone:</strong> {booking.formDetails?.phone}</li>
-                    <li><strong>Date:</strong> {booking.formDetails?.visitDate || booking.formDetails?.checkInOutDates?.start}</li>
-                    <li><strong>Time:</strong> {booking.formDetails?.activityTime || booking.formDetails?.reservationTime}</li>
-                    <li><strong>Special Requests:</strong> {booking.formDetails?.specialRequests}</li>
-                    <li><strong>Amount:</strong> {booking.formDetails?.amount}</li>
+                    <li><strong>Product:</strong> {booking.productName}</li>
+                    <li><strong>Guests:</strong> {booking.numberOfGuests}</li>
+                    <li><strong>Email:</strong> {booking.email}</li>
+                    <li><strong>Phone:</strong> {booking.phone}</li>
+                    <li><strong>Date:</strong> {new Date(booking.dateIn).toLocaleDateString()}</li>
+                    <li><strong>Time:</strong> {new Date(booking.dateIn).toLocaleTimeString()}</li>
+                    <li><strong>Special Requests:</strong> {booking.specialRequests}</li>
+                    <li><strong>Amount:</strong> ₱{parseFloat(booking.priceDetails.discountedPrice).toLocaleString()}</li>
                   </ul>
                 </div>
               </div>
@@ -73,18 +89,18 @@ const MyBookingTab = ({ bookings, onCancelBooking }) => {
         <Tab key="cancelled" title="Cancelled">
           <div className="overflow-y-auto max-h-[500px] scrollbar-custom">
             {filterBookings("cancelled").map((booking) => (
-              <div key={booking.id} className="bg-white shadow-lg p-4 rounded-lg ">
+              <div key={booking.booking_id} className="bg-white shadow-lg p-4 rounded-lg ">
                 <div className="p-3 bg-gray-50 rounded-lg text-sm text-black border border-gray-200">
                   <h4 className="font-semibold mb-2">Booking Details:</h4>
                   <ul className="space-y-1">
-                    <li><strong>Product:</strong> {booking.formDetails?.productName || 'Sample Product'}</li>
-                    <li><strong>Guests:</strong> {booking.formDetails?.numberOfGuests}</li>
-                    <li><strong>Email:</strong> {booking.formDetails?.email}</li>
-                    <li><strong>Phone:</strong> {booking.formDetails?.phone}</li>
-                    <li><strong>Date:</strong> {booking.formDetails?.visitDate || booking.formDetails?.checkInOutDates?.start}</li>
-                    <li><strong>Time:</strong> {booking.formDetails?.activityTime || booking.formDetails?.reservationTime}</li>
-                    <li><strong>Special Requests:</strong> {booking.formDetails?.specialRequests}</li>
-                    <li><strong>Amount:</strong> {booking.formDetails?.amount}</li>
+                    <li><strong>Product:</strong> {booking.productName}</li>
+                    <li><strong>Guests:</strong> {booking.numberOfGuests}</li>
+                    <li><strong>Email:</strong> {booking.email}</li>
+                    <li><strong>Phone:</strong> {booking.phone}</li>
+                    <li><strong>Date:</strong> {new Date(booking.dateIn).toLocaleDateString()}</li>
+                    <li><strong>Time:</strong> {new Date(booking.dateIn).toLocaleTimeString()}</li>
+                    <li><strong>Special Requests:</strong> {booking.specialRequests}</li>
+                    <li><strong>Amount:</strong> ₱{parseFloat(booking.priceDetails.discountedPrice).toLocaleString()}</li>
                   </ul>
                 </div>
               </div>
@@ -116,6 +132,7 @@ const UserProfile = ({ activities = [] }) => {
   const [businessData, setBusinessData] = useState(null); // State
   const [loading, setLoading] = useState(true);
   const [showButton, setShowButton] = useState(false); // State to show/hide button
+  const [bookings, setBookings] = useState([]);
 
   
      // Title Tab
@@ -293,27 +310,43 @@ const UserProfile = ({ activities = [] }) => {
   const acceptedBookings = Object.values(initialBookings).flat().filter(booking => booking.sender !== 'You');
 
   // Function to handle booking cancellation
-  const handleCancelBooking = (bookingId) => {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: "Do you really want to cancel this booking?",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#0BDA51',
-      cancelButtonColor: '#D33736',
-      confirmButtonText: 'Yes, cancel it!'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        // Implement cancellation logic here
-        console.log(`Booking with ID ${bookingId} has been cancelled.`);
+  const handleCancelBooking = async (bookingId) => {
+    try {
+      const response = await fetch(`http://localhost:5000/cancel-booking/${bookingId}`, {
+        method: 'PUT',
+        credentials: 'include'
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        // Update the local state to reflect the cancellation
+        setBookings(prevBookings => 
+          prevBookings.map(booking => 
+            booking.booking_id === bookingId 
+              ? { ...booking, status: 'cancelled' } 
+              : booking
+          )
+        );
+        
         Swal.fire({
-          title: 'Cancelled!',
-          text: 'Your booking has been cancelled.',
+          title: 'Success!',
+          text: 'Booking cancelled successfully',
           icon: 'success',
           confirmButtonColor: '#0BDA51'
         });
+      } else {
+        throw new Error(data.message);
       }
-    });
+    } catch (error) {
+      console.error('Error cancelling booking:', error);
+      Swal.fire({
+        title: 'Error!',
+        text: 'Failed to cancel booking',
+        icon: 'error',
+        confirmButtonColor: '#D33736'
+      });
+    }
   };
 
   // Function to check login status
@@ -498,6 +531,28 @@ const UserProfile = ({ activities = [] }) => {
       }
     });
   };
+
+  // Add this useEffect to fetch bookings
+  useEffect(() => {
+    const fetchBookings = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/bookings', {
+          credentials: 'include'
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+          setBookings(data.bookings);
+        } else {
+          console.error('Failed to fetch bookings:', data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching bookings:', error);
+      }
+    };
+
+    fetchBookings();
+  }, []);
 
   if (loading) {
     return     <Spinner className='flex justify-center items-center h-screen ' size='lg' label="Loading..." color="primary" />;  // dapat may design to
@@ -793,7 +848,7 @@ const UserProfile = ({ activities = [] }) => {
             <Tab key="myBookings" title="My Bookings">
               <Card>
                 <CardBody className='p-6 min-h-[700px]'>
-                  <MyBookingTab bookings={acceptedBookings} onCancelBooking={handleCancelBooking} />
+                  <MyBookingTab bookings={bookings} onCancelBooking={handleCancelBooking} />
                 </CardBody>
               </Card>
             </Tab>

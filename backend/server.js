@@ -2097,6 +2097,137 @@ app.post('/book-activity', async (req, res) => {
   }
 });
 
+// Endpoint to fetch bookings
+app.get('/bookings', (req, res) => {
+  const userId = req.session?.user?.user_id;
+
+  if (!userId) {
+    return res.status(401).json({ success: false, message: 'User not logged in' });
+  }
+
+  const sql = `
+    SELECT 
+      b.*,
+      p.name AS product_name,
+      p.images AS product_image,
+      p.type AS product_type,
+      bs.businessName,
+      bs.businessLogo
+    FROM bookings b
+    LEFT JOIN products p ON b.product_id = p.product_id
+    LEFT JOIN businesses bs ON b.business_id = bs.business_id
+    WHERE b.user_id = ?
+    ORDER BY b.dateIn DESC
+  `;
+
+  connection.query(sql, [userId], (err, results) => {
+    if (err) {
+      console.error('Error fetching bookings:', err);
+      return res.status(500).json({ 
+        success: false, 
+        message: 'Failed to fetch bookings'
+      });
+    }
+
+    // Format dates and process results
+    const formattedBookings = results.map(booking => {
+      // Convert status number to string
+      let statusText;
+      switch(Number(booking.status)) {
+        case 0:
+          statusText = 'pending';
+          break;
+        case 1:
+          statusText = 'confirmed';
+          break;
+        case 2:
+          statusText = 'completed';
+          break;
+        case 3:
+          statusText = 'cancelled';
+          break;
+        default:
+          statusText = 'pending';
+      }
+
+      return {
+        booking_id: booking.booking_id,
+        user_id: booking.user_id,
+        business_id: booking.business_id,
+        product_id: booking.product_id,
+        customerName: booking.customerName,
+        productName: booking.productName,
+        numberOfGuests: booking.numberOfGuests,
+        email: booking.email,
+        phone: booking.phone,
+        type: booking.type,
+        dateIn: booking.dateIn ? new Date(booking.dateIn).toISOString() : null,
+        dateOut: booking.dateOut ? new Date(booking.dateOut).toISOString() : null,
+        specialRequests: booking.specialRequests || '',
+        priceDetails: {
+          originalPrice: parseFloat(booking.originalPrice || 0).toFixed(2),
+          discount: parseFloat(booking.discount || 0).toFixed(2),
+          discountedPrice: parseFloat(booking.discountedPrice || 0).toFixed(2)
+        },
+        status: statusText,
+        // Additional product and business details
+        product_name: booking.product_name,
+        product_image: booking.product_image,
+        product_type: booking.product_type,
+        businessName: booking.businessName,
+        businessLogo: booking.businessLogo
+      };
+    });
+
+    res.json({
+      success: true,
+      bookings: formattedBookings
+    });
+  });
+});
+
+//Endpoint for cancel booking
+app.put('/cancel-booking/:id', (req, res) => {
+  const bookingId = req.params.id;
+  const userId = req.session?.user?.user_id;
+
+  if (!userId) {
+    return res.status(401).json({ 
+      success: false, 
+      message: 'User not logged in' 
+    });
+  }
+
+  const sql = `
+    UPDATE bookings 
+    SET status = 3
+    WHERE booking_id = ? AND user_id = ?
+  `;
+
+  connection.query(sql, [bookingId, userId], (err, result) => {
+    if (err) {
+      console.error('Error cancelling booking:', err);
+      return res.status(500).json({ 
+        success: false, 
+        message: 'Failed to cancel booking' 
+      });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Booking not found or not authorized' 
+      });
+    }
+
+    res.json({ 
+      success: true, 
+      message: 'Booking cancelled successfully',
+      bookingId: bookingId
+    });
+  });
+});
+
 //Para sa pag display ng accomodations
 // Endpoint to fetch accomodations
 app.get('/accomodations', (req, res) => {
