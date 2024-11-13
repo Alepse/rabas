@@ -24,6 +24,15 @@ import { today, getLocalTimeZone } from '@internationalized/date';
 import { MdPeople, MdEmail, MdPhone, MdDateRange, MdHotel, MdRestaurant, MdDirectionsRun, MdCheck, MdDone, MdClose } from 'react-icons/md';
 import Swal from 'sweetalert2';
 
+// Add the formatDate helper function at the top of your file
+const formatDate = (date) => {
+  if (!date) return '';
+  if (typeof date === 'object' && date.year && date.month && date.day) {
+    return `${date.year}-${String(date.month).padStart(2, '0')}-${String(date.day).padStart(2, '0')}`;
+  }
+  return date.toString();
+};
+
 // SweetAlert functions
 const showSuccessAlert = (message) => {
   Swal.fire({
@@ -166,8 +175,8 @@ const BookingForm = ({ isOpen, onClose, title, products, onSubmit, type }) => {
   const [checkOutDate, setCheckOutDate] = useState(null);
   const [checkInTime, setCheckInTime] = useState('');
   const [checkOutTime, setCheckOutTime] = useState('');
-  const [reservationDate, setReservationDate] = useState('');
-  const [reservationTime, setReservationTime] = useState('');
+  const [reservationDate, setReservationDate] = useState(null);
+  const [reservationTime, setReservationTime] = useState('18:00'); // Default time
   const [activityDate, setActivityDate] = useState('');
   const [startingTime, setStartingTime] = useState('');
 
@@ -192,8 +201,8 @@ const BookingForm = ({ isOpen, onClose, title, products, onSubmit, type }) => {
     setCheckOutDate(null);
     setCheckInTime('');
     setCheckOutTime('');
-    setReservationDate('');
-    setReservationTime('');
+    setReservationDate(null);
+    setReservationTime('18:00');
     setActivityDate('');
     setStartingTime('');
 
@@ -212,9 +221,9 @@ const BookingForm = ({ isOpen, onClose, title, products, onSubmit, type }) => {
       setIsLoading(true);
 
       const formData = {
-        businessId: selectedProduct.business_id,
+        business_id: selectedProduct.business_id,
         user_id: 0,// use random user id
-        productId: selectedProduct.product_id,
+        product_id: selectedProduct.product_id,
         firstName,
         lastName,
         email,
@@ -260,12 +269,9 @@ const BookingForm = ({ isOpen, onClose, title, products, onSubmit, type }) => {
           return;
         }
 
-        formData.reservationDate = {
-          year: new Date(reservationDate).getFullYear(),
-          month: new Date(reservationDate).getMonth() + 1,
-          day: new Date(reservationDate).getDate()
-        };
+        formData.reservationDate = reservationDate;
         formData.reservationTime = reservationTime;
+
       } else if (type === 'Activity') {
         if (!activityDate) {
           showErrorAlert('Please select an activity date');
@@ -468,19 +474,20 @@ const BookingForm = ({ isOpen, onClose, title, products, onSubmit, type }) => {
           
           {type === 'Table Reservation' && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Input 
-                type="date" 
-                label="Reservation Date" 
-                required 
+              <DatePicker
+                aria-label="Select Reservation Date"
                 value={reservationDate}
-                onChange={(e) => setReservationDate(e.target.value)}
+                onChange={(date) => setReservationDate(date)}
               />
               <Input 
                 type="time" 
                 label="Reservation Time" 
                 required 
                 value={reservationTime}
-                onChange={(e) => setReservationTime(e.target.value)}
+                onChange={(e) => {
+                  const selectedTime = e.target.value;
+                  setReservationTime(selectedTime);
+                }}
               />
             </div>
           )}

@@ -1833,7 +1833,7 @@ app.post('/book-accommodation', async (req, res) => {
     numberOfGuests
   } = req.body;
 
-  console.log('Request Body Data:', req.body);
+  // console.log('Request Body Data:', req.body);
   
   if (!firstName || !lastName || !email || !checkInOutDates || !checkInOutDates.start || !checkInOutDates.end) {
     return res.status(400).json({ success: false, message: 'Missing required fields' });
@@ -1927,9 +1927,11 @@ app.post('/book-table', async (req, res) => {
     type,
   } = req.body;
 
+  console.log('Request Body Data:', req.body);
+
   if (
     !business_id || 
-    !user_id || 
+    !user_id == null|| 
     !product_id || 
     !firstName || 
     !lastName || 
@@ -2030,7 +2032,7 @@ app.post('/book-activity', async (req, res) => {
   } = req.body;
 
   if (
-    !user_id ||
+    !user_id == null ||
     !firstName ||
     !lastName ||
     !email ||
