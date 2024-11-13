@@ -2455,6 +2455,47 @@ app.get('/locations', (req, res) => {
 });
 
 //SUPER ADMIN
+//Endpoint to fetch all users
+app.get('/superAdmin-fetchAllUsers', (req, res) => {
+  const sql = `
+    SELECT 
+      u.user_id,
+      u.Fname,
+      u.Lname,
+      u.email,
+      b.business_id,
+      b.businessName,
+      b.businessType
+    FROM users u
+    LEFT JOIN businesses b ON u.user_id = b.user_id
+  `;
+
+  connection.query(sql, (err, results) => {
+    if (err) {
+      console.error('Error executing SQL query:', err);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+
+    // Transform the results to include user type
+    const formattedUsers = results.map(user => ({
+      user_id: user.user_id,
+      name: `${user.Fname} ${user.Lname}`,
+      email: user.email,
+      type: user.business_id ? 'Business Owner' : 'Tourist',
+      // Include business details if they exist
+      ...(user.business_id && {
+        businessName: user.businessName,
+        businessType: user.businessType
+      })
+    }));
+
+    return res.json({ 
+      success: true, 
+      users: formattedUsers 
+    });
+  });
+});
+
 //Endpoint to fetch all business applications
 app.get('/superAdmin-businessApplications', (req, res) => {
   const sql = `
