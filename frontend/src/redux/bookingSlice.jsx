@@ -6,17 +6,6 @@ const initialState = {
   bookingHistory: [],
   chatMessages: [],
   walkInCustomers: [],
-  sampleWalkInCustomers: {
-    Accommodation: [
-      { id: 101, customerName: 'Sample John', details: 'Sample Luxury Cabin, 2 guests, Check-in: 2023-12-01, Check-out: 2023-12-05' }
-    ],
-    'Table Reservation': [
-      { id: 102, customerName: 'Sample Jane', details: 'Sample Dining, Reservation Date: 2023-12-10, Time: 19:00' }
-    ],
-    Attraction: [
-      { id: 103, customerName: 'Sample Alice', details: 'Sample Hiking Adventure, Activity Date: 2023-12-15' }
-    ]
-  },
   walkInHistory: [],
   loading: false,
   error: null
@@ -39,7 +28,8 @@ export const fetchBookings = createAsyncThunk(
       const transformed = {
         pendingBookings: [],
         activeBookings: [],
-        bookingHistory: []
+        bookingHistory: [],
+        walkInCustomers: []
       };
 
       data.bookings.forEach(booking => {
@@ -86,15 +76,19 @@ export const fetchBookings = createAsyncThunk(
           status: getStatusString(booking.status)
         };
 
-        console.log('Formatted booking:', formattedBooking);
+        console.log('Formatting booking:', formattedBooking);
 
-        // Sort based on status
-        if (formattedBooking.status === 'Pending') {
-          transformed.pendingBookings.push(formattedBooking);
-        } else if (formattedBooking.status === 'Active') {
-          transformed.activeBookings.push(formattedBooking);
+        if (formattedBooking.userId === 0) {
+          transformed.walkInCustomers.push(formattedBooking);
         } else {
-          transformed.bookingHistory.push(formattedBooking);
+          // Existing sorting logic for regular bookings
+          if (formattedBooking.status === 'Pending') {
+            transformed.pendingBookings.push(formattedBooking);
+          } else if (formattedBooking.status === 'Active') {
+            transformed.activeBookings.push(formattedBooking);
+          } else {
+            transformed.bookingHistory.push(formattedBooking);
+          }
         }
       });
 
@@ -168,6 +162,7 @@ const bookingsSlice = createSlice({
         state.pendingBookings = action.payload.pendingBookings;
         state.activeBookings = action.payload.activeBookings;
         state.bookingHistory = action.payload.bookingHistory;
+        state.walkInCustomers = action.payload.walkInCustomers;
       })
       .addCase(fetchBookings.rejected, (state, action) => {
         state.loading = false;

@@ -230,7 +230,7 @@ const BookingForm = ({ isOpen, onClose, title, products, onSubmit, type }) => {
         phone,
         numberOfGuests: parseInt(guests),
         specialRequests,
-        amount: parseFloat(amount),
+        discountedPrice: parseFloat(amount),
         status: 'Active', // For walk-in bookings
         type: selectedProduct.type, // Add type from selected product
         productName: selectedProduct.name // Add product name
@@ -238,11 +238,6 @@ const BookingForm = ({ isOpen, onClose, title, products, onSubmit, type }) => {
 
       // Add date/time fields based on booking type
       if (type === 'Accommodation') {
-        // Log the dates to debug
-        console.log('Check-in date:', checkInDate);
-        console.log('Check-out date:', checkOutDate);
-        console.log('Check-in time:', checkInTime);
-        console.log('Check-out time:', checkOutTime);
 
         if (!checkInDate || !checkOutDate || !checkInTime || !checkOutTime) {
           showErrorAlert('Please select both dates and times');
@@ -599,6 +594,8 @@ const BusinessBooking = () => {
   const bookingHistory = useSelector(state => state.bookings.bookingHistory);
   const chatMessages = useSelector(state => state.bookings.chatMessages);
   const walkInCustomers = useSelector(state => state.bookings.walkInCustomers);
+  // log the walkInCustomers
+  console.log('Walk-In Customers:', walkInCustomers);
   const [isChatModalVisible, setChatModalVisible] = useState(false);
   const [currentBookingDetails, setCurrentBookingDetails] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -609,11 +606,10 @@ const BusinessBooking = () => {
   const [tableReservationSearchQuery, setTableReservationSearchQuery] = useState('');
   const [activitySearchQuery, setActivitySearchQuery] = useState('');
   const [walkInSearchQuery, setWalkInSearchQuery] = useState('');
-  const [walkInBookings, setWalkInBookings] = useState([]);
-  const [walkInHistory, setWalkInHistory] = useState([]);
   const [walkInAccommodationSearchQuery, setWalkInAccommodationSearchQuery] = useState('');
   const [walkInTableReservationSearchQuery, setWalkInTableReservationSearchQuery] = useState('');
   const [walkInActivitiesSearchQuery, setWalkInActivitiesSearchQuery] = useState('');
+  const walkInHistory = useSelector(state => state.bookings.walkInHistory);
 
   // Title Tab
   useEffect(() => {
@@ -677,8 +673,8 @@ const BusinessBooking = () => {
   };
 
   const filteredWalkInCustomers = walkInCustomers.filter(customer =>
-    customer.name.toLowerCase().includes(walkInSearchQuery.toLowerCase()) ||
-    customer.details.toLowerCase().includes(walkInSearchQuery.toLowerCase())
+    customer.customerName.toLowerCase().includes(walkInSearchQuery.toLowerCase()) ||
+    customer.productName.toLowerCase().includes(walkInSearchQuery.toLowerCase())
   );
 
   const addWalkInBooking = (booking) => {
@@ -820,31 +816,32 @@ const BusinessBooking = () => {
                 openChatModal={openChatModal}
                 filteredBookingsByType={filteredBookingsByType}
               />
-              <WalkInHistorySection
-                title="Walk-In Accommodation History"
-                history={walkInHistory}
-                type="Accommodation"
-                searchQuery={walkInSearchQuery}
-              />
-              <WalkInHistorySection
-                title="Walk-In Table Reservation History"
-                history={walkInHistory}
-                type="Table Reservation"
-                searchQuery={walkInSearchQuery}
-              />
-              <WalkInHistorySection
-                title="Walk-In Attraction History"
-                history={walkInHistory}
-                type="Attraction"
-                searchQuery={walkInSearchQuery}
-              />
+              {walkInHistory && (
+                <>
+                  <WalkInHistorySection
+                    title="Walk-In Accommodation History"
+                    history={walkInHistory}
+                    type="Accommodation"
+                    searchQuery={walkInSearchQuery}
+                  />
+                  <WalkInHistorySection
+                    title="Walk-In Table Reservation History"
+                    history={walkInHistory}
+                    type="Table Reservation"
+                    searchQuery={walkInSearchQuery}
+                  />
+                  <WalkInHistorySection
+                    title="Walk-In Attraction History"
+                    history={walkInHistory}
+                    type="Attraction"
+                    searchQuery={walkInSearchQuery}
+                  />
+                </>
+              )}
             </Tab>
 
             <Tab title="Walk In Customers" className="flex-1 min-w-[150px]">
               <WalkInCustomersSection
-                walkInCustomers={filteredWalkInCustomers}
-                walkInSearchQuery={walkInSearchQuery}
-                setWalkInSearchQuery={setWalkInSearchQuery}
                 setAccommodationFormOpen={setAccommodationFormOpen}
                 setTableReservationFormOpen={setTableReservationFormOpen}
                 setAttractionActivitiesFormOpen={setAttractionActivitiesFormOpen}
@@ -1016,50 +1013,52 @@ const BookingTypeSection = ({ type, bookings, searchQuery, setSearchQuery, openC
 
 // Walk-in customers section component
 const WalkInCustomersSection = ({
-  walkInCustomers,
-  walkInSearchQuery,
-  setWalkInSearchQuery,
   setAccommodationFormOpen,
   setTableReservationFormOpen,
   setAttractionActivitiesFormOpen
-}) => (
-  <div className="w-full space-y-4">
-    <div className="text-xl font-bold mb-4 text-gray-700">Walk In Customers</div>
+}) => {
+  const [walkInSearchQuery, setWalkInSearchQuery] = useState('');
+  const walkInCustomers = useSelector(state => state.bookings.walkInCustomers);
 
-    {/* Form Buttons */}
-    <div className="flex flex-wrap gap-4 mb-4 items-center font-medium text-color2">
-      <h1>Select Forms for Walk In Customers:</h1>
-      <Button color="primary" onClick={() => setAccommodationFormOpen(true)}>
-        Book Accommodation <span className="ml-2">📝</span>
-      </Button>
-      <Button color="primary" onClick={() => setTableReservationFormOpen(true)}>
-        Reserve Table <span className="ml-2">📝</span>
-      </Button>
-      <Button color="primary" onClick={() => setAttractionActivitiesFormOpen(true)}>
-        Book Activity <span className="ml-2">📝</span>
-      </Button>
-    </div>
+  return (
+    <div className="w-full space-y-4">
+      <div className="text-xl font-bold mb-4 text-gray-700">Walk In Customers</div>
 
-    {/* Search Bar */}
-    <Input
-      clearable
-      placeholder="Search walk-in customers..."
-      value={walkInSearchQuery}
-      onChange={(e) => setWalkInSearchQuery(e.target.value)}
-      width="100%"
-      className="mb-4"
-    />
+      {/* Form Buttons */}
+      <div className="flex flex-wrap gap-4 mb-4 items-center font-medium text-color2">
+        <h1>Select Forms for Walk In Customers:</h1>
+        <Button color="primary" onClick={() => setAccommodationFormOpen(true)}>
+          Book Accommodation <span className="ml-2">📝</span>
+        </Button>
+        <Button color="primary" onClick={() => setTableReservationFormOpen(true)}>
+          Reserve Table <span className="ml-2">📝</span>
+        </Button>
+        <Button color="primary" onClick={() => setAttractionActivitiesFormOpen(true)}>
+          Book Activity <span className="ml-2">📝</span>
+        </Button>
+      </div>
 
-    {['Accommodation', 'Table Reservation', 'Attraction'].map((type) => (
-      <WalkInTypeSection
-        key={type}
-        type={type}
-        customers={walkInCustomers}
-        searchQuery={walkInSearchQuery}
+      {/* Search Bar */}
+      <Input
+        clearable
+        placeholder="Search walk-in customers..."
+        value={walkInSearchQuery}
+        onChange={(e) => setWalkInSearchQuery(e.target.value)}
+        width="100%"
+        className="mb-4"
       />
-    ))}
-  </div>
-);
+
+      {['Accommodation', 'Table Reservation', 'Attraction'].map((type) => (
+        <WalkInTypeSection
+          key={type}
+          type={type}
+          customers={walkInCustomers}
+          searchQuery={walkInSearchQuery}
+        />
+      ))}
+    </div>
+  );
+};
 
 // Walk-in type section component
 const WalkInTypeSection = ({ type, customers, searchQuery }) => {
@@ -1070,53 +1069,17 @@ const WalkInTypeSection = ({ type, customers, searchQuery }) => {
     'Attraction': <MdDirectionsRun className="text-xl text-color1" />
   };
 
-  const sampleData = {
-    'Accommodation': [
-      {
-        id: 'sample1',
-        customerName: 'Sample John',
-        email: 'john.doe@example.com',
-        phone: '123-456-7890',
-        details: 'Sample Luxury Cabin, 2 guests, Check-in: 2023-12-01, Check-out: 2023-12-05',
-        specialRequests: 'None',
-        amount: '5000',
-        paymentMethod: 'Credit Card',
-        additionalNotes: 'N/A'
-      }
-    ],
-    'Table Reservation': [
-      {
-        id: 'sample2',
-        customerName: 'Sample Jane',
-        email: 'jane.doe@example.com',
-        phone: '098-765-4321',
-        details: 'Sample Dining, Reservation Date: 2023-12-10, Time: 19:00',
-        specialRequests: 'Window seat',
-        amount: '2000',
-        paymentMethod: 'Cash',
-        additionalNotes: 'N/A'
-      }
-    ],
-    'Attraction': [
-      {
-        id: 'sample3',
-        customerName: 'Sample Alice',
-        email: 'alice@example.com',
-        phone: '555-555-5555',
-        details: 'Sample Hiking Adventure, Activity Date: 2023-12-15',
-        specialRequests: 'Vegetarian meal',
-        amount: '1500',
-        paymentMethod: 'Debit Card',
-        additionalNotes: 'N/A'
-      }
-    ]
-  };
-
-  const filteredCustomers = customers.filter(customer => 
-    customer.type === type && 
-    (customer.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-     customer.details.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  // Filter customers by type and search query
+  const filteredCustomers = customers.filter(customer => {
+    const searchTermLower = searchQuery?.toLowerCase() || '';
+    return (
+      customer?.type === type && 
+      ((customer?.customerName?.toLowerCase() || '').includes(searchTermLower) ||
+       (customer?.email?.toLowerCase() || '').includes(searchTermLower) ||
+       (customer?.phone?.toLowerCase() || '').includes(searchTermLower) ||
+       (customer?.details?.toLowerCase() || '').includes(searchTermLower))
+    );
+  });
 
   const handleMarkAsComplete = (customerId) => {
     dispatch(markWalkInAsCompleted(customerId));
@@ -1125,12 +1088,10 @@ const WalkInTypeSection = ({ type, customers, searchQuery }) => {
       text: 'Customer booking marked as complete',
       icon: 'success',
       confirmButtonText: 'OK',
-      confirmButtonColor: '#0BDA51', // Green color for confirmation
-      cancelButtonColor: '#D33736',  // Red color for cancellation
+      confirmButtonColor: '#0BDA51',
+      cancelButtonColor: '#D33736',
     });
   };
-
-  const hasBookings = filteredCustomers.length > 0 || sampleData[type].length > 0;
 
   return (
     <div className="bg-gray-100 p-6 rounded-lg shadow-lg">
@@ -1138,44 +1099,31 @@ const WalkInTypeSection = ({ type, customers, searchQuery }) => {
         {iconMap[type]} {type}
       </h3>
       <div className="bg-white max-h-[600px] flex flex-col gap-4 overflow-y-auto rounded-lg p-4 shadow-inner">
-        {filteredCustomers.map((customer) => (
-          <div key={customer.id} className="p-4 bg-white rounded-lg shadow-md border border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">{customer.customerName}</h2>
-            <p className="text-gray-600"><strong>Email:</strong> {customer.email || 'Not provided'}</p>
-            <p className="text-gray-600"><strong>Phone:</strong> {customer.phone || 'Not provided'}</p>
-            <p className="text-gray-600"><strong>Details:</strong> {customer.details}</p>
-            <p className="text-gray-600"><strong>Special Requests:</strong> {customer.specialRequests || 'None'}</p>
-            <p className="text-gray-600"><strong>Total Amount:</strong> ₱{customer.amount || '0'}</p>
-            <p className="text-gray-600"><strong>Payment Method:</strong> {customer.paymentMethod || 'Not specified'}</p>
-            <p className="text-gray-600"><strong>Additional Notes:</strong> {customer.additionalNotes || 'None'}</p>
-            <div className="flex justify-end items-center mt-4">
-              <Button auto color="success" onClick={() => handleMarkAsComplete(customer.id)}>
-                Mark as Complete
-              </Button>
+        {filteredCustomers.length > 0 ? (
+          filteredCustomers.map((customer) => (
+            <div key={customer.id} className="p-4 bg-white rounded-lg shadow-md border border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-900">{customer.customerName}</h2>
+              <p className="text-gray-600"><strong>Email:</strong> {customer.email || 'Not provided'}</p>
+              <p className="text-gray-600"><strong>Phone:</strong> {customer.phone || 'Not provided'}</p>
+              <p className="text-gray-600"><strong>Details:</strong> {customer.details || 'Not provided'}</p>
+              <p className="text-gray-600"><strong>Special Requests:</strong> {customer.specialRequests || 'None'}</p>
+              <p className="text-gray-600"><strong>Total Amount:</strong> ₱{customer.amount || '0'}</p>
+              <p className="text-gray-600"><strong>Payment Method:</strong> {customer.paymentMethod || 'Not specified'}</p>
+              <p className="text-gray-600"><strong>Additional Notes:</strong> {customer.additionalNotes || 'None'}</p>
+              <div className="flex justify-end items-center mt-4">
+                <Button auto color="success" onClick={() => handleMarkAsComplete(customer.id)}>
+                  Mark as Complete
+                </Button>
+              </div>
             </div>
+          ))
+        ) : (
+          <div className="p-4 text-gray-500">
+            {searchQuery 
+              ? `No ${type.toLowerCase()} walk-in bookings found matching "${searchQuery}"`
+              : `No ${type.toLowerCase()} walk-in bookings available`
+            }
           </div>
-        ))}
-
-        {filteredCustomers.length === 0 && sampleData[type].map((sample) => (
-          <div key={sample.id} className="p-4 bg-white rounded-lg shadow-md border border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">{sample.customerName}</h2>
-            <p className="text-gray-600"><strong>Email:</strong> {sample.email}</p>
-            <p className="text-gray-600"><strong>Phone:</strong> {sample.phone}</p>
-            <p className="text-gray-600"><strong>Details:</strong> {sample.details}</p>
-            <p className="text-gray-600"><strong>Special Requests:</strong> {sample.specialRequests}</p>
-            <p className="text-gray-600"><strong>Total Amount:</strong> ₱{sample.amount}</p>
-            <p className="text-gray-600"><strong>Payment Method:</strong> {sample.paymentMethod}</p>
-            <p className="text-gray-600"><strong>Additional Notes:</strong> {sample.additionalNotes}</p>
-            <div className="flex justify-end items-center mt-4">
-              <Button auto color="success" onClick={() => handleMarkAsComplete(sample.id)}>
-                Mark as Complete
-              </Button>
-            </div>
-          </div>
-        ))}
-
-        {!hasBookings && (
-          <div className="p-4 text-gray-500">No walk-in {type.toLowerCase()} bookings available</div>
         )}
       </div>
     </div>
@@ -1183,19 +1131,25 @@ const WalkInTypeSection = ({ type, customers, searchQuery }) => {
 };
 
 // New component for walk-in history sections
-const WalkInHistorySection = ({ title, history, type, searchQuery }) => (
+const WalkInHistorySection = ({ title, history = [], type, searchQuery }) => (
   <div className="bg-gray-100 p-4 rounded-lg shadow-lg mt-4">
     <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
     <div className="bg-white max-h-[600px] flex flex-col gap-3 overflow-y-auto rounded-lg p-4 shadow-inner">
-      {history.filter(booking => booking.type === type && 
-        (booking.firstName.toLowerCase().includes(searchQuery.toLowerCase()) || 
-         booking.lastName.toLowerCase().includes(searchQuery.toLowerCase()))).length > 0 ? (
-        history.filter(booking => booking.type === type && 
-          (booking.firstName.toLowerCase().includes(searchQuery.toLowerCase()) || 
-           booking.lastName.toLowerCase().includes(searchQuery.toLowerCase()))).map((booking) => (
+      {history.filter(booking => 
+        booking.type === type && 
+        (booking.customerName?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+         booking.productName?.toLowerCase().includes(searchQuery.toLowerCase()))
+      ).length > 0 ? (
+        history.filter(booking => 
+          booking.type === type && 
+          (booking.customerName?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+           booking.productName?.toLowerCase().includes(searchQuery.toLowerCase()))
+        ).map((booking) => (
           <div key={booking.id} className="p-4 bg-gray-200 rounded-lg">
-            <h2 className="text-lg font-semibold">{booking.firstName} {booking.lastName}</h2>
-            <p>Details: {booking.productTitle}</p>
+            <h2 className="text-lg font-semibold">{booking.customerName}</h2>
+            <p>Details: {booking.productName}</p>
+            <p>Date: {booking.date}</p>
+            <p>Amount: ₱{booking.amount}</p>
           </div>
         ))
       ) : (
