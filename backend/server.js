@@ -2060,8 +2060,8 @@ app.post('/book-activity', async (req, res) => {
 
     const values = [
       user_id,
-      business_id || null,
-      product_id || null,
+      business_id,
+      product_id,
       customerName,
       productName,
       numberOfGuests,

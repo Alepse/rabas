@@ -21,28 +21,8 @@ import { Tabs, Tab } from "@nextui-org/tabs";
 import { FaSearch } from 'react-icons/fa';
 import ChatModal from './ChatSystem/ChatModal';
 import { today, getLocalTimeZone } from '@internationalized/date';
-import { MdPeople, MdEmail, MdPhone, MdDateRange, MdHotel, MdRestaurant, MdDirectionsRun, MdCheck, MdDone } from 'react-icons/md';
+import { MdPeople, MdEmail, MdPhone, MdDateRange, MdHotel, MdRestaurant, MdDirectionsRun, MdCheck, MdDone, MdClose } from 'react-icons/md';
 import Swal from 'sweetalert2';
-
-// Mock data similar to BusinessAllproducts.jsx
-const mockData = {
-  accommodations: [
-    { title: 'Luxury Mountain Cabin', type: 'Cabins' },
-    { title: 'Beachfront Resort', type: 'Resorts' },
-  ],
-  restaurant: [
-    { title: 'Mountain View Dining', type: 'Fine Dining' },
-    { title: 'Coastal Seafood Feast', type: 'Buffet' },
-  ],
-  activities: [
-    { title: 'Hiking Adventure', type: 'Hiking' },
-    { title: 'Water Sports Fun', type: 'Water Sports' },
-  ],
-  shop: [
-    { title: 'Local Handicrafts', type: 'Local Crafts' },
-    { title: 'Souvenir Shop', type: 'Souvenirs' },
-  ],
-};
 
 // SweetAlert functions
 const showSuccessAlert = (message) => {
@@ -165,65 +145,414 @@ const BookingCard = ({ booking, onOpenChatModal, onMarkAsCompleted, onAcceptBook
 );
 
 // Form component
-const BookingForm = ({ isOpen, onClose, title, products, onSubmit, type }) => (
-  <Modal isOpen={isOpen} onClose={onClose} size='full'>
-    <ModalContent className='max-h-screen overflow-auto '>
-      <ModalHeader>{title}</ModalHeader>
-      <ModalBody className="space-y-4 ">
-        <Select label={`Select ${title}`} placeholder="Choose a product" required className="w-full">
-          {products.map((product) => (
-            <SelectItem key={product.title} value={product.title}>
-              {product.title}
-            </SelectItem>
-          ))}
-        </Select>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Input label="First Name" fullWidth required />
-          <Input label="Last Name" fullWidth required />
-        </div>
-        <Input label="Email" type="email" fullWidth required />
-        <Input label="Phone" type="tel" fullWidth required />
-        
-        {type === 'Accommodation' && (
-          <>
-            <h1 className='text-center'>Choose Check-in and Check-out Date</h1>
-            <div className='flex justify-center'>
-            <RangeCalendar aria-label="Select Dates" visibleMonths={2} required  />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Input type="time" label="Check-in Time" required />
-              <Input type="time" label="Check-out Time" required />
-            </div>
-          </>
-        )}
-        
-        {type === 'Table Reservation' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input type="date" label="Reservation Date" required />
-            <Input type="time" label="Reservation Time" required />
+const BookingForm = ({ isOpen, onClose, title, products, onSubmit, type }) => {
+  // Product selection states
+  const [searchValue, setSearchValue] = useState('');
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Form field states
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [guests, setGuests] = useState('');
+  const [amount, setAmount] = useState('');
+  const [specialRequests, setSpecialRequests] = useState('');
+  
+  // Date/Time states
+  const [checkInDate, setCheckInDate] = useState(null);
+  const [checkOutDate, setCheckOutDate] = useState(null);
+  const [checkInTime, setCheckInTime] = useState('');
+  const [checkOutTime, setCheckOutTime] = useState('');
+  const [reservationDate, setReservationDate] = useState('');
+  const [reservationTime, setReservationTime] = useState('');
+  const [activityDate, setActivityDate] = useState('');
+  const [startingTime, setStartingTime] = useState('');
+
+  // Reset function
+  const handleClose = () => {
+    // Reset product selection
+    setSearchValue('');
+    setSelectedProduct(null);
+    setShowSuggestions(false);
+
+    // Reset form fields
+    setFirstName('');
+    setLastName('');
+    setEmail('');
+    setPhone('');
+    setGuests('');
+    setAmount('');
+    setSpecialRequests('');
+
+    // Reset dates/times
+    setCheckInDate(null);
+    setCheckOutDate(null);
+    setCheckInTime('');
+    setCheckOutTime('');
+    setReservationDate('');
+    setReservationTime('');
+    setActivityDate('');
+    setStartingTime('');
+
+    onClose();
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!selectedProduct) {
+      showErrorAlert('Please select a product');
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+
+      const formData = {
+        businessId: selectedProduct.business_id,
+        user_id: 0,// use random user id
+        productId: selectedProduct.product_id,
+        firstName,
+        lastName,
+        email,
+        phone,
+        numberOfGuests: parseInt(guests),
+        specialRequests,
+        amount: parseFloat(amount),
+        status: 'Active', // For walk-in bookings
+        type: selectedProduct.type, // Add type from selected product
+        productName: selectedProduct.name // Add product name
+      };
+
+      // Add date/time fields based on booking type
+      if (type === 'Accommodation') {
+        // Log the dates to debug
+        console.log('Check-in date:', checkInDate);
+        console.log('Check-out date:', checkOutDate);
+        console.log('Check-in time:', checkInTime);
+        console.log('Check-out time:', checkOutTime);
+
+        if (!checkInDate || !checkOutDate || !checkInTime || !checkOutTime) {
+          showErrorAlert('Please select both dates and times');
+          return;
+        }
+
+        formData.checkInOutDates = {
+          start: {
+            year: checkInDate.year,
+            month: checkInDate.month,
+            day: checkInDate.day,
+            time: checkInTime
+          },
+          end: {
+            year: checkOutDate.year,
+            month: checkOutDate.month,
+            day: checkOutDate.day,
+            time: checkOutTime
+          }
+        };
+      } else if (type === 'Table Reservation') {
+        if (!reservationDate) {
+          showErrorAlert('Please select a reservation date');
+          return;
+        }
+
+        formData.reservationDate = {
+          year: new Date(reservationDate).getFullYear(),
+          month: new Date(reservationDate).getMonth() + 1,
+          day: new Date(reservationDate).getDate()
+        };
+        formData.reservationTime = reservationTime;
+      } else if (type === 'Activity') {
+        if (!activityDate) {
+          showErrorAlert('Please select an activity date');
+          return;
+        }
+
+        formData.visitDate = {
+          year: new Date(activityDate).getFullYear(),
+          month: new Date(activityDate).getMonth() + 1,
+          day: new Date(activityDate).getDate()
+        };
+        formData.activityTime = startingTime;
+      }
+
+      let endpoint = '';
+      switch (type) {
+        case 'Accommodation':
+          endpoint = '/book-accommodation';
+          break;
+        case 'Table Reservation':
+          endpoint = '/book-table';
+          break;
+        case 'Activity':
+          endpoint = '/book-activity';
+          break;
+        default:
+          throw new Error('Invalid booking type');
+      }
+
+      const response = await fetch(`http://localhost:5000${endpoint}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(formData)
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        showSuccessAlert('Booking created successfully!');
+        handleClose(); // Close and reset form
+      } else {
+        throw new Error(data.message || 'Failed to create booking');
+      }
+    } catch (error) {
+      console.error('Error creating booking:', error);
+      showErrorAlert(error.message || 'Failed to create booking');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <Modal 
+      isOpen={isOpen} 
+      onClose={handleClose}
+      size='3xl'
+      scrollBehavior="inside"
+    >
+      <ModalContent className='max-h-[90vh]'>
+        <ModalHeader>{title}</ModalHeader>
+        <ModalBody className="space-y-4">
+          <div className="relative">
+            <Input
+              label={`Select ${title}`}
+              placeholder="Type to search..."
+              required
+              className="w-full"
+              startContent={<FaSearch className="text-default-400 text-sm" />}
+              value={searchValue}
+              onChange={(e) => {
+                setSearchValue(e.target.value);
+                setShowSuggestions(true);
+              }}
+              onFocus={() => setShowSuggestions(true)}
+              onBlur={() => {
+                setTimeout(() => setShowSuggestions(false), 200);
+              }}
+            />
+            
+            {/* Dropdown Suggestions */}
+            {showSuggestions && (
+              <div 
+                className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 overflow-auto"
+                style={{ backgroundColor: 'white' }}
+              >
+                {products
+                  .filter(product =>
+                    searchValue === '' ? true :
+                    (product.name.toLowerCase().includes(searchValue.toLowerCase()) || product.type.toLowerCase().includes(searchValue.toLowerCase()))
+                  )
+                  .map((product) => (
+                    <div
+                      key={product.product_id}
+                      className="p-2 hover:bg-gray-100 cursor-pointer bg-white"
+                      onClick={() => {
+                        setSearchValue(product.name);
+                        setSelectedProduct(product);
+                        setShowSuggestions(false);
+                      }}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                      }}
+                    >
+                      <div className="flex flex-col gap-1">
+                        <span className="text-sm font-medium text-gray-900">{product.name}</span>
+                        {product.description && (
+                          <span className="text-xs text-gray-600">
+                            {product.description}
+                          </span>
+                        )}
+                        {product.price && (
+                          <span className="text-xs text-gray-600">
+                            ₱{product.price}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                
+                {/* No results message */}
+                {products.filter(product =>
+                  searchValue === '' ? true :
+                  (product.name.toLowerCase().includes(searchValue.toLowerCase()) || product.type.toLowerCase().includes(searchValue.toLowerCase()))
+                ).length === 0 && (
+                  <div className="p-4 text-center text-gray-500 bg-white">
+                    No matches found for "{searchValue}"
+                  </div>
+                )}
+              </div>
+            )}
           </div>
-        )}
-        
-        {type === 'Activity' && (
-          <>
-            <Input type="date" label="Activity Date" required />
-            <Input type="time" label="Starting Time" required />
-          </>
-        )}
-        
-        <Input label="Number of Guests" type="number" fullWidth min={1} required />
-        <Input label="Special Requests" fullWidth multiline />
-        <Input label="Total Amount" type="number" fullWidth min={0} required />
-        <Input label="Payment Method" fullWidth />
-        <Input label="Additional Notes" fullWidth multiline />
-      </ModalBody>
-      <ModalFooter className="flex justify-end space-x-4">
-        <Button auto flat color="danger" onClick={onClose}>Cancel</Button>
-        <Button auto color="success" onClick={onSubmit}>Submit</Button>
-      </ModalFooter>
-    </ModalContent>
-  </Modal>
-);
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input 
+              label="First Name" 
+              fullWidth 
+              required 
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+            />
+            <Input 
+              label="Last Name" 
+              fullWidth 
+              required 
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+            />
+          </div>
+          <Input 
+            label="Email" 
+            type="email" 
+            fullWidth 
+            required 
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <Input 
+            label="Phone" 
+            type="tel" 
+            fullWidth 
+            required 
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+          />
+          
+          {type === 'Accommodation' && (
+            <>
+              <h1 className='text-center'>Choose Check-in and Check-out Date</h1>
+              <div className='flex justify-center'>
+                <RangeCalendar 
+                  aria-label="Select Dates" 
+                  visibleMonths={1}
+                  required
+                  onChange={dates => {
+                    setCheckInDate(dates.start);
+                    setCheckOutDate(dates.end);
+                  }}
+                />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Input 
+                  type="time" 
+                  label="Check-in Time" 
+                  required 
+                  value={checkInTime}
+                  onChange={(e) => setCheckInTime(e.target.value)}
+                />
+                <Input 
+                  type="time" 
+                  label="Check-out Time" 
+                  required 
+                  value={checkOutTime}
+                  onChange={(e) => setCheckOutTime(e.target.value)}
+                />
+              </div>
+            </>
+          )}
+          
+          {type === 'Table Reservation' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input 
+                type="date" 
+                label="Reservation Date" 
+                required 
+                value={reservationDate}
+                onChange={(e) => setReservationDate(e.target.value)}
+              />
+              <Input 
+                type="time" 
+                label="Reservation Time" 
+                required 
+                value={reservationTime}
+                onChange={(e) => setReservationTime(e.target.value)}
+              />
+            </div>
+          )}
+          
+          {type === 'Activity' && (
+            <>
+              <Input 
+                type="date" 
+                label="Activity Date" 
+                required 
+                value={activityDate}
+                onChange={(e) => setActivityDate(e.target.value)}
+              />
+              <Input 
+                type="time" 
+                label="Starting Time" 
+                required 
+                value={startingTime}
+                onChange={(e) => setStartingTime(e.target.value)}
+              />
+            </>
+          )}
+          
+          <Input 
+            label="Number of Guests" 
+            type="number" 
+            fullWidth 
+            min={1} 
+            required 
+            value={guests}
+            onChange={(e) => setGuests(e.target.value)}
+          />
+          <Input 
+            label="Special Requests" 
+            fullWidth 
+            multiline 
+            value={specialRequests}
+            onChange={(e) => setSpecialRequests(e.target.value)}
+          />
+          <Input 
+            label="Total Amount" 
+            type="number" 
+            fullWidth 
+            min={0} 
+            required 
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+          />
+        </ModalBody>
+        <ModalFooter className="flex justify-end space-x-4">
+          <Button 
+            auto 
+            flat 
+            color="danger" 
+            onClick={handleClose}
+            disabled={isLoading}
+          >
+            Cancel
+          </Button>
+          <Button 
+            auto 
+            color="success" 
+            onClick={handleSubmit}
+            isLoading={isLoading}
+          >
+            Submit
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
+  );
+};
 
 // Main business booking component
 const BusinessBooking = () => {
@@ -409,6 +738,37 @@ const BusinessBooking = () => {
     }
   };
 
+  // Add state for real data
+  const [accommodations, setAccommodations] = useState([]);
+  const [restaurants, setRestaurants] = useState([]);
+  const [activities, setActivities] = useState([]);
+
+  // Add useEffect to fetch real data
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/getAllBusinessProduct');
+        const data = await response.json();
+        
+        if (data.success) {
+          const products = data.businessProducts;
+          // Log to see available categories
+          console.log('Available product categories:', [...new Set(products.map(p => p.product_category))]);
+          
+          setAccommodations(products.filter(p => p.product_category === 'accommodation'));
+          setRestaurants(products.filter(p => p.product_category === 'restaurant'));
+          setActivities(products.filter(p => p.product_category === 'activity'));
+        } else {
+          console.error('Failed to fetch products:', data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-gray-50 relative">
       <Sidebar />
@@ -507,7 +867,7 @@ const BusinessBooking = () => {
           isOpen={isAccommodationFormOpen}
           onClose={() => setAccommodationFormOpen(false)}
           title="Accommodation"
-          products={mockData.accommodations}
+          products={accommodations}
           onSubmit={() => handleSubmit('Accommodation')}
           type="Accommodation"
         />
@@ -515,7 +875,7 @@ const BusinessBooking = () => {
           isOpen={isTableReservationFormOpen}
           onClose={() => setTableReservationFormOpen(false)}
           title="Table Reservation"
-          products={mockData.restaurant}
+          products={restaurants}
           onSubmit={() => handleSubmit('Table Reservation')}
           type="Table Reservation"
         />
@@ -523,7 +883,7 @@ const BusinessBooking = () => {
           isOpen={isAttractionActivitiesFormOpen}
           onClose={() => setAttractionActivitiesFormOpen(false)}
           title="Activity"
-          products={mockData.activities}
+          products={activities}
           onSubmit={() => handleSubmit('Activity')}
           type="Activity"
         />
