@@ -353,10 +353,26 @@ app.post('/signup', async (req, res) => {
         return res.status(500).json({ success: false, message: 'Internal server error', error: err.message });
       }
 
-      console.log('Signup successful. Affected rows:', results.affectedRows);
+      // Get the newly created user's ID
+      const userId = results.insertId;
 
-      // Return a success response
-      return res.json({ success: true, message: 'Signup successful' });
+      // Set up user session
+      req.session.user = {
+        user_id: userId
+      };
+
+      console.log('Signup and auto-login successful. User ID:', userId);
+
+      // Return a success response with session info
+      return res.json({ 
+        success: true, 
+        message: 'Signup successful and automatically logged in',
+        user: {
+          user_id: userId,
+          username: username,
+          email: email
+        }
+      });
     });  
   } catch (error) {
     console.error('Error hashing password:', error);
