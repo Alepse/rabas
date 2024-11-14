@@ -15,81 +15,6 @@ import { CheckboxGroup, Checkbox } from "@nextui-org/checkbox";
 import SuperAdminSidebar from './superadmincomponents/superadminsidebar';
 import SearchBar from './superadmincomponents/SearchBar'; // Import the SearchBar component
 
-// Mock Data
-const mockData = {
-  activities: [
-    {
-      title: 'Hiking Adventure',
-      description: 'Explore scenic mountain trails. Guide and equipment included.',
-      price: 1500,
-      imageUrl: 'https://via.placeholder.com/200',
-      rating: 4,
-      type: 'Hiking',
-    },
-    {
-      title: 'Snorkeling Tour',
-      description: 'Discover the underwater world with a guided snorkeling tour.',
-      price: 1200,
-      imageUrl: 'https://via.placeholder.com/200',
-      rating: 3,
-      type: 'Water Sports',
-    },
-  ],
-  accommodations: [
-    {
-      title: 'Luxury Mountain Cabin',
-      description: 'Stay in a cozy cabin with scenic views and modern amenities.',
-      price: 5000,
-      imageUrl: 'https://via.placeholder.com/200',
-      rating: 5,
-      type: 'Cabins',
-    },
-    {
-      title: 'Beachfront Resort',
-      description: 'Relax in a luxury resort right on the beach.',
-      price: 8000,
-      imageUrl: 'https://via.placeholder.com/200',
-      rating: 4,
-      type: 'Resorts',
-    },
-  ],
-  restaurant: [
-    {
-      title: 'Mountain View Dining',
-      description: 'Experience local cuisine with a view of the mountains.',
-      price: 1000,
-      imageUrl: 'https://via.placeholder.com/200',
-      rating: 2,
-      type: 'Fine Dining',
-    },
-    {
-      title: 'Coastal Seafood Feast',
-      description: 'Indulge in fresh seafood dishes by the shore.',
-      price: 1500,
-      imageUrl: 'https://via.placeholder.com/200',
-      rating: 4,
-      type: 'Buffet',
-    },
-  ],
-  shop: [
-    {
-      title: 'Local Handicrafts',
-      description: 'Shop unique handmade items from local artisans.',
-      price: 500,
-      imageUrl: 'https://via.placeholder.com/200',
-      rating: 3,
-      type: 'Local Crafts',
-    },
-    {
-      title: 'Souvenir Shop',
-      description: 'Get your souvenirs and take home memories of the trip.',
-      price: 700,
-      imageUrl: 'https://via.placeholder.com/200',
-      rating: 2,
-      type: 'Souvenirs',
-    },
-  ],
-};
 
 // Sample Business Listings Data
 const businessListings = {
@@ -145,7 +70,7 @@ const businessListings = {
 
 // Dashboard component for product counts
 const Dashboard = ({ productCounts }) => (
-  <div className="flex justify-around py-6">
+  <div className="flex justify-around py-6 space-x-4">
     <div className="bg-red-400 text-white w-72 h-40 flex flex-col justify-center items-center rounded-lg shadow-lg hover:shadow-xl transition-shadow">
       <p className="text-lg">Attractions</p>
       <p className="text-4xl font-bold">{productCounts.activities}</p>
@@ -158,6 +83,10 @@ const Dashboard = ({ productCounts }) => (
       <p className="text-lg">Foods</p>
       <p className="text-4xl font-bold">{productCounts.foods}</p>
     </div>
+    <div className="bg-yellow-400 text-white w-72 h-40 flex flex-col justify-center items-center rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+      <p className="text-lg">Shops</p>
+      <p className="text-4xl font-bold">{productCounts.shops}</p>
+    </div>
     <div className="bg-pink-400 text-white w-72 h-40 flex flex-col justify-center items-center rounded-lg shadow-lg hover:shadow-xl transition-shadow">
       <p className="text-lg">Total Products</p>
       <p className="text-4xl font-bold">{productCounts.total}</p>
@@ -167,7 +96,7 @@ const Dashboard = ({ productCounts }) => (
 
 // Dashboard component for business counts
 const BusinessDashboard = ({ businessCounts }) => (
-  <div className="flex justify-around py-6">
+  <div className="flex justify-around py-6 space-x-4">
     <div className="bg-blue-400 text-white w-72 h-40 flex flex-col justify-center text-center items-center rounded-lg shadow-lg hover:shadow-xl transition-shadow">
       <p className="text-lg">Activities & Attractions</p>
       <p className="text-4xl font-bold">{businessCounts.activitiesAndAttractions}</p>
@@ -184,8 +113,33 @@ const BusinessDashboard = ({ businessCounts }) => (
       <p className="text-lg">Shops</p>
       <p className="text-4xl font-bold">{businessCounts.shops}</p>
     </div>
+    <div className="bg-gray-500 text-white w-72 h-40 flex flex-col justify-center items-center rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+        <p className="text-lg">Total Businesses</p>
+        <p className="text-4xl font-bold">{businessCounts.total}</p>
+      </div>
   </div>
 );
+
+// Remove the Highlight import and add this custom component
+const Highlight = ({ content, match }) => {
+  if (!match.trim() || !content) return content;
+
+  const parts = content.toString().split(new RegExp(`(${match})`, 'gi'));
+  
+  return (
+    <span>
+      {parts.map((part, i) => 
+        part.toLowerCase() === match.toLowerCase() ? (
+          <span key={i} className="bg-yellow-200 text-black px-1 rounded">
+            {part}
+          </span>
+        ) : (
+          part
+        )
+      )}
+    </span>
+  );
+};
 
 const SuperAdminProducts = () => {
   const [products, setProducts] = useState([]);
@@ -197,6 +151,7 @@ const SuperAdminProducts = () => {
     activities: 0,
     accommodations: 0,
     foods: 0,
+    shops: 0,
     total: 0,
   });
   const [businessCounts, setBusinessCounts] = useState({
@@ -204,6 +159,7 @@ const SuperAdminProducts = () => {
     accommodations: 0,
     foodPlaces: 0,
     shops: 0,
+    total: 0,
   });
   const [selectedSections, setSelectedSections] = useState([]);
   const [selectedBusiness, setSelectedBusiness] = useState(null);
@@ -211,69 +167,253 @@ const SuperAdminProducts = () => {
 
   const [selectedProductFilter, setSelectedProductFilter] = useState('all');
   const [selectedBusinessFilter, setSelectedBusinessFilter] = useState('all');
+  const [businessProducts, setBusinessProducts] = useState({
+    activities: [],
+    accommodations: [],
+    restaurant: [],
+    shop: []
+  });
+
+  const [businessListings, setBusinessListings] = useState({
+    activitiesAndAttractions: [],
+    accommodations: [],
+    foodPlaces: [],
+    shops: []
+  });
 
   useEffect(() => {
-    const activitiesCount = mockData.activities.length;
-    const accommodationsCount = mockData.accommodations.length;
-    const foodsCount = mockData.restaurant.length;
-    const shopCount = mockData.shop.length;
-    const totalProducts = activitiesCount + accommodationsCount + foodsCount + shopCount;
-
-    setProductCounts({
-      activities: activitiesCount,
-      accommodations: accommodationsCount,
-      foods: foodsCount,
-      total: totalProducts,
-    });
-
-    const sortedProducts = [
-      ...mockData.activities,
-      ...mockData.accommodations,
-      ...mockData.restaurant,
-      ...mockData.shop,
-    ].sort((a, b) => b.rating - a.rating);
-
-    setProducts(sortedProducts);
-
-    setBusinessCounts({
-      activitiesAndAttractions: businessListings.activitiesAndAttractions.length,
-      accommodations: businessListings.accommodations.length,
-      foodPlaces: businessListings.foodPlaces.length,
-      shops: businessListings.shops.length,
-    });
+    fetchBusinessProducts();
+    fetchBusinessListings();
   }, []);
 
-  const filterProducts = (products) => {
-    switch (selectedProductFilter) {
-      case 'topRated':
-        return products.filter(product => product.rating >= 4);
-      case 'budgetFriendly':
-        return products.filter(product => product.price <= 1500);
-      case 'luxury':
-        return products.filter(product => product.price >= 5000);
-      default:
-        return products;
+  const fetchBusinessProducts = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/superAdmin-fetchAllBusinessProducts', {
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch products');
+      }
+
+      const data = await response.json();
+      
+      if (data.success) {
+        console.log('Received products data:', data.products);
+
+        // Categorize products
+        const categorizedProducts = {
+          activities: [],
+          accommodations: [],
+          restaurant: [],
+          shop: []
+        };
+
+        // Create enhanced products array
+        const enhancedProducts = data.products.map(product => {
+          // Parse JSON fields
+          const images = typeof product.images === 'string' ? JSON.parse(product.images) : product.images;
+          const inclusions = typeof product.inclusions === 'string' ? JSON.parse(product.inclusions) : product.inclusions;
+          const terms = typeof product.termsAndConditions === 'string' ? JSON.parse(product.termsAndConditions) : product.termsAndConditions;
+
+          return {
+            ...product,
+            title: product.name || 'Untitled Product',
+            description: product.description || 'No description available',
+            price: parseFloat(product.price) || 0,
+            imageUrl: images && images.length > 0 ?  `http://localhost:5000/${images[0].path}` : 'https://via.placeholder.com/200',
+            rating: product.rating || 0,
+            type: product.type || 'Uncategorized',
+            businessName: product.businessName || 'Unknown Business',
+            ownerName: product.owner_name || 'Unknown Owner',
+            discount: product.discount || 0,
+            expirationDate: product.expiration || 'No Expiration',
+            inclusions: inclusions || [],
+            termsAndConditions: terms || [],
+            images: images || [],
+            pricingUnit: product.pricing_unit || 'per item'
+          };
+        });
+
+        // Categorize the enhanced products
+        enhancedProducts.forEach(product => {
+          const category = (product.product_category || '').toLowerCase();
+          
+          if (category.includes('activit') || category.includes('attract')) {
+            categorizedProducts.activities.push(product);
+          } else if (category.includes('accommodat') || category.includes('hotel') || category.includes('resort')) {
+            categorizedProducts.accommodations.push(product);
+          } else if (category.includes('restaurant') || category.includes('food')) {
+            categorizedProducts.restaurant.push(product);
+          } else if (category.includes('shop') || category.includes('souvenir')) {
+            categorizedProducts.shop.push(product);
+          } else {
+            console.log('Uncategorized product:', product.name, 'Category:', category);
+            categorizedProducts.shop.push(product);
+          }
+        });
+
+        setBusinessProducts(categorizedProducts);
+        
+        // Update product counts
+        setProductCounts({
+          activities: categorizedProducts.activities.length,
+          accommodations: categorizedProducts.accommodations.length,
+          foods: categorizedProducts.restaurant.length,
+          shops: categorizedProducts.shop.length,
+          total: enhancedProducts.length
+        });
+
+        // Update the products state
+        setProducts(enhancedProducts);
+
+      } else {
+        console.error('Failed to fetch products:', data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching products:', error);
     }
   };
 
-  const filterBusinesses = (businesses) => {
-    switch (selectedBusinessFilter) {
-      case 'topRated':
-        return businesses.filter(business => business.rating >= 4);
-      case 'budgetFriendly':
-        return businesses.filter(business => business.price <= 1500);
-      case 'luxury':
-        return businesses.filter(business => business.price >= 5000);
-      default:
-        return businesses;
+  const fetchBusinessListings = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/superAdmin-fetchAllBusinessListings', {
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch business listings');
+      }
+
+      const data = await response.json();
+      
+      if (data.success) {
+        console.log('Received business listings data:', data.businesses);
+        const categorizedBusinesses = {
+          activitiesAndAttractions: [],
+          accommodations: [],
+          foodPlaces: [],
+          shops: []
+        };
+
+        data.businesses.forEach(business => {
+          // Create a standardized business object
+          const enhancedBusiness = {
+            title: business.businessName,
+            description: business.aboutUs || 'No description available',
+            imageUrl: business.businessLogo ? `http://localhost:5000/${business.businessLogo}` : 'https://via.placeholder.com/200',
+            type: business.businessType,
+            businessInfo: {
+              category: business.category || [],
+              facilities: business.facilities || [],
+              policies: business.policies || [],
+              contactInfo: business.contactInfo || [],
+              openingHours: business.openingHours || [],
+              businessCard: business.businessCard || {}
+            },
+            owner: {
+              name: business.owner_name || 'Unknown Owner',
+              email: business.owner_email || 'No email provided'
+            },
+            status: business.displayStatus,
+            heroImages: business.heroImages || []
+          };
+
+          // Categorize based on businessType
+          const type = (business.businessType || '').toLowerCase();
+          if (type.includes('activity') || type.includes('attraction')) {
+            categorizedBusinesses.activitiesAndAttractions.push(enhancedBusiness);
+          } else if (type.includes('accommodation') || type.includes('hotel') || type.includes('resort')) {
+            categorizedBusinesses.accommodations.push(enhancedBusiness);
+          } else if (type.includes('restaurant') || type.includes('food') || type.includes('cafe')) {
+            categorizedBusinesses.foodPlaces.push(enhancedBusiness);
+          } else if (type.includes('shop') || type.includes('store') || type.includes('souvenir')) {
+            categorizedBusinesses.shops.push(enhancedBusiness);
+          } else {
+            // Default to shops if type is unknown
+            console.log('Uncategorized business:', business.businessName, 'Type:', type);
+            categorizedBusinesses.shops.push(enhancedBusiness);
+          }
+        });
+
+        setBusinessListings(categorizedBusinesses);
+        
+        // Update business counts
+        setBusinessCounts({
+          activitiesAndAttractions: categorizedBusinesses.activitiesAndAttractions.length,
+          accommodations: categorizedBusinesses.accommodations.length,
+          foodPlaces: categorizedBusinesses.foodPlaces.length,
+          shops: categorizedBusinesses.shops.length,
+          total: categorizedBusinesses.activitiesAndAttractions.length +
+                 categorizedBusinesses.accommodations.length +
+                 categorizedBusinesses.foodPlaces.length +
+                 categorizedBusinesses.shops.length
+        });
+
+      } else {
+        console.error('Failed to fetch business listings:', data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching business listings:', error);
     }
+  };
+
+  const filterProducts = (products) => {
+    let filtered = products;
+    
+    // First apply the filter type
+    switch (selectedProductFilter) {
+      case 'topRated':
+        filtered = filtered.filter(product => product.rating >= 4);
+        break;
+      case 'budgetFriendly':
+        filtered = filtered.filter(product => product.price <= 1500);
+        break;
+      case 'luxury':
+        filtered = filtered.filter(product => product.price >= 5000);
+        break;
+    }
+
+    // Then apply the search term if it exists
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
+      filtered = filtered.filter(product => 
+        product.title?.toLowerCase().includes(searchLower) ||
+        product.description?.toLowerCase().includes(searchLower) ||
+        product.businessName?.toLowerCase().includes(searchLower) ||
+        product.ownerName?.toLowerCase().includes(searchLower) ||
+        product.type?.toLowerCase().includes(searchLower)
+      );
+    }
+
+    return filtered;
+  };
+
+  const filterBusinesses = (businesses) => {
+    if (!businessSearchTerm) return businesses;
+
+    const searchLower = businessSearchTerm.toLowerCase();
+    return businesses.filter(business => 
+      business.title?.toLowerCase().includes(searchLower) ||
+      business.description?.toLowerCase().includes(searchLower) ||
+      business.type?.toLowerCase().includes(searchLower) ||
+      business.owner?.name?.toLowerCase().includes(searchLower) ||
+      business.owner?.email?.toLowerCase().includes(searchLower) ||
+      (Array.isArray(business.businessInfo?.category) 
+        ? business.businessInfo.category.some(cat => cat.toLowerCase().includes(searchLower))
+        : business.businessInfo?.category?.toLowerCase().includes(searchLower)) ||
+      business.businessInfo?.businessCard?.priceRange?.toLowerCase().includes(searchLower) ||
+      JSON.stringify(business.businessInfo?.contactInfo)?.toLowerCase().includes(searchLower)
+    );
   };
 
   const filteredProducts = filterProducts(
     products.filter(
       (product) =>
         product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.description.toLowerCase().includes(searchTerm.toLowerCase())
+        product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.ownerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.businessName.toLowerCase().includes(searchTerm.toLowerCase())
     )
   );
 
@@ -338,8 +478,37 @@ const SuperAdminProducts = () => {
               alt={product.title}
               className="object-cover w-full h-40 rounded-lg mb-2"
             />
-            <h3 className="font-bold text-lg">{product.title}</h3>
-            <p className="text-gray-700">{product.description}</p>
+            <h3 className="font-bold text-lg">
+              <Highlight
+                content={product.title}
+                match={searchTerm}
+              />
+            </h3>
+            <p className="text-gray-700">
+              <Highlight
+                content={product.description}
+                match={searchTerm}
+              />
+            </p>
+            {product.businessName && (
+              <p className="text-sm text-gray-600 mt-1">
+                Business: <Highlight
+                  content={product.businessName}
+                  match={searchTerm}
+                />
+              </p>
+            )}
+            {product.ownerName && (
+              <p className="text-sm text-gray-600">
+                Owner: <Highlight
+                  content={product.ownerName}
+                  match={searchTerm}
+                />
+              </p>
+            )}
+            {product.discount > 0 && (
+              <p className="text-sm text-green-600">Discount: {product.discount}%</p>
+            )}
             <div className="flex justify-between items-center mt-2">
               <span className="text-lg font-semibold">₱{product.price}</span>
               <HiOutlineDotsVertical
@@ -363,10 +532,65 @@ const SuperAdminProducts = () => {
               alt={business.title}
               className="object-cover w-full h-40 rounded-lg mb-2"
             />
-            <h3 className="font-bold text-lg">{business.title}</h3>
-            <p className="text-gray-700">{business.description}</p>
-            <div className="flex justify-between items-center mt-2">
-              <span className="text-lg font-semibold">₱{business.price}</span>
+            <h3 className="font-bold text-lg">
+              <Highlight content={business.title} match={businessSearchTerm} />
+            </h3>
+            <p className="text-gray-700 mb-2">
+              <Highlight content={business.description} match={businessSearchTerm} />
+            </p>
+            <div className="text-sm space-y-1">
+              <p className="text-gray-600">
+                Type: <Highlight content={business.type} match={businessSearchTerm} />
+              </p>
+              <p className="text-gray-600">
+                Owner: <Highlight content={business.owner.name} match={businessSearchTerm} />
+              </p>
+              <p className="text-gray-600">
+                Email: <Highlight content={business.owner.email} match={businessSearchTerm} />
+              </p>
+              {business.businessInfo.category && (
+                <p className="text-gray-600">
+                  Category: <Highlight 
+                    content={Array.isArray(business.businessInfo.category) 
+                      ? business.businessInfo.category.join(', ') 
+                      : business.businessInfo.category} 
+                    match={businessSearchTerm} 
+                  />
+                </p>
+              )}
+              {business.businessInfo.businessCard?.priceRange && (
+                <p className="text-gray-600">
+                  Price Range: <Highlight 
+                    content={business.businessInfo.businessCard.priceRange} 
+                    match={businessSearchTerm} 
+                  />
+                </p>
+              )}
+              <p className="text-gray-600">
+                Status: <span className={`px-2 py-1 rounded-full text-xs ${
+                  business.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                }`}>
+                  {business.status}
+                </span>
+              </p>
+            </div>
+            {/* Display hero images */}
+            {business.heroImages && business.heroImages.length > 0 && (
+              <div className="mt-4">
+                <h4 className="font-semibold text-sm mb-2">Hero Images:</h4>
+                <div className="flex space-x-2 overflow-x-auto">
+                  {business.heroImages.map((img, idx) => (
+                    <img
+                      key={idx}
+                      src={`http://localhost:5000/${img.path}`}
+                      alt={`Hero ${idx + 1}`}
+                      className="w-20 h-20 object-cover rounded"
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+            <div className="flex justify-end mt-2">
               <HiOutlineDotsVertical
                 className="cursor-pointer"
                 onClick={() => handleOpenBusinessModal(business)}
@@ -377,6 +601,17 @@ const SuperAdminProducts = () => {
       ))}
     </div>
   );
+
+  // Combine all businesses into a single array
+  const allBusinesses = [
+    ...businessListings.activitiesAndAttractions,
+    ...businessListings.accommodations,
+    ...businessListings.foodPlaces,
+    ...businessListings.shops
+  ];
+
+  // Filter all businesses based on the search term
+  const filteredAllBusinesses = filterBusinesses(allBusinesses);
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -444,6 +679,9 @@ const SuperAdminProducts = () => {
               onSearch={setBusinessSearchTerm}
             />
             <Tabs>
+              <Tab title="All Businesses">
+                {renderBusinessCards(filteredAllBusinesses)}
+              </Tab>
               <Tab title="Activities">
                 {renderBusinessCards(filteredBusinesses.activitiesAndAttractions)}
               </Tab>
@@ -467,7 +705,9 @@ const SuperAdminProducts = () => {
             </ModalHeader>
             <ModalBody>
               <p className="mb-4">{selectedProduct?.description}</p>
-              <p className="mb-2 font-semibold">Price: ₱{selectedProduct?.price}</p>
+              <p className="mb-2 font-semibold">
+                Price: {new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(selectedProduct?.price || 0)}
+              </p>
               {selectedProduct && (
                 <p className="mb-4">Ranking based on rating: #{getProductRank(selectedProduct)}</p>
               )}
@@ -500,7 +740,9 @@ const SuperAdminProducts = () => {
             </ModalHeader>
             <ModalBody>
               <p className="mb-4">{selectedBusiness?.description}</p>
-              <p className="mb-2 font-semibold">Price: ₱{selectedBusiness?.price}</p>
+              <p className="mb-2 font-semibold">
+                Price Range: {selectedBusiness?.businessInfo?.businessCard?.priceRange || 'Price range not available'}
+              </p>
               {selectedBusiness && (
                 <p className="mb-4">Ranking based on rating: #{getProductRank(selectedBusiness)}</p>
               )}

@@ -2567,6 +2567,136 @@ app.delete('/superAdmin-deleteUser/:id', (req, res) => {
   });
 });
 
+//Endpoint to fetch all business products
+app.get('/superAdmin-fetchAllBusinessProducts', async (req, res) => {
+  try {
+    const sql = `
+      SELECT 
+        p.*,
+        b.businessName,
+        u.username as owner_name,
+        COALESCE(d.discount, 0) as discount,
+        COALESCE(d.expirationDate, 'No Expiration') as expiration
+      FROM products p
+      LEFT JOIN businesses b ON p.business_id = b.business_id
+      LEFT JOIN users u ON p.user_id = u.user_id
+      LEFT JOIN (
+        SELECT product_id, MAX(discount) as discount, MAX(expirationDate) as expirationDate
+        FROM deals
+        WHERE expirationDate > NOW() OR expirationDate IS NULL
+        GROUP BY product_id
+      ) d ON p.product_id = d.product_id
+      ORDER BY p.created_at DESC
+    `;
+
+    connection.query(sql, (err, results) => {
+      if (err) {
+        console.error('Error fetching business products:', err);
+        return res.status(500).json({ 
+          success: false, 
+          message: 'Failed to fetch business products',
+          error: err.message 
+        });
+      }
+
+      return res.json({
+        success: true,
+        products: results
+      });
+    });
+  } catch (error) {
+    console.error('Unexpected error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Unexpected server error',
+      error: error.message
+    });
+  }
+});
+
+//Endpoint to fetch all business listings
+app.get('/superAdmin-fetchAllBusinessListings', (req, res) => {
+  const sql = `
+    SELECT 
+      b.*,
+      u.username as owner_name,
+      u.email as owner_email,
+      ba.status as application_status
+    FROM businesses b
+    LEFT JOIN users u ON b.user_id = u.user_id
+    LEFT JOIN business_applications ba ON b.application_id = ba.application_id
+    ORDER BY b.business_id DESC
+  `;
+
+  connection.query(sql, (err, results) => {
+    if (err) {
+      console.error('Error fetching business listings:', err);
+      return res.status(500).json({ 
+        success: false, 
+        message: 'Failed to fetch business listings',
+        error: err.message 
+      });
+    }
+
+    try {
+      // Helper function to handle JSON fields
+      const handleJSONField = (field) => {
+        if (!field) return null;
+        // If it's already an object/array, return as is
+        if (typeof field === 'object') return field;
+        // If it's a string, try to parse it
+        try {
+          return JSON.parse(field);
+        } catch (e) {
+          return field;
+        }
+      };
+
+      // Process the results
+      const formattedResults = results.map(business => ({
+        business_id: business.business_id,
+        user_id: business.user_id,
+        application_id: business.application_id,
+        businessName: business.businessName,
+        businessType: business.businessType || '',
+        owner_name: business.owner_name,
+        owner_email: business.owner_email,
+        application_status: business.application_status,
+        
+        // Handle JSON fields
+        category: handleJSONField(business.category),
+        businessLogo: business.businessLogo,
+        businessCard: handleJSONField(business.businessCard),
+        heroImages: handleJSONField(business.heroImages),
+        aboutUs: business.aboutUs,
+        facilities: handleJSONField(business.facilities),
+        policies: handleJSONField(business.policies),
+        contactInfo: handleJSONField(business.contactInfo),
+        openingHours: handleJSONField(business.openingHours),
+
+        // Add formatted fields for frontend display
+        displayStatus: business.application_status === 1 ? 'Active' : 'Pending',
+        logoUrl: business.businessLogo ? `${business.businessLogo}` : null,
+        mainHeroImage: business.heroImages ? 
+          handleJSONField(business.heroImages)[0] || null : null
+      }));
+
+      return res.json({
+        success: true,
+        businesses: formattedResults,
+        total: formattedResults.length
+      });
+    } catch (error) {
+      console.error('Error processing business data:', error);
+      return res.status(500).json({ 
+        success: false, 
+        message: 'Error processing business data',
+        error: error.message 
+      });
+    }
+  });
+});
+
 //Endpoint to fetch all business applications
 app.get('/superAdmin-businessApplications', (req, res) => {
   const sql = `
