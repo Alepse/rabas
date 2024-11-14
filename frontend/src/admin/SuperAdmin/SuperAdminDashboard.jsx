@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import SuperAdminSidebar from './superadmincomponents/superadminsidebar';
@@ -91,57 +91,65 @@ const SuperAdminDashboard = () => {
   const hasMore = page < 9;
 
   // Updated data for the table
-  const tableData = [
-    {
-      name: 'Lorem Ipsum',
-      type: 'Attraction',
-      products: 10,
-      location: 'Gubat Sorsogon',
-      status: 'Not Reported',
-      ranking: 1,
-    },
-    {
-      name: 'Lorem Ipsum',
-      type: 'Accommodation',
-      products: 10,
-      location: 'Gubat Sorsogon',
-      status: 'Not Reported',
-      ranking: 2,
-    },
-    {
-      name: 'Lorem Ipsum',
-      type: 'Foods',
-      products: 10,
-      location: 'Gubat Sorsogon',
-      status: 'Not Reported',
-      ranking: 3,
-    },
-    {
-      name: 'Lorem Ipsum',
-      type: 'Attraction, Accommodation',
-      products: 10,
-      location: 'Gubat Sorsogon',
-      status: 'Reported',
-      ranking: 4,
-    },
-    {
-      name: 'Lorem Ipsum',
-      type: 'Accommodation, Foods',
-      products: 10,
-      location: 'Gubat Sorsogon',
-      status: 'Reported',
-      ranking: 5,
-    },
-    {
-      name: 'Lorem Ipsum',
-      type: 'Attraction, Accommodation, Foods',
-      products: 10,
-      location: 'Gubat Sorsogon',
-      status: 'Reported',
-      ranking: 6,
-    },
-    
-  ];
+  const [tableData, setTableData] = React.useState([]);
+
+  useEffect(() => {
+    const fetchBusinessOwners = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/superAdmin-fetchAllBusinessOwners', {
+          credentials: 'include'
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch business owners');
+        }
+
+        const data = await response.json();
+        if (data.success) {
+          setTableData(data.data);
+        } else {
+          console.error('Failed to fetch business owners:', data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching business owners:', error);
+      }
+    };
+
+    fetchBusinessOwners();
+  }, []);
+
+  const [pendingVerifications, setPendingVerifications] = useState(0);
+  const [businessOwners, setBusinessOwners] = useState(0);
+  const [tourists, setTourists] = useState(0);
+  const [reports, setReports] = useState(0);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/superAdmin-fetchAllData', {
+          credentials: 'include'
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch data');
+        }
+
+        const data = await response.json();
+        if (data.success) {
+          setPendingVerifications(data.pendingVerifications);
+          setBusinessOwners(data.businessOwners);
+          setTourists(data.tourists);
+          setReports(data.reports);
+        } else {
+          console.error('Failed to fetch data:', data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <div className="flex min-h-screen font-sans">
@@ -156,19 +164,19 @@ const SuperAdminDashboard = () => {
         <div className="grid grid-cols-4 gap-4 mb-6 text-center">
           <div className="bg-red-400 text-white p-4 rounded shadow-md">
             <h2 className="text-lg">Pending Verifications</h2>
-            <p className="text-2xl font-bold">5</p>
+            <p className="text-2xl font-bold">{pendingVerifications}</p>
           </div>
           <div className="bg-green-400 text-white p-4 rounded shadow-md">
             <h2 className="text-lg">Business Owners</h2>
-            <p className="text-2xl font-bold">5</p>
+            <p className="text-2xl font-bold">{businessOwners}</p>
           </div>
           <div className="bg-purple-400 text-white p-4 rounded shadow-md">
             <h2 className="text-lg">Tourists</h2>
-            <p className="text-2xl font-bold">10</p>
+            <p className="text-2xl font-bold">{tourists}</p>
           </div>
           <div className="bg-pink-400 text-white p-4 rounded shadow-md">
             <h2 className="text-lg">Reports</h2>
-            <p className="text-2xl font-bold">4</p>
+            <p className="text-2xl font-bold">{reports}</p>
           </div>
         </div>
 
@@ -205,7 +213,7 @@ const SuperAdminDashboard = () => {
               </thead>
               <tbody className="text-gray-600 text-sm font-light">
                 {tableData.map((item, index) => (
-                  <tr>
+                  <tr key={item.name + index}>
                     <td className="py-3 px-6 text-left whitespace-nowrap">{item.name}</td>
                     <td className="py-3 px-6 text-left">{item.type}</td>
                     <td className="py-3 px-6 text-left">{item.products}</td>

@@ -35,7 +35,28 @@ const ActionButton = ({ icon, tooltip, onClick, color }) => (
   </Tooltip>
 );
 
-const VerificationTable = ({ data, title, onUpdateStatus }) => {
+// Remove the Highlight import and add this custom component
+const Highlight = ({ content, match }) => {
+  if (!match || !match.trim() || !content) return <span>{content}</span>;
+
+  const parts = content.toString().split(new RegExp(`(${match})`, 'gi'));
+  
+  return (
+    <span>
+      {parts.map((part, i) => 
+        part.toLowerCase() === match.toLowerCase() ? (
+          <span key={i} className="bg-yellow-200 text-black px-1 rounded">
+            {part}
+          </span>
+        ) : (
+          part
+        )
+      )}
+    </span>
+  );
+};
+
+const VerificationTable = ({ data, title, onUpdateStatus, searchTerm }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [selectedItem, setSelectedItem] = useState(null);
 
@@ -51,17 +72,15 @@ const VerificationTable = ({ data, title, onUpdateStatus }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ status: newStatus }), // Send status as 1 for Approved
+        body: JSON.stringify({ status: newStatus }),
       });
   
       const data = await response.json();
   
       if (response.ok) {
-        // Handle success, maybe update the UI or state
         console.log('Status updated:', data.message);
-        return true; // Signal that the update was successful
+        return true;
       } else {
-        // Handle error from the server
         console.error('Error updating status:', data.message);
         return false;
       }
@@ -82,7 +101,7 @@ const VerificationTable = ({ data, title, onUpdateStatus }) => {
       confirmButtonText: 'Yes, approve it!',
     }).then(async (result) => {
       if (result.isConfirmed) {
-        const updateSuccessful = await updateStatus(item, 1); // Send to API server
+        const updateSuccessful = await updateStatus(item, 1);
         if (updateSuccessful) {
           Swal.fire({
             title: 'Approved!',
@@ -90,7 +109,7 @@ const VerificationTable = ({ data, title, onUpdateStatus }) => {
             icon: 'success',
             confirmButtonColor: '#0BDA51',
           });
-          onUpdateStatus(item, 'Approved'); // Update the UI or state
+          onUpdateStatus(item, 'Approved');
         } else {
           Swal.fire({
             title: 'Error!',
@@ -114,7 +133,7 @@ const VerificationTable = ({ data, title, onUpdateStatus }) => {
       confirmButtonText: 'Yes, reject it!',
     }).then(async (result) => {
       if (result.isConfirmed) {
-        const updateSuccessful = await updateStatus(item, -1); // Send to API server
+        const updateSuccessful = await updateStatus(item, -1);
         if (updateSuccessful) {
           Swal.fire({
             title: 'Rejected!',
@@ -122,7 +141,7 @@ const VerificationTable = ({ data, title, onUpdateStatus }) => {
             icon: 'success',
             confirmButtonColor: '#0BDA51',
           });
-          onUpdateStatus(item, 'Rejected'); // Update the UI or state
+          onUpdateStatus(item, 'Rejected');
         } else {
           Swal.fire({
             title: 'Error!',
@@ -133,7 +152,7 @@ const VerificationTable = ({ data, title, onUpdateStatus }) => {
         }
       }
     });
-  };  
+  };
 
   return (
     <div className="overflow-x-auto mb-8">
@@ -155,27 +174,73 @@ const VerificationTable = ({ data, title, onUpdateStatus }) => {
         <tbody>
           {data.map((item, index) => (
             <tr key={index} className="border-b hover:bg-gray-100 transition duration-300">
-              <td className="py-3 px-6">{item.businessName}</td>
-              <td className="py-3 px-6">{`${item.firstName} ${item.lastName}`}</td>
-              <td className="py-3 px-6">{item.businessType}</td>
               <td className="py-3 px-6">
-                {Array.isArray(item.category) ? item.category.join(', ') : item.category}
+                {item.updatedBusinessName && item.updatedBusinessName !== item.businessName ? (
+                  <div>
+                    <span className="line-through text-gray-500">
+                      <Highlight
+                        content={item.businessName}
+                        match={searchTerm}
+                      />  
+                    </span>
+                    <div className="text-blue-600 font-semibold">
+                      {'Updated: '}
+                      <Highlight
+                        content={item.updatedBusinessName}
+                        match={searchTerm}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <Highlight
+                    content={item.businessName}
+                    match={searchTerm}
+                  />
+                )}
               </td>
-              <td className="py-3 px-6">{item.certNumber}</td>
-              <td className="py-3 px-6">{item.location}</td>
+              <td className="py-3 px-6">
+                <Highlight
+                  content={`${item.firstName} ${item.lastName}`}
+                  match={searchTerm}
+                />
+              </td>
+              <td className="py-3 px-6">
+                <Highlight
+                  content={item.businessType}
+                  match={searchTerm}
+                />
+              </td>
+              <td className="py-3 px-6">
+                <Highlight
+                  content={Array.isArray(item.category) ? item.category.join(', ') : item.category}
+                  match={searchTerm}
+                />
+              </td>
+              <td className="py-3 px-6">
+                <Highlight
+                  content={item.certNumber}
+                  match={searchTerm}
+                />
+              </td>
+              <td className="py-3 px-6">
+                <Highlight
+                  content={item.location}
+                  match={searchTerm}
+                />
+              </td>
               <td className="py-3 px-6">
                 {new Date(item.application_date).toISOString().split('T')[0]}
               </td>
               <td className="py-3 px-6">
-              <StatusBadge 
-                status={
-                  item.status === 1 
-                    ? 'Approved' 
-                    : item.status === -1 
-                    ? 'Rejected' 
-                    : 'Pending'
-                } 
-              />
+                <StatusBadge 
+                  status={
+                    item.status === 1 
+                      ? 'Approved' 
+                      : item.status === -1 
+                      ? 'Rejected' 
+                      : 'Pending'
+                  } 
+                />
               </td>
               <td className="py-3 px-6 flex gap-2">
                 <ActionButton 
@@ -270,12 +335,13 @@ const SuperAdminVerification = () => {
       if (response.ok) {
         setVerificationData(data.businessApplications);
       } else {
-        console.error('Error fetching business applications:', error);
+        console.error('Error fetching business applications:', data.message);
       }
     } catch (error) {
-        console.error('Error fetching Super Admin Business Applications: ', error);
+      console.error('Error fetching Super Admin Business Applications: ', error);
     }
-  }
+  };
+
   useEffect(() => {
     fetchData();
   }, [fetchData]);
@@ -293,7 +359,7 @@ const SuperAdminVerification = () => {
   // Derived counts
   const appliedActivities = verificationData.filter(item => item.businessType === 'activities').length;
   const appliedAttractions = verificationData.filter(item => item.businessType === 'attraction').length;
-  const appliedAccommodations = verificationData.filter(item => item.businessType === 'accommodation').length;
+  const appliedAccommodations = verificationData.filter(item => item.businessType === 'accommodations').length;
   const appliedFoods = verificationData.filter(item => item.businessType === 'food').length;
   const totalPending = verificationData.filter(item => item.status === 0).length;
 
@@ -301,8 +367,14 @@ const SuperAdminVerification = () => {
   const filterData = (data, searchTerm) => {
     return data.filter(item =>
       item.businessName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.updatedBusinessName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.lastName.toLowerCase().includes(searchTerm.toLowerCase())
+      item.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      `${item.firstName} ${item.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.businessType.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (Array.isArray(item.category) ? item.category.join(', ').toLowerCase().includes(searchTerm.toLowerCase()) : item.category.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      item.certNumber.includes(searchTerm) ||
+      item.location.toLowerCase().includes(searchTerm.toLowerCase())
     );
   };
 
@@ -329,19 +401,39 @@ const SuperAdminVerification = () => {
 
         <h2 className="text-2xl font-bold mb-4">All Applications</h2>
         <SearchBar placeholder="Search all applications..." onSearch={setSearchTermAll} />
-        <VerificationTable data={filteredDataAll} title="All Applications" onUpdateStatus={updateStatus} />
+        <VerificationTable 
+          data={filteredDataAll} 
+          title="All Applications" 
+          onUpdateStatus={updateStatus} 
+          searchTerm={searchTermAll} 
+        />
 
         <h2 className="text-2xl font-bold mb-4">Pending Applications</h2>
         <SearchBar placeholder="Search pending applications..." onSearch={setSearchTermPending} />
-        <VerificationTable data={filteredDataPending} title="Pending Applications" onUpdateStatus={updateStatus} />
+        <VerificationTable 
+          data={filteredDataPending} 
+          title="Pending Applications" 
+          onUpdateStatus={updateStatus} 
+          searchTerm={searchTermPending} 
+        />
 
         <h2 className="text-2xl font-bold mb-4">Approved Applications</h2>
         <SearchBar placeholder="Search approved applications..." onSearch={setSearchTermApproved} />
-        <VerificationTable data={filteredDataApproved} title="Approved Applications" onUpdateStatus={updateStatus} />
+        <VerificationTable 
+          data={filteredDataApproved} 
+          title="Approved Applications" 
+          onUpdateStatus={updateStatus} 
+          searchTerm={searchTermApproved} 
+        />
 
         <h2 className="text-2xl font-bold mb-4">Rejected Applications</h2>
         <SearchBar placeholder="Search rejected applications..." onSearch={setSearchTermRejected} />
-        <VerificationTable data={filteredDataRejected} title="Rejected Applications" onUpdateStatus={updateStatus} />
+        <VerificationTable 
+          data={filteredDataRejected} 
+          title="Rejected Applications" 
+          onUpdateStatus={updateStatus} 
+          searchTerm={searchTermRejected} 
+        />
       </div>
     </div>
   );

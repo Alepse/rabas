@@ -2470,7 +2470,53 @@ app.get('/locations', (req, res) => {
   });
 });
 
-//SUPER ADMIN
+//SUPER 
+// Endpoint to fetch all data
+app.get('/superAdmin-fetchAllData', (req, res) => {
+  try {
+    const queries = {
+      pendingVerifications: 'SELECT COUNT(*) AS count FROM business_applications WHERE status = 0',
+      businessOwners: 'SELECT COUNT(DISTINCT user_id) AS count FROM businesses',
+      tourists: 'SELECT COUNT(*) AS count FROM users WHERE user_id NOT IN (SELECT DISTINCT user_id FROM businesses)',
+      reports: 'SELECT COUNT(*) AS count FROM reports WHERE status = "open"'
+    };
+
+    const results = {};
+
+    // Execute all queries
+    const queryPromises = Object.keys(queries).map(key => {
+      return new Promise((resolve, reject) => {
+        connection.query(queries[key], (err, result) => {
+          if (err) {
+            return reject(err);
+          }
+          results[key] = result[0].count;
+          resolve();
+        });
+      });
+    });
+
+    Promise.all(queryPromises)
+      .then(() => {
+        res.json({
+          success: true,
+          pendingVerifications: results.pendingVerifications,
+          businessOwners: results.businessOwners,
+          tourists: results.tourists,
+          reports: results.reports
+        });
+      })
+      .catch(err => {
+        console.error('Error fetching data:', err);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+      });
+
+  } catch (error) {
+    console.error('Unexpected error:', error);
+    res.status(500).json({ success: false, message: 'Unexpected server error' });
+  }
+});
+
 //Endpoint to fetch all users
 app.get('/superAdmin-fetchAllUsers', (req, res) => {
   const sql = `
@@ -2564,6 +2610,44 @@ app.delete('/superAdmin-deleteUser/:id', (req, res) => {
         });
       });
     });
+  });
+});
+
+// Endpoint to fetch all business owners with their businesses and business products
+app.get('/superAdmin-fetchAllBusinessOwners', (req, res) => {
+  const sql = `
+    SELECT 
+      u.user_id,
+      u.Fname AS firstName,
+      u.Lname AS lastName,
+      u.email,
+      b.business_id,
+      b.businessName,
+      b.businessType,
+      b.location,
+      COUNT(p.product_id) AS products
+    FROM users u
+    JOIN businesses b ON u.user_id = b.user_id
+    LEFT JOIN products p ON b.business_id = p.business_id
+    GROUP BY b.business_id
+  `;
+
+  connection.query(sql, (err, results) => {
+    if (err) {
+      console.error('Error fetching business owners:', err);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+
+    const formattedResults = results.map(owner => ({
+      name: `${owner.firstName} ${owner.lastName}`,
+      type: owner.businessType,
+      products: owner.products,
+      location: owner.location,
+      status: 'Not Reported', // Placeholder, update as needed
+      ranking: 0 // Placeholder, update with actual logic if needed
+    }));
+
+    return res.json({ success: true, data: formattedResults });
   });
 });
 
@@ -2697,11 +2781,16 @@ app.get('/superAdmin-fetchAllBusinessListings', (req, res) => {
   });
 });
 
-//Endpoint to fetch all business applications
+// Endpoint to fetch all business applications
 app.get('/superAdmin-businessApplications', (req, res) => {
   const sql = `
-    SELECT * FROM business_applications
+    SELECT 
+      ba.*,
+      b.businessName AS updatedBusinessName
+    FROM business_applications ba
+    LEFT JOIN businesses b ON ba.application_id = b.application_id
   `;
+
   // Execute the SQL query
   connection.query(sql, (err, results) => {
     if (err) {
@@ -2753,8 +2842,8 @@ app.put('/updateStatus-businessApplications/:id', async (req, res) => {
           // Prepare to insert into businesses table
           const insertQuery = `
             INSERT INTO businesses 
-            (user_id, application_id, businessName, businessType, category, businessLogo, businessCard, heroImages, aboutUs, facilities, policies, contactInfo, openingHours) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+            (user_id, application_id, businessName, businessType, category, location, businessLogo, businessCard, heroImages, aboutUs, facilities, policies, contactInfo, openingHours) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
           // Set default values for the new business entry
           const insertValues = [
@@ -2763,6 +2852,7 @@ app.put('/updateStatus-businessApplications/:id', async (req, res) => {
             businessName,
             businessType,
             JSON.stringify(category),
+            location, // Add location here
             null, // businessLogo, you can update this later
             JSON.stringify({ category, location, cardImage: '', priceRange: '', description: '' }), // businessCard
             null, // heroImages, you can update later

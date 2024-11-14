@@ -4,6 +4,27 @@ import { Tabs, Tab, Card, CardBody } from '@nextui-org/react';
 import SearchBar from './superadmincomponents/SearchBar'; // Import the SearchBar component
 import Swal from 'sweetalert2';
 
+// Remove the Highlight import and add this custom component
+const Highlight = ({ content, match }) => {
+  if (!match || !match.trim() || !content) return <span>{content}</span>;
+
+  const parts = content.toString().split(new RegExp(`(${match})`, 'gi'));
+  
+  return (
+    <span>
+      {parts.map((part, i) => 
+        part.toLowerCase() === match.toLowerCase() ? (
+          <span key={i} className="bg-yellow-200 text-black px-1 rounded">
+            {part}
+          </span>
+        ) : (
+          part
+        )
+      )}
+    </span>
+  );
+};
+
 // SweetAlert functions
 const showSuccessAlert = (message) => {
   Swal.fire({
@@ -105,7 +126,8 @@ const SuperAdminUsers = () => {
 
   // Filtered data based on search query
   const filteredData = users.filter(user =>
-    user.name.toLowerCase().includes(searchQuery.toLowerCase())
+    user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    user.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   // Calculate counts for summary cards
@@ -163,8 +185,18 @@ const SuperAdminUsers = () => {
                     <tbody>
                       {filteredData.map((user, index) => (
                         <tr key={index} className="hover:bg-gray-100 transition duration-300">
-                          <td className="py-2 px-4 border-b">{user.name}</td>
-                          <td className="py-2 px-4 border-b">{user.email}</td>
+                          <td className="py-2 px-4 border-b">
+                            <Highlight
+                              content={user.name}
+                              match={searchQuery}
+                            />
+                          </td>
+                          <td className="py-2 px-4 border-b">
+                            <Highlight
+                              content={user.email}
+                              match={searchQuery}
+                            />
+                          </td>
                           <td className="py-2 px-4 border-b">{user.type}</td>
                           <td className="py-2 px-4 border-b">
                             <button 
@@ -203,8 +235,18 @@ const SuperAdminUsers = () => {
                         .filter(user => user.type === 'Tourist')
                         .map((user, index) => (
                           <tr key={index} className="hover:bg-gray-100 transition duration-300">
-                            <td className="py-2 px-4 border-b">{user.name}</td>
-                            <td className="py-2 px-4 border-b">{user.email}</td>
+                            <td className="py-2 px-4 border-b">
+                              <Highlight
+                                content={user.name}
+                                match={searchQuery}
+                              />
+                            </td>
+                            <td className="py-2 px-4 border-b">
+                              <Highlight
+                                content={user.email}
+                                match={searchQuery}
+                              />
+                            </td>
                             <td className="py-2 px-4 border-b">{user.type}</td>
                             <td className="py-2 px-4 border-b">
                               <button 
@@ -243,8 +285,18 @@ const SuperAdminUsers = () => {
                         .filter(user => user.type === 'Business Owner')
                         .map((user, index) => (
                           <tr key={index} className="hover:bg-gray-100 transition duration-300">
-                            <td className="py-2 px-4 border-b">{user.name}</td>
-                            <td className="py-2 px-4 border-b">{user.email}</td>
+                            <td className="py-2 px-4 border-b">
+                              <Highlight
+                                content={user.name}
+                                match={searchQuery}
+                              />
+                            </td>
+                            <td className="py-2 px-4 border-b">
+                              <Highlight
+                                content={user.email}
+                                match={searchQuery}
+                              />
+                            </td>
                             <td className="py-2 px-4 border-b">{user.type}</td>
                             <td className="py-2 px-4 border-b">
                               <button 
