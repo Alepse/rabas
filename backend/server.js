@@ -2479,7 +2479,7 @@ app.get('/superAdmin-fetchAllUsers', (req, res) => {
     // Transform the results to include user type
     const formattedUsers = results.map(user => ({
       user_id: user.user_id,
-      name: `${user.Fname} ${user.Lname}`,
+      name: `${user.Fname} ${user.Lname }`,
       email: user.email,
       type: user.business_id ? 'Business Owner' : 'Tourist',
       // Include business details if they exist
@@ -2492,6 +2492,61 @@ app.get('/superAdmin-fetchAllUsers', (req, res) => {
     return res.json({ 
       success: true, 
       users: formattedUsers 
+    });
+  });
+});
+
+//Endpoint to delete user
+app.delete('/superAdmin-deleteUser/:id', (req, res) => {
+  const userId = req.params.id;
+
+  // First check if user exists
+  const checkUserSql = 'SELECT * FROM users WHERE user_id = ?';
+  connection.query(checkUserSql, [userId], (checkErr, checkResults) => {
+    if (checkErr) {
+      console.error('Error checking user:', checkErr);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+
+    if (checkResults.length === 0) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // If user exists, proceed with deletion
+    // First delete related records from businesses table if they exist
+    const deleteBusinessSql = 'DELETE FROM businesses WHERE user_id = ?';
+    connection.query(deleteBusinessSql, [userId], (businessErr) => {
+      if (businessErr) {
+        console.error('Error deleting business records:', businessErr);
+        return res.status(500).json({ success: false, message: 'Error deleting business records' });
+      }
+
+      // Then delete related records from business_applications table
+      const deleteApplicationsSql = 'DELETE FROM business_applications WHERE user_id = ?';
+      connection.query(deleteApplicationsSql, [userId], (appErr) => {
+        if (appErr) {
+          console.error('Error deleting business applications:', appErr);
+          return res.status(500).json({ success: false, message: 'Error deleting business applications' });
+        }
+
+        // Finally delete the user
+        const deleteUserSql = 'DELETE FROM users WHERE user_id = ?';
+        connection.query(deleteUserSql, [userId], (deleteErr, deleteResult) => {
+          if (deleteErr) {
+            console.error('Error deleting user:', deleteErr);
+            return res.status(500).json({ success: false, message: 'Error deleting user' });
+          }
+
+          if (deleteResult.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+          }
+
+          return res.json({ 
+            success: true, 
+            message: 'User and associated records deleted successfully' 
+          });
+        });
+      });
     });
   });
 });

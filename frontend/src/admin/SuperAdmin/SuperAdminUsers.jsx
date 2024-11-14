@@ -2,6 +2,30 @@ import React, { useState, useEffect } from 'react';
 import SuperAdminSidebar from './superadmincomponents/superadminsidebar';
 import { Tabs, Tab, Card, CardBody } from '@nextui-org/react';
 import SearchBar from './superadmincomponents/SearchBar'; // Import the SearchBar component
+import Swal from 'sweetalert2';
+
+// SweetAlert functions
+const showSuccessAlert = (message) => {
+  Swal.fire({
+    title: 'Success!',
+    text: message,
+    icon: 'success',
+    confirmButtonText: 'OK',
+    confirmButtonColor: '#0BDA51', // Green color for confirmation
+    cancelButtonColor: '#D33736',  // Red color for cancellation
+  });
+};
+
+const showErrorAlert = (message) => {
+  Swal.fire({
+    title: 'Error!',
+    text: message,
+    icon: 'error',
+    confirmButtonText: 'Try Again',
+    confirmButtonColor: '#0BDA51', // Green color for confirmation
+    cancelButtonColor: '#D33736',  // Red color for cancellation
+  });
+};
 
 const SuperAdminUsers = () => {
   const [users, setUsers] = useState([]);
@@ -33,6 +57,49 @@ const SuperAdminUsers = () => {
       }
     } catch (error) {
       console.error('Error fetching users:', error);
+    }
+  };
+
+  const handleDeleteUser = async (userId) => {
+    // First, show a confirmation dialog
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: "After deleting this user, you won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#0BDA51',
+      cancelButtonColor: '#D33736',
+      confirmButtonText: 'Yes, delete it!'
+    });
+
+    // If user confirms, proceed with deletion
+    if (result.isConfirmed) {
+      try {
+        const response = await fetch(`http://localhost:5000/superAdmin-deleteUser/${userId}`, {
+          method: 'DELETE',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (data.success) {
+          // Remove the deleted user from the state
+          setUsers(users.filter(user => user.user_id !== userId));
+          showSuccessAlert('User deleted successfully');
+        } else {
+          showErrorAlert('Error deleting user: ' + data.message);
+          console.error('Error deleting user:', data.message);
+        }
+      } catch (error) {
+        showErrorAlert('An error occurred while deleting the user');
+        console.error('Error deleting user:', error);
+      }
     }
   };
 
@@ -100,7 +167,15 @@ const SuperAdminUsers = () => {
                           <td className="py-2 px-4 border-b">{user.email}</td>
                           <td className="py-2 px-4 border-b">{user.type}</td>
                           <td className="py-2 px-4 border-b">
-                            <button className="text-red-500 hover:text-red-700">Delete</button>
+                            <button 
+                              onClick={() => {
+                                console.log('Deleting user with ID:', user.user_id);
+                                handleDeleteUser(user.user_id);
+                              }}
+                              className="text-red-500 hover:text-red-700 transition duration-300"
+                            >
+                              Delete
+                            </button>
                           </td>
                         </tr>
                       ))}
@@ -132,7 +207,15 @@ const SuperAdminUsers = () => {
                             <td className="py-2 px-4 border-b">{user.email}</td>
                             <td className="py-2 px-4 border-b">{user.type}</td>
                             <td className="py-2 px-4 border-b">
-                              <button className="text-red-500 hover:text-red-700">Delete</button>
+                              <button 
+                                onClick={() => {
+                                  console.log('Deleting user with ID:', user.user_id);
+                                  handleDeleteUser(user.user_id);
+                                }}
+                                className="text-red-500 hover:text-red-700 transition duration-300"
+                              >
+                                Delete
+                              </button>
                             </td>
                           </tr>
                         ))}
@@ -164,7 +247,15 @@ const SuperAdminUsers = () => {
                             <td className="py-2 px-4 border-b">{user.email}</td>
                             <td className="py-2 px-4 border-b">{user.type}</td>
                             <td className="py-2 px-4 border-b">
-                              <button className="text-red-500 hover:text-red-700">Delete</button>
+                              <button 
+                                onClick={() => {
+                                  console.log('Deleting user with ID:', user.user_id);
+                                  handleDeleteUser(user.user_id);
+                                }}
+                                className="text-red-500 hover:text-red-700 transition duration-300"
+                              >
+                                Delete
+                              </button>
                             </td>
                           </tr>
                         ))}
