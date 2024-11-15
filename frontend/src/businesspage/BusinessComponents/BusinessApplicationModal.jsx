@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import { Modal, ModalContent } from "@nextui-org/modal";
 import { ModalHeader, ModalBody, ModalFooter } from "@nextui-org/modal";
 import { Input, Button, Progress, CheckboxGroup, Checkbox,Select, SelectItem } from "@nextui-org/react";
-import { FaCheck, FaPlus, FaMapMarkerAlt, FaTimes } from "react-icons/fa";
+import { FaCheck, FaPlus, FaTimes } from "react-icons/fa";
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
+import MapPicker from '../../components/map-picker';
 
 const MySwal = withReactContent(Swal);
 
@@ -21,6 +22,8 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
     category: [],
     customCategory: "",
     location: "",
+    latitude: null,
+    longitude: null
   });
 
   const [categoryOptions, setCategoryOptions] = useState({
@@ -93,6 +96,22 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
         customCategory: "",
       }));
     }
+  };
+
+  const handleLatitudeChange = (lat) => {
+    // console.log('Latitude:', lat);
+    setFormData((prevData) => ({
+      ...prevData,
+      latitude: lat
+    }));
+  };
+
+  const handleLongitudeChange = (lng) => {
+    // console.log('Longitude:', lng);
+    setFormData((prevData) => ({
+      ...prevData,
+      longitude: lng
+    }));
   };
 
   const validateStep = (currentStep) => {
@@ -252,13 +271,10 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
         return (
           <div className="mt-4">
             <h3 className="text-xl font-semibold mb-4">Business Location</h3>
-            <div className="h-64 bg-gray-100 mt-2 rounded-lg flex items-center justify-center">
-              <div className="text-center">
-                <FaMapMarkerAlt className="text-4xl text-gray-400 mx-auto mb-2" />
-                <p className="text-gray-600">Map Component Placeholder</p>
-                <p className="text-sm text-gray-500 mt-2">Click to pin your business location</p>
-              </div>
-            </div>
+            <MapPicker
+              setLatitude={handleLatitudeChange}
+              setLongitude={handleLongitudeChange}
+            />
             <Input
               clearable
               bordered
@@ -267,7 +283,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
               name="location"
               placeholder="Enter or select your business location"
               value={formData.location}
-              onChange={handleInputChange}
+              onChange={(e) => setFormData({ ...formData, location: e.target.value })}
               className="mt-4"
               required
             />
@@ -333,6 +349,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
             confirmButtonText: 'OK',
           }).then(() => {
             onBusinessOpenChange(false); // Close the modal
+            window.location.reload();
           });
   
         } catch (error) {

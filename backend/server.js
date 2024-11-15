@@ -817,10 +817,10 @@ app.post('/submitBusinessApplication', async (req, res) => {
     businessScope,
     businessType,
     category,
-    location    
+    location,
+    latitude,
+    longitude    
   } = req.body;
-
-  console.log('Received business application request:', req.body);
 
   // Input validation (ensure all fields are provided)
   if (
@@ -858,20 +858,23 @@ app.post('/submitBusinessApplication', async (req, res) => {
   // Convert category array to JSON string
   const categoryJSON = JSON.stringify(category);
 
+  // Create JSON object for pin_location
+  const pinLocationJSON = JSON.stringify({ latitude, longitude });
+
   try {
     // SQL query to insert business application data into the database, including application_id
     const sql = `
       INSERT INTO business_applications (
         application_id, user_id, firstName, lastName, businessName, businessTerritory,
-        certNumber, businessScope, businessType, category, location
+        certNumber, businessScope, businessType, category, location, pin_location
       ) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     // Execute the SQL query
     connection.query(
       sql, 
-      [application_id, user_id, firstName, lastName, businessName, businessTerritory, certificateNo, businessScope, businessType, categoryJSON, location],
+      [application_id, user_id, firstName, lastName, businessName, businessTerritory, certificateNo, businessScope, businessType, categoryJSON, location, pinLocationJSON],
       (err, results) => {
         if (err) {
           console.error('Error executing SQL query:', err);
@@ -3030,13 +3033,13 @@ app.put('/updateStatus-businessApplications/:id', async (req, res) => {
 
           // Extract data from business application
           const applicationData = applicationResults[0];
-          const { user_id, application_id, businessName, businessType, category, location } = applicationData;
+          const { user_id, application_id, businessName, businessType, category, location, pin_location } = applicationData;
 
           // Prepare to insert into businesses table
           const insertQuery = `
             INSERT INTO businesses 
-            (user_id, application_id, businessName, businessType, category, location, businessLogo, businessCard, heroImages, aboutUs, facilities, policies, contactInfo, openingHours) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+            (user_id, application_id, businessName, businessType, category, location, pin_location, businessLogo, businessCard, heroImages, aboutUs, facilities, policies, contactInfo, openingHours) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
           // Set default values for the new business entry
           const insertValues = [
@@ -3045,7 +3048,8 @@ app.put('/updateStatus-businessApplications/:id', async (req, res) => {
             businessName,
             businessType,
             JSON.stringify(category),
-            location, // Add location here
+            location,
+            JSON.stringify(pin_location), // Add pin_location here
             null, // businessLogo, you can update this later
             JSON.stringify({ category, location, cardImage: '', priceRange: '', description: '' }), // businessCard
             null, // heroImages, you can update later
@@ -3103,7 +3107,7 @@ function generateUniqueUsername(baseName, callback) {
       console.error('Database error:', err);
       return callback(err);
     }
-    if (results.length > 0) {
+    if (results.length >0) {
       // If the username exists, try again
       return generateUniqueUsername(baseName, callback);
     } else {
