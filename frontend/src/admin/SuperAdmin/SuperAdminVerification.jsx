@@ -357,10 +357,10 @@ const SuperAdminVerification = () => {
   };
 
   // Derived counts
-  const appliedActivities = verificationData.filter(item => item.businessType === 'activities').length;
-  const appliedAttractions = verificationData.filter(item => item.businessType === 'attraction').length;
+  const appliedAttractions = verificationData.filter(item => item.businessType === ('attractions' || 'activity')).length;
   const appliedAccommodations = verificationData.filter(item => item.businessType === 'accommodations').length;
   const appliedFoods = verificationData.filter(item => item.businessType === 'food').length;
+  const appliedShops = verificationData.filter(item => item.businessType === 'shops').length;
   const totalPending = verificationData.filter(item => item.status === 0).length;
 
   // Filter function
@@ -392,10 +392,10 @@ const SuperAdminVerification = () => {
         <h1 className="text-3xl font-bold mb-6">Verification</h1>
 
         <div className="grid grid-cols-5 gap-6 mb-8 text-center">
-          <SummaryCard title="Applied for Activities" count={appliedActivities} color="bg-blue-400" />
           <SummaryCard title="Applied for Attraction" count={appliedAttractions} color="bg-red-400" />
           <SummaryCard title="Applied for Accommodation" count={appliedAccommodations} color="bg-teal-400" />
           <SummaryCard title="Applied for Food Places" count={appliedFoods} color="bg-purple-400" />
+          <SummaryCard title="Applied for Shops" count={appliedShops} color="bg-blue-400" />
           <SummaryCard title="Pending Verification" count={totalPending} color="bg-pink-400" />
         </div>
 

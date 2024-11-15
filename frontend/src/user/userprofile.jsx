@@ -457,7 +457,9 @@ const UserProfile = ({ activities = [] }) => {
                 ? profilePic 
                 : (userData?.image_path 
                   ? `http://localhost:5000/${userData.image_path}`
-                  : `https://ui-avatars.com/api/?name=${username?.charAt(0).toUpperCase()}`)}  
+                  : userData?.google_id
+                    ? userData.image
+                    : `https://ui-avatars.com/api/?name=${username?.charAt(0).toUpperCase()}`)}  
               />
               <input type='file' className='hidden' accept='image/*' onChange={handleFileChange} id='fileInput' />
               <div

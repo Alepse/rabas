@@ -11,6 +11,8 @@ const bcrypt = require('bcryptjs'); //install bcrypt using this commant 'npm ins
 const nodemailer = require('nodemailer'); // npm install nodemailer
 const crypto = require('crypto'); // crypto is a built-in Node.js module, no need to install
 const { v4: uuidv4 } = require('uuid');
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
 const app = express();
 // app.use(cors());
@@ -123,6 +125,7 @@ app.post('/login', (req, res) => {
 app.get('/check-login', (req, res) => {
   // Retrieve session data from the database
   sessionStore.get(req.sessionID, (err, session) => {
+    console.log('Session data:', session);
     if (err) {
       console.error('Error fetching session from database:', err);
       return res.status(500).json({ isLoggedIn: false, error: 'Internal server error' });
@@ -144,7 +147,7 @@ app.get('/get-userData', (req, res) => {
   // Check if user is logged in and session contains user_id
   if (req.session.user && req.session.user.user_id) {
     const userId = req.session.user.user_id;
-    const sql = 'SELECT user_id, Fname, Lname, username, contact, email, image, image_path FROM users WHERE user_id = ?';
+    const sql = 'SELECT user_id, google_id, Fname, Lname, username, contact, email, image, image_path FROM users WHERE user_id = ?';
 
     connection.query(sql, [userId], (err, results) => {
       if (err) {
@@ -380,55 +383,109 @@ app.post('/signup', async (req, res) => {
   }
 });
 
-const { OAuth2Client } = require('google-auth-library');
-const client = new OAuth2Client('YOUR_GOOGLE_CLIENT_ID'); // Replace with your Google Client ID
-
 //google login endpoint
-app.post('/google-login', async (req, res) => {
-  const { token } = req.body;
+// Passport setup
+app.use(passport.initialize());
+// Remove this line if you are managing sessions manually
+app.use(passport.session());
 
-  try {
-    const ticket = await client.verifyIdToken({
-      idToken: token,
-      audience: 'YOUR_GOOGLE_CLIENT_ID', // Specify the client ID of the app
-    });
+passport.use(new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: 'http://localhost:5000/auth/google/callback'
+},
+(accessToken, refreshToken, profile, done) => {
+  console.log('Google profile:', profile); // Debug log
 
-    const payload = ticket.getPayload();
-    const { sub: googleId, email, given_name: firstName, family_name: lastName } = payload;
+  connection.query('SELECT * FROM users WHERE google_id = ? OR email = ?', [profile.id, profile.emails[0].value], (err, results) => {
+    if (err) {
+      console.error('Database error:', err);
+      return done(err);
+    }
+    if (results.length > 0) {
+      // User already exists, return the existing user
+      return done(null, results[0]);
+    } else {
+      const baseName = profile.displayName.replace(/\s+/g, '').toLowerCase(); // Remove spaces and lowercase
 
-    // Check if the user exists in your database
-    const checkUserSql = 'SELECT * FROM users WHERE email = ?';
-    connection.query(checkUserSql, [email], (err, results) => {
-      if (err) {
-        console.error('Error querying the database:', err);
-        return res.status(500).json({ success: false, message: 'Internal server error' });
-      }
+      generateUniqueUsername(baseName, (err, uniqueUsername) => {
+        if (err) {
+          console.error('Error generating unique username:', err);
+          return done(err);
+        }
 
-      if (results.length > 0) {
-        // User already exists, login the user
-        return res.json({ success: true, message: 'Login successful', user: results[0] });
-      } else {
-        // User doesn't exist, create a new user in the database
-        const insertUserSql = 'INSERT INTO users (username, Fname, Lname, address, email, contact) VALUES (?, ?, ?, ?, ?, ?)';
-        const defaultUsername = email.split('@')[0]; // Generate username from email
-        const defaultAddress = 'N/A'; // You can set a default address if none is provided
-        const defaultPhone = 'N/A'; // Default phone number if not available
+        const newUser = {
+          google_id: profile.id,
+          Fname: profile.name.givenName,
+          Lname: profile.name.familyName,
+          username: uniqueUsername,
+          email: profile.emails[0].value,
+          image: profile.photos[0].value
+        };
 
-        connection.query(insertUserSql, [defaultUsername, firstName, lastName, defaultAddress, email, defaultPhone], (insertErr, insertResults) => {
-          if (insertErr) {
-            console.error('Error inserting user into the database:', insertErr);
-            return res.status(500).json({ success: false, message: 'Internal server error' });
+        connection.query('INSERT INTO users SET ?', newUser, (err, res) => {
+          if (err) {
+            console.error('Error inserting new user:', err);
+            return done(err);
           }
-
-          console.log('New Google user created successfully.');
-          return res.json({ success: true, message: 'Signup and login successful', userId: insertResults.insertId });
+          newUser.user_id = res.insertId; // Set new user ID
+          return done(null, newUser);
         });
+      });
+    }
+  });
+}));
+
+passport.serializeUser((user, done) => {
+  console.log('Serializing user:', user); // Debug log
+  done(null, user.user_id); // Use a valid identifier
+});
+
+passport.deserializeUser((id, done) => {
+  connection.query('SELECT * FROM users WHERE user_id = ?', [id], (err, results) => {
+    if (err) {
+      console.error('Error deserializing user:', err);
+      return done(err);
+    }
+    if (results.length === 0) {
+      console.error('No user found for ID:', id);
+      return done(new Error('User not found'));
+    }
+    done(null, results[0]);
+  });
+});
+
+// Routes
+app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: 'http://localhost:5173' }),
+  (req, res) => {
+    if (!req.user || !req.user.user_id) {
+      console.error('User object is invalid:', req.user);
+      return res.status(500).json({ success: false, message: 'Invalid user object' });
+    }
+
+    // Assign user details to session
+    req.session.user = {
+      user_id: req.user.user_id,
+      name: `${req.user.Fname} ${req.user.Lname}`
+    };
+
+    // Save the session
+    req.session.save((err) => {
+      if (err) {
+        console.error('Error saving session:', err);
+        return res.status(500).json({ success: false, message: 'Failed to save session' });
       }
+      res.redirect('http://localhost:5173');
     });
-  } catch (error) {
-    console.error('Error verifying Google token:', error);
-    return res.status(401).json({ success: false, message: 'Invalid Google token' });
+  });
+
+app.get('/', (req, res) => {
+  if (!req.session.user) {
+    return res.redirect('http://localhost:5173');
   }
+  res.json({ name: req.session.user.name });
 });
 
 // Endpoint for user logout
@@ -2890,6 +2947,8 @@ app.put('/updateStatus-businessApplications/:id', async (req, res) => {
 });
 
 app.use((req, res, next) => {
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+  res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
   console.log('Api request: ');
   console.log(`${req.method} ${req.url} - ${JSON.stringify(req.body)}`);
   next();
@@ -2897,3 +2956,23 @@ app.use((req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+
+function generateUniqueUsername(baseName, callback) {
+  const randomSuffix = Math.floor(Math.random() * 10000); // Generate a random number
+  const username = `${baseName}${randomSuffix}`;
+
+  // Check if the username already exists in the database
+  connection.query('SELECT * FROM users WHERE username = ?', [username], (err, results) => {
+    if (err) {
+      console.error('Database error:', err);
+      return callback(err);
+    }
+    if (results.length > 0) {
+      // If the username exists, try again
+      return generateUniqueUsername(baseName, callback);
+    } else {
+      // If the username is unique, return it
+      return callback(null, username);
+    }
+  });
+}

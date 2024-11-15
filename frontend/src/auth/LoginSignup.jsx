@@ -138,59 +138,8 @@ const LoginSignup = () => {
   }
 
   const handleGoogleLogin = () => {
-    const clientId = 'YOUR_GOOGLE_CLIENT_ID'; // Replace this with your Google Client ID
-  
-    // Initialize Google login
-    window.google.accounts.id.initialize({
-      client_id: clientId,
-      callback: handleGoogleResponse
-    });
-  
-    // Render the button
-    window.google.accounts.id.prompt(); // Display the Google login prompt
+    window.location.href = 'http://localhost:5000/auth/google';
   };
-  
-  // Callback after a successful Google sign-in
-  const handleGoogleResponse = async (response) => {
-    const token = response.credential; // This is the JWT token from Google
-    
-    try {
-      // Send the token to your backend for verification
-      const apiResponse = await fetch('http://localhost:5000/google-login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` // Send Google token in the request
-        },
-        credentials: 'include'
-      });
-  
-      const data = await apiResponse.json();
-      
-      if (data.success) {
-        Swal.fire({
-          title: 'Login Successful!',
-          text: 'You have logged in with Google!',
-          icon: 'success',
-          showConfirmButton: false,
-          timer: 1500
-        }).then(() => {
-          window.location.href = '/'; // Redirect to the homepage
-        });
-      } else {
-        Swal.fire({
-          title: 'Login Failed!',
-          text: 'Could not verify Google login',
-          icon: 'error',
-          showConfirmButton: false,
-          timer: 2000
-        });
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      alert('An error occurred while logging in with Google. Please try again later.');
-    }
-  };  
 
   const handleForgotPassword = async (e) => {
     e.preventDefault();

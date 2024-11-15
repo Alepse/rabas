@@ -247,7 +247,9 @@ const Nav = () => {
                     className='text-lg bg-color1 text-light hover:bg-color2/80 transition-colors duration-300'
                     src={userData?.image_path
                       ? `http://localhost:5000/${userData.image_path}`
-                      : `https://ui-avatars.com/api/?name=${firstLetter}`
+                      : userData?.google_id
+                        ? userData.image
+                        : `https://ui-avatars.com/api/?name=${firstLetter}`
                     }
                   />
                 </div>
@@ -388,7 +390,9 @@ const Nav = () => {
                     className='text-lg bg-color1 text-light hover:bg-color2/80 transition-colors duration-300'
                     src={userData?.image_path
                       ? `http://localhost:5000/${userData.image_path}`
-                      : `https://ui-avatars.com/api/?name=${firstLetter}`
+                      : userData?.google_id
+                        ? userData.image
+                        : `https://ui-avatars.com/api/?name=${firstLetter}`
                     }
                   />
                 </div>
