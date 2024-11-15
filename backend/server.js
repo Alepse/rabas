@@ -24,6 +24,9 @@ app.use(cors({
 
 app.use(express.json()); // Parse JSON bodies
 
+// Add this line to parse URL-encoded bodies
+app.use(express.urlencoded({ extended: true }));
+
 const connection = mysql.createConnection({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -90,34 +93,167 @@ app.use((err, req, res, next) => {
 // User Login Endpoint
 app.post('/login', (req, res) => {
   const { identifier, password } = req.body; // Use 'identifier' to accept either username or email
-  const sql = 'SELECT * FROM users WHERE (username = ? OR email = ?)'; // Update SQL query to retrieve user by username or email
-  connection.query(sql, [identifier, identifier], async (err, results) => { // Removed 'AND password = ?' from SQL query
+
+  if (!identifier || !password) {
+    return res.status(400).json({ success: false, message: 'Username or email and password are required' });
+  }
+
+  const sql = 'SELECT * FROM users WHERE (username = ? OR email = ?)';
+  connection.query(sql, [identifier, identifier], async (err, results) => {
     if (err) {
-      console.error(err);
+      // console.error(err);
       return res.status(500).json({ success: false, message: 'Internal server error' });
     }
     if (results.length > 0) {
       const user = results[0];
       try {
+        if (user.password === null) {
+          // Handle users who signed up with Google
+          return res.status(401).json({ success: false, message: 'Please log in using Google' });
+        }
+
         // Compare the provided password with the hashed password from the database
         const passwordMatch = await bcrypt.compare(password, user.password);
         if (passwordMatch) {
-          // Set user data in the session upon successful login
-          req.session.user = {
-            user_id: user.user_id
-          };
-          // console.log('User logged in:', req.session.user); // Log session use
+          req.session.user = { user_id: user.user_id };
           return res.json({ success: true, message: 'Login successful' });
         } else {
           return res.status(401).json({ success: false, message: 'Invalid password' });
         }
       } catch (error) {
-        console.error('Error comparing passwords:', error);
+        // console.error('Error comparing passwords:', error);
         return res.status(500).json({ success: false, message: 'Internal server error' });
       }
     } else {
       return res.status(401).json({ success: false, message: 'User not found' });
     }
+  });
+});
+
+// Endpoint for forgot password
+app.post('/forgot-password', (req, res) => {
+  const { email } = req.body;
+
+  // Generate a secure token
+  const token = crypto.randomBytes(20).toString('hex');
+
+  // Set token expiration time (e.g., 1 hour)
+  const tokenExpiration = Date.now() + 3600000;
+
+  // Store the token and expiration in the database for the user
+  const sql = 'UPDATE users SET reset_password_token = ?, reset_password_expires = ? WHERE email = ?';
+  connection.query(sql, [token, tokenExpiration, email], (err, results) => {
+    if (err) {
+      console.error('Error updating user with token:', err);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+
+    if (results.affectedRows === 0) {
+      console.log('Email not found:', email); // Log the email not found
+      return res.status(404).json({ success: false, message: 'Email not found' });
+    }
+
+    // Send email with the token
+    const transporter = nodemailer.createTransport({
+      service: 'Gmail',
+      auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_PASS
+      }
+    });
+
+    const mailOptions = {
+      to: email,
+      from: process.env.GMAIL_USER,
+      subject: 'Password Reset',
+      text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n
+             Please click on the following link, or paste this into your browser to complete the process:\n\n
+             http://localhost:5000/reset-password/${token}\n\n
+             If you did not request this, please ignore this email and your password will remain unchanged.\n`
+    };
+
+    transporter.sendMail(mailOptions, (err) => {
+      if (err) {
+        console.error('Error sending email:', err);
+        return res.status(500).json({ success: false, message: 'Failed to send email' });
+      }
+      res.json({ success: true, message: 'Password reset email sent' });
+    });
+  });
+});
+
+// Endpoint to handle password reset
+app.post('/reset-password/:token', (req, res) => {
+  const { token } = req.params;
+  const { newPassword } = req.body;
+
+  // Log the new password to ensure it's defined
+  console.log('New password:', newPassword);
+
+  if (!newPassword) {
+    return res.status(400).json({ success: false, message: 'New password is required' });
+  }
+
+  // Hash the new password
+  bcrypt.hash(newPassword, 10, (err, hashedPassword) => {
+    if (err) {
+      console.error('Error hashing password:', err);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+
+    // Update the user's password in the database
+    const updateSql = 'UPDATE users SET password = ?, reset_password_token = NULL, reset_password_expires = NULL WHERE reset_password_token = ?';
+    connection.query(updateSql, [hashedPassword, token], (err) => {
+      if (err) {
+        console.error('Error updating password:', err);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+      }
+      res.json({ success: true, message: 'Password has been reset' });
+    });
+  });
+});
+
+// Serve the password reset form
+app.get('/reset-password/:token', (req, res) => {
+  const { token } = req.params;
+
+  // Render a simple HTML form for password reset
+  res.send(`
+    <form action="/reset-password/${token}" method="POST">
+      <input type="password" name="newPassword" placeholder="Enter new password" required />
+      <button type="submit">Reset Password</button>
+    </form>
+  `);
+});
+
+// Handle the password reset form submission
+app.post('/reset-password/:token', (req, res) => {
+  const { token } = req.params;
+  const { newPassword } = req.body;
+
+  // Log the new password to ensure it's defined
+  console.log('New password:', newPassword);
+
+  if (!newPassword) {
+    return res.status(400).json({ success: false, message: 'New password is required' });
+  }
+
+  // Hash the new password
+  bcrypt.hash(newPassword, 10, (err, hashedPassword) => {
+    if (err) {
+      console.error('Error hashing password:', err);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+
+    // Update the user's password in the database
+    const updateSql = 'UPDATE users SET password = ?, reset_password_token = NULL, reset_password_expires = NULL WHERE reset_password_token = ?';
+    connection.query(updateSql, [hashedPassword, token], (err) => {
+      if (err) {
+        console.error('Error updating password:', err);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+      }
+      res.json({ success: true, message: 'Password has been reset' });
+    });
   });
 });
 

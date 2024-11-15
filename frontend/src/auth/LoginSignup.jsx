@@ -160,12 +160,12 @@ const LoginSignup = () => {
           showConfirmButton: true, // Show confirm button
           confirmButtonColor: '#0BDA51', // Set confirm button color
         }).then(() => {
-          window.open('/resetpassword', '_blank'); // Open the reset password page in a new tab
+          window.open('/'); 
         });
       } else {
         Swal.fire({
           title: 'Error!',
-          text: data.error || 'Failed to send reset link.',
+          text: data.message || error.message,
           icon: 'error',
           showConfirmButton: true, // Show confirm button
           confirmButtonColor: '#0BDA51', // Set confirm button color
