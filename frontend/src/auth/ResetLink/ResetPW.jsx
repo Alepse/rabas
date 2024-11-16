@@ -1,22 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Button, Input, Spacer } from '@nextui-org/react';
 import Swal from 'sweetalert2';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import axios from 'axios';
 import Logo2 from '../../assets/rabas.png';
 
 const ResetPW = () => {
-  const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  
-  // Separate states for each password visibility
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [token, setToken] = useState('');
+
+  const location = useLocation();
+
+  useEffect(() => {
+    const query = new URLSearchParams(location.search);
+    const token = query.get('token');
+    setToken(token);
+  }, [location]);
 
   const isFormValid = () => {
     return (
-      currentPassword &&
       newPassword &&
       confirmPassword &&
       newPassword.length >= 8 &&
@@ -29,14 +35,14 @@ const ResetPW = () => {
     return regex.test(password);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!isFormValid()) {
       Swal.fire({
         icon: 'warning',
         title: 'Invalid Input',
-        text: 'Please ensure all fields are filled, the new password is at least 8 characters long, and contains a number and a special character.',
+        text: 'Please ensure the new password is at least 8 characters long and contains a number and a special character.',
         confirmButtonColor: '#0BDA51',
       });
       return;
@@ -52,25 +58,36 @@ const ResetPW = () => {
       return;
     }
 
-    Swal.fire({
-      title: 'Confirm Password Change',
-      text: 'Are you sure you want to reset your password?',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonColor: '#0BDA51',
-      cancelButtonColor: '#D33736',
-      confirmButtonText: 'Yes, reset it!',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        // Reset password logic here
+    try {
+      const response = await axios.post(`http://localhost:5000/reset-password/${token}`, {
+        newPassword,
+      });
+
+      if (response.data.success) {
         Swal.fire({
           icon: 'success',
           title: 'Password Reset Successfully!',
           text: 'Your password has been updated.',
           confirmButtonColor: '#0BDA51',
+        }).then(() => {          
+          window.location.href = '/'; // Redirect to home page after the alert is closed
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: response.data.message,
+          confirmButtonColor: '#0BDA51',
         });
       }
-    });
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'An error occurred while resetting your password.',
+        confirmButtonColor: '#0BDA51',
+      });
+    }
   };
 
   return (
@@ -80,33 +97,6 @@ const ResetPW = () => {
         <h2 className="text-2xl font-semibold text-center text-gray-800 mb-6">Reset Your Password</h2>
         
         <form onSubmit={handleSubmit} className="space-y-4" aria-label="Reset Password Form">
-          <Input
-            label="Current Password"
-            placeholder="Enter your current password"
-            required
-            fullWidth
-            clearable
-            bordered
-            onChange={(e) => setCurrentPassword(e.target.value)}
-            className="border rounded-lg"
-            aria-required="true"
-            type={showCurrentPassword ? "text" : "password"}
-            endContent={
-              <button
-                type="button"
-                onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                className="focus:outline-none"
-              >
-                {showCurrentPassword ? (
-                  <FaEyeSlash className="text-2xl text-default-400" />
-                ) : (
-                  <FaEye className="text-2xl text-default-400" />
-                )}
-              </button>
-            }
-          />
-          <Spacer y={0.5} />
-          
           <Input
             label="New Password"
             placeholder="Enter your new password"

@@ -213,17 +213,12 @@ app.post('/reset-password/:token', (req, res) => {
   });
 });
 
-// Serve the password reset form
+// Redirect to the React frontend for password reset
 app.get('/reset-password/:token', (req, res) => {
   const { token } = req.params;
 
-  // Render a simple HTML form for password reset
-  res.send(`
-    <form action="/reset-password/${token}" method="POST">
-      <input type="password" name="newPassword" placeholder="Enter new password" required />
-      <button type="submit">Reset Password</button>
-    </form>
-  `);
+  // Redirect to the React frontend with the token as a query parameter
+  res.redirect(`http://localhost:5173/resetpassword?token=${token}`);
 });
 
 // Handle the password reset form submission

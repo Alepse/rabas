@@ -160,7 +160,7 @@ const LoginSignup = () => {
           showConfirmButton: true, // Show confirm button
           confirmButtonColor: '#0BDA51', // Set confirm button color
         }).then(() => {
-          window.open('/'); 
+          window.location.href = '/'; 
         });
       } else {
         Swal.fire({
