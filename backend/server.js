@@ -187,9 +187,6 @@ app.post('/reset-password/:token', (req, res) => {
   const { token } = req.params;
   const { newPassword } = req.body;
 
-  // Log the new password to ensure it's defined
-  console.log('New password:', newPassword);
-
   if (!newPassword) {
     return res.status(400).json({ success: false, message: 'New password is required' });
   }
@@ -947,15 +944,12 @@ app.get('/get-businessData', (req, res) => {
 app.put('/updateBusinessLogo/:id', upload.single('businessLogo'), (req, res) => {
   const businessId = req.params.id;
 
-  // Check if a new logo file was uploaded
   if (!req.file) {
     return res.status(400).json({ success: false, message: 'No logo file uploaded' });
   }
 
-  // Prepare the new logo path
-  const newLogoPath = req.file.path; // Update with the correct path where the logo is stored
+  const newLogoPath = req.file.path;
 
-  // Fetch the current business logo to delete the old file
   connection.query('SELECT businessLogo FROM businesses WHERE business_id = ?', [businessId], (err, results) => {
     if (err) {
       console.error('Error fetching business logo:', err);
@@ -966,10 +960,8 @@ app.put('/updateBusinessLogo/:id', upload.single('businessLogo'), (req, res) => 
       return res.status(404).json({ success: false, message: 'Business not found' });
     }
 
-    // Get the current logo path
     const currentLogoPath = results[0].businessLogo;
 
-    // Update the businessLogo field in the businesses table
     connection.query('UPDATE businesses SET businessLogo = ? WHERE business_id = ?', [newLogoPath, businessId], (err, updateResults) => {
       if (err) {
         console.error('Error updating business logo:', err);
@@ -980,19 +972,27 @@ app.put('/updateBusinessLogo/:id', upload.single('businessLogo'), (req, res) => 
         return res.status(404).json({ success: false, message: 'Business not found' });
       }
 
-      // Remove the old logo file from the server
-      fs.unlink(currentLogoPath, (unlinkErr) => {
-        if (unlinkErr) {
-          console.error('Error deleting the old logo file:', unlinkErr);
-          return res.status(500).json({ success: false, message: 'Failed to delete the old logo file from server' });
-        }
+      // Check if currentLogoPath is valid before attempting to delete
+      if (currentLogoPath) {
+        fs.unlink(currentLogoPath, (unlinkErr) => {
+          if (unlinkErr) {
+            console.error('Error deleting the old logo file:', unlinkErr);
+            return res.status(500).json({ success: false, message: 'Failed to delete the old logo file from server' });
+          }
 
+          return res.json({
+            success: true,
+            message: 'Business logo updated successfully',
+            updatedLogoPath: newLogoPath,
+          });
+        });
+      } else {
         return res.json({
           success: true,
           message: 'Business logo updated successfully',
           updatedLogoPath: newLogoPath,
         });
-      });
+      }
     });
   });
 });
