@@ -253,7 +253,7 @@ app.post('/reset-password/:token', (req, res) => {
 app.get('/check-login', (req, res) => {
   // Retrieve session data from the database
   sessionStore.get(req.sessionID, (err, session) => {
-    console.log('Session data:', session);
+    // console.log('Session data:', session);
     if (err) {
       console.error('Error fetching session from database:', err);
       return res.status(500).json({ isLoggedIn: false, error: 'Internal server error' });
@@ -1488,6 +1488,8 @@ app.delete('/businessCoverPhoto/:id', (req, res) => {
   });
 });
 
+
+// May babaguhin pa dito, dapat yung products lang nung business na selected ang lalabas
 // Endpoint to get all business product
 app.get('/getAllBusinessProduct', (req, res) => {
   const sql = `
@@ -3079,6 +3081,79 @@ app.put('/updateStatus-businessApplications/:id', async (req, res) => {
     console.error('Error updating status:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
+});
+
+
+// ************************************************************
+// ************************************************************
+// ************ Displaying data for the pages *****************
+// ************************************************************
+// ************************************************************
+
+// Endpoint to display all the business with its price ranges based on the business products
+app.get('/getAllBusinesses', (req, res) => {
+  const sql = `
+    SELECT 
+      b.business_id,
+      b.businessName,
+      b.businessType,
+      b.category,
+      b.businessLogo,
+      b.location AS destination,
+      IF(
+        JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.description')) IS NULL OR 
+        JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.description')) = '', 
+        NULL, 
+        JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.description'))
+	    ) AS description,
+      b.aboutUs,
+      MIN(CAST(p.price AS DECIMAL)) AS lowest_price,
+      MAX(CAST(p.price AS DECIMAL)) AS highest_price,
+      AVG(r.ratings) AS rating,
+      JSON_ARRAYAGG(JSON_UNQUOTE(JSON_EXTRACT(p.inclusions, '$[*].item'))) AS raw_amenities
+    FROM 
+      businesses b
+    LEFT JOIN 
+      products p ON b.business_id = p.business_id
+    LEFT JOIN
+      ratings r ON b.business_id = r.business_id
+    GROUP BY 
+      b.business_id, b.businessName, b.businessType, b.businessLogo, 
+      b.location, b.businessCard, b.aboutUs
+    ORDER BY 
+      b.business_id;
+  `;
+
+  connection.query(sql, (err, results) => {
+    if (err) {
+      console.error('Error executing SQL query:', err);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+
+    // Post-process the results to clean up the unique_amenities
+    const cleanedResults = results.map(business => {
+      const uniqueAmenitiesSet = new Set();
+
+      // Parse each raw_amenity entry and add unique items to the set
+      business.raw_amenities.forEach(amenity => {
+        if (amenity) {
+          try {
+            const amenitiesArray = JSON.parse(amenity);
+            amenitiesArray.forEach(item => uniqueAmenitiesSet.add(item));
+          } catch (e) {
+            console.error('Error parsing amenity:', e);
+          }
+        }
+      });
+
+      return {
+        ...business,
+        amenities: Array.from(uniqueAmenitiesSet)
+      };
+    });
+
+    return res.json({ success: true, businesses: cleanedResults });
+  });
 });
 
 app.use((req, res, next) => {

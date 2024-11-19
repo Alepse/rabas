@@ -526,7 +526,7 @@ const BusinessAllproducts = () => {
     ]);
   }, [mockData.activities, mockData.accommodations, mockData.restaurant, mockData.shop]);
 
-  // console.log('All products', allProducts);
+  console.log('All products', mockData);
 
   const openBookingModal = (product) => {
     if (product.type === 'Cabins' || product.type === 'Resorts') {

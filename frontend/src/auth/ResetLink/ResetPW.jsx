@@ -84,7 +84,7 @@ const ResetPW = () => {
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: 'An error occurred while resetting your password.',
+        text: error.response?.data?.message || 'An error occurred while resetting your password.',
         confirmButtonColor: '#0BDA51',
       });
     }

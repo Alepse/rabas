@@ -27,7 +27,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
   });
 
   const [categoryOptions, setCategoryOptions] = useState({
-    attractions: [
+    attraction: [
       { label: "Adventure", value: "adventure" },
       { label: "Tour", value: "tour" },
       { label: "Relaxation", value: "relaxation" },
@@ -35,7 +35,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
       { label: "Nature", value: "nature" },
       { label: "Add Category", value: "others" },
     ],
-    accommodations: [
+    accommodation: [
       { label: "Hotel", value: "hotel" },
       { label: "Inn", value: "inn" },
       { label: "Lodge", value: "lodge" },
@@ -49,7 +49,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
       { label: "Café", value: "cafe" },
       { label: "Add Category", value: "others" },
     ],
-    shops: [
+    shop: [
       { label: "Souvenir Shop", value: "souvenir_shop" },
       { label: "Clothing Shop", value: "clothing_shop" },
       { label: "Add Category", value: "others" },
@@ -70,10 +70,10 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
   };
 
   const businessTypeOptions = [
-    { label: "Activities", value: "attractions" },
-    { label: "Accommodations", value: "accommodations" },
+    { label: "Activities", value: "attraction" },
+    { label: "Accommodations", value: "accommodation" },
     { label: "Food Places", value: "food" },
-    { label: "Shops", value: "shops" },
+    { label: "Shops", value: "shop" },
   ];
 
   const addCustomCategory = () => {
