@@ -3100,6 +3100,7 @@ app.get('/getAllBusinesses', (req, res) => {
       b.category,
       b.businessLogo,
       b.location AS destination,
+      b.pin_location,
       IF(
         JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.description')) IS NULL OR 
         JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.description')) = '', 

@@ -9,7 +9,9 @@ import { Link } from 'react-router-dom';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Search from '@/components/Search';
-
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
 
 
 
@@ -145,6 +147,9 @@ const cardVariants = {
 };
 
 const Discover = () => {
+  //for maps
+  const [currentZoom, setCurrentZoom] = useState(10); // Initial zoom level
+
   const [mockData, setMockData] = useState({
     activities: [],
     accommodations: [],
@@ -237,7 +242,7 @@ const Discover = () => {
   const accommodationTypes = ['Cabins', 'Resorts', 'Hotels', 'Hostels'];
   const foodTypes = ['Restaurant', 'Bar', 'Cafe'];
   const cuisines = ['Filipino', 'International', 'Chinese', 'Japanese', 'Italian'];
-  const amenitiesList = ['Wi-Fi', 'Outdoor Seating', 'Live Music', 'Happy Hour', 'Family-Friendly', 'Vegan Options'];
+  const amenitiesList = ['WiFi', 'Outdoor Seating', 'Live Music', 'Happy Hour', 'Family-Friendly', 'Vegan Options'];
   const shopTypes = ['Souvenir Shop', 'Clothing Store', 'Grocery Store', 'Electronics Store', 'Bookstore'];
   const categories = ['Handicrafts', 'Fashion', 'Food', 'Electronics', 'Books', 'Home Decor'];
 
@@ -263,8 +268,13 @@ const Discover = () => {
       // console.log('matchesType', matchesType);
       // console.log('item.category', item.category);
       // console.log('filters.selectedType', filters.selectedType);
-      const matchesCategory = filters.selectedCategory?.length === 0 || filters.selectedCategory.includes(item.category);
-      const matchesAmenities = filters.selectedAmenities.length === 0 || filters.selectedAmenities.every(amenity => item.amenities.includes(amenity));
+      const matchesCategory = filters.selectedCategory?.length === 0 || 
+        filters.selectedCategory.some(category => category.toLowerCase() === item.category.toLowerCase());
+
+      const matchesAmenities = filters.selectedAmenities.length === 0 || 
+        filters.selectedAmenities.every(amenity => 
+          item.amenities.map(a => a.toLowerCase()).includes(amenity.toLowerCase())
+        );
       const matchesRatings = filters.selectedRatings.length === 0 || filters.selectedRatings.includes(item.rating);
       const matchesDestination = filters.selectedDestination === 'All' || filters.selectedDestination === item.destination;
       const matchesPriceRange = item.lowest_price >= filters.priceRange[0] && item.highest_price <= filters.priceRange[1];
@@ -504,8 +514,10 @@ const Discover = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-
-
+  useEffect(() => {
+    // Log the businesses data to the console
+    console.log('Businesses data:', businesses);
+  }, [businesses]);
 
   if (loading) {
     return <Spinner className='flex justify-center items-center h-screen' size='lg' label="Loading..." color="primary" />;
@@ -692,12 +704,35 @@ const Discover = () => {
           </div>
         </div>
 
-         {/* Map Placeholder */}
-         <div className="mt-8 bg-gray-200 rounded-lg shadow-md p-4">
+        {/* Map Section */}
+        <div className="mt-8 bg-gray-200 rounded-lg shadow-md p-4">
           <h2 className="text-lg font-semibold mb-4">Locations</h2>
-          <div className="w-full h-64 bg-gray-300 flex items-center justify-center">
-            <span className="text-gray-600">Map will be here</span>
-          </div>
+          <MapContainer center={[12.9738, 123.9807]} zoom={10} className="w-full h-96">
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            />
+            <MapEvents setCurrentZoom={setCurrentZoom} />
+            {businesses.map((business, index) => {
+              const { pin_location } = business;
+              if (pin_location && currentZoom >= 7) { // Adjust zoom level as needed
+                const position = [pin_location.latitude, pin_location.longitude];
+                const showLogo = currentZoom >= 12; // Set zoom level to show/hide logo
+                const customDivIcon = L.divIcon({
+                  className: 'custom-icon',
+                  html: `<div class="custom-popup flex items-center whitespace-nowrap font-bold text-pink-600" style="font-size: 0.85rem;">
+                          ${showLogo ? `<img src="http://localhost:5000/${business.businessLogo}" alt="${business.businessName}" class="w-10 h-10" />` : ''}
+                          <span class="ml-2">${business.businessName}</span>
+                        </div>`,
+                  iconAnchor: [20, 20] // Adjust these values to center the logo
+                });
+                return (
+                  <Marker key={index} position={position} icon={customDivIcon}/>
+                );
+              }
+              return null;
+            })}
+          </MapContainer>
         </div>
       </div>
    
@@ -723,6 +758,16 @@ const Discover = () => {
 
     </div>
   );
+};
+
+// Component to handle map events
+const MapEvents = ({ setCurrentZoom }) => {
+  useMapEvents({
+    zoomend: (e) => {
+      setCurrentZoom(e.target.getZoom());
+    },
+  });
+  return null;
 };
 
 export default Discover;
