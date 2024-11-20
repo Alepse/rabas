@@ -30,6 +30,7 @@ const useIsLargeScreen = () => {
 
 const Activities = () => {
   // State Variables
+  const [activityDetails, setActivityDetails] = useState([0]);
   const [selectedActivities, setSelectedActivities] = useState([]);
   const [selectedAmenities, setSelectedAmenities] = useState([]);
   const [selectedRatings, setSelectedRatings] = useState([]);
@@ -39,8 +40,28 @@ const Activities = () => {
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
   
-const [showButton, setShowButton] = useState(false); // State to show/hide button
+  const [showButton, setShowButton] = useState(false); // State to show/hide button
 
+  useEffect(() => {
+    const fetchActivities = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/getAllBusinesses?businessType=attraction`);
+        const data = await response.json();
+        if (data.success) {
+          // Filter businesses to only include those with businessType 'attraction'
+          const attractions = data.businesses.filter(business => business.businessType === 'attraction');
+          setActivityDetails(attractions);
+          // console.log('Attraction Details:', attractions);
+        } else {
+          console.error('Failed to fetch activities:', data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching activities:', error);
+      }
+    };
+  
+    fetchActivities();
+  }, []);
 
      // Title Tab
      useEffect(() => {
@@ -112,76 +133,89 @@ const [showButton, setShowButton] = useState(false); // State to show/hide butto
   };
 
   // Activity Details
-  const activityDetails = [
-    {
-      name: 'Beautiful Beach',
-      description: 'Relax and enjoy the scenic beach view.',
-      image: pic1,
-      tags: ['Swimming', 'Surfing'],
-      amenities: ['Parking', 'Restrooms'],
-      rating: 5,
-      destination: 'Donsol',
-      budget: '500-2000',
-      category: 'Relaxation',
-    },
-    {
-      name: 'Mountain Adventure',
-      description: 'Hike through the mountains and enjoy nature.',
-      image: pic1,
-      tags: ['Hiking', 'Camping'],
-      amenities: ['Guides', 'Parking'],
-      rating: 4,
-      destination: 'Bulusan',
-      budget: '250-3000',
+  // const activityDetails = [
+  //   {
+  //     name: 'Beautiful Beach',
+  //     description: 'Relax and enjoy the scenic beach view.',
+  //     image: pic1,
+  //     tags: ['Swimming', 'Surfing'],
+  //     amenities: ['Parking', 'Restrooms'],
+  //     rating: 5,
+  //     destination: 'Donsol',
+  //     budget: '500-2000',
+  //     category: 'Relaxation',
+  //   },
+  //   {
+  //     name: 'Mountain Adventure',
+  //     description: 'Hike through the mountains and enjoy nature.',
+  //     image: pic1,
+  //     tags: ['Hiking', 'Camping'],
+  //     amenities: ['Guides', 'Parking'],
+  //     rating: 4,
+  //     destination: 'Bulusan',
+  //     budget: '250-3000',
      
-    },
-    {
-      name: 'Cultural Tour',
-      description: 'Discover the local history and culture.',
-      image: pic1,
-      tags: ['Tour', 'History'],
-      amenities: ['Guides'],
-      rating: 4,
-      destination: 'Sorsogon City',
-      budget: '30-1500',
+  //   },
+  //   {
+  //     name: 'Cultural Tour',
+  //     description: 'Discover the local history and culture.',
+  //     image: pic1,
+  //     tags: ['Tour', 'History'],
+  //     amenities: ['Guides'],
+  //     rating: 4,
+  //     destination: 'Sorsogon City',
+  //     budget: '30-1500',
     
-    },
-    {
-      name: 'Snorkeling Expedition',
-      description: 'Explore underwater life.',
-      image: pic1,
-      tags: ['Swimming', 'Snorkeling'],
-      amenities: ['Guides', 'Restrooms'],
-      rating: 5,
-      destination: 'Matnog',
-      budget: '500-3500',
+  //   },
+  //   {
+  //     name: 'Snorkeling Expedition',
+  //     description: 'Explore underwater life.',
+  //     image: pic1,
+  //     tags: ['Swimming', 'Snorkeling'],
+  //     amenities: ['Guides', 'Restrooms'],
+  //     rating: 5,
+  //     destination: 'Matnog',
+  //     budget: '500-3500',
     
-    },
-    {
-      name: 'Camping Retreat',
-      description: 'Spend the night under the stars.',
-      image: pic1,
-      tags: ['Camping'],
-      amenities: ['Parking', 'Restrooms'],
-      rating: 4,
-      destination: 'Bulan',
-      budget: '40-800',
+  //   },
+  //   {
+  //     name: 'Camping Retreat',
+  //     description: 'Spend the night under the stars.',
+  //     image: pic1,
+  //     tags: ['Camping'],
+  //     amenities: ['Parking', 'Restrooms'],
+  //     rating: 4,
+  //     destination: 'Bulan',
+  //     budget: '40-800',
       
-    },
-    // Add more mock activities here...
-  ];
+  //   },
+  //   // Add more mock activities here...
+  // ];
 
   // Define the activity types based on the tags used in your activity data
-  const activityTypes = ['Swimming', 'Surfing', 'Hiking', 'Camping', 'Tour', 'History', 'Snorkeling'];
+  const activityTypes = [ 'Adventure', 'Swimming', 'Surfing', 'Hiking', 'Camping', 'Tour', 'History', 'Snorkeling'];
 
   // Filtering logic
   const filteredActivities = activityDetails.filter((activity) => {
-    const matchesActivityType = selectedActivities.length === 0 || selectedActivities.every((selected) => activity.tags.includes(selected));
-    const matchesAmenities = selectedAmenities.length === 0 || selectedAmenities.some((amenity) => activity.amenities.includes(amenity));
+    const matchesActivityType = selectedActivities.length === 0 || 
+      selectedActivities.every((selected) => 
+        activity.category.map(cat => cat.toLowerCase().replace(/s$/, '')).includes(selected.toLowerCase().replace(/s$/, ''))
+      );
+
+      // console.log('selectedActivities', selectedActivities);
+      // console.log('activity.category', activity.category);
+    const matchesAmenities = selectedAmenities.length === 0 || 
+      selectedAmenities.every((amenity) => 
+        activity.amenities.map(a => a.toLowerCase().replace(/s$/, '')).includes(amenity.toLowerCase().replace(/s$/, ''))
+      );
     const matchesRating = selectedRatings.length === 0 || selectedRatings.includes(activity.rating);
     const matchesDestination = selectedDestination === 'All' || activity.destination === selectedDestination;
     const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(activity.category);
-    const [minBudget, maxBudget] = activity.budget.split('-').map(Number);
+
+    // Ensure lowest_price and highest_price are numbers
+    const minBudget = parseFloat(activity.lowest_price) || 0;
+    const maxBudget = parseFloat(activity.highest_price) || Infinity;
+
     const matchesBudget = minBudget <= budgetRange[1] && maxBudget >= budgetRange[0];
 
     return matchesActivityType && matchesAmenities && matchesRating && matchesDestination && matchesCategory && matchesBudget;
@@ -229,7 +263,7 @@ const [showButton, setShowButton] = useState(false); // State to show/hide butto
 
         {/* Toggle Button for Filters */}
         <div className="lg:hidden mb-4 bg-white">
-          <Button onClick={toggleFilters} className="w-full bg-color1 text-color3">
+          <Button aria-label="Close menu" onClick={toggleFilters} className="w-full bg-color1 text-color3">
             {showFilters ? 'Hide Filters' : 'Show Filters'}
           </Button>
         </div>
@@ -354,20 +388,20 @@ const [showButton, setShowButton] = useState(false); // State to show/hide butto
                     variants={cardVariants}
                   >
                     <img
-                      src={activity.image}
-                      alt={activity.name}
+                      src={`http://localhost:5000/${activity.businessLogo}`}
+                      alt={activity.businessName}
                       className='w-full h-48 object-cover rounded-t-lg'
                     />
                     <div className='p-4'>
                       <div className='flex items-center justify-between gap-2'>
-                          {/* tags */}
+                      {/* tags */}
                       <div className='flex flex-wrap gap-2 mb-2'>
-                        {activity.tags.map((tag, index) => (
+                        {activity.category.map((cat, index) => (
                           <span 
                             key={index} 
-                            className={`text-xs px-2 py-1 rounded-full ${selectedActivities.includes(tag) ? 'bg-color2 text-white' : 'bg-gray-200 text-gray-700'}`}
+                            className={`text-xs px-2 py-1 rounded-full ${selectedActivities.map(a => a.toLowerCase()).includes(cat.toLowerCase().replace(/s$/, '')) ? 'bg-color2 text-white' : 'bg-gray-200 text-gray-700'}`}
                           >
-                            {tag}
+                            {cat}
                           </span>
                         ))}
                       </div>
@@ -381,7 +415,7 @@ const [showButton, setShowButton] = useState(false); // State to show/hide butto
                           </div>
                         </div>
                       </div>
-                      <h3 className='font-semibold text-lg text-color1'>{activity.name}</h3>
+                      <h3 className='font-semibold text-lg text-color1'>{activity.businessName}</h3>
                       <div className='text-xs text-gray-500 mb-2 flex items-center'>
                         <GiPositionMarker/> {activity.destination}
                       </div>
@@ -389,7 +423,7 @@ const [showButton, setShowButton] = useState(false); // State to show/hide butto
                       <div className='flex mb-2 max-w-[500px] max-h-[5rem] overflow-y-auto scrollbar-custom flex-col'>      
                         <p className='text-sm text-gray-600 mb-2'>{activity.description}</p>
                       </div>
-                      <p className='font-semibold text-md mb-2'>₱{activity.budget}</p>
+                      <p className='font-semibold text-md mb-2'>₱{activity.lowest_price} - ₱{activity.highest_price}</p>
                       <Link to="/business" target='_blank'>
                         <Button 
                           className='w-full bg-color1 text-color3 hover:bg-color2'

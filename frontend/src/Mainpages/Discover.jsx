@@ -289,7 +289,7 @@ const Discover = () => {
 
       const matchesDestination = filters.selectedDestination === 'All' || filters.selectedDestination === item.destination;
       
-      const matchesPriceRange = item.lowest_price >= filters.priceRange[0] && item.highest_price <= filters.priceRange[1];
+      const matchesPriceRange = item.lowest_price <= filters.priceRange[1] && item.highest_price >= filters.priceRange[0];
 
       return matchesType && matchesCategory && matchesCuisine && matchesAmenities && matchesRatings && matchesDestination && matchesPriceRange;
     });
