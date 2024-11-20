@@ -3117,7 +3117,7 @@ app.get('/getAllBusinesses', (req, res) => {
     LEFT JOIN 
       products p ON b.business_id = p.business_id
     LEFT JOIN
-      ratings r ON b.business_id = r.business_id
+      business_ratings r ON b.business_id = r.business_id
     GROUP BY 
       b.business_id, b.businessName, b.businessType, b.businessLogo, 
       b.location, b.businessCard, b.aboutUs

@@ -241,10 +241,10 @@ const Discover = () => {
   const activityTypes = ['Hiking', 'Water Sports', 'Relaxation', 'Adventure', 'Attraction'];
   const accommodationTypes = ['Cabins', 'Resorts', 'Hotels', 'Hostels'];
   const foodTypes = ['Restaurant', 'Bar', 'Cafe'];
-  const cuisines = ['Filipino', 'International', 'Chinese', 'Japanese', 'Italian'];
+  const cuisines = ['Filipino', 'International', 'Chinese', 'Japanese', 'Italian', 'cafe'];
   const amenitiesList = ['WiFi', 'Outdoor Seating', 'Live Music', 'Happy Hour', 'Family-Friendly', 'Vegan Options'];
   const shopTypes = ['Souvenir Shop', 'Clothing Store', 'Grocery Store', 'Electronics Store', 'Bookstore'];
-  const categories = ['Handicrafts', 'Fashion', 'Food', 'Electronics', 'Books', 'Home Decor'];
+  const categories = ['Souvenir Shop', 'Handicrafts', 'Fashion', 'Food', 'Electronics', 'Books', 'Home Decor'];
 
   const handleRatingClick = (rating, setFilters) => {
     setFilters((prevFilters) => {
@@ -262,24 +262,36 @@ const Discover = () => {
 
   const filterData = (data, filters) => {
     return data.filter(item => {
-      const matchesType = filters.selectedType.length === 0 || item.category.some(cat => 
-        filters.selectedType.map(type => type.toLowerCase().replace(/s$/, '')).includes(cat.toLowerCase().replace(/s$/, ''))
-      );
-      // console.log('matchesType', matchesType);
-      // console.log('item.category', item.category);
-      // console.log('filters.selectedType', filters.selectedType);
+      const matchesType = filters.selectedType.length === 0 || 
+        filters.selectedType.every(type => 
+          item.category.map(cat => cat.toLowerCase().replace(/s$/, '')).includes(type.toLowerCase().replace(/s$/, ''))
+        );
+     
       const matchesCategory = filters.selectedCategory?.length === 0 || 
-        filters.selectedCategory.some(category => category.toLowerCase() === item.category.toLowerCase());
+        filters.selectedCategory.every(category => 
+          item.category.map(cat => cat.toLowerCase().replace(/s$/, '')).includes(category.toLowerCase().replace(/s$/, ''))
+        );
+      
+      const matchesCuisine = filters.selectedCuisine?.length === 0 || 
+        filters.selectedCuisine.every(cuisine => 
+          item.category.map(cat => cat.toLowerCase().replace(/s$/, '')).includes(cuisine.toLowerCase().replace(/s$/, ''))
+        );
+
+      // console.log('selectedCuisine', filters.selectedCuisine);
+      // console.log('item.category', item.category);
 
       const matchesAmenities = filters.selectedAmenities.length === 0 || 
         filters.selectedAmenities.every(amenity => 
-          item.amenities.map(a => a.toLowerCase()).includes(amenity.toLowerCase())
+          item.amenities.map(a => a.toLowerCase().replace(/s$/, '')).includes(amenity.toLowerCase().replace(/s$/, ''))
         );
+
       const matchesRatings = filters.selectedRatings.length === 0 || filters.selectedRatings.includes(item.rating);
+
       const matchesDestination = filters.selectedDestination === 'All' || filters.selectedDestination === item.destination;
+      
       const matchesPriceRange = item.lowest_price >= filters.priceRange[0] && item.highest_price <= filters.priceRange[1];
 
-      return matchesType && matchesCategory && matchesAmenities && matchesRatings && matchesDestination && matchesPriceRange;
+      return matchesType && matchesCategory && matchesCuisine && matchesAmenities && matchesRatings && matchesDestination && matchesPriceRange;
     });
   };
 
@@ -433,40 +445,6 @@ const Discover = () => {
           </div>
         </div>
 
-        {/* Additional Filters for All Tab */}
-        {isAllTab && (
-          <>
-            {/* Cuisine Filter */}
-            <div className="mb-6 max-h-[230px] overflow-auto scrollbar-custom">
-              <h3 className="text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2">Cuisine</h3>
-              <CheckboxGroup
-                value={foodFilters.selectedCuisine}
-                onChange={(value) => setFoodFilters(prev => ({ ...prev, selectedCuisine: value }))}
-              >
-                {cuisines.map((cuisine) => (
-                  <Checkbox key={cuisine} value={cuisine}>
-                    {cuisine}
-                  </Checkbox>
-                ))}
-              </CheckboxGroup>
-            </div>
-
-            {/* Category Filter */}
-            <div className="mb-6 max-h-[230px] overflow-auto scrollbar-custom">
-              <h3 className="text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2">Category</h3>
-              <CheckboxGroup
-                value={shopFilters.selectedCategory}
-                onChange={(value) => setShopFilters(prev => ({ ...prev, selectedCategory: value }))}
-              >
-                {categories.map((category) => (
-                  <Checkbox key={category} value={category}>
-                    {category}
-                  </Checkbox>
-                ))}
-              </CheckboxGroup>
-            </div>
-          </>
-        )}
       </div>
     </div>
   );
@@ -513,11 +491,6 @@ const Discover = () => {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-
-  useEffect(() => {
-    // Log the businesses data to the console
-    console.log('Businesses data:', businesses);
-  }, [businesses]);
 
   if (loading) {
     return <Spinner className='flex justify-center items-center h-screen' size='lg' label="Loading..." color="primary" />;
@@ -636,6 +609,7 @@ const Discover = () => {
                               activeTab === 'activities' ? activitiesFilters.priceRange :
                               activeTab === 'accommodations' ? accommodationsFilters.priceRange :
                               allFilters.priceRange,
+                  selectedCuisine: activeTab === 'restaurant' ? foodFilters.selectedCuisine : [],
                 };
 
                 const filteredItems = filterData(mockData[category], filters);
@@ -656,11 +630,26 @@ const Discover = () => {
                     <div className="p-4">
                       <div className="flex justify-between items-center mb-2">
                         <div className="flex flex-wrap gap-2">
-                          {item.category.map((cat, idx) => (
-                            <span key={idx} className="bg-color2 text-color3 text-xs px-2 py-1 rounded-full">
-                              {cat}
-                            </span>
-                          ))}
+                          {item.category.map((cat, idx) => {
+                            const isSelected = filters.selectedType.some(type => 
+                              type.toLowerCase().replace(/s$/, '') === cat.toLowerCase().replace(/s$/, '') 
+                            ) || shopFilters.selectedCategory.some(type => 
+                              type.toLowerCase() === cat.toLowerCase() 
+                            ) || foodFilters.selectedCuisine.some(type => 
+                              type.toLowerCase() === cat.toLowerCase() 
+                            );
+
+                            return (
+                              <span
+                                key={idx}
+                                className={`text-xs px-2 py-1 rounded-full ${
+                                  isSelected ? 'bg-color2 text-white' : 'bg-gray-200 text-gray-700'
+                                }`}
+                              >
+                                {cat}
+                              </span>
+                            );
+                          })}
                         </div>
                         <div className="flex items-center gap-1">
                           {item.rating ? (
