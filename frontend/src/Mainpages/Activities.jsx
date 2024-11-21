@@ -208,7 +208,8 @@ const Activities = () => {
       selectedAmenities.every((amenity) => 
         activity.amenities.map(a => a.toLowerCase().replace(/s$/, '')).includes(amenity.toLowerCase().replace(/s$/, ''))
       );
-    const matchesRating = selectedRatings.length === 0 || selectedRatings.includes(activity.rating);
+      const matchesRating = selectedRatings.length === 0 || 
+      selectedRatings.includes(Math.floor(activity.rating || 0));
     const matchesDestination = selectedDestination === 'All' || activity.destination === selectedDestination;
     const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(activity.category);
 
@@ -410,7 +411,7 @@ const Activities = () => {
                           <div className='flex items-center gap-1 '>
                             <span className='text-black text-[12px] '>{activity.rating}</span> 
                             <span className='text-yellow-500'>
-                              {'★'.repeat(activity.rating)}{'☆'.repeat(5 - activity.rating)}
+                            {'★'.repeat(Math.floor(activity.rating || 0))}{'☆'.repeat(5 - Math.floor(activity.rating || 0))}
                             </span>
                           </div>
                         </div>

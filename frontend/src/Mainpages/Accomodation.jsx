@@ -124,13 +124,14 @@ const Accommodations = () => {
   const filteredAccommodations = accommodationDetails.filter((accommodation) => {
     const matchesTags = selectedTags.length === 0 || 
       selectedTags.every((selected) => 
-        accommodation.category.map(tag => tag.toLowerCase()).includes(selected.toLowerCase())
+        accommodation.category.map(tag => tag.toLowerCase().replace(/s$/, '')).includes(selected.toLowerCase().replace(/s$/, ''))
       );
     const matchesAmenities = selectedAmenities.length === 0 || 
       selectedAmenities.every((amenity) => 
-        accommodation.amenities.map(a => a.toLowerCase()).includes(amenity.toLowerCase())
+        accommodation.amenities.map(a => a.toLowerCase().replace(/s$/, '')).includes(amenity.toLowerCase().replace(/s$/, ''))
       );
-    const matchesRating = selectedRatings.length === 0 || selectedRatings.includes(accommodation.rating);
+      const matchesRating = selectedRatings.length === 0 || 
+      selectedRatings.includes(Math.floor(accommodation.rating || 0));
     const matchesDestination = selectedDestination === 'All' || accommodation.destination === selectedDestination;
 
      // Ensure lowest_price and highest_price are numbers
@@ -328,7 +329,7 @@ const Accommodations = () => {
                           <div className='flex items-center gap-1 '>
                             <span className='text-black text-[12px] '>{accommodation.rating}</span> 
                             <span className='text-yellow-500'>
-                              {'★'.repeat(accommodation.rating)}{'☆'.repeat(5 - accommodation.rating)}
+                            {'★'.repeat(Math.floor(accommodation.rating || 0))}{'☆'.repeat(5 - Math.floor(accommodation.rating || 0))}
                             </span>
                           </div>
                         </div>

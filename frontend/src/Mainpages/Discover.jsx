@@ -285,7 +285,8 @@ const Discover = () => {
           item.amenities.map(a => a.toLowerCase().replace(/s$/, '')).includes(amenity.toLowerCase().replace(/s$/, ''))
         );
 
-      const matchesRatings = filters.selectedRatings.length === 0 || filters.selectedRatings.includes(item.rating);
+      const matchesRatings = filters.selectedRatings.length === 0 || 
+        filters.selectedRatings.includes(Math.floor(item.rating || 0));
 
       const matchesDestination = filters.selectedDestination === 'All' || filters.selectedDestination === item.destination;
       
