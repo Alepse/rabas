@@ -24,6 +24,9 @@ import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import AccommodationBookingForm from './bookingFormModal/AccommodationBookingForm';
 import TableReservationForm from './bookingFormModal/TableReservationForm';
 import AttractionActivitiesBookingForm from './bookingFormModal/AttractionActivitiesBookingForm';
+import { useParams } from 'react-router-dom';
+import CryptoJS from 'crypto-js';
+import axios from 'axios';
 
 // Mock Data for each tab with amenities
 // const mockData = {
@@ -148,19 +151,88 @@ import AttractionActivitiesBookingForm from './bookingFormModal/AttractionActivi
 
 // Review Modal Component
 const ReviewModal = ({ isOpen, onClose, product }) => {
+  const [userData, setUserData] = useState(null);
   const [newReview, setNewReview] = useState('');
   const [newRating, setNewRating] = useState(0);
-  const [reviews, setReviews] = useState([
-    { user: 'John Doe', rating: 4, comment: 'Great experience! Highly recommend this.' },
-    { user: 'Jane Smith', rating: 5, comment: 'Amazing service, I loved it!' },
-  ]);
+  const [reviews, setReviews] = useState([]);
 
-  const handleReviewSubmit = () => {
+  const fetchUserData = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/get-userData', {
+        method: 'GET',
+        credentials: 'include' // Include cookies
+      });
+      const data = await response.json();
+      setUserData(data.userData);
+      setUsername(data.userData.username); // Set username
+      setEmail(data.userData.email); // Set email
+      setPhoneNumber(data.userData.contact || ''); // Set phone number (if available)
+      // Fetch liked pages
+      setLikedPages(data.userData.likedPages || []); // Set liked pages (default to empty array if not present)
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
+  useEffect(() => {
+    const fetchReviewsAndRatings = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/getAllReviewsAndRatings`);
+        
+        if (response.data.success) {
+          const reviews = response.data.reviewsAndRatings.filter(review => review.product_id === parseInt(product.product_id));
+          console.log('Filtered Reviews:', reviews);
+          setReviews(reviews);
+        } else {
+          console.error('Failed to fetch reviews and ratings:', response.data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching reviews and ratings:', error);
+      }
+    };
+
+    if (isOpen) {
+      fetchReviewsAndRatings();
+    }
+  }, [isOpen, product.product_id]);
+
+  const handleReviewSubmit = async () => {
     if (newReview && newRating > 0) {
-      const review = { user: 'Anonymous', rating: newRating, comment: newReview };
-      setReviews([...reviews, review]);
-      setNewReview('');
-      setNewRating(0);
+      try {
+        const response = await fetch(`http://localhost:5000/addReviewsAndRatings`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            user_id: userData.user_id,
+            product_id: product.product_id,
+            rating: newRating,
+            comment: newReview
+          }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Add the new review to the existing list of reviews
+          setReviews([...reviews, {
+            username: userData.username, // Or fetch the username from session if available
+            ratings: newRating,
+            comment: newReview
+          }]);
+          setNewReview('');
+          setNewRating(0);
+        } else {
+          console.error('Failed to submit review:', data.message);
+        }
+      } catch (error) {
+        console.error('Error submitting review:', error);
+      }
     }
   };
 
@@ -198,19 +270,28 @@ const ReviewModal = ({ isOpen, onClose, product }) => {
           <div className="mt-6">
             <h3 className="font-bold mb-2">Reviews</h3>
             <div className="space-y-4">
-              {reviews.map((review, index) => (
-                <div key={index} className="bg-gray-100 p-4 rounded-lg">
-                  <div className="flex items-center mb-2">
-                    <div className="font-bold">{review.user}</div>
-                    <div className="flex ml-2">
-                      {Array.from({ length: review.rating }).map((_, i) => (
-                        <AiFillStar key={i} className="text-yellow-500" />
-                      ))}
+              {reviews.length > 0 ? (
+                reviews.map((review, index) => (
+                  <div key={index} className="bg-gray-100 p-4 rounded-lg">
+                    <div className="flex items-center mb-2">
+                      <div className="font-bold">{review.username}</div>
+                      <div className="flex ml-2">
+                        {[1, 2, 3, 4, 5].map((num) => (
+                          <AiFillStar
+                            key={num}
+                            className={num <= review.ratings ? 'text-yellow-500' : 'text-gray-300'}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    <div className={review.comment ? "text-gray-700 p-2 border-t border-gray-300 mt-2" : "text-gray-400 italic p-2 border-t border-gray-300 bg-gray-100 mt-2"}>
+                      {review.comment ? review.comment : 'No comment'}
                     </div>
                   </div>
-                  <div>{review.comment}</div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <div className="text-gray-600">No reviews available</div>
+              )}
             </div>
           </div>
         </ModalBody>
@@ -316,9 +397,18 @@ const ProductCard = ({ product, openBookingModal, onOpen }) => {
               
               <div className="flex mt-4 gap-2">
                 <Button color="primary">Inquire</Button>
-                <Button color="success" className="text-white" onClick={() => openBookingModal(product)}>
-                  Book
-                </Button>
+                {product.product_category !== 'shop' && (
+                  <Button
+                    color="success"
+                    className="text-white"
+                    onClick={() => openBookingModal(product)}
+                  >
+                    {product.product_category === 'restaurant' ? 'Reserve Table' : 
+                     product.product_category === 'activity' ? 'Book Activity' : 
+                     product.product_category === 'accommodation' ? 'Book Stay' : 
+                     'Book'}
+                  </Button>
+                )}
               </div>
             </div>
           </div>
@@ -450,6 +540,8 @@ const BusinessAllproducts = () => {
     shop: []
   });
 
+  const { businessId: encryptedBusinessId } = useParams();
+
   const [allProducts, setAllProducts] = useState([]);
   const [activeTab, setActiveTab] = useState('all');
   const [selectedType, setSelectedType] = useState('All');
@@ -464,12 +556,19 @@ const BusinessAllproducts = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const { isOpen, onOpen: originalOnOpen, onOpenChange } = useDisclosure();
 
+  // Function to decrypt the business_id
+  const decryptId = (encryptedId) => {
+    const secretKey = import.meta.env.VITE_SECRET_KEY;
+    const bytes = CryptoJS.AES.decrypt(decodeURIComponent(encryptedId), secretKey);
+    return bytes.toString(CryptoJS.enc.Utf8);
+  };
   const categories = ['activity', 'accommodation', 'restaurant', 'shop'];
 
   // Fetch data for each category from the backend
   useEffect(() => {
     const fetchCategoryData = async (category) => {
       try {
+        const decryptedBusinessId = decryptId(encryptedBusinessId);
         const response = await fetch(`http://localhost:5000/getAllBusinessProduct?category=${category}`);
         const contentType = response.headers.get("content-type");
 
@@ -479,16 +578,10 @@ const BusinessAllproducts = () => {
           console.log('Products: ', data);
 
           if (data.success) {
-            // Log to check category matching
-            // console.log(`Fetching data for category: ${category}`);
-
-            // Filter products based on their category to ensure they match the current category
+            // Filter products based on their category and decrypted business_id
             const filteredProducts = data.businessProducts.filter((product) => {
-              // console.log(`Category: ${category}, Product Category: ${product.product_category}`);
-              return product.product_category === category;
+              return product.product_category === category && product.business_id === parseInt(decryptedBusinessId);
             });
-
-            // console.log('FilteredProducts:', filteredProducts);
 
             // Map backend categories to state keys
             const categoryKey = category === 'activity' ? 'activities' :
@@ -514,7 +607,7 @@ const BusinessAllproducts = () => {
     categories.forEach((category) => {
       fetchCategoryData(category);
     });
-  }, []);
+  }, [encryptedBusinessId]);
 
    // Update `allProducts` whenever category data changes
   useEffect(() => {
@@ -529,16 +622,22 @@ const BusinessAllproducts = () => {
   console.log('All products', mockData);
 
   const openBookingModal = (product) => {
-    if (product.type === 'Cabins' || product.type === 'Resorts') {
+    console.log('Opening booking modal for product:', product);
+    if (product.product_category === 'accommodation') {
       setActiveModal({ type: 'accommodation', product });
-    } else if (product.type === 'Fine Dining' || product.type === 'Buffet') {
+    } else if (product.product_category === 'restaurant') {
       setActiveModal({ type: 'restaurant', product });
-    } else if (product.type === 'Hiking' || product.type === 'Water Sports') {
+    } else if (product.product_category === 'activity') {
       setActiveModal({ type: 'activities', product });
+    } else {
+      console.warn('Product type not recognized:', product.type);
     }
   };
 
-  const closeBookingModal = () => setActiveModal(null);
+  const closeBookingModal = () => {
+    console.log('Closing booking modal');
+    setActiveModal(null);
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -791,9 +890,15 @@ const BusinessAllproducts = () => {
       </Modal>
 
       {/* Conditionally Render Modals */}
-      {activeModal?.type === 'accommodation' && <AccommodationBookingForm isOpen={true} onClose={closeBookingModal} product={activeModal.product} />}
-      {activeModal?.type === 'restaurant' && <TableReservationForm isOpen={true} onClose={closeBookingModal} product={activeModal.product} />}
-      {activeModal?.type === 'activities' && <AttractionActivitiesBookingForm isOpen={true} onClose={closeBookingModal} product={activeModal.product} />}
+      {activeModal?.type === 'accommodation' && (
+        <AccommodationBookingForm isOpen={true} onClose={closeBookingModal} product={activeModal.product} />
+      )}
+      {activeModal?.type === 'restaurant' && (
+        <TableReservationForm isOpen={true} onClose={closeBookingModal} product={activeModal.product} />
+      )}
+      {activeModal?.type === 'activities' && (
+        <AttractionActivitiesBookingForm isOpen={true} onClose={closeBookingModal} product={activeModal.product} />
+      )}
     </div>
   );
 };

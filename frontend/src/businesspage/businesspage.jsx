@@ -37,8 +37,8 @@ const BusinessPage = () => {
         const response = await axios.get(`http://localhost:5000/getAllBusinesses`);
         const business = response.data.businesses.find(b => b.business_id === parseInt(decryptedBusinessId));
         setBusinessData(business);
-        console.log('Encrypted ID:', encryptedBusinessId);
-        console.log('Decrypted ID:', decryptedBusinessId);
+        // console.log('Encrypted ID:', encryptedBusinessId);
+        // console.log('Decrypted ID:', decryptedBusinessId);
       } catch (error) {
         console.error('Error fetching business data:', error);
       } finally {

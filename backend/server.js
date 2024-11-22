@@ -1071,6 +1071,41 @@ app.put('/updateBusinessContactInfo/:id', (req, res) => {
   );
 });
 
+// Endpoint for updating the openhours
+app.put('/update-opening-hours/:id', (req, res) => {
+  const businessId = req.params.id;
+  const { openingHours } = req.body;
+  // console.log('Request body:', req.body);
+
+  // Validate openingHours format
+  if (!openingHours || !Array.isArray(openingHours)) {
+    return res.status(400).json({ success: false, message: 'Invalid opening hours format' });
+  }
+
+  // Example validation for each entry
+  const isValid = openingHours.every(hour => {
+    return hour.day && (hour.open === "Closed" || hour.close === "Closed" || (hour.open && hour.close));
+  });
+
+  if (!isValid) {
+    return res.status(400).json({ success: false, message: 'Each entry must have day, and either "Closed" or valid open and close times' });
+  }
+
+  // Update the database
+  const sql = 'UPDATE businesses SET openingHours = ? WHERE business_id = ?';
+  connection.query(sql, [JSON.stringify(openingHours), businessId], (err, results) => {
+    if (err) {
+      console.error('Error updating opening hours:', err);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: 'Business not found' });
+    }
+
+    return res.json({ success: true, message: 'Opening hours updated successfully' });
+  });
+});
 // Endpoint for updating Facilities
 app.put('/updateBusinessFacilities/:id', (req, res) => {
   const businessId = req.params.id;
@@ -1496,13 +1531,16 @@ app.get('/getAllBusinessProduct', (req, res) => {
     SELECT 
         products.*, 
         MAX(COALESCE(deals.discount, 0)) AS discount, 
-        MAX(COALESCE(deals.expirationDate, 'No Expiration')) AS expiration
+        MAX(COALESCE(deals.expirationDate, 'No Expiration')) AS expiration,
+        AVG(r.ratings) AS rating
     FROM 
         products
     LEFT JOIN 
         deals 
     ON 
         products.product_id = deals.product_id
+    LEFT JOIN
+        product_ratings r ON products.product_id = r.product_id
     GROUP BY 
         products.product_id
     ORDER BY 
@@ -3101,6 +3139,10 @@ app.get('/getAllBusinesses', (req, res) => {
       b.businessLogo,
       b.location AS destination,
       b.pin_location,
+      b.contactInfo,
+      b.openingHours,
+      b.facilities,
+      b.policies,
       IF(
         JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.description')) IS NULL OR 
         JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.description')) = '', 
@@ -3154,6 +3196,61 @@ app.get('/getAllBusinesses', (req, res) => {
     });
 
     return res.json({ success: true, businesses: cleanedResults });
+  });
+});
+
+// Endpoint for reviews and ratings
+app.get('/getAllReviewsAndRatings', (req, res) => {
+  const sql = `
+    SELECT 
+      product_ratings.*, 
+      products.name AS title, 
+      products.description,
+      users.username, 
+      users.email
+    FROM 
+      product_ratings
+    LEFT JOIN 
+      products ON products.product_id = product_ratings.product_id
+    LEFT JOIN 
+      users ON users.user_id = product_ratings.user_id
+  `;
+
+  connection.query(sql, (err, results) => {
+    if (err) {
+      console.error('Error fetching reviews and ratings:', err);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+
+    return res.json({ success: true, reviewsAndRatings: results });
+  });
+});
+
+// Endpoint to add reviews and ratings
+app.post('/addReviewsAndRatings', async (req, res) => {
+  const { product_id, user_id, rating, comment } = req.body;
+  // const user_id = req.session?.user?.user_id;
+
+  console.log(product_id, user_id, rating, comment);
+
+  // Validate the input
+  if (!product_id || !user_id || !rating) {
+    return res.status(400).json({ success: false, message: 'Product ID, User ID, and Rating are required' });
+  }
+
+  // SQL query to insert the review and rating
+  const sql = `
+    INSERT INTO product_ratings (product_id, user_id, ratings, comment)
+    VALUES (?, ?, ?, ?)
+  `;
+
+  connection.query(sql, [product_id, user_id, rating, comment || ''], (err, results) => {
+    if (err) {
+      console.error('Error adding review and rating:', err);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+
+    return res.json({ success: true, message: 'Review and rating added successfully' });
   });
 });
 

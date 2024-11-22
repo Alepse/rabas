@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
+import CryptoJS from 'crypto-js';
+import { updateBusinessData } from '@/redux/businessSlice'; 
 import { Tabs, Tab, Card, CardBody, Textarea, Button, Avatar } from "@nextui-org/react";
 import { businessIcons } from './businessIcons';
 import DOMPurify from 'dompurify';
-import { updateBusinessData } from '@/redux/businessSlice'; 
-import { FaFacebook, FaInstagram, FaPhone, FaWifi } from 'react-icons/fa';
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
+import { FaFacebook, FaInstagram, FaPhone, FaWifi, FaCheckCircle, FaPlus, FaClipboardList } from 'react-icons/fa';
 
 
 const StarRating = ({ rating, onRatingChange, size = "md" }) => {
@@ -45,14 +48,60 @@ const ReviewCard = ({ name, rating, comment, avatar }) => (
   </Card>
 );
 
+const formatTime = (time) => {
+  if (time === "Closed") return "Closed";
+  
+  const [hour, minute] = time.split(':');
+  const hourInt = parseInt(hour, 10);
+  const ampm = hourInt >= 12 ? 'PM' : 'AM';
+  const formattedHour = hourInt % 12 || 12; // Convert 0 to 12 for midnight
+  return `${formattedHour}:${minute} ${ampm}`;
+};
+
 const BusinessInfo = () => {
-  const businessData = useSelector((state) => state.business);
-  const dispatch = useDispatch();
+  const { businessId: encryptedBusinessId } = useParams();
+  const [businessData, setBusinessData] = useState(null);
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [currentZoom, setCurrentZoom] = useState(10);
+
+  // Function to decrypt the business_id
+  const decryptId = (encryptedId) => {
+    const secretKey = import.meta.env.VITE_SECRET_KEY;
+    const bytes = CryptoJS.AES.decrypt(decodeURIComponent(encryptedId), secretKey);
+    return bytes.toString(CryptoJS.enc.Utf8);
+  };
+
+  useEffect(() => {
+    const fetchBusinessData = async () => {
+      try {
+        setLoading(true);
+        const decryptedBusinessId = decryptId(encryptedBusinessId);
+        const response = await axios.get(`http://localhost:5000/getAllBusinesses`);
+        const business = response.data.businesses.find(b => b.business_id === parseInt(decryptedBusinessId));
+        setBusinessData(business);
+        // console.log('Encrypted ID:', encryptedBusinessId);
+        // console.log('Decrypted ID:', decryptedBusinessId);
+      } catch (error) {
+        console.error('Error fetching business data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBusinessData();
+  }, [encryptedBusinessId]);
+
+  // log the business data
+  console.log('Business Data:', businessData);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   if (!businessData) {
-    return <div>Loading...</div>;
+    return <div>No data available</div>;
   }
 
   const handleSubmitReview = (e) => {
@@ -78,6 +127,19 @@ const BusinessInfo = () => {
     __html: DOMPurify.sanitize(html)
   });
 
+  const { pin_location } = businessData;
+  const initialCenter = pin_location ? [pin_location.latitude, pin_location.longitude] : [12.9738, 123.9807];
+
+  const handleGetDirections = () => {
+    if (businessData.pin_location) {
+      const { latitude, longitude } = businessData.pin_location;
+      const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
+      window.open(googleMapsUrl, '_blank');
+    } else {
+      alert('Location not available');
+    }
+  };
+
   return (
     <div className='container mx-auto mt-4 px-4'>
       <Tabs aria-label="Business Information " className='max-w-full overflow-x-auto'>
@@ -90,74 +152,85 @@ const BusinessInfo = () => {
                   <div className='max-w-full lg:max-w-[40rem] w-full flex flex-col justify-center items-center'>
                     <div className="text-black mb-6 break-words whitespace-normal">
                       <h1 className="text-md font-normal">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime mollitia,
-                        molestiae quas vel sint commodi repudiandae consequuntur voluptatum laborum
-                        numquam blanditiis harum quisquam eius sed odit fugiat iusto fuga praesentium
-                        optio, eaque rerum! Provident similique accusantium nemo autem. Veritatis
-                        obcaecati tenetur iure eius earum ut molestias architecto voluptate aliquam
-                        nihil, eveniet aliquid culpa officia aut! Impedit sit sunt quaerat, odit,
-                        tenetur error, harum nesciunt ipsum debitis quas aliquid. Reprehenderit,
-                        quia. Quo neque error repudiandae fuga? Ipsa laudantium molestias eos optio,
-                        obcaecati tenetur iure eius earum ut molestias architecto voluptate aliquam
-                        nihil, eveniet aliquid culpa officia aut! Impedit sit sunt quaerat, odit,
-                        tenetur error, harum nesciunt ipsum debitis quas aliquid. Reprehenderit,
+                        {businessData.aboutUs}
                       </h1>
                     </div>
                   </div>
                   <div className="mb-6">
                     <h3 className="text-xl font-semibold flex items-center gap-3 mb-2">Contact Information</h3>
                     <ul className="space-y-2">
-                      {businessData.contactInfo && businessData.contactInfo.map((info, index) => (
-                        <li key={index} className="flex items-center gap-2">
-                          {renderIcon(info.icon)}
-                          <span>{info.label}: {info.value}</span>
+                      {businessData.contactInfo && businessData.contactInfo.length > 0 ? (
+                        businessData.contactInfo.map((info, index) => (
+                          <li key={`${info.label}-${index}`} className="flex items-center gap-2">
+                            {renderIcon(info.icon)}
+                            <span>
+                              {info.label}{info.value ? `: ${info.value}` : ''}
+                            </span>
+                          </li>
+                        ))
+                      ) : (
+                        <li className="italic text-gray-500 p-4 bg-gray-100 rounded-md">
+                          No contact information available
                         </li>
-                      ))}
-                      <li className='flex items-center gap-2'><FaFacebook /> Business Facebook page</li>
-                      <li className='flex items-center gap-2'><FaInstagram /> Business Instagram</li>
-                      <li className='flex items-center gap-2'><FaPhone /> 09123456645</li>
+                      )}
                     </ul>
                   </div>
                   <Card>
                     <CardBody>
                       <h3 className="text-xl font-semibold flex items-center gap-3 mb-3">Opening Hours</h3>
                       <ul className="space-y-2">
-                        {businessData.openingHours && businessData.openingHours.map((hours, index) => (
-                          <li key={index} className="flex justify-between items-center py-2 border-b">
-                            <span className="font-medium">{hours.day}</span>
-                            <span className="text-gray-600">6:00 am - 8:00 pm</span>
+                        {businessData.openingHours && businessData.openingHours.length > 0 ? (
+                          businessData.openingHours.map((hours, index) => (
+                            <li key={index} className="flex justify-between items-center py-2 border-b">
+                              <span className="font-medium">{hours.day}</span>
+                              <span className="text-gray-600">
+                                {hours.open === "Closed" && hours.close === "Closed" ? "Closed" : `${formatTime(hours.open)} - ${formatTime(hours.close)}`}
+                              </span>
+                            </li>
+                          ))
+                        ) : (
+                          <li className="italic text-gray-500 p-4 bg-gray-100 rounded-md">
+                            No opening hours available
                           </li>
-                        ))}
+                        )}
                       </ul>
                     </CardBody>
                   </Card>
                 </div>
                 <div className="flex-1 p-4">
                   <h2 className="text-2xl md:text-3xl font-bold mb-4">Location</h2>
-                  <p className="mb-4 text-gray-600">{businessData.location} Sorsogon City Philippines</p>
-                  <div className="relative h-full rounded-xl mb-4">
-                    {businessData.mapEmbedUrl ? (
-                      <iframe
-                        src={businessData.mapEmbedUrl}
-                        width="100%"
-                        height="100%"
-                        style={{ border: 0 }}
-                        allowFullScreen=""
-                        loading="lazy"
-                        referrerPolicy="no-referrer-when-downgrade"
-                        title="Business Location Map"
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                          e.target.parentNode.innerHTML = 'Map could not be loaded. Please try again later.';
-                        }}
-                      ></iframe>
+                  <p className="mb-4 text-gray-600">{businessData.destination}</p>
+                  <MapContainer center={initialCenter} zoom={currentZoom} className="w-full h-96">
+                    <TileLayer
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    />
+                    <MapEvents setCurrentZoom={setCurrentZoom} />
+                    {pin_location ? (
+                      (() => {
+                        const { businessName, businessLogo } = businessData;
+                        const position = [pin_location.latitude, pin_location.longitude];
+                        const showLogo = currentZoom >= 10; // Set zoom level to show/hide logo
+
+                        // Adjust font size based on zoom level
+                        const fontSize = currentZoom >= 12 ? '1rem' : '0.85rem';
+
+                        const customDivIcon = L.divIcon({
+                          className: 'custom-icon',
+                          html: `<div class="custom-popup flex items-center whitespace-nowrap font-bold text-pink-600" style="font-size: ${fontSize};">
+                                  ${showLogo ? `<img src="http://localhost:5000/${businessLogo}" alt="${businessName}" class="w-10 h-10" />` : ''}
+                                  <span class="ml-2">${businessName}</span>
+                                </div>`,
+                          iconAnchor: [20, 20] // Adjust these values to center the logo
+                        });
+
+                        return <Marker key={businessData.business_id} position={position} icon={customDivIcon} />;
+                      })()
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-500">
-                        Map not available
-                      </div>
+                      <div>No business data available</div>
                     )}
-                  </div>
-                  <Button color="primary" className="w-full mb-6 hover:bg-color2/90">
+                  </MapContainer>
+                  <Button color="primary" className="w-full mb-6 hover:bg-color2/90" onClick={handleGetDirections}>
                     Get Directions
                   </Button>
                 </div>
@@ -170,30 +243,24 @@ const BusinessInfo = () => {
             <CardBody>
               <h2 className="text-2xl font-bold mb-4">Our Facilities & Amenities</h2>
               <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div className='h-auto flex flex-col items-center w-full p-4 bg-gray-100 rounded-lg shadow-md'>
-                  <p className='font-semibold text-lg mb-2'>Swimming Pool</p>
-                  <ul className='space-y-1'>
-                    <li className='font-normal text-sm items-center gap-2 flex'><FaWifi /> Heated pool</li>
-                    <li className='font-normal text-sm items-center gap-2 flex'><FaWifi /> Poolside bar</li>
-                    <li className='font-normal text-sm items-center gap-2 flex'><FaWifi /> Lifeguard on duty</li>
-                  </ul>
-                </div>
-                <div className='h-auto flex flex-col items-center w-full p-4 bg-gray-100 rounded-lg shadow-md'>
-                  <p className='font-semibold text-lg mb-2'>Gym</p>
-                  <ul className='space-y-1'>
-                    <li className='font-normal text-sm items-center gap-2 flex'><FaWifi /> 24/7 Access</li>
-                    <li className='font-normal text-sm items-center gap-2 flex'><FaWifi /> Personal trainers available</li>
-                    <li className='font-normal text-sm items-center gap-2 flex'><FaWifi /> Modern equipment</li>
-                  </ul>
-                </div>
-                <div className='h-auto flex flex-col items-center w-full p-4 bg-gray-100 rounded-lg shadow-md'>
-                  <p className='font-semibold text-lg mb-2'>Conference Rooms</p>
-                  <ul className='space-y-1'>
-                    <li className='font-normal text-sm items-center gap-2 flex'><FaWifi /> High-speed internet</li>
-                    <li className='font-normal text-sm items-center gap-2 flex'><FaWifi /> Audio/Visual equipment</li>
-                    <li className='font-normal text-sm items-center gap-2 flex'><FaWifi /> Catering services</li>
-                  </ul>
-                </div>
+                {businessData.facilities && businessData.facilities.length > 0 ? (
+                  businessData.facilities.map((facility, index) => (
+                    <div key={index} className='h-auto flex flex-col items-center w-full p-4 bg-gray-100 rounded-lg shadow-md'>
+                      <div className='flex items-center gap-2 mb-2'>
+                        {React.createElement(
+                          businessIcons.find(icon => icon.name === facility.icon)?.icon || FaCheckCircle,
+                          { size: 20 }
+                        )}
+                        <p className='font-semibold text-lg'>{facility.name}</p>
+                      </div>
+                      <ul className='space-y-1'>
+                        <li className='font-normal text-sm'>{facility.description || 'No description available'}</li>
+                      </ul>
+                    </div>
+                  ))
+                ) : (
+                  <div className="italic text-gray-500 p-4 bg-gray-100 rounded-md">No facilities available</div>
+                )}
               </div>
             </CardBody>
           </Card>
@@ -203,9 +270,9 @@ const BusinessInfo = () => {
             <CardBody>
               <h2 className="text-2xl font-bold mb-6">Customer Reviews</h2>
               <div className="space-y-4 mb-8">
-                {businessData.reviews && businessData.reviews.map((review) => (
+                {businessData.reviews && businessData.reviews.map((review, index) => (
                   <ReviewCard
-                    key={review.id}
+                    key={`${review.id}-${index}`}
                     name={review.name}
                     rating={review.rating}
                     comment={review.comment}
@@ -249,39 +316,25 @@ const BusinessInfo = () => {
             <CardBody>
               <h2 className="text-2xl font-bold mb-4">Our Policies</h2>
               <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div className='h-auto flex flex-col items-center w-full p-4 bg-gray-100 rounded-lg shadow-md'>
-                  <p className='font-semibold text-lg mb-2'>Cancellation Policy</p>
-                  <ul className='pl-5 space-y-1'>
-                    <li className='font-normal text-sm list-disc items-center gap-2'>
-                      <span className='flex-grow'>Free cancellation up to 24 hours before check-in</span>
-                    </li>
-                    <li className='font-normal text-sm list-disc items-center gap-2'>
-                      <span className='flex-grow'>50% refund for cancellations within 24 hours</span>
-                    </li>
-                  </ul>
-                </div>
-                <div className='h-auto flex flex-col items-center w-full p-4 bg-gray-100 rounded-lg shadow-md'>
-                  <p className='font-semibold text-lg mb-2'>Pet Policy</p>
-                  <ul className='pl-5 space-y-1'>
-                    <li className='font-normal text-sm list-disc items-center gap-2'>
-                      <span className='flex-grow'>Pets allowed with prior notice</span>
-                    </li>
-                    <li className='font-normal text-sm list-disc items-center gap-2'>
-                      <span className='flex-grow'>Additional cleaning fee may apply</span>
-                    </li>
-                  </ul>
-                </div>
-                <div className='h-auto flex flex-col items-center w-full p-4 bg-gray-100 rounded-lg shadow-md'>
-                  <p className='font-semibold text-lg mb-2'>Check-in/Check-out</p>
-                  <ul className='pl-5 space-y-1'>
-                    <li className='font-normal text-sm list-disc items-center gap-2'>
-                      <span className='flex-grow'>Check-in: 3:00 PM</span>
-                    </li>
-                    <li className='font-normal text-sm list-disc items-center gap-2'>
-                      <span className='flex-grow'>Check-out: 11:00 AM</span>
-                    </li>
-                  </ul>
-                </div>
+                {businessData.policies && businessData.policies.length > 0 ? (
+                  businessData.policies.map((policy, index) => (
+                    <div key={index} className='h-auto flex flex-col items-center w-full p-4 bg-gray-100 rounded-lg shadow-md'>
+                      <div className='flex items-center gap-2 mb-2'>
+                        <FaClipboardList size={20} />
+                        <p className='font-semibold text-lg'>{policy.title}</p>
+                      </div>
+                      <ul className='pl-5 space-y-1'>
+                        {policy.items.map((item, itemIndex) => (
+                          <li key={itemIndex} className='font-normal text-sm list-disc items-center gap-2'>
+                            <span className='flex-grow'>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))
+                ) : (
+                  <div className="italic text-gray-500 p-4 bg-gray-100 rounded-md">No policies available</div>
+                )}
               </div>
             </CardBody>
           </Card>
@@ -290,5 +343,16 @@ const BusinessInfo = () => {
     </div>
   )
 }
+
+// Component to handle map events
+const MapEvents = ({ setCurrentZoom }) => {
+  useMapEvents({
+    zoomend: (e) => {
+      setCurrentZoom(e.target.getZoom());
+    },
+  });
+  return null;
+};
+
 
 export default BusinessInfo;

@@ -675,7 +675,7 @@ const BusinessProfile = () => {
 
   const handleSaveHours = async () => {
     try {
-      const response = await fetch('http://localhost:5000/update-opening-hours', {
+      const response = await fetch(`http://localhost:5000/update-opening-hours/${businessData.business_id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -683,6 +683,8 @@ const BusinessProfile = () => {
         credentials: 'include',
         body: JSON.stringify({ openingHours: tempOpeningHours }), // Send updated hours
       });
+
+      console.log('Response:', response);
 
       const data = await response.json();
 

@@ -670,8 +670,8 @@ const Discover = () => {
                             <>
                               <span className="text-[12px]">{parseFloat(item.rating).toFixed(1)}</span>
                               <span className="text-yellow-500">
-                                {'★'.repeat(Math.round(item.rating))}
-                                {'☆'.repeat(5 - Math.round(item.rating))}
+                                {'★'.repeat(Math.floor(item.rating))}
+                                {'☆'.repeat(5 - Math.floor(item.rating))}
                               </span>
                             </>
                           ) : (
