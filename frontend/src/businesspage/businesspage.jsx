@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
+import CryptoJS from 'crypto-js';
 import Nav from '../components/nav';
 import HeroAndGallery from './BusinessComponents/BusinessHero';
 import Footer from '@/components/Footer';
@@ -15,19 +17,45 @@ import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 
 const BusinessPage = () => {
-  const businessData = useSelector((state) => state.business);
+  const { businessId: encryptedBusinessId } = useParams();
+  const [businessData, setBusinessData] = useState(null);
   const [isLiked, setIsLiked] = useState(false);
-  const averageRating = businessData.averageRating || 0;
   const [loading, setLoading] = useState(true);
   const [showButton, setShowButton] = useState(false);
 
-  useEffect(() => {
-    document.title = 'RabaSorsogon | Business Name';
-  }, []);
+  // Function to decrypt the business_id
+  const decryptId = (encryptedId) => {
+    const secretKey = import.meta.env.VITE_SECRET_KEY;
+    const bytes = CryptoJS.AES.decrypt(decodeURIComponent(encryptedId), secretKey);
+    return bytes.toString(CryptoJS.enc.Utf8);
+  };
 
   useEffect(() => {
-    setTimeout(() => setLoading(false), 1000);
+    const fetchBusinessData = async () => {
+      try {
+        const decryptedBusinessId = decryptId(encryptedBusinessId);
+        const response = await axios.get(`http://localhost:5000/getAllBusinesses`);
+        const business = response.data.businesses.find(b => b.business_id === parseInt(decryptedBusinessId));
+        setBusinessData(business);
+        console.log('Encrypted ID:', encryptedBusinessId);
+        console.log('Decrypted ID:', decryptedBusinessId);
+      } catch (error) {
+        console.error('Error fetching business data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    fetchBusinessData();
+  }, [encryptedBusinessId]);
+
+  useEffect(() => {
+    if (businessData) {
+      document.title = `RabaSorsogon | ${businessData.businessName}`;
+    }
+  }, [businessData]);
+
+  useEffect(() => {
     const handleScroll = () => {
       setShowButton(window.scrollY > 300);
     };
@@ -49,6 +77,10 @@ const BusinessPage = () => {
         color="primary" 
       />
     );
+  }
+
+  if (!businessData) {
+    return <p className="text-center mt-10">Business not found.</p>;
   }
 
   const renderStars = (rating) => {
@@ -86,8 +118,8 @@ const BusinessPage = () => {
       <div className='container mx-auto px-4'>
         <AnimatedSection>
           <div className='flex flex-wrap items-center gap-4 py-4'>
-            <img className='h-16 sm:h-24 rounded-full object-cover' src='https://i.pravatar.cc/150?u=currentuser' alt="Business Logo" />
-            <h1 className='text-xl sm:text-2xl font-medium mr-16'>{businessData.businessName} Business Name</h1>
+            <img className='h-16 sm:h-24 rounded-full object-cover' src={`http://localhost:5000/${businessData.businessLogo}`} alt="Business Logo" />
+            <h1 className='text-xl sm:text-2xl font-medium mr-16'>{businessData.businessName}</h1>
             <div className='flex flex-wrap items-center gap-3'>
               <Button className='h-9 px-3 bg-slate-300 hover:text-white hover:bg-color2/90'>
                 <div className='text-sm flex items-center gap-2'>
@@ -106,8 +138,8 @@ const BusinessPage = () => {
                 </div>
               </Button>
               <div className="flex items-center">
-                {renderStars(averageRating)}
-                <span className="ml-1 text-sm">{averageRating.toFixed(1)}</span>
+                {renderStars(businessData.rating)}
+                <span className="ml-1 text-sm">{parseFloat(businessData.rating).toFixed(1)}</span>
               </div>
             </div>
           </div>

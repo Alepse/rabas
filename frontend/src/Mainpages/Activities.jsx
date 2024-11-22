@@ -11,6 +11,7 @@ import { Link } from 'react-router-dom';
 import Search from '@/components/Search';
 import wave from '@/assets/wave2.svg'
 
+import CryptoJS from 'crypto-js';
 
 // Custom hook to detect if the screen is large
 const useIsLargeScreen = () => {
@@ -131,6 +132,13 @@ const Activities = () => {
 
   const toggleFilters = () => {
     setShowFilters(!showFilters);
+  };
+
+  // Function to encrypt the business_id
+  const encryptId = (id) => {
+    const secretKey = import.meta.env.VITE_SECRET_KEY;
+    const ciphertext = CryptoJS.AES.encrypt(id.toString(), secretKey).toString();
+    return encodeURIComponent(ciphertext);
   };
 
   // Activity Details
@@ -444,7 +452,7 @@ const Activities = () => {
                           <span className="text-gray-400 italic">Price Range Not available</span>
                         )}
                       </p>
-                      <Link to="/business" target='_blank'>
+                      <Link to={`/business/${encryptId(activity.business_id)}`} target='_blank'>
                         <Button 
                           className='w-full bg-color1 text-color3 hover:bg-color2'
                         >

@@ -34,10 +34,10 @@ const BusinessProfile = () => {
   const businessData = useSelector((state) => state.business);
   const businessCard = useSelector((state) => state.business.businessCard);
 
-    // Title Tab
-    useEffect(() => {
-      document.title = 'BusinessName | Admin profile';
-      });
+  // Title Tab
+  useEffect(() => {
+    document.title = 'BusinessName | Admin profile';
+  });
 
 
   const [isIconModalOpen, setIsIconModalOpen] = useState(false);

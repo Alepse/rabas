@@ -15,6 +15,7 @@ import L from 'leaflet';
 import wave from '@/assets/wave2.svg'
 
 
+import CryptoJS from 'crypto-js';
 
 
 
@@ -145,6 +146,17 @@ const cardVariants = {
       damping: 12,
     },
   },
+};
+
+// Function to encrypt the business_id
+const encryptId = (id) => {
+  const secretKey = import.meta.env.VITE_SECRET_KEY;
+  if (!secretKey) {
+    console.error('Secret key is not defined');
+    return null;
+  }
+  const ciphertext = CryptoJS.AES.encrypt(id.toString(), secretKey).toString();
+  return encodeURIComponent(ciphertext);
 };
 
 const Discover = () => {
@@ -693,7 +705,7 @@ const Discover = () => {
                         )}
                       </p>
                     </div>
-                    <Link to={`/business/${item.business_id}`} target="_blank">
+                    <Link to={`/business/${encryptId(item.business_id)}`} target="_blank">
                       <Button className="w-full bg-color1 text-color3 rounded-md hover:bg-color2">
                         Explore More
                       </Button>

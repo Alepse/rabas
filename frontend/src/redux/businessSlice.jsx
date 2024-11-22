@@ -13,6 +13,7 @@ export const fetchBusinessData = createAsyncThunk(
 );
 
 const initialState = {
+  businessId: null,           // Update business ID
   businessName: '',           // Update business name
   businessLogo: null,         // Update business logo
   coverPhoto: null,           // Update cover photo
@@ -208,6 +209,7 @@ const businessSlice = createSlice({
         console.log('Fetched Business Data:', fetchedData);
 
         // Update the state with fetched data
+        state.businessId = fetchedData.business_id;
         state.businessName = fetchedData.businessName;
         state.businessLogo = fetchedData.businessLogo;
         state.coverPhoto = fetchedData.coverPhoto || null;
