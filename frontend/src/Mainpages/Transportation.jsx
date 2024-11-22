@@ -7,7 +7,7 @@ import Terminal from '../assets/legazpi terminal.webp'
 import Sitex from '../assets/sitex.webp'
 import Footer from '@/components/Footer';
 import { motion } from 'framer-motion'; // Import Framer Motion
-
+import wave from '@/assets/wave2.svg'
 
 const Transportation = () => {
   const [loading, setLoading] = useState(true);
@@ -47,7 +47,7 @@ const [showButton, setShowButton] = useState(false); // State to show/hide butto
   }
 
   return (
-    <div className="bg-gray-100 min-h-screen font-sans">
+    <div className="bg-gray-100 min-h-screen font-sans" style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>
       <Nav />
       <Hero />
       <Search />

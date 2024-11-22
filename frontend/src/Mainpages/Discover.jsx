@@ -12,6 +12,9 @@ import Search from '@/components/Search';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import wave from '@/assets/wave2.svg'
+
+
 import CryptoJS from 'crypto-js';
 
 
@@ -508,7 +511,7 @@ const Discover = () => {
   }
 
   return (
-    <div className="mx-auto bg-light min-h-screen font-sans">
+    <div className="mx-auto bg-light min-h-screen font-sans" style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>
       <Nav />
       <Hero />
       <Search/>

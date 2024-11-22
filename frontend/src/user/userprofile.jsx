@@ -11,6 +11,7 @@ import { AiOutlineLike } from 'react-icons/ai';
 import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { motion } from 'framer-motion'; // Import Framer Motion
+import wave from '@/assets/wave2.svg'
 
 
 // Simplified component for the "My Booking" tab
@@ -441,7 +442,7 @@ const UserProfile = ({ activities = [] }) => {
   }
 
   return (
-    <div className='mx-auto min-h-screen font-sans bg-light'>
+    <div className='mx-auto min-h-screen font-sans bg-light' style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat' }}>
       <Nav />
       <div className='container p-3 rounded-md mt-[7.2rem] flex justify-center'>
         <Search />

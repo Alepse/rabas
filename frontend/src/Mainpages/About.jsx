@@ -7,6 +7,7 @@ import Hero from '@/components/heroabout';
 import Footer from '@/components/Footer';
 import Logo from '@/assets/rabas.png';
 import { Users, MapPin, Heart, Compass, Coffee } from 'lucide-react';
+import wave from '@/assets/wave2.svg'
 
 const About = () => {
   const [loading, setLoading] = useState(true);
@@ -40,7 +41,7 @@ const About = () => {
   }
 
   return (
-    <div className="min-h-screen bg-light mx-auto font-sans">
+    <div className="min-h-screen bg-light mx-auto font-sans" style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>
       <Nav />
       <Hero />
       <Search />

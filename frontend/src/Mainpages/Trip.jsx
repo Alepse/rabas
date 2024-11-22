@@ -24,6 +24,7 @@ import {today, getLocalTimeZone} from "@internationalized/date";
 import Planner from '@/Mainpages/PlanATripComponents/SchedulesPlan'; // Ensure this path is correct
 import Swal from 'sweetalert2';
 import TripDetailsModal from './PlanATripComponents/TripDetailsModal';
+import wave from '@/assets/wave2.svg'
 
 const MotionBox = motion.div;
 
@@ -189,7 +190,7 @@ const Trip = () => {
   };
 
   return (
-    <div className="mx-auto bg-gray-100 min-h-screen font-sans flex flex-col">
+    <div className="mx-auto bg-gray-100 min-h-screen font-sans flex flex-col" style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>
       <Nav />
       <div className="mt-[7rem] flex justify-center w-full px-4">
         <Search />

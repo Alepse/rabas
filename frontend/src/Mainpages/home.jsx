@@ -10,6 +10,7 @@ import PlanTripSection from './HomePageSections/PlanTripSection';
 import AboutSection from './HomePageSections/AboutSection';
 import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
+import wave from '@/assets/wave2.svg'
 
 const Home = () => {
   const [loading, setLoading] = useState(true);
@@ -42,7 +43,7 @@ const Home = () => {
   }
 
   return (  
-    <div className='mx-auto min-h-screen bg-light font-sans'>
+    <div className='mx-auto min-h-screen bg-light font-sans'style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>
       <Nav />
       
       {/* Hero Section */}
