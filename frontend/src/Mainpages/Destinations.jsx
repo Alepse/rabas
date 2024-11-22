@@ -38,6 +38,7 @@ import PrietoDiaz from './DestinationsSectioncomponent/PrietoDiaz';
 import StaMagdalena from './DestinationsSectioncomponent/StaMagdalena';
 import Sorsogon from './DestinationsSectioncomponent/Sorsogon';
 import EmergencyHotlines from '../Mainpages/DestinationsSectioncomponent/EmergencyHotlines';
+import wave from '@/assets/wave2.svg'
 
 const destinationComponents = {
   Bulusan,
@@ -113,7 +114,7 @@ const Destinations = () => {
   }
 
   return (
-    <div className='mx-auto min-h-screen bg-light font-sans'>
+    <div className='mx-auto min-h-screen bg-light font-sans'style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>
       <Nav />
 
       {/* Hero Section */}

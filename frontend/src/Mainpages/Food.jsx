@@ -8,7 +8,7 @@ import { Checkbox, CheckboxGroup, Select, SelectItem, Slider } from "@nextui-org
 import { GiPositionMarker } from "react-icons/gi";
 import { Link } from 'react-router-dom';
 import Search from '@/components/Search';
-
+import wave from '@/assets/wave2.svg'
 // Custom hook to detect if the screen is large
 const useIsLargeScreen = () => {
   const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1024);
@@ -171,7 +171,7 @@ const Foods = () => {
   };
 
   return (
-    <div className='mx-auto bg-light min-h-screen font-sans'>
+    <div className='mx-auto bg-light min-h-screen font-sans'style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>
       <Nav />
       <Hero />
       <Search/>
