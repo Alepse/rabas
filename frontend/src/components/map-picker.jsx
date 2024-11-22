@@ -33,7 +33,7 @@ const MapPicker = ({ setLatitude, setLongitude }) => {
 
   return (
     <div>
-      <h2>Select a Location</h2>
+      <h2>Pin Your Business Location</h2>
       <MapContainer
         center={[13, 124]}
         zoom={11}

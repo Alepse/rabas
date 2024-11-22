@@ -301,10 +301,17 @@ const Shop = () => {
                        
                         <div className='flex items-center gap-2'>
                           <div className='flex items-center gap-1 '>
-                            <span className='text-black text-[12px] '>{shop.rating}</span> 
-                            <span className='text-yellow-500'>
-                              {'★'.repeat(Math.floor(shop.rating || 0))}{'☆'.repeat(5 - Math.floor(shop.rating || 0))}
-                            </span>
+                            {shop.rating ? (
+                              <>
+                                <span className='text-black text-[12px] '>{shop.rating}</span> 
+                                <span className='text-yellow-500'>
+                                  {'★'.repeat(Math.floor(shop.rating))}
+                                  {'☆'.repeat(5 - Math.floor(shop.rating))}
+                                </span>
+                              </>
+                            ) : (
+                              <span className="text-gray-500 text-[12px]">No ratings</span>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -314,9 +321,19 @@ const Shop = () => {
                       </div>
                       
                       <div className='flex mb-2 max-w-[500px] max-h-[5rem] overflow-y-auto scrollbar-custom flex-col'>      
-                        <p className='text-sm text-gray-600 mb-2'>{shop.description}</p>
+                        {shop.description ? (
+                          <p className='text-sm text-gray-600 mb-2'>{shop.description}</p>
+                        ) : (
+                          <p className='text-sm text-gray-400 italic mb-2'>No description</p>
+                        )}
                       </div>
-                      <p className='font-semibold text-md mb-2'>₱{shop.lowest_price} - ₱{shop.highest_price}</p>
+                      <p className='font-semibold text-md mb-2'>
+                        {shop.lowest_price && shop.highest_price ? (
+                          `₱${shop.lowest_price} - ₱${shop.highest_price}`
+                        ) : (
+                          <span className="text-gray-400 italic">Price Range Not available</span>
+                        )}
+                      </p>
                       <Link to="/business" target='_blank'>
                         <Button 
                           className='w-full bg-color1 text-color3 hover:bg-color2'

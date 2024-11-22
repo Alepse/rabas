@@ -673,19 +673,27 @@ const Discover = () => {
                         <GiPositionMarker className="mr-1" />
                         {item.destination}
                       </div>
-                      {item.description && (
-                        <div className="flex mb-2 max-w-[500px] max-h-[5rem] overflow-y-auto scrollbar-custom flex-col">
+                      <div className="flex mb-2 max-w-[500px] max-h-[5rem] overflow-y-auto scrollbar-custom flex-col">
+                        {item.description ? (
                           <p className="text-sm text-gray-600 mb-2">
                             {item.description}
                           </p>
-                        </div>
-                      )}
+                        ) : (
+                          <p className="text-sm text-gray-400 italic mb-2">
+                            No description
+                          </p>
+                        )}
+                      </div>
                       <p className="text-md font-semibold text-black mb-2">
-                        ₱{item.lowest_price} - ₱{item.highest_price}
+                        {item.lowest_price && item.highest_price ? (
+                          `₱${item.lowest_price} - ₱${item.highest_price}`
+                        ) : (
+                          <span className="text-gray-400 italic">Price Range Not available</span>
+                        )}
                       </p>
                     </div>
-                    <Link to="/business" target="_blank">
-                      <Button className="w-full bg-color1  text-color3 rounded-md hover:bg-color2 ">
+                    <Link to={`/business/${item.business_id}`} target="_blank">
+                      <Button className="w-full bg-color1 text-color3 rounded-md hover:bg-color2">
                         Explore More
                       </Button>
                     </Link>

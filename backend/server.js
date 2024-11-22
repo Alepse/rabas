@@ -523,7 +523,7 @@ passport.use(new GoogleStrategy({
   callbackURL: 'http://localhost:5000/auth/google/callback'
 },
 (accessToken, refreshToken, profile, done) => {
-  console.log('Google profile:', profile); // Debug log
+  // console.log('Google profile:', profile); // Debug log
 
   connection.query('SELECT * FROM users WHERE google_id = ? OR email = ?', [profile.id, profile.emails[0].value], (err, results) => {
     if (err) {
@@ -565,7 +565,7 @@ passport.use(new GoogleStrategy({
 }));
 
 passport.serializeUser((user, done) => {
-  console.log('Serializing user:', user); // Debug log
+  // console.log('Serializing user:', user); // Debug log
   done(null, user.user_id); // Use a valid identifier
 });
 
@@ -3111,7 +3111,7 @@ app.get('/getAllBusinesses', (req, res) => {
       MIN(CAST(p.price AS DECIMAL)) AS lowest_price,
       MAX(CAST(p.price AS DECIMAL)) AS highest_price,
       AVG(r.ratings) AS rating,
-      JSON_ARRAYAGG(JSON_UNQUOTE(JSON_EXTRACT(p.inclusions, '$[*].item'))) AS raw_amenities
+      JSON_ARRAYAGG(JSON_UNQUOTE(JSON_EXTRACT(b.facilities, '$[*].name'))) AS raw_amenities
     FROM 
       businesses b
     LEFT JOIN 

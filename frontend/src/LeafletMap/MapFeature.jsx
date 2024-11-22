@@ -1,9 +1,9 @@
 import React, { useRef, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
+// import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 import L from 'leaflet';
-import 'leaflet-routing-machine';
+// import 'leaflet-routing-machine';
 
 // Define the MapComponent within the same file
 const MapComponent = ({ currentLocation, destination, setCurrentLocation, setDestination }) => {

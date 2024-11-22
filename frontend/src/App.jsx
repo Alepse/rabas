@@ -39,7 +39,7 @@ function App() {
           <Route path='/accomodations' element={<Accomodation />} />
           <Route path='/foodplaces' element={<Food />} />
           <Route path='/shops' element={<Shop />} />
-          <Route path='/business' element={<Business />} />
+          <Route path='/business/:businessId' element={<Business />} />
           <Route path='/businessdashboardadmin' element={<Dashboard />} />
           <Route path='/businessprofileadmin' element={<Profile />} />
           <Route path='/businessproductsadmin' element={<Product />} />
