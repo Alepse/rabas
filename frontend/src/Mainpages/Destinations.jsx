@@ -1,5 +1,5 @@
 import React, { useState, useEffect, lazy, Suspense, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Nav from '../components/nav';
 import Footer from '../components/Footer';
 import Hero from '../components/herodestination';
@@ -37,6 +37,7 @@ import Pilar from './DestinationsSectioncomponent/Pilar';
 import PrietoDiaz from './DestinationsSectioncomponent/PrietoDiaz';
 import StaMagdalena from './DestinationsSectioncomponent/StaMagdalena';
 import Sorsogon from './DestinationsSectioncomponent/Sorsogon';
+import EmergencyHotlines from '../Mainpages/DestinationsSectioncomponent/EmergencyHotlines';
 
 const destinationComponents = {
   Bulusan,
@@ -64,6 +65,7 @@ const Destinations = () => {
   const initialDestination = queryParams.get('name');
   const [selectedDestination, setSelectedDestination] = useState(initialDestination);
   const destinationSectionRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     document.title = 'RabaSorsogon | Destinations';
@@ -92,6 +94,7 @@ const Destinations = () => {
 
   const handleDestinationClick = (destination) => {
     setSelectedDestination(destination);
+    navigate(`?name=${destination}`);
   };
 
   const renderDestinationSection = () => {
@@ -121,6 +124,7 @@ const Destinations = () => {
       <AnimatedSection>
         <Search />
       </AnimatedSection>
+
 
       {/* Main content */}
       <div className='mt-4 mx-auto w-full container'>
@@ -160,12 +164,18 @@ const Destinations = () => {
             </AnimatedSection>
           ))}
         </div>
+     
 
         {/* Selected destination section */}
         <div ref={destinationSectionRef}>
           {renderDestinationSection()}
         </div>
       </div>
+
+         {/* Emergency Hotlines Section */}
+         <AnimatedSection>
+        <EmergencyHotlines />
+      </AnimatedSection>
 
       <Footer />
 

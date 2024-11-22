@@ -23,7 +23,7 @@ module.exports = {
         color1: '#092635',  
         color2: '#688484',
         color3: '#EEF7FF',  
-        light: '#EEEEEE',
+        light: '#F5F7F8',
         dark: '#021526', 
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -34,6 +34,9 @@ module.exports = {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
         },
+        backgroundImage: {
+        'custom-gradient': 'linear-gradient(to right, #092635, #688484)',
+      },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",

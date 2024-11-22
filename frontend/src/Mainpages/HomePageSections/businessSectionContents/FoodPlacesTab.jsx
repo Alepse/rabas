@@ -6,7 +6,7 @@ import { Navigation } from 'swiper/modules';
 import { Link } from 'react-router-dom';
 import { Button } from '@nextui-org/react';
 import { GiPositionMarker } from 'react-icons/gi';
-import { AiFillStar } from 'react-icons/ai';
+import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import img from '@/assets/shop.webp';
 
 const foodPlaceDetails = [
@@ -39,268 +39,103 @@ const foodPlaceDetails = [
   },
 ];
 
+const FoodPlaceSwiper = ({ title, link, isLast }) => (
+  <div className="p-4 md:p-6">
+    <div className='flex flex-col md:flex-row justify-between items-center'>
+      <h1 className={`text-xl md:text-2xl font-bold mb-4 md:mb-6 text-center lg:text-start ${isLast ? 'text-light' : ''}`}>
+        {title}
+      </h1>
+      {link && (
+        <Link to={link} target='_blank' className='mb-4 md:mb-0'>
+          <h1 className='text-md font-semibold text-color1 hover:tracking-wide duration-300 hover:underline cursor-pointer'>
+            See More ⥬
+          </h1>
+        </Link>
+      )}
+    </div>
+    <Swiper
+      modules={[Navigation]}
+      navigation={{ nextEl: '.custom-next', prevEl: '.custom-prev' }}
+      spaceBetween={20}
+      slidesPerView={1}
+      breakpoints={{
+        320: { slidesPerView: 1 },
+        640: { slidesPerView: 1 },
+        768: { slidesPerView: 2 },
+        1024: { slidesPerView: 3 },
+        1440: { slidesPerView: 4 },
+      }}
+      className='max-w-full p-4 md:p-6'
+    >
+      {foodPlaceDetails.map((foodPlace, index) => (
+        <SwiperSlide key={index} className='flex justify-center'>
+          <div className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between max-w-xs md:max-w-lg lg:max-w-sm mx-auto h-[400px] p-2 relative"
+               style={{ width: '300px', height: '400px' }}>
+            {foodPlace.discount > 0 && (
+              <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold py-1 px-2 rounded">
+                {foodPlace.discount}% OFF
+              </div>
+            )}
+            <img
+              src={foodPlace.image || 'path/to/placeholder.jpg'}
+              alt={foodPlace.name}
+              className="w-full h-56 md:h-64 object-cover rounded-t-lg"
+            />
+            <div className="flex-grow flex flex-col justify-between mt-4">
+              <div>
+                <div className="flex justify-between items-center mb-3">
+                  <div className="flex items-center gap-1">
+                    <span className="text-[12px]">{foodPlace.rating}</span>
+                    <span className="text-yellow-500">
+                      {'★'.repeat(foodPlace.rating)}
+                      {'☆'.repeat(5 - foodPlace.rating)}
+                    </span>
+                  </div>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-800 truncate mb-2">{foodPlace.name}</h3>
+                <div className="text-xs text-gray-500 mb-4 flex items-center">
+                  <GiPositionMarker className="mr-1" />
+                  {foodPlace.destination}
+                </div>
+              </div>
+              <div className="mt-auto">
+                <p className="text-md font-semibold text-black mb-4">
+                  {foodPlace.discount ? (
+                    <>
+                      <span className="line-through text-gray-500">₱{foodPlace.budget}</span>
+                      <span className="text-red-500 text-xl font-bold ml-2">
+                        ₱{foodPlace.budget - (foodPlace.budget * foodPlace.discount) / 100}
+                      </span>
+                    </>
+                  ) : (
+                    `₱${foodPlace.budget}`
+                  )}
+                </p>
+                <Link to="/business" target="_blank">
+                  <Button className="w-full bg-color1 text-white text-sm font-medium px-5 py-2 rounded hover:bg-color2">
+                    Explore More
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </SwiperSlide>
+      ))}
+      <div className="custom-prev absolute left-2 top-[25%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300">
+          <FaArrowLeft />
+        </div>
+        <div className="custom-next absolute right-2 top-[25%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300">
+          <FaArrowRight />
+        </div>
+    </Swiper>
+  </div>
+);
+
 const FoodPlacesTab = () => (
-  <div>
-    <div className="p-4 md:p-6">
-      <div className='flex flex-col md:flex-row justify-between items-center'>
-        <h1 className='text-xl md:text-2xl font-bold mb-4 md:mb-6 text-center lg:text-start'>
-          Culinary Delights: Must-Try Food Spots
-        </h1>
-        <Link to='/foodplaces' target='_blank' className='mb-4 md:mb-0'>
-          <h1 className='text-md font-semibold text-color1 hover:tracking-wide duration-300 hover:underline cursor-pointer'>
-            See More ⥬
-          </h1>
-        </Link>
-      </div>
-      <Swiper
-        modules={[Navigation]}
-        navigation={{ nextEl: '.custom-next', prevEl: '.custom-prev' }}
-        spaceBetween={20}
-        slidesPerView={1}
-        breakpoints={{
-          320: { slidesPerView: 1 },
-          640: { slidesPerView: 1 },
-          768: { slidesPerView: 2 },
-          1024: { slidesPerView: 3 },
-          1440: { slidesPerView: 4 },
-        }}
-        className='max-w-full p-4 md:p-6'
-      >
-        {foodPlaceDetails.map((foodPlace, index) => (
-          <SwiperSlide key={index} className='flex justify-center'>
-            <div className='bg-white rounded-md shadow-md hover:shadow-xl   transform transition-all duration-500 p-4 w-full max-w-[280px] md:max-w-[320px] h-[380px] flex flex-col'>
-              <div className='relative w-full h-40 md:h-44'>
-                <img
-                  src={foodPlace.image || 'path/to/placeholder.jpg'}
-                  alt={foodPlace.name}
-                  className='w-full h-full object-cover rounded-t-lg'
-                />
-                {!foodPlace.image && (
-                  <div className='absolute inset-0 flex items-center justify-center bg-gray-200'>
-                    <span className='text-gray-500'>Image Not Available</span>
-                  </div>
-                )}
-              </div>
-              <div className='p-4 flex flex-col justify-between h-full'>
-                <div>
-                  <h3 className='font-semibold text-base md:text-lg text-color1 mb-1'>{foodPlace.name}</h3>
-                  <div className='text-xs text-gray-500 mb-2 flex items-center'>
-                    <GiPositionMarker /> {foodPlace.destination}
-                  </div>
-                  <div className='flex items-center justify-between gap-2 mb-3'>
-                    <div className='flex flex-wrap gap-1'>
-                      {foodPlace.tags.map((tag, idx) => (
-                        <span
-                          key={idx}
-                          className='text-xs px-2 py-1 rounded-full bg-gray-200 text-black'
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                    <div className='flex items-center gap-1'>
-                      <span className='text-black text-sm'>{foodPlace.rating}</span>
-                      <span className='text-yellow-500'>
-                        {'★'.repeat(foodPlace.rating)}{'☆'.repeat(5 - foodPlace.rating)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div className='flex justify-between items-center'>
-                  <p className='font-semibold text-sm md:text-md'>
-                    <span>₱{foodPlace.budget}- 1000</span>
-                  </p>
-                  <Link to="/business" target='_blank'>
-                    <Button className='bg-color1 text-color3 hover:bg-color2 px-4 py-2 text-xs'>
-                      Explore More
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </SwiperSlide>
-        ))}
-        <div className="custom-prev absolute left-2 top-1/2 transform -translate-y-1/2 bg-light p-2 rounded-full shadow-md z-10 cursor-pointer hover:-translate-x-2 duration-300">
-          ←
-        </div>
-        <div className="custom-next absolute right-2 top-1/2 transform -translate-y-1/2 bg-light p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-200 text-xl hover:translate-x-2 duration-300">
-          →
-        </div>
-      </Swiper>
-    </div>
-
-    <div className="p-4 md:p-6">
-      <div className='flex flex-col md:flex-row justify-between items-center'>
-        <h1 className='text-xl md:text-2xl font-bold mb-4 md:mb-6 text-center lg:text-start'>
-          Taste-Tested: Most Reviewed Eateries
-        </h1>
-        <Link to='/foodplaces' target='_blank' className='mb-4 md:mb-0'>
-          <h1 className='text-md font-semibold text-color1 hover:tracking-wide duration-300 hover:underline cursor-pointer'>
-            See More ⥬
-          </h1>
-        </Link>
-      </div>
-      <Swiper
-        modules={[Navigation]}
-        navigation={{ nextEl: '.custom-next', prevEl: '.custom-prev' }}
-        spaceBetween={20}
-        slidesPerView={1}
-        breakpoints={{
-          320: { slidesPerView: 1 },
-          640: { slidesPerView: 1 },
-          768: { slidesPerView: 2 },
-          1024: { slidesPerView: 3 },
-          1440: { slidesPerView: 4 },
-        }}
-        className='max-w-full p-4 md:p-6'
-      >
-        {foodPlaceDetails.map((foodPlace, index) => (
-          <SwiperSlide key={index} className='flex justify-center'>
-            <div className='bg-white rounded-md shadow-md hover:shadow-xl  transform transition-all duration-500 p-4 w-full max-w-[280px] md:max-w-[320px] h-[380px] flex flex-col'>
-              <div className='relative w-full h-40 md:h-44'>
-                <img
-                  src={foodPlace.image || 'path/to/placeholder.jpg'}
-                  alt={foodPlace.name}
-                  className='w-full h-full object-cover rounded-t-lg'
-                />
-                {!foodPlace.image && (
-                  <div className='absolute inset-0 flex items-center justify-center bg-gray-200'>
-                    <span className='text-gray-500'>Image Not Available</span>
-                  </div>
-                )}
-              </div>
-              <div className='p-4 flex flex-col justify-between h-full'>
-                <div>
-                  <h3 className='font-semibold text-base md:text-lg text-color1 mb-1'>{foodPlace.name}</h3>
-                  <div className='text-xs text-gray-500 mb-2 flex items-center'>
-                    <GiPositionMarker /> {foodPlace.destination}
-                  </div>
-                  <div className='flex items-center justify-between gap-2 mb-3'>
-                    <div className='flex flex-wrap gap-1'>
-                      {foodPlace.tags.map((tag, idx) => (
-                        <span
-                          key={idx}
-                          className='text-xs px-2 py-1 rounded-full bg-gray-200 text-black'
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                    <div className='flex items-center gap-1'>
-                      <span className='text-black text-sm'>{foodPlace.rating}</span>
-                      <span className='text-yellow-500'>
-                        {'★'.repeat(foodPlace.rating)}{'☆'.repeat(5 - foodPlace.rating)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div className='flex justify-between items-center'>
-                  <p className='font-semibold text-sm md:text-md'>
-                    <span>₱{foodPlace.budget}- 1000</span>
-                  </p>
-                  <Link to="/business" target='_blank'>
-                    <Button className='bg-color1 text-color3 hover:bg-color2 px-4 py-2 text-xs'>
-                      Explore More
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </SwiperSlide>
-        ))}
-        <div className="custom-prev absolute left-2 top-1/2 transform -translate-y-1/2 bg-light p-2 rounded-full shadow-md z-10 cursor-pointer hover:-translate-x-2 duration-300">
-          ←
-        </div>
-        <div className="custom-next absolute right-2 top-1/2 transform -translate-y-1/2 bg-light p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-200 text-xl hover:translate-x-2 duration-300">
-          →
-        </div>
-      </Swiper>
-    </div>
-
-    <div className="p-4 md:p-6">
-      <div className='flex flex-col md:flex-row justify-between items-center'>
-        <h1 className='text-xl md:text-2xl font-bold mb-4 md:mb-6 text-center lg:text-start'>
-          Savor the Savings: Top Food Offers
-        </h1>
-      </div>
-      <Swiper
-        modules={[Navigation]}
-        navigation={{ nextEl: '.custom-next', prevEl: '.custom-prev' }}
-        spaceBetween={20}
-        slidesPerView={1}
-        breakpoints={{
-          320: { slidesPerView: 1 },
-          640: { slidesPerView: 1 },
-          768: { slidesPerView: 2 },
-          1024: { slidesPerView: 3 },
-          1440: { slidesPerView: 4 },
-        }}
-        className='max-w-full p-4 md:p-6'
-      >
-        {foodPlaceDetails.map((foodPlace, index) => (
-          <SwiperSlide key={index} className='flex justify-center'>
-            <div className='bg-white rounded-md shadow-md hover:shadow-xl  transform transition-all duration-500 p-4 w-full max-w-[280px] md:max-w-[320px] h-[380px] flex flex-col'>
-              <div className='relative w-full h-40 md:h-44'>
-                <img
-                  src={foodPlace.image || 'path/to/placeholder.jpg'}
-                  alt={foodPlace.name}
-                  className='w-full h-full object-cover rounded-t-lg'
-                />
-                {!foodPlace.image && (
-                  <div className='absolute inset-0 flex items-center justify-center bg-gray-200'>
-                    <span className='text-gray-500'>Image Not Available</span>
-                  </div>
-                )}
-                {foodPlace.discount > 0 && (
-                  <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
-                    {foodPlace.discount}% OFF
-                  </div>
-                )}
-              </div>
-              <div className='p-4 flex flex-col gap-4  h-full'>
-                <div>
-                  <h3 className='font-semibold text-base md:text-lg mb-1'>{foodPlace.name}</h3>
-                  <div className='flex items-center gap-1 mb-2'>
-                    <span className='text-black font-semibold'>{foodPlace.rating}</span>
-                    <div className='flex'>
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <AiFillStar
-                          key={star}
-                          className={star <= foodPlace.rating ? 'text-yellow-500' : 'text-gray-300'}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                <div className='flex justify-between items-center'>
-                  <p className='font-semibold text-lg'>
-                    {foodPlace.discount ? (
-                      <>
-                        <span className='line-through text-gray-500'>₱{foodPlace.budget}</span>
-                        <span className='text-red-500 ml-2'>₱{foodPlace.budget - (foodPlace.budget * foodPlace.discount / 100)}</span>
-                      </>
-                    ) : (
-                      `₱${foodPlace.budget}`
-                    )}
-                  </p>
-                  <Link to="/business" target='_blank'>
-                    <Button className='bg-color1 text-color3 hover:bg-color2 px-4 py-2 text-xs'>
-                      View
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </SwiperSlide>
-        ))}
-        <div className="custom-prev absolute left-2 top-1/2 transform -translate-y-1/2 bg-light p-2 rounded-full shadow-md z-10 cursor-pointer hover:-translate-x-2 duration-300">
-          ←
-        </div>
-        <div className="custom-next absolute right-2 top-1/2 transform -translate-y-1/2 bg-light p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-200 text-xl hover:translate-x-2 duration-300">
-          →
-        </div>
-      </Swiper>
-    </div>
+  <div className='lg:container'>
+    <FoodPlaceSwiper title="Culinary Delights: Must-Try Food Spots" link="/foodplaces" />
+    <FoodPlaceSwiper title="Taste-Tested: Most Reviewed Eateries" link="/foodplaces" />
+    <FoodPlaceSwiper title="Savor the Savings: Top Food Offers" isLast />
   </div>
 );
 

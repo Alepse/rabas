@@ -3,8 +3,6 @@ import { MapPin, Star, Info } from 'lucide-react'
 import stapic1 from '@/assets/stapic1.jpg'
 import stapic2 from '@/assets/stapic2.webp'
 import stapic3 from '@/assets/santa.jpg'
-import stapic4 from '@/assets/sorsogonpic4.jpg'
-import stapic5  from '@/assets/sorsogonpic5.jpg'
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -13,6 +11,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@nextui-org/react';
 import { GiPositionMarker } from 'react-icons/gi';
 import img from '@/assets/shop.webp'; // Sample image
+import { FaArrowLeft, FaArrowRight } from 'react-icons/fa'
 
 const recommendedSpots = [
   {
@@ -136,51 +135,37 @@ const StaMagdalena = () => {
         >
           {recommendedSpots.map((spot, index) => (
             <SwiperSlide key={index} className='flex justify-center'>
-              <div className='bg-white rounded-sm shadow-md hover:shadow-xl transform transition-all duration-500 p-4 w-full max-w-[280px] md:max-w-[320px] h-[380px] flex flex-col'>
-                <div className='relative w-full h-40 md:h-44'>
-                  <img
-                    src={spot.image || 'path/to/placeholder.jpg'}
-                    alt={spot.name}
-                    className='w-full h-full object-cover rounded-t-lg'
-                  />
-                  {!spot.image && (
-                    <div className='absolute inset-0 flex items-center justify-center bg-gray-200'>
-                      <span className='text-gray-500'>Image Not Available</span>
-                    </div>
-                  )}
-                </div>
-                <div className='p-4 flex flex-col justify-between h-full'>
+              <div className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between max-w-xs md:max-w-lg lg:max-w-sm mx-auto h-[400px] p-2 relative"
+                   style={{ width: '300px', height: '400px' }}>
+                <img
+                  src={spot.image || 'path/to/placeholder.jpg'}
+                  alt={spot.name}
+                  className="w-full h-56 md:h-64 object-cover rounded-t-lg"
+                />
+                <div className="flex-grow flex flex-col justify-between mt-4">
                   <div>
-                    <h3 className='font-semibold text-base md:text-lg text-color1 mb-1'>{spot.name}</h3>
-                    <div className='text-xs text-gray-500 mb-2 flex items-center'>
-                      <GiPositionMarker /> {spot.destination}
-                    </div>
-                    <div className='flex items-center justify-between gap-2 mb-3'>
-                      <div className='flex flex-wrap gap-1'>
-                        {spot.tags.map((tag, idx) => (
-                          <span
-                            key={idx}
-                            className='text-xs px-2 py-1 rounded-full bg-gray-200 text-black'
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                      <div className='flex items-center gap-1'>
-                        <span className='text-black text-sm'>{spot.rating}</span>
-                        <span className='text-yellow-500'>
-                          {'★'.repeat(spot.rating)}{'☆'.repeat(5 - spot.rating)}
+                    <div className="flex justify-between items-center mb-3">
+                      <div className="flex items-center gap-1">
+                        <span className="text-[12px]">{spot.rating}</span>
+                        <span className="text-yellow-500">
+                          {'★'.repeat(spot.rating)}
+                          {'☆'.repeat(5 - spot.rating)}
                         </span>
                       </div>
                     </div>
+                    <h3 className="text-lg font-semibold text-gray-800 truncate mb-2">{spot.name}</h3>
+                    <div className="text-xs text-gray-500 mb-4 flex items-center">
+                      <GiPositionMarker className="mr-1" />
+                      {spot.destination}
+                    </div>
                   </div>
-                  <div className='flex justify-between items-center'>
-                    <p className='font-semibold text-sm md:text-md'>
+                  <div className="mt-auto">
+                    <p className="text-md font-semibold text-black mb-4">
                       ₱{spot.budget}
                     </p>
-                    <Link to="/business" target='_blank'>
-                      <Button className='bg-color1 text-color3 hover:bg-color2 px-4 py-2 text-xs'>
-                      Explore More
+                    <Link to="/business" target="_blank">
+                      <Button className="w-full bg-color1 text-white text-sm font-medium px-5 py-2 rounded hover:bg-color2">
+                        Explore More
                       </Button>
                     </Link>
                   </div>
@@ -188,11 +173,11 @@ const StaMagdalena = () => {
               </div>
             </SwiperSlide>
           ))}
-          <div className="custom-prev absolute left-2 top-1/2 transform -translate-y-1/2 bg-light p-2 rounded-full shadow-md z-10 cursor-pointer hover:-translate-x-2 duration-300">
-            ←
+          <div className="custom-prev absolute left-2 top-[25%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300">
+            <FaArrowLeft />
           </div>
-          <div className="custom-next absolute right-2 top-1/2 transform -translate-y-1/2 bg-light p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-200 text-xl hover:translate-x-2 duration-300">
-            →
+          <div className="custom-next absolute right-2 top-[25%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300">
+            <FaArrowRight />
           </div>
         </Swiper>
       </div>
@@ -228,51 +213,37 @@ const StaMagdalena = () => {
         >
           {recommendedSpots.map((spot, index) => (
             <SwiperSlide key={index} className='flex justify-center'>
-              <div className='bg-white rounded-sm shadow-md hover:shadow-xl transform transition-all duration-500 p-4 w-full max-w-[280px] md:max-w-[320px] h-[380px] flex flex-col'>
-                <div className='relative w-full h-40 md:h-44'>
-                  <img
-                    src={spot.image || 'path/to/placeholder.jpg'}
-                    alt={spot.name}
-                    className='w-full h-full object-cover rounded-t-lg'
-                  />
-                  {!spot.image && (
-                    <div className='absolute inset-0 flex items-center justify-center bg-gray-200'>
-                      <span className='text-gray-500'>Image Not Available</span>
-                    </div>
-                  )}
-                </div>
-                <div className='p-4 flex flex-col justify-between h-full'>
+              <div className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between max-w-xs md:max-w-lg lg:max-w-sm mx-auto h-[400px] p-2 relative"
+                   style={{ width: '300px', height: '400px' }}>
+                <img
+                  src={spot.image || 'path/to/placeholder.jpg'}
+                  alt={spot.name}
+                  className="w-full h-56 md:h-64 object-cover rounded-t-lg"
+                />
+                <div className="flex-grow flex flex-col justify-between mt-4">
                   <div>
-                    <h3 className='font-semibold text-base md:text-lg text-color1 mb-1'>{spot.name}</h3>
-                    <div className='text-xs text-gray-500 mb-2 flex items-center'>
-                      <GiPositionMarker /> {spot.destination}
-                    </div>
-                    <div className='flex items-center justify-between gap-2 mb-3'>
-                      <div className='flex flex-wrap gap-1'>
-                        {spot.tags.map((tag, idx) => (
-                          <span
-                            key={idx}
-                            className='text-xs px-2 py-1 rounded-full bg-gray-200 text-black'
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                      <div className='flex items-center gap-1'>
-                        <span className='text-black text-sm'>{spot.rating}</span>
-                        <span className='text-yellow-500'>
-                          {'★'.repeat(spot.rating)}{'☆'.repeat(5 - spot.rating)}
+                    <div className="flex justify-between items-center mb-3">
+                      <div className="flex items-center gap-1">
+                        <span className="text-[12px]">{spot.rating}</span>
+                        <span className="text-yellow-500">
+                          {'★'.repeat(spot.rating)}
+                          {'☆'.repeat(5 - spot.rating)}
                         </span>
                       </div>
                     </div>
+                    <h3 className="text-lg font-semibold text-gray-800 truncate mb-2">{spot.name}</h3>
+                    <div className="text-xs text-gray-500 mb-4 flex items-center">
+                      <GiPositionMarker className="mr-1" />
+                      {spot.destination}
+                    </div>
                   </div>
-                  <div className='flex justify-between items-center'>
-                    <p className='font-semibold text-sm md:text-md'>
+                  <div className="mt-auto">
+                    <p className="text-md font-semibold text-black mb-4">
                       ₱{spot.budget}
                     </p>
-                    <Link to="/business" target='_blank'>
-                      <Button className='bg-color1 text-color3 hover:bg-color2 px-4 py-2 text-xs'>
-                      Explore More
+                    <Link to="/business" target="_blank">
+                      <Button className="w-full bg-color1 text-white text-sm font-medium px-5 py-2 rounded hover:bg-color2">
+                        Explore More
                       </Button>
                     </Link>
                   </div>
@@ -280,11 +251,11 @@ const StaMagdalena = () => {
               </div>
             </SwiperSlide>
           ))}
-          <div className="custom-prev absolute left-2 top-1/2 transform -translate-y-1/2 bg-light p-2 rounded-full shadow-md z-10 cursor-pointer hover:-translate-x-2 duration-300">
-            ←
+          <div className="custom-prev absolute left-2 top-[25%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300">
+            <FaArrowLeft />
           </div>
-          <div className="custom-next absolute right-2 top-1/2 transform -translate-y-1/2 bg-light p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-200 text-xl hover:translate-x-2 duration-300">
-            →
+          <div className="custom-next absolute right-2 top-[25%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300">
+            <FaArrowRight />
           </div>
         </Swiper>
       </div>
@@ -320,51 +291,37 @@ const StaMagdalena = () => {
         >
           {recommendedSpots.map((spot, index) => (
             <SwiperSlide key={index} className='flex justify-center'>
-              <div className='bg-white rounded-sm shadow-md hover:shadow-xl transform transition-all duration-500 p-4 w-full max-w-[280px] md:max-w-[320px] h-[380px] flex flex-col'>
-                <div className='relative w-full h-40 md:h-44'>
-                  <img
-                    src={spot.image || 'path/to/placeholder.jpg'}
-                    alt={spot.name}
-                    className='w-full h-full object-cover rounded-t-lg'
-                  />
-                  {!spot.image && (
-                    <div className='absolute inset-0 flex items-center justify-center bg-gray-200'>
-                      <span className='text-gray-500'>Image Not Available</span>
-                    </div>
-                  )}
-                </div>
-                <div className='p-4 flex flex-col justify-between h-full'>
+              <div className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between max-w-xs md:max-w-lg lg:max-w-sm mx-auto h-[400px] p-2 relative"
+                   style={{ width: '300px', height: '400px' }}>
+                <img
+                  src={spot.image || 'path/to/placeholder.jpg'}
+                  alt={spot.name}
+                  className="w-full h-56 md:h-64 object-cover rounded-t-lg"
+                />
+                <div className="flex-grow flex flex-col justify-between mt-4">
                   <div>
-                    <h3 className='font-semibold text-base md:text-lg text-color1 mb-1'>{spot.name}</h3>
-                    <div className='text-xs text-gray-500 mb-2 flex items-center'>
-                      <GiPositionMarker /> {spot.destination}
-                    </div>
-                    <div className='flex items-center justify-between gap-2 mb-3'>
-                      <div className='flex flex-wrap gap-1'>
-                        {spot.tags.map((tag, idx) => (
-                          <span
-                            key={idx}
-                            className='text-xs px-2 py-1 rounded-full bg-gray-200 text-black'
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                      <div className='flex items-center gap-1'>
-                        <span className='text-black text-sm'>{spot.rating}</span>
-                        <span className='text-yellow-500'>
-                          {'★'.repeat(spot.rating)}{'☆'.repeat(5 - spot.rating)}
+                    <div className="flex justify-between items-center mb-3">
+                      <div className="flex items-center gap-1">
+                        <span className="text-[12px]">{spot.rating}</span>
+                        <span className="text-yellow-500">
+                          {'★'.repeat(spot.rating)}
+                          {'☆'.repeat(5 - spot.rating)}
                         </span>
                       </div>
                     </div>
+                    <h3 className="text-lg font-semibold text-gray-800 truncate mb-2">{spot.name}</h3>
+                    <div className="text-xs text-gray-500 mb-4 flex items-center">
+                      <GiPositionMarker className="mr-1" />
+                      {spot.destination}
+                    </div>
                   </div>
-                  <div className='flex justify-between items-center'>
-                    <p className='font-semibold text-sm md:text-md'>
+                  <div className="mt-auto">
+                    <p className="text-md font-semibold text-black mb-4">
                       ₱{spot.budget}
                     </p>
-                    <Link to="/business" target='_blank'>
-                      <Button className='bg-color1 text-color3 hover:bg-color2 px-4 py-2 text-xs'>
-                      Explore More
+                    <Link to="/business" target="_blank">
+                      <Button className="w-full bg-color1 text-white text-sm font-medium px-5 py-2 rounded hover:bg-color2">
+                        Explore More
                       </Button>
                     </Link>
                   </div>
@@ -372,11 +329,11 @@ const StaMagdalena = () => {
               </div>
             </SwiperSlide>
           ))}
-          <div className="custom-prev absolute left-2 top-1/2 transform -translate-y-1/2 bg-light p-2 rounded-full shadow-md z-10 cursor-pointer hover:-translate-x-2 duration-300">
-            ←
+          <div className="custom-prev absolute left-2 top-[25%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300">
+            <FaArrowLeft />
           </div>
-          <div className="custom-next absolute right-2 top-1/2 transform -translate-y-1/2 bg-light p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-200 text-xl hover:translate-x-2 duration-300">
-            →
+          <div className="custom-next absolute right-2 top-[25%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300">
+            <FaArrowRight />
           </div>
         </Swiper>
       </div>
@@ -411,51 +368,37 @@ const StaMagdalena = () => {
         >
           {recommendedSpots.map((spot, index) => (
             <SwiperSlide key={index} className='flex justify-center'>
-              <div className='bg-white rounded-sm shadow-md hover:shadow-xl transform transition-all duration-500 p-4 w-full max-w-[280px] md:max-w-[320px] h-[380px] flex flex-col'>
-                <div className='relative w-full h-40 md:h-44'>
-                  <img
-                    src={spot.image || 'path/to/placeholder.jpg'}
-                    alt={spot.name}
-                    className='w-full h-full object-cover rounded-t-lg'
-                  />
-                  {!spot.image && (
-                    <div className='absolute inset-0 flex items-center justify-center bg-gray-200'>
-                      <span className='text-gray-500'>Image Not Available</span>
-                    </div>
-                  )}
-                </div>
-                <div className='p-4 flex flex-col justify-between h-full'>
+              <div className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between max-w-xs md:max-w-lg lg:max-w-sm mx-auto h-[400px] p-2 relative"
+                   style={{ width: '300px', height: '400px' }}>
+                <img
+                  src={spot.image || 'path/to/placeholder.jpg'}
+                  alt={spot.name}
+                  className="w-full h-56 md:h-64 object-cover rounded-t-lg"
+                />
+                <div className="flex-grow flex flex-col justify-between mt-4">
                   <div>
-                    <h3 className='font-semibold text-base md:text-lg text-color1 mb-1'>{spot.name}</h3>
-                    <div className='text-xs text-gray-500 mb-2 flex items-center'>
-                      <GiPositionMarker /> {spot.destination}
-                    </div>
-                    <div className='flex items-center justify-between gap-2 mb-3'>
-                      <div className='flex flex-wrap gap-1'>
-                        {spot.tags.map((tag, idx) => (
-                          <span
-                            key={idx}
-                            className='text-xs px-2 py-1 rounded-full bg-gray-200 text-black'
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                      <div className='flex items-center gap-1'>
-                        <span className='text-black text-sm'>{spot.rating}</span>
-                        <span className='text-yellow-500'>
-                          {'★'.repeat(spot.rating)}{'☆'.repeat(5 - spot.rating)}
+                    <div className="flex justify-between items-center mb-3">
+                      <div className="flex items-center gap-1">
+                        <span className="text-[12px]">{spot.rating}</span>
+                        <span className="text-yellow-500">
+                          {'★'.repeat(spot.rating)}
+                          {'☆'.repeat(5 - spot.rating)}
                         </span>
                       </div>
                     </div>
+                    <h3 className="text-lg font-semibold text-gray-800 truncate mb-2">{spot.name}</h3>
+                    <div className="text-xs text-gray-500 mb-4 flex items-center">
+                      <GiPositionMarker className="mr-1" />
+                      {spot.destination}
+                    </div>
                   </div>
-                  <div className='flex justify-between items-center'>
-                    <p className='font-semibold text-sm md:text-md'>
+                  <div className="mt-auto">
+                    <p className="text-md font-semibold text-black mb-4">
                       ₱{spot.budget}
                     </p>
-                    <Link to="/business" target='_blank'>
-                      <Button className='bg-color1 text-color3 hover:bg-color2 px-4 py-2 text-xs'>
-                      Explore More
+                    <Link to="/business" target="_blank">
+                      <Button className="w-full bg-color1 text-white text-sm font-medium px-5 py-2 rounded hover:bg-color2">
+                        Explore More
                       </Button>
                     </Link>
                   </div>
@@ -463,11 +406,11 @@ const StaMagdalena = () => {
               </div>
             </SwiperSlide>
           ))}
-          <div className="custom-prev absolute left-2 top-1/2 transform -translate-y-1/2 bg-light p-2 rounded-full shadow-md z-10 cursor-pointer hover:-translate-x-2 duration-300">
-            ←
+          <div className="custom-prev absolute left-2 top-[25%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300">
+            <FaArrowLeft />
           </div>
-          <div className="custom-next absolute right-2 top-1/2 transform -translate-y-1/2 bg-light p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-200 text-xl hover:translate-x-2 duration-300">
-            →
+          <div className="custom-next absolute right-2 top-[25%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300">
+            <FaArrowRight />
           </div>
         </Swiper>
       </div>

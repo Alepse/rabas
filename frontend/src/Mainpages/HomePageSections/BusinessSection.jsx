@@ -4,36 +4,74 @@ import ActivitiesTab from './businessSectionContents/ActivitiesTab';
 import AccommodationsTab from './businessSectionContents/AccommodationsTab';
 import FoodPlacesTab from './businessSectionContents/FoodPlacesTab';
 import ShopsTab from './businessSectionContents/ShopsTab';
+import wave from '@/assets/wave.svg'
 
 const BusinessSection = () => {
   return (
-    <div className="container mx-auto p-4 md:p-8 bg-white  mb-8">
+   <div 
+     className="mx-auto md:p-8 mb-8"
+     style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat' }}
+   >
+   
       <div className="text-center mb-10">
-        <h1 className="text-3xl md:text-5xl font-bold text-[#092635]">
+        <h1 className="text-3xl md:text-5xl font-bold text-color1">
           Explore Sorsogon
         </h1>
-        <p className="text-lg md:text-xl text-[#4A5568] mt-3">Discover the best places to visit, stay, and dine.</p>
+        <p className="text-md md:text-lg text-gray-500 mt-3">
+          Discover the best places to visit, stay, and dine.
+        </p>
       </div>
       
       <Tabs 
+        aria-label="Sorsogon Exploration Options"
         variant="underlined"
         classNames={{
-          tab: "text-[14px] md:text-[15px] font-semibold transition-colors duration-200 px-4 md:px-5 py-2 md:py-3 rounded-md",
-          tabContent: "group-data-[selected=true]:text-[#092635] text-[#4A5568]",
-          tabPanel: "mt-8"
+          base: "w-full overflow-x-auto rounded-full",
+          tabList: "gap-6 w-full  p-4  container ",
+          tab: "max-w-fit px-0 h-12 ",
+          tabContent: " text-color1  ",
+          cursor: "w-full bg-color1",
+        
         }}
-        className='overflow-x-auto max-w-full'
       >
-        <Tab title="Activities">
+        <Tab 
+          key="activities" 
+          title={
+            <div className="flex items-center space-x-2">
+              <span>Activities</span>
+            </div>
+          }
+        >
           <ActivitiesTab />
         </Tab>
-        <Tab title="Accommodations">
+        <Tab 
+          key="accommodations" 
+          title={
+            <div className="flex items-center space-x-2">
+              <span>Accommodations</span>
+            </div>
+          }
+        >
           <AccommodationsTab />
         </Tab>
-        <Tab title="Food Places">
+        <Tab 
+          key="food-places" 
+          title={
+            <div className="flex items-center space-x-2">
+              <span>Food Places</span>
+            </div>
+          }
+        >
           <FoodPlacesTab />
         </Tab>
-        <Tab title="Shops">
+        <Tab 
+          key="shops" 
+          title={
+            <div className="flex items-center space-x-2">
+              <span>Shops</span>
+            </div>
+          }
+        >
           <ShopsTab />
         </Tab>
       </Tabs>

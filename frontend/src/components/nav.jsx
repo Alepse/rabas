@@ -20,7 +20,7 @@ import { GiPositionMarker } from "react-icons/gi";
 import { FaRegCircleUser } from "react-icons/fa6";
 import { FaPersonWalking } from "react-icons/fa6";
 import { Modal, ModalContent, ModalBody, useDisclosure } from "@nextui-org/react";
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import UserChatModal from '@/user/userChatSystem/UserChatModal';
 
 
@@ -37,6 +37,8 @@ const Nav = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isSearchOverlayOpen, setIsSearchOverlayOpen] = useState(false);
+  const [activeLink, setActiveLink] = useState('');
+  const location = useLocation();
 
   const sampleData = {
     activities: [
@@ -226,25 +228,37 @@ const Nav = () => {
     clearSearchField();
   };
 
+  const handleLinkClick = (link) => {
+    setActiveLink(link);
+  };
+
+  useEffect(() => {
+    setActiveLink(location.pathname);
+  }, [location.pathname]);
+
   if (isLoggedIn === null || (isLoggedIn && !userData)) {
     return null;
   }
 
   return (
-    <div className={`bg-light flex justify-center fixed top-0 z-50 w-full shadow-lg`}>
-      <div className="flex justify-between items-center w-full container  mx-auto h-[7rem] p-4">
-        <a className='flex items-center hover:scale-105 duration-500' href='/'>
-          <img className="lg:h-[6rem] max-h-[7rem] lg:w-[6rem] max-w-[6rem]" src={Logo} alt="Logo" />
-          <img className="lg:h-[12rem] h-[9rem]" src={Logo2} alt="Logo" />
+    <div className={` bg-gradient-to-r from-color1 to-color2 flex justify-center fixed top-0 z-50 w-full shadow-lg`}>
+      <div className="flex justify-between items-center w-full container  mx-auto h-[6rem] p-6">
+        <a
+          className='flex items-center hover:scale-105 duration-500'
+          href='/'
+          onClick={() => handleLinkClick('/')}
+        >
+          <img className="lg:h-[4.3rem] max-h-[4.3rem] lg:w-[4.3rem] max-w-[4.3rem]" src={Logo} alt="Logo" />
+          <div className='text-white ml-2 text-xl font-mono '>RabaSorsogon</div>
         </a>
-
+        
         <div className="flex items-center gap-3 xl:hidden">
           {isLoggedIn ? (
             <Dropdown placement="bottom-end">
               <DropdownTrigger>
                 <div className="cursor-pointer ml-6">
                   <Avatar
-                    className='text-lg bg-color1 text-light hover:bg-color2/80 transition-colors duration-300'
+                    className='text-lg bg-color1 text-white  duration-300'
                     src={userData?.image_path
                       ? `http://localhost:5000/${userData.image_path}`
                       : userData?.google_id
@@ -275,19 +289,19 @@ const Nav = () => {
               </DropdownMenu>
             </Dropdown>
           ) : (
-            <div className="text-color1 cursor-pointer" onClick={onOpen}>
+            <div className="text-white hover:bg-color1 rounded-full cursor-pointer" onClick={onOpen}>
               <FaRegCircleUser className="text-3xl" />
             </div>
           )}
 
-          <button onClick={toggleMenu} className="text-color1 text-2xl z-50 p-2">
-            {isMenuOpen ? <FaTimes /> : <FaBars />}
+          <button onClick={toggleMenu} className=" text-2xl z-50 p-2">
+            {isMenuOpen ? <FaTimes /> : <FaBars className='text-white' />}
           </button>
         </div>
 
         <div className="hidden xl:flex items-center gap-6">
           <div className="flex space-x-8 items-center text-color1">
-            <div className="relative">
+          <div className="relative">
               <input
                 type="text"
                 placeholder={`Search for ${activeTab}`}
@@ -304,83 +318,93 @@ const Nav = () => {
                 />
               )}
             </div>
-
-            <div className="hover:text-gray-700 cursor-pointer hover:font-semibold duration-100 text-lg font-light flex items-center gap-1">
+            <div
+              className={`cursor-pointer text text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1 ${activeLink === '/' ? ' border-light border-b-1 p-1 font-semibold  ' : ''}`}
+              onClick={() => setActiveLink('/')}
+            >
               <FaHome /> <a href='/'>Home</a>
             </div>
-            <NavigationMenu>
-              <NavigationMenuList>
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger className="flex gap-1 text-color1 hover:text-gray-700 text-lg cursor-pointer hover:font-semibold duration-100 font-light">
-                    <GiPositionMarker />
-                    <a href='/destinations'> Destinations</a>
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <NavigationMenuLink>
-                      <div className="p-9 w-max bg-light shadow-md">
-                        <ul className="space-y-2 text-dark text-sm">
-                          <Link to='/destinations?name=Barcelona'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Barcelona</li></Link>
-                          <Link to='/destinations?name=Bulan'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Bulan</li></Link>
-                          <Link to='/destinations?name=Bulusan'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Bulusan</li></Link>
-                          <Link to='/destinations?name=Casiguran'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Casiguran</li></Link>
-                          <Link to='/destinations?name=Castilla'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Castilla</li></Link>
-                          <Link to='/destinations?name=Donsol'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Donsol</li></Link>
-                          <Link to='/destinations?name=Gubat'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Gubat</li></Link>
-                          <Link to='/destinations?name=Irosin'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Irosin</li></Link>
-                          <Link to='/destinations?name=Juban'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Juban</li></Link>
-                          <Link to='/destinations?name=Magallanes'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Magallanes</li></Link>
-                          <Link to='/destinations?name=Matnog'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Matnog</li></Link>
-                          <Link to='/destinations?name=Pilar'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Pilar</li></Link>
-                          <Link to='/destinations?name=PrietoDiaz'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Prieto Diaz</li></Link>
-                          <Link to='/destinations?name=StaMagdalena'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Sta. Magdalena</li></Link>
-                          <Link to='/destinations?name=Sorsogon'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Sorsogon City</li></Link>
-                        </ul>
-                      </div>
-                    </NavigationMenuLink>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-              </NavigationMenuList>
-            </NavigationMenu>
 
-            <NavigationMenu>
-              <NavigationMenuList>
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger className="flex gap-1 text-color1 hover:text-gray-700 text-lg cursor-pointer hover:font-semibold duration-100 font-light">
-                    <FaPersonWalking />
-                    <a href='/Discover'> Discover </a>
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <NavigationMenuLink>
-                      <div className="w-max p-9 bg-light">
-                        <ul className="text-dark text-sm space-y-3">
-                          <a href='/activities'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Activities</li></a>
-                          <a href='/accomodations'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Accommodations</li></a>
-                          <a href='/foodplaces'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Food Places</li></a>
-                          <a href='/shops'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Shops</li></a>
-                        </ul>
-                      </div>
-                    </NavigationMenuLink>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-              </NavigationMenuList>
-            </NavigationMenu>
-
-            <Link to='/trip'>
-              <div className="hover:text-gray-700 cursor-pointer hover:font-semibold duration-100 text-lg font-light flex items-center gap-1">
-                <TbNotes />Trip
-              </div>
-            </Link>
+            <NavigationMenu className='z-50'>
+  <NavigationMenuList>
+    <NavigationMenuItem>
+      <NavigationMenuTrigger className={`cursor-pointer rounded-none text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1  ${activeLink === '/destinations' ? 'font-semibold border-b-1 border-light p-1' : ''}`}>
+        <GiPositionMarker />
+        <a href='/destinations'> Destinations</a>
+      </NavigationMenuTrigger>
+      <NavigationMenuContent>
+        <NavigationMenuLink>
+          <div className="p-9 w-max bg-light shadow-md">
+            <ul className="space-y-2 text-dark text-sm">
+              <Link to='/destinations?name=Barcelona'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Barcelona</li></Link>
+              <Link to='/destinations?name=Bulan'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Bulan</li></Link>
+              <Link to='/destinations?name=Bulusan'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Bulusan</li></Link>
+              <Link to='/destinations?name=Casiguran'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Casiguran</li></Link>
+              <Link to='/destinations?name=Castilla'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Castilla</li></Link>
+              <Link to='/destinations?name=Donsol'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Donsol</li></Link>
+              <Link to='/destinations?name=Gubat'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Gubat</li></Link>
+              <Link to='/destinations?name=Irosin'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Irosin</li></Link>
+              <Link to='/destinations?name=Juban'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Juban</li></Link>
+              <Link to='/destinations?name=Magallanes'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Magallanes</li></Link>
+              <Link to='/destinations?name=Matnog'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Matnog</li></Link>
+              <Link to='/destinations?name=Pilar'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Pilar</li></Link>
+              <Link to='/destinations?name=PrietoDiaz'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Prieto Diaz</li></Link>
+              <Link to='/destinations?name=StaMagdalena'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Sta. Magdalena</li></Link>
+              <Link to='/destinations?name=Sorsogon'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Sorsogon City</li></Link>
+            </ul>
           </div>
-          <Link to='/transportation'>
-            <div className="hover:text-gray-700 cursor-pointer hover:font-semibold duration-100 text-lg font-light flex items-center gap-1">
-              <PiJeep />Transportation
+        </NavigationMenuLink>
+      </NavigationMenuContent>
+    </NavigationMenuItem>
+  </NavigationMenuList>
+</NavigationMenu>
+
+            <NavigationMenu className='z-40 '>
+  <NavigationMenuList>
+    <NavigationMenuItem>
+      <NavigationMenuTrigger className={`cursor-pointer rounded-none text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1  ${activeLink === '/Discover' ? 'font-semibold border-b-1 border-light p-1' : ''}`}>
+        <FaPersonWalking />
+        <a href='/Discover'> Discover </a>
+      </NavigationMenuTrigger>
+      <NavigationMenuContent>
+        <NavigationMenuLink>
+          <div className="w-max p-9 bg-light">
+            <ul className="text-dark text-sm space-y-3">
+              <a href='/activities'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Activities</li></a>
+              <a href='/accomodations'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Accommodations</li></a>
+              <a href='/foodplaces'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Food Places</li></a>
+              <a href='/shops'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Shops</li></a>
+            </ul>
+          </div>
+        </NavigationMenuLink>
+      </NavigationMenuContent>
+    </NavigationMenuItem>
+  </NavigationMenuList>
+</NavigationMenu>
+
+            <div
+              className={`cursor-pointer text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1 ${activeLink === '/trip' ? ' border-b-1 border-light p-1 font-semibold ' : ''}`}
+              onClick={() => setActiveLink('/trip')}
+            >
+              <TbNotes /> <a href='/trip'>Trip</a>
             </div>
-          </Link>
-          <Link to='/about'>
-            <div className="hover:text-gray-700 cursor-pointer hover:font-semibold duration-100 text-lg font-light flex items-center gap-1">
-              <CiSquareInfo />About
+
+            <div
+              className={`cursor-pointer text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1 ${activeLink === '/transportation' ? ' border-b-1 border-light p-1 font-semibold ': ''}`}
+              onClick={() => setActiveLink('/transportation')}
+            >
+              <PiJeep /> <a href='/transportation'>Transportation</a>
             </div>
-          </Link>
+
+            <div  className={`cursor-pointer text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1 ${activeLink === '/about' ? 'border-b-1 border-light p-1 font-semibold ': ''}`}
+             onClick={() => setActiveLink('/about')}>
+              <CiSquareInfo /> <a href='/about'>About</a>
+            </div>
+
+         
+          </div>
+         
+         
 
           {isLoggedIn ? (
             <Dropdown placement="bottom-end">
@@ -418,8 +442,8 @@ const Nav = () => {
               </DropdownMenu>
             </Dropdown>
           ) : (
-            <div className="text-color1 cursor-pointer ml-6" onClick={onOpen}>
-              <FaRegCircleUser className="text-3xl hover:bg-color2/70 hover:text-light duration-300 rounded-full" />
+            <div className="text-white cursor-pointer ml-6" onClick={onOpen}>
+              <FaRegCircleUser className="text-3xl hover:bg-color1 hover:text-light text-white duration-300 rounded-full" />
             </div>
           )}
         </div>

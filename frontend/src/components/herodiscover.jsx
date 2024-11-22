@@ -4,7 +4,7 @@ import Sorsogon from '../assets/sorsogon city.jpg'
 
 const herodiscover = () => {  
   return (  
-    <div className="relative flex flex-col items-center justify-center mx-auto bg-cover bg-center h-[400px] mt-28" style={{  
+    <div className="relative flex flex-col items-center justify-center mx-auto bg-cover bg-center h-[400px] mt-24" style={{  
         backgroundImage: `url(${Sorsogon})`,  
       }}>  
 

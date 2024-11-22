@@ -298,7 +298,7 @@ const Discover = () => {
 
   const renderFilters = (filters, setFilters, types, additionalFilters = null, isAllTab = false) => (
     <div className="w-full lg:w-1/4  ">
-      <div className="bg-white p-4 rounded-lg shadow-md max-h-screen overflow-y-auto scrollbar-custom">
+      <div className="bg-white p-4 rounded-lg shadow-md  overflow-y-auto scrollbar-custom">
         <h2 className="text-xl font-semibold mb-4">Filters</h2>
         
         {/* Destination Dropdown */}
@@ -620,7 +620,7 @@ const Discover = () => {
                 return filteredItems.map((item, index) => (
                   <motion.div
                     key={index}
-                    className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300"
+                    className="bg-white rounded-lg shadow-lg p-2 hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between"
                     variants={cardVariants}
                   >
                     <img
@@ -628,8 +628,8 @@ const Discover = () => {
                       alt={item.businessName}
                       className="w-full h-48 object-cover rounded-t-lg"
                     />
-                    <div className="p-4">
-                      <div className="flex justify-between items-center mb-2">
+                    <div className="p-4 flex-grow">
+                      <div className="flex justify-between  items-center mb-2">
                         <div className="flex flex-wrap gap-2">
                           {item.category.map((cat, idx) => {
                             const isSelected = filters.selectedType.some(type => 
@@ -673,30 +673,33 @@ const Discover = () => {
                         <GiPositionMarker className="mr-1" />
                         {item.destination}
                       </div>
-                      <div className="flex mb-2 max-w-[500px] max-h-[5rem] overflow-y-auto scrollbar-custom flex-col">
-                        <p className="text-sm text-gray-600 mb-2">
-                          {item.description}
-                        </p>
-                      </div>
+                      {item.description && (
+                        <div className="flex mb-2 max-w-[500px] max-h-[5rem] overflow-y-auto scrollbar-custom flex-col">
+                          <p className="text-sm text-gray-600 mb-2">
+                            {item.description}
+                          </p>
+                        </div>
+                      )}
                       <p className="text-md font-semibold text-black mb-2">
                         ₱{item.lowest_price} - ₱{item.highest_price}
                       </p>
-                      <Link to="/business" target="_blank">
-                        <Button className="w-full bg-color1 text-color3 hover:bg-color2">
-                          Explore More
-                        </Button>
-                      </Link>
                     </div>
+                    <Link to="/business" target="_blank">
+                      <Button className="w-full bg-color1  text-color3 rounded-md hover:bg-color2 ">
+                        Explore More
+                      </Button>
+                    </Link>
                   </motion.div>
                 ));
               })}
             </motion.div>
           </div>
         </div>
-
+       
+       <div className='flex justify-center '>
         {/* Map Section */}
-        <div className="mt-8 bg-gray-200 rounded-lg shadow-md p-4">
-          <h2 className="text-lg font-semibold mb-4">Locations</h2>
+        <div className="mt-8  bg-color1 rounded-lg shadow-md p-4 w-full bg-gradient-to-r from-color1 to-color2">
+          <h2 className="text-lg font-semibold text-light mb-4">Locations</h2>
           <MapContainer center={[12.9738, 123.9807]} zoom={10} className="w-full h-96">
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -723,6 +726,7 @@ const Discover = () => {
               return null;
             })}
           </MapContainer>
+        </div>
         </div>
       </div>
    

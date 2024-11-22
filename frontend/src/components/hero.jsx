@@ -80,7 +80,7 @@ const Hero = () => {
   };
 
   return (
-    <div className="mx-auto mt-28 h-[500px] relative font-sans overflow-hidden">
+    <div className="mx-auto mt-24 h-[500px] relative font-sans overflow-hidden">
       <Slider {...settings}>
         {images.map((image, index) => (
           <div key={index} className="relative h-[500px]">

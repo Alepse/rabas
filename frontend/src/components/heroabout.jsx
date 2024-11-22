@@ -2,7 +2,7 @@ import React from 'react'
 import Rabas from '@/assets/about.webp'
 const heroabout = () => {
   return (
-    <div className="relative flex flex-col items-center justify-center mx-auto bg-cover  bg-center h-[300px] mt-28 " style={{  
+    <div className="relative flex flex-col items-center justify-center mx-auto bg-cover  bg-center h-[300px] mt-24 " style={{  
         backgroundImage: `url(${Rabas})`,  
       }}>  
 

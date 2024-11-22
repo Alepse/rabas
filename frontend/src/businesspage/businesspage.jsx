@@ -73,7 +73,7 @@ const BusinessPage = () => {
     <div className='mx-auto min-h-screen bg-light font-sans'>
       <Nav />
 
-      <div className='container p-3 rounded-md mt-[7.2rem] flex justify-center'> 
+      <div className='container p-3 rounded-md mt-[5.2rem] flex justify-center'> 
         <Search/>
       </div>
 
