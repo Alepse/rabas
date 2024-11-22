@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { CalendarIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Link } from 'react-router-dom'
+import wave from '@/assets/wave3.svg'
 
 
 // Import images
@@ -20,8 +21,8 @@ export default function PlanTripSection() {
   ]
 
   return (
-    <section className="py-24 bg-white">
-      <div className="container mx-auto p-9">
+    <section className="mt-2 bg-white" style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat' }}>
+      <div className="  mx-auto p-9 container"  >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
           <motion.div 
             className="space-y-8"

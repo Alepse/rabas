@@ -9,7 +9,7 @@ import wave from '@/assets/wave.svg'
 const BusinessSection = () => {
   return (
    <div 
-     className="mx-auto md:p-8 mb-8"
+     className="mx-auto  "
      style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat' }}
    >
    

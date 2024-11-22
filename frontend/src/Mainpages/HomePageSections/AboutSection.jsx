@@ -3,13 +3,14 @@ import { Card,CardBody, CardHeader, } from "@nextui-org/react"
 import { MapPin, Heart, Compass, ChevronRight} from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import wave from '@/assets/wave2.svg'
 
 
 
 
 const AboutSection = () => {
   return (
-    <section className="py-16 bg-white">
+    <section className=" bg-white"  style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat' }}>
       <div className="container mx-auto px-4">
         <h2 className="text-4xl font-bold text-center mb-8">Why Choose Us</h2>
         

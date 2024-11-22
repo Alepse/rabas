@@ -21,7 +21,7 @@ import Prieto from '@/assets/prieto.jpg'
 import Santa from '@/assets/santa.jpg'
 import Sorso from '@/assets/sorsogon city.jpg'
 import { Link } from 'react-router-dom'
-import wave from '@/assets/wave3.svg'
+import wave from '@/assets/wave2.svg'
 
 
 const destinations = [
@@ -45,8 +45,8 @@ const destinations = [
 
 const DestinationSection = () => {
   return (
-    <section className='mt-24 container mx-auto px-4 rounded-lg'  style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>
-      <div className='flex flex-col items-start'>
+    <section className='mt-24  mx-auto p-8 rounded-lg'  style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>
+      <div className='flex flex-col container items-start'>
           <h1 className='text-4xl font-bold text-gray-800 mb-2'>
             Discover the Wonders of Sorsogon
           </h1>
@@ -80,7 +80,7 @@ const DestinationSection = () => {
         }}
         pagination={{ clickable: true }}
         navigation
-        className='mb-5'
+        className='mb-5 container'
       >
         {destinations.map((destination, index) => (
           <SwiperSlide key={index}>
