@@ -8,6 +8,7 @@ import { Checkbox, CheckboxGroup, Select, SelectItem, Slider } from "@nextui-org
 import { GiPositionMarker } from "react-icons/gi";
 import { Link } from 'react-router-dom';
 import Search from '@/components/Search';
+import CryptoJS from 'crypto-js';
 
 // Custom hook to detect if the screen is large
 const useIsLargeScreen = () => {
@@ -110,6 +111,13 @@ const Shop = () => {
 
   const toggleFilters = () => {
     setShowFilters(!showFilters);
+  };
+
+  // Function to encrypt the business_id
+  const encryptId = (id) => {
+    const secretKey = import.meta.env.VITE_SECRET_KEY;
+    const ciphertext = CryptoJS.AES.encrypt(id.toString(), secretKey).toString();
+    return encodeURIComponent(ciphertext);
   };
 
   // Define the shop categories based on the tags used in your shop data
@@ -334,7 +342,7 @@ const Shop = () => {
                           <span className="text-gray-400 italic">Price Range Not available</span>
                         )}
                       </p>
-                      <Link to="/business" target='_blank'>
+                      <Link to={`/business/${encryptId(shop.business_id)}`} target='_blank'>
                         <Button 
                           className='w-full bg-color1 text-color3 hover:bg-color2'
                         >
