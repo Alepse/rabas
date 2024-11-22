@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Nav from '@/components/nav';
 import Search from '@/components/Search';
 import Footer from '@/components/Footer';
-import { FaPlus } from 'react-icons/fa';
+import { FaPlus, FaTimes } from 'react-icons/fa';
 import {
   Modal,
   ModalContent,
@@ -261,8 +261,15 @@ const Trip = () => {
 
       <Modal hideCloseButton isOpen={isOpen} onClose={() => {}} className="rounded-lg shadow-lg mx-auto p-3 max-h-screen max-w-[1200px]">
         <ModalContent className="rounded-lg overflow-y-auto scrollbar-custom">
-          <ModalHeader className="bg-primary text-white p-4 rounded-t-lg">
+          <ModalHeader className="bg-primary text-white p-4 rounded-t-lg flex justify-between items-center">
             <h2 className="text-2xl font-bold">Let's create your trip in Sorsogon</h2>
+                    <button 
+                        aria-label="Close" 
+                        className='text-white hover:text-gray-300 transition-colors duration-200'
+                        onClick={onClose}
+                    >
+                        <FaTimes />
+                    </button>
           </ModalHeader>
           <ModalBody className="bg-gray-50 p-2">
             <Progress value={progress} size="xs" classNames={{ indicator: "bg-color2",}} />

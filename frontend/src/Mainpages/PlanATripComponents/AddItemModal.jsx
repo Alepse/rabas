@@ -3,7 +3,7 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Check
 import { motion } from 'framer-motion';
 import { GiPositionMarker } from 'react-icons/gi';
 import { Link } from 'react-router-dom';
-import { FaSearch, FaPlus } from 'react-icons/fa';
+import { FaSearch, FaPlus, FaTimes } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 
 const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
@@ -461,6 +461,8 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                     title: 'Added!',
                     icon: 'success',
                     confirmButtonColor: '#0BDA51'
+                }).then(() => {
+                    onClose();
                 });
             }
         });
@@ -476,10 +478,20 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
             size='full'
         >
             <ModalContent>
-                <ModalHeader className='w-full text-white flex justify-center bg-color1'>
-                    <h1 className="text-center text-lg md:text-xl lg:text-2xl">Your Travel Itinerary: Must-Do Activities, Stay Options, Food Spots & Shopping Spots</h1>
+                <ModalHeader className='w-full text-white flex justify-end items-center bg-color1 p-4'>
+                   
+                    <button 
+                        aria-label="Close" 
+                        className='text-white hover:text-gray-300 transition-colors duration-200'
+                        onClick={onClose}
+                    >
+                        <FaTimes />
+                    </button>
                 </ModalHeader>
                 <ModalBody className='bg-light'>
+                <h1 className="text-center text-lg md:text-xl lg:text-2xl flex-grow">
+                        Your Travel Itinerary: Must-Do Activities, Stay Options, Food Spots & Shopping Spots
+                    </h1>
                     {/* Search Input */}
                     <div className="mb-4 relative">
                         <input
