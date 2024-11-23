@@ -9,7 +9,7 @@ import { Checkbox, CheckboxGroup, Select, SelectItem } from "@nextui-org/react";
 import { GiPositionMarker } from "react-icons/gi";
 import Search from '@/components/Search';
 import { Link } from 'react-router-dom';
-import wave from '@/assets/wave2.svg'
+import wave from '@/assets/wave2.webp'
 import CryptoJS from 'crypto-js';
 // Custom hook to detect if the screen is large
 const useIsLargeScreen = () => {

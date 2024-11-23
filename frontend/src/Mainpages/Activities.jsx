@@ -9,7 +9,7 @@ import { Checkbox, CheckboxGroup, Select, SelectItem, Slider } from "@nextui-org
 import { GiPositionMarker } from "react-icons/gi";
 import { Link } from 'react-router-dom';
 import Search from '@/components/Search';
-import wave from '@/assets/wave2.svg'
+import wave from '@/assets/wave2.webp'
 
 import CryptoJS from 'crypto-js';
 

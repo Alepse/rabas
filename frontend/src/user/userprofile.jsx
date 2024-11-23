@@ -11,7 +11,7 @@ import { AiOutlineLike } from 'react-icons/ai';
 import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { motion } from 'framer-motion'; // Import Framer Motion
-import wave from '@/assets/wave2.svg'
+import wave from '@/assets/wave2.webp'
 
 
 // Simplified component for the "My Booking" tab

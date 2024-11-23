@@ -38,7 +38,7 @@ import PrietoDiaz from './DestinationsSectioncomponent/PrietoDiaz';
 import StaMagdalena from './DestinationsSectioncomponent/StaMagdalena';
 import Sorsogon from './DestinationsSectioncomponent/Sorsogon';
 import EmergencyHotlines from '../Mainpages/DestinationsSectioncomponent/EmergencyHotlines';
-import wave from '@/assets/wave2.svg'
+import wave from '@/assets/wave2.webp'
 
 const destinationComponents = {
   Bulusan,

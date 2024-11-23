@@ -7,7 +7,7 @@ import Terminal from '../assets/legazpi terminal.webp'
 import Sitex from '../assets/sitex.webp'
 import Footer from '@/components/Footer';
 import { motion } from 'framer-motion'; // Import Framer Motion
-import wave from '@/assets/wave2.svg'
+import wave from '@/assets/wave2.webp'
 
 const Transportation = () => {
   const [loading, setLoading] = useState(true);

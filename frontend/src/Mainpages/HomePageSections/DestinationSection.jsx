@@ -21,7 +21,7 @@ import Prieto from '@/assets/prieto.jpg'
 import Santa from '@/assets/santa.jpg'
 import Sorso from '@/assets/sorsogon city.jpg'
 import { Link } from 'react-router-dom'
-import wave from '@/assets/wave2.svg'
+import wave from '@/assets/wave2.webp'
 
 
 const destinations = [
