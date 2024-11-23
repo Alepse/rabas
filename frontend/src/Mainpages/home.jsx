@@ -10,7 +10,7 @@ import PlanTripSection from './HomePageSections/PlanTripSection';
 import AboutSection from './HomePageSections/AboutSection';
 import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import wave from '@/assets/wave2.svg'
+import wave from '@/assets/wave2.webp'
 
 const Home = () => {
   const [loading, setLoading] = useState(true);

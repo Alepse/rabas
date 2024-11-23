@@ -4,7 +4,7 @@ import ActivitiesTab from './businessSectionContents/ActivitiesTab';
 import AccommodationsTab from './businessSectionContents/AccommodationsTab';
 import FoodPlacesTab from './businessSectionContents/FoodPlacesTab';
 import ShopsTab from './businessSectionContents/ShopsTab';
-import wave from '@/assets/wave.svg'
+import wave from '@/assets/wave.webp'
 
 const BusinessSection = () => {
   return (

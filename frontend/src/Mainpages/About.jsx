@@ -7,7 +7,7 @@ import Hero from '@/components/heroabout';
 import Footer from '@/components/Footer';
 import Logo from '@/assets/rabas.png';
 import { Users, MapPin, Heart, Compass, Coffee } from 'lucide-react';
-import wave from '@/assets/wave2.svg'
+import wave from '@/assets/wave2.webp'
 
 const About = () => {
   const [loading, setLoading] = useState(true);

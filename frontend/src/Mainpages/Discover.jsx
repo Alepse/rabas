@@ -12,7 +12,7 @@ import Search from '@/components/Search';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import wave from '@/assets/wave2.svg'
+import wave from '@/assets/wave2.webp'
 
 
 import CryptoJS from 'crypto-js';

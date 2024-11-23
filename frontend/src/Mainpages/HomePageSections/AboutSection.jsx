@@ -3,7 +3,7 @@ import { Card,CardBody, CardHeader, } from "@nextui-org/react"
 import { MapPin, Heart, Compass, ChevronRight} from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import wave from '@/assets/wave2.svg'
+import wave from '@/assets/wave2.webp'
 
 
 

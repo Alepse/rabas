@@ -197,7 +197,7 @@ const BusinessInfo = () => {
                     </CardBody>
                   </Card>
                 </div>
-                <div className="flex-1 p-4">
+                <div className="flex-1 p-4 z-0 ">
                   <h2 className="text-2xl md:text-3xl font-bold mb-4">Location</h2>
                   <p className="mb-4 text-gray-600">{businessData.destination}</p>
                   <MapContainer center={initialCenter} zoom={currentZoom} className="w-full h-96">

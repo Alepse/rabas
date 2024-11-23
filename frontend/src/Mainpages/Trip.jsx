@@ -24,7 +24,7 @@ import {today, getLocalTimeZone} from "@internationalized/date";
 import Planner from '@/Mainpages/PlanATripComponents/SchedulesPlan'; // Ensure this path is correct
 import Swal from 'sweetalert2';
 import TripDetailsModal from './PlanATripComponents/TripDetailsModal';
-import wave from '@/assets/wave2.svg'
+import wave from '@/assets/wave2.webp'
 
 const MotionBox = motion.div;
 
