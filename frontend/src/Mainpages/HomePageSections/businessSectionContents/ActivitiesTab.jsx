@@ -116,7 +116,7 @@ const ActivitiesTab = () => (
     {['Adventure Awaits: Top Activity Spots', 'Popular Now: Most Reviewed Activities', 'Top Activity Offers'].map((title, idx) => (
       <div key={idx} className="p-4 md:p-6">
         <div className='flex flex-col md:flex-row justify-between items-center'>
-          <h1 className={`text-xl md:text-2xl font-bold mb-4 md:mb-6 text-center lg:text-start ${title === 'Top Activity Offers' ? 'text-white' : ''}`}>
+          <h1 className={`text-xl md:text-2xl font-bold mb-4 md:mb-6 text-center lg:text-start ${title === 'Top Activity Offers' ? 'lg:text-white' : ''}`}>
             {title}
           </h1>
           {title !== 'Top Activity Offers' && (
