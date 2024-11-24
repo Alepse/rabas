@@ -705,7 +705,7 @@ const Discover = () => {
                         )}
                       </p>
                     </div>
-                    <Link to={`/business/${encryptId(item.business_id)}`} target="_blank">
+                    <Link to={`/business/${encryptId(item.business_id)}`}>
                       <Button className="w-full bg-color1 text-color3 rounded-md hover:bg-color2">
                         Explore More
                       </Button>

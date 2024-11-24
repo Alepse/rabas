@@ -250,15 +250,22 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn }) => {
     <Card variant="shadow" className="border-0 rounded-lg mb-4 overflow-hidden">
       <CardBody className="flex flex-col">
         <div className="relative w-full h-[250px] md:h-[300px]">
-          <img
-            src={
-              product.images.length > 0 && product.images[0].path
-                ? `http://localhost:5000/${product.images[0].path}`
-                : product.fileUrl || ''
-            }
-            alt={product.images.length > 0 ? product.images[0].title : product.name}
-            className="object-cover w-full h-full rounded-t-lg"
-          />
+          {product.images.length > 0 ?(
+            <img
+              src={
+                product.images.length > 0 && product.images[0].path
+                  ? `http://localhost:5000/${product.images[0].path}`
+                  : product.fileUrl || ''
+              }
+              alt={product.images.length > 0 ? product.images[0].title : product.name}
+              className="object-cover w-full h-full rounded-t-lg"
+            />
+          ) : (
+            <div className="col-span-full text-center py-4 text-gray-500">
+              No images available
+            </div>
+          )}
+          
           {product.discount > 0 && (
             <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
               {product.discount}% OFF
