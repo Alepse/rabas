@@ -261,7 +261,7 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn }) => {
               className="object-cover w-full h-full rounded-t-lg"
             />
           ) : (
-            <div className="col-span-full text-center py-4 text-gray-500">
+            <div className="w-full h-full flex items-center justify-center rounded-t-lg bg-gray-100 text-gray-500">
               No images available
             </div>
           )}
@@ -768,7 +768,7 @@ const BusinessAllproducts = () => {
                       </div>
                     ))
                   ) : (
-                    <div className="col-span-full text-center py-4 text-gray-500">
+                    <div className="w-full h-full flex items-center justify-center rounded-t-lg bg-gray-100 text-gray-500">
                       No images available
                     </div>
                   )}
