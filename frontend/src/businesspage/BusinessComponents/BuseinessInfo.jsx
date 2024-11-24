@@ -217,12 +217,20 @@ const BusinessInfo = () => {
 
                         const customDivIcon = L.divIcon({
                           className: 'custom-icon',
-                          html: `<div class="custom-popup flex items-center whitespace-nowrap font-bold text-pink-600" style="font-size: ${fontSize};">
-                                  ${showLogo ? `<img src="http://localhost:5000/${businessLogo}" alt="${businessName}" class="w-10 h-10" />` : ''}
-                                  <span class="ml-2">${businessName}</span>
-                                </div>`,
-                          iconAnchor: [20, 20] // Adjust these values to center the logo
-                        });
+                          html: `
+                            <div class="custom-popup flex items-center whitespace-nowrap font-bold text-pink-600" style="font-size: ${fontSize};">
+                              ${showLogo ? `<div class="pin-container">
+                                <div class="pin-head">
+                                  <img src="http://localhost:5000/${businessLogo}" alt="${businessName}" class="pin-logo" />
+                                </div>
+                                <div class="pin-point"></div>
+                              </div><span>${businessName}</span>` : `<div class="business-name">${businessName}</div>`}
+                              
+                            </div>
+                          `,
+                          iconSize: [50, 70], 
+                          iconAnchor: [25, 70] 
+                        });     
 
                         return <Marker key={businessData.business_id} position={position} icon={customDivIcon} />;
                       })()

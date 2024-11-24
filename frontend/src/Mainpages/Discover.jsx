@@ -731,17 +731,27 @@ const Discover = () => {
               const { pin_location } = business;
               if (pin_location && currentZoom >= 7) { // Adjust zoom level as needed
                 const position = [pin_location.latitude, pin_location.longitude];
-                const showLogo = currentZoom >= 12; // Set zoom level to show/hide logo
+                const locationName = business.businessName;
+                const showLogo = currentZoom >= 13; // Set zoom level to show/hide logo
+                const fontSize = currentZoom >= 12 ? '1rem' : '0.85rem';
                 const customDivIcon = L.divIcon({
                   className: 'custom-icon',
-                  html: `<div class="custom-popup flex items-center whitespace-nowrap font-bold text-pink-600" style="font-size: 0.85rem;">
-                          ${showLogo ? `<img src="http://localhost:5000/${business.businessLogo}" alt="${business.businessName}" class="w-10 h-10" />` : ''}
-                          <span class="ml-2">${business.businessName}</span>
-                        </div>`,
-                  iconAnchor: [20, 20] // Adjust these values to center the logo
-                });
+                  html: `
+                    <div class="custom-popup flex items-center whitespace-nowrap font-bold text-pink-600" style="font-size: ${fontSize};">
+                      ${showLogo ? `<div class="pin-container">
+                        <div class="pin-head">
+                          <img src="http://localhost:5000/${business.businessLogo}" alt="${business.businessName}" class="pin-logo" />
+                        </div>
+                        <div class="pin-point"></div>
+                      </div><span>${locationName}</span>` : `<div class="business-name">${locationName}</div>`}
+                      
+                    </div>
+                  `,
+                  iconSize: [50, 70], 
+                  iconAnchor: [25, 70] 
+                });      
                 return (
-                  <Marker key={index} position={position} icon={customDivIcon}/>
+                  <Marker key={index} position={position} icon={customDivIcon} />
                 );
               }
               return null;
