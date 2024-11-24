@@ -94,7 +94,7 @@ const BusinessInfo = () => {
   }, [encryptedBusinessId]);
 
   // log the business data
-  console.log('Business Data:', businessData);
+  // console.log('Business Data:', businessData);
 
   if (loading) {
     return <div>Loading...</div>;

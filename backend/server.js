@@ -3231,7 +3231,7 @@ app.post('/addReviewsAndRatings', async (req, res) => {
   const { product_id, user_id, rating, comment } = req.body;
   // const user_id = req.session?.user?.user_id;
 
-  console.log(product_id, user_id, rating, comment);
+  // console.log(product_id, user_id, rating, comment);
 
   // Validate the input
   if (!product_id || !user_id || !rating) {

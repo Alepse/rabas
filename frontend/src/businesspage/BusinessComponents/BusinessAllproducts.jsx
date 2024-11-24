@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Tabs,
   Tab,
@@ -27,130 +27,35 @@ import AttractionActivitiesBookingForm from './bookingFormModal/AttractionActivi
 import { useParams } from 'react-router-dom';
 import CryptoJS from 'crypto-js';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
-// Mock Data for each tab with amenities
-// const mockData = {
-//   activities: [
-//     {
-//       product_id: 1,
-//       business_id: 2,
-//       title: 'Hiking Adventure',
-//       description: 'Explore scenic mountain trails. Guide and equipment included.',
-//       price: 1500,
-//       discount: 10, // 10% discount
-//       imageUrl: 'https://via.placeholder.com/200',
-//       rating: 4,
-//       type: 'Hiking',
-//       images: ['https://via.placeholder.com/600', 'https://via.placeholder.com/601', 'https://via.placeholder.com/602', 'https://via.placeholder.com/603'],
-//       expiration: '10/4/2024', // Added expiration date
-//     },
-//     {
-//       product_id: 2,
-//       business_id: 2,
-//       title: 'Snorkeling Tour',
-//       description: 'Discover the underwater world with a guided snorkeling tour.',
-//       price: 1200,
-//       discount: 5, // 5% discount
-//       imageUrl: 'https://via.placeholder.com/200',
-//       rating: 3,
-//       type: 'Water Sports',
-//       images: ['https://via.placeholder.com/600', 'https://via.placeholder.com/601', 'https://via.placeholder.com/602', 'https://via.placeholder.com/603'],
-//       expiration: '10/4/2024', // Added expiration date
-//     },
-//   ],
-//   accommodations: [
-//     {
-//       product_id: 1,
-//       business_id: 2,
-//       product_category: 'accommodation',
-//       title: 'Luxury Mountain Cabin',
-//       description: 'Stay in a cozy cabin with scenic views and modern amenities.',
-//       price: 5000,
-//       discount: 10, // 10% discount
-//       imageUrl: 'https://via.placeholder.com/200',
-//       rating: 5,
-//       type: 'Cabins',
-//       images: ['https://via.placeholder.com/600', 'https://via.placeholder.com/601', 'https://via.placeholder.com/602', 'https://via.placeholder.com/603'],
-//       expiration: '12/31/2024', // Added expiration date
-//     },
-//     {
-//       product_id: 2,
-//       business_id: 2,
-//       product_category: 'accommodation',
-//       title: 'Beachfront Resort',
-//       description: 'Relax in a luxury resort right on the beach.',
-//       price: 8000,
-//       discount: 5, // 5% discount
-//       imageUrl: 'https://via.placeholder.com/200',
-//       rating: 4,
-//       type: 'Resorts',
-//       images: ['https://via.placeholder.com/600', 'https://via.placeholder.com/601', 'https://via.placeholder.com/602', 'https://via.placeholder.com/603'],
-//       expiration: '12/31/2024', // Added expiration date
-//     },
-//   ],
-//   restaurant: [
-//     {
-//       product_id: 1,
-//       business_id: 2,
-//       title: 'Mountain View Dining',
-//       description: 'Experience local cuisine with a view of the mountains.',
-//       price: 1000,
-//       discount: 10, // 10% discount
-//       imageUrl: 'https://via.placeholder.com/200',
-//       rating: 2,
-//       type: 'Fine Dining',
-//       images: ['https://via.placeholder.com/600', 'https://via.placeholder.com/601', 'https://via.placeholder.com/602', 'https://via.placeholder.com/603'],
-//       expiration: '10/4/2024', // Added expiration date
-//     },
-//     {
-//       product_id: 2,
-//       business_id: 2,
-//       title: 'Coastal Seafood Feast',
-//       description: 'Indulge in fresh seafood dishes by the shore.',
-//       price: 1500,
-//       discount: 5, // 5% discount
-//       imageUrl: 'https://via.placeholder.com/200',
-//       rating: 4,
-//       type: 'Buffet',
-//       images: ['https://via.placeholder.com/600', 'https://via.placeholder.com/601', 'https://via.placeholder.com/602', 'https://via.placeholder.com/603'],
-//       expiration: '10/4/2024', // Added expiration date
-//     },
-//   ],
-//   shop: [
-//     {
-//       title: 'Local Handicrafts',
-//       description: 'Shop unique handmade items from local artisans.',
-//       price: 500,
-//       discount: 10, // 10% discount
-//       imageUrl: 'https://via.placeholder.com/200',
-//       rating: 3,
-//       type: 'Local Crafts',
-//       images: ['https://via.placeholder.com/600', 'https://via.placeholder.com/601', 'https://via.placeholder.com/602', 'https://via.placeholder.com/603'],
-//       expiration: '10/4/2024', // Added expiration date
-//     },
-//     {
-//       title: 'Souvenir Shop',
-//       description: 'Get your souvenirs and take home memories of the trip.',
-//       price: 700,
-//       discount: 5, // 5% discount
-//       imageUrl: 'https://via.placeholder.com/200',
-//       rating: 2,
-//       type: 'Souvenirs',
-//       images: ['https://via.placeholder.com/600', 'https://via.placeholder.com/601', 'https://via.placeholder.com/602', 'https://via.placeholder.com/603'],
-//       expiration: '10/4/2024', // Added expiration date
-//     },
-//   ],
-// };
+// SweetAlert functions
+const showSuccessAlert = (message) => {
+  Swal.fire({
+    title: 'Success!',
+    text: message,
+    icon: 'success',
+    confirmButtonText: 'OK',
+    confirmButtonColor: '#0BDA51', // Green color for confirmation
+    cancelButtonColor: '#D33736',  // Red color for cancellation
+  });
+};
 
-// const allProducts = [
-//   ...mockData.activities,
-//   ...mockData.accommodations,
-//   ...mockData.restaurant,
-//   ...mockData.shop,
-// ];
+const showErrorAlert = (message) => {
+  Swal.fire({
+    title: 'Error!',
+    text: message,
+    icon: 'error',
+    confirmButtonText: 'Try Again',
+    confirmButtonColor: '#0BDA51', // Green color for confirmation
+    cancelButtonText: 'Close',
+    cancelButtonColor: '#D33736',  // Red color for cancellation
+  });
+};
 
 // Review Modal Component
-const ReviewModal = ({ isOpen, onClose, product }) => {
+const ReviewModal = ({ isOpen, onClose, product, isLoggedIn }) => {
+  // console.log('isloggin', isLoggedIn);
   const [userData, setUserData] = useState(null);
   const [newReview, setNewReview] = useState('');
   const [newRating, setNewRating] = useState(0);
@@ -164,19 +69,16 @@ const ReviewModal = ({ isOpen, onClose, product }) => {
       });
       const data = await response.json();
       setUserData(data.userData);
-      setUsername(data.userData.username); // Set username
-      setEmail(data.userData.email); // Set email
-      setPhoneNumber(data.userData.contact || ''); // Set phone number (if available)
-      // Fetch liked pages
-      setLikedPages(data.userData.likedPages || []); // Set liked pages (default to empty array if not present)
     } catch (error) {
       console.error('Error fetching user data:', error);
     }
   };
 
   useEffect(() => {
-    fetchUserData();
-  }, []);
+    if (isLoggedIn) {
+      fetchUserData();
+    }
+  }, [isLoggedIn]);
 
   useEffect(() => {
     const fetchReviewsAndRatings = async () => {
@@ -225,19 +127,30 @@ const ReviewModal = ({ isOpen, onClose, product }) => {
             ratings: newRating,
             comment: newReview
           }]);
-          setNewReview('');
-          setNewRating(0);
+          clearReview();
         } else {
+          showErrorAlert('Failed to submit review:', data.message);
           console.error('Failed to submit review:', data.message);
         }
       } catch (error) {
+        showErrorAlert('Error submitting review:', error);
         console.error('Error submitting review:', error);
       }
     }
   };
 
+  const clearReview = () => {
+    setNewReview('');
+    setNewRating(0);
+  };
+
+  const handleClose = () => {
+    clearReview();
+    onClose();
+  };
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-full md:max-w-2xl">
+    <Modal isOpen={isOpen} onClose={handleClose} className="max-w-full md:max-w-2xl">
       <ModalContent className="p-4">
         <ModalHeader>
           <h2 className="text-xl font-semibold">Write a Review for {product.title}</h2>
@@ -296,10 +209,20 @@ const ReviewModal = ({ isOpen, onClose, product }) => {
           </div>
         </ModalBody>
         <ModalFooter className="flex justify-end">
-          <Button onClick={handleReviewSubmit} color="primary" disabled={!newReview || newRating === 0}>
+          <Button 
+            onClick={() => {
+              if (isLoggedIn) {
+                handleReviewSubmit();
+              } else {
+                showErrorAlert('Please log in to submit a review.');
+              }
+            }} 
+            color="primary" 
+            disabled={!newReview || newRating === 0}
+          >
             Submit Review
           </Button>
-          <Button color="danger" onClick={onClose}>
+          <Button color="danger" onClick={handleClose}>
             Close
           </Button>
         </ModalFooter>
@@ -309,7 +232,7 @@ const ReviewModal = ({ isOpen, onClose, product }) => {
 };
 
 // Product Card Component
-const ProductCard = ({ product, openBookingModal, onOpen }) => {
+const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn }) => {
   const [isReviewModalOpen, setReviewModalOpen] = useState(false);
 
   const openReviewModal = () => setReviewModalOpen(true);
@@ -401,7 +324,13 @@ const ProductCard = ({ product, openBookingModal, onOpen }) => {
                   <Button
                     color="success"
                     className="text-white"
-                    onClick={() => openBookingModal(product)}
+                    onClick={() => {
+                      if (isLoggedIn) {
+                        openBookingModal(product);
+                      } else {
+                        showErrorAlert('Please log in to book this product.');
+                      }
+                    }}
                   >
                     {product.product_category === 'restaurant' ? 'Reserve Table' : 
                      product.product_category === 'activity' ? 'Book Activity' : 
@@ -414,7 +343,7 @@ const ProductCard = ({ product, openBookingModal, onOpen }) => {
           </div>
         </div>
       </CardBody>
-      <ReviewModal isOpen={isReviewModalOpen} onClose={closeReviewModal} product={product} />
+      <ReviewModal isOpen={isReviewModalOpen} onClose={closeReviewModal} product={product} isLoggedIn={isLoggedIn} />
     </Card>
   );
 };
@@ -521,18 +450,9 @@ const LoadingSpinner = () => (
   </div>
 );
 
-// // Add the images array from BusinessHero
-// const images = [
-//   { url: 'https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80', title: 'Sunset Over the Hills' },
-//   { url: 'https://images.unsplash.com/photo-1497366811353-6870744d04b2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80', title: 'Mountain Range' },
-//   { url: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80', title: 'City Skyline' },
-//   { url: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80', title: 'Forest Path' },
-//   { url: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80', title: 'Ocean Waves' },
-//   { url: 'https://images.unsplash.com/photo-1497215842964-222b430dc094?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80', title: 'Desert Dunes' },
-// ];
-
 // Main Business All Products Component
 const BusinessAllproducts = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Initialize login status
   const [mockData, setMockData] = useState({
     activities: [],
     accommodations: [],
@@ -564,6 +484,28 @@ const BusinessAllproducts = () => {
   };
   const categories = ['activity', 'accommodation', 'restaurant', 'shop'];
 
+  // Function to check login status
+  const checkLoginStatus = useCallback(async () => {
+    try {
+      const response = await fetch('http://localhost:5000/check-login', {
+        method: 'GET',
+        credentials: 'include' // Include cookies
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setIsLoggedIn(data.isLoggedIn); // Set login status
+      } else {
+        setIsLoggedIn(false);
+      }
+    } catch (error) {
+      console.error('Error checking login status:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    checkLoginStatus();
+  }, []);
+
   // Fetch data for each category from the backend
   useEffect(() => {
     const fetchCategoryData = async (category) => {
@@ -575,7 +517,7 @@ const BusinessAllproducts = () => {
         if (contentType && contentType.includes("application/json")) {
           const data = await response.json();
 
-          console.log('Products: ', data);
+          // console.log('Products: ', data);
 
           if (data.success) {
             // Filter products based on their category and decrypted business_id
@@ -619,7 +561,7 @@ const BusinessAllproducts = () => {
     ]);
   }, [mockData.activities, mockData.accommodations, mockData.restaurant, mockData.shop]);
 
-  console.log('All products', mockData);
+  // console.log('All products', mockData);
 
   const openBookingModal = (product) => {
     console.log('Opening booking modal for product:', product);
@@ -635,7 +577,7 @@ const BusinessAllproducts = () => {
   };
 
   const closeBookingModal = () => {
-    console.log('Closing booking modal');
+    // console.log('Closing booking modal');
     setActiveModal(null);
   };
 
@@ -717,8 +659,8 @@ const BusinessAllproducts = () => {
   };
 
   const onOpen = (product) => {
-    console.log('Selected Product:', product);
-    console.log('Product Images:', product?.images);
+    // console.log('Selected Product:', product);
+    // console.log('Product Images:', product?.images);
     
     if (product && Array.isArray(product.images)) {
       setSelectedProduct(product);
@@ -771,8 +713,14 @@ const BusinessAllproducts = () => {
             {loading ? (
               <LoadingSpinner />
             ) : filteredData.length > 0 ? (
-              filteredData.map((product, index) => (
-                <ProductCard key={index} product={product} openBookingModal={openBookingModal} onOpen={onOpen} />
+              filteredData.map((product) => (
+                <ProductCard 
+                  key={product.product_id}
+                  product={product} 
+                  openBookingModal={openBookingModal} 
+                  onOpen={onOpen} 
+                  isLoggedIn={isLoggedIn} 
+                />
               ))
             ) : (
               <div className="text-center text-gray-500">No results found</div>
