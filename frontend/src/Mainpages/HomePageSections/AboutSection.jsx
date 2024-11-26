@@ -11,7 +11,7 @@ import wave from '@/assets/wave2.webp'
 const AboutSection = () => {
   return (
     <section className=" bg-white"  style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat' }}>
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 p-9">
         <h2 className="text-4xl font-bold text-center mb-8">Why Choose Us</h2>
         
         <div className="max-w-3xl mx-auto text-center mb-12">
