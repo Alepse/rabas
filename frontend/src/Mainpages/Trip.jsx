@@ -355,6 +355,9 @@ const Trip = () => {
           </ModalBody>
           <ModalFooter className="bg-gray-100 p-4 z-50 sticky bottom-[-10px] rounded-b-lg">
             <div className='flex justify-between w-full'>
+            <Button onClick={onClose} className="bg-red-500 hover:bg-red-600 text-white rounded-lg py-2 px-4 transition-all">
+                Close
+              </Button>
               <div className='flex gap-3'>
                 {step > 1 && (
                   <Button onClick={prevStep} className="bg-gray-300 hover:bg-gray-400 text-black rounded-lg py-2 px-4 transition-all">
@@ -371,9 +374,7 @@ const Trip = () => {
                   </Button>
                 )}
               </div>
-              <Button onClick={onClose} className="bg-red-500 hover:bg-red-600 text-white rounded-lg py-2 px-4 transition-all">
-                Close
-              </Button>
+              
             </div>
           </ModalFooter>
         </ModalContent>
