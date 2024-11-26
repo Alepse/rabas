@@ -732,7 +732,7 @@ const Discover = () => {
               if (pin_location && currentZoom >= 7) { // Adjust zoom level as needed
                 const position = [pin_location.latitude, pin_location.longitude];
                 const locationName = business.businessName;
-                const showLogo = currentZoom >= 13; // Set zoom level to show/hide logo
+                const showLogo = currentZoom >= 12; // Set zoom level to show/hide logo
                 const fontSize = currentZoom >= 12 ? '1rem' : '0.85rem';
                 const customDivIcon = L.divIcon({
                   className: 'custom-icon',

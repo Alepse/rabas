@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Accordion, AccordionItem, Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Checkbox, Textarea } from "@nextui-org/react";
 import { FaPlus, FaSearch, FaTimes, FaMapMarkerAlt } from 'react-icons/fa';
 import AddItemModal from './AddItemModal';
@@ -6,18 +6,35 @@ import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import MapFeature from '../../LeafletMap/MapFeature';
 
-const SchedulesPlan = () => {
+const SchedulesPlan = ({ startDate, endDate }) => {
+    console.log('SchedulesPlan Dates:', startDate, endDate);
+
     const { isOpen: isLocationOpen, onOpen: onLocationOpen, onClose: onLocationClose } = useDisclosure();
     const { isOpen: isAddOpen, onOpen: onAddOpen, onClose: onAddClose } = useDisclosure();
     
-    const [itineraryItems, setItineraryItems] = useState({
-        "Tuesday, Oct 15": [
-            { title: "Visit Bulusan Lake", time: "09:00", isBooked: true, notes: "Bring a camera" },
-            { title: "Lunch at Local Restaurant", time: "12:00", isBooked: false, notes: "Try the local delicacies" }
-        ],
-        "Wednesday, Oct 16": [
-            { title: "Explore Sorsogon City", time: "10:00", isBooked: true, notes: "Visit the museum" }
-        ]
+    // Utility function to generate dates between startDate and endDate
+    const generateDateRange = (start, end) => {
+        const dateArray = [];
+        let currentDate = new Date(start);
+        const endDate = new Date(end);
+
+        while (currentDate <= endDate) {
+            dateArray.push(new Date(currentDate));
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        return dateArray;
+    };
+
+    // Initialize itineraryItems with dates between startDate and endDate
+    const [itineraryItems, setItineraryItems] = useState(() => {
+        const dates = generateDateRange(startDate, endDate);
+        const initialItems = {};
+        dates.forEach(date => {
+            const formattedDate = date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+            initialItems[formattedDate] = []; // Initialize with empty array or default items
+        });
+        return initialItems;
     });
 
     const [currentDate, setCurrentDate] = useState("Tuesday, Oct 15");
@@ -32,10 +49,7 @@ const SchedulesPlan = () => {
 
     const [currentLocation, setCurrentLocation] = useState(null);
     const [destination, setDestination] = useState(null);
-    const [selectedLocations, setSelectedLocations] = useState({
-        "Tuesday, Oct 15": 'Set Location',
-        "Wednesday, Oct 16": 'Set Location'
-    });
+    const [selectedLocations, setSelectedLocations] = useState({});
 
     const locations = [
         { name: 'Bulusan' },
@@ -188,7 +202,7 @@ const SchedulesPlan = () => {
                       title={date} 
                       subtitle={
                           <Button size='sm' onClick={() => { onLocationOpen(); setCurrentDate(date); }}>
-                              {selectedLocations[date]}
+                              {selectedLocations[date] || 'Select Location'}
                           </Button>
                       }
                     >

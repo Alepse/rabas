@@ -5,6 +5,18 @@ import { GiPositionMarker } from 'react-icons/gi';
 import { Link } from 'react-router-dom';
 import { FaSearch, FaPlus, FaTimes } from 'react-icons/fa';
 import Swal from 'sweetalert2';
+import CryptoJS from 'crypto-js';
+
+// Function to encrypt the business_id
+const encryptId = (id) => {
+    const secretKey = import.meta.env.VITE_SECRET_KEY;
+    if (!secretKey) {
+      console.error('Secret key is not defined');
+      return null;
+    }
+    const ciphertext = CryptoJS.AES.encrypt(id.toString(), secretKey).toString();
+    return encodeURIComponent(ciphertext);
+  };
 
 const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
     // State and mock data from Discover.jsx
@@ -30,10 +42,10 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
     const activityTypes = ['Hiking', 'Water Sports', 'Relaxation', 'Adventure'];
     const accommodationTypes = ['Cabins', 'Resorts', 'Hotels', 'Hostels'];
     const foodTypes = ['Restaurant', 'Bar', 'Cafe'];
-    const cuisines = ['Filipino', 'International', 'Chinese', 'Japanese', 'Italian'];
-    const amenitiesList = ['Wi-Fi', 'Outdoor Seating', 'Live Music', 'Happy Hour', 'Family-Friendly', 'Vegan Options'];
+    const cuisines = ['Filipino', 'International', 'Chinese', 'Japanese', 'Italian', 'Cafe'];
+    const amenitiesList = ['WiFi', 'Outdoor Seating', 'Live Music', 'Happy Hour', 'Family-Friendly', 'Vegan Options'];
     const shopTypes = ['Souvenir Shop', 'Clothing Store', 'Grocery Store', 'Electronics Store', 'Bookstore'];
-    const categories = ['Handicrafts', 'Fashion', 'Food', 'Electronics', 'Books', 'Home Decor'];
+    const categories = ['Handicrafts', 'Fashion', 'Food', 'Electronics', 'Books', 'Home Decor' , 'Souvenir Shop'];
 
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -41,109 +53,72 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
         setSearchQuery(event.target.value.toLowerCase());
     };
 
-    // Mock Data
-    const mockData = {
-        activities: [
-            {
-                title: 'Hiking Adventure',
-                description: 'Explore scenic mountain trails. Guide and equipment included.',
-                price: 1500,
-                imageUrl: 'https://via.placeholder.com/200',
-                rating: 4,
-                type: 'Hiking',
-                tags: ['Swimming', 'Surfing'],
-                amenities: ['Parking', 'Restrooms'],
-                destination: 'Donsol',
-                budget: '500-2000',
-                category: 'Relaxation',
-            },
-            {
-                title: 'Snorkeling Tour',
-                description: 'Discover the underwater world with a guided snorkeling tour.',
-                price: 1200,
-                imageUrl: 'https://via.placeholder.com/200',
-                rating: 3,
-                type: 'Water Sports',
-                tags: ['Swimming', 'Snorkeling'],
-                amenities: ['Guides', 'Restrooms'],
-                destination: 'Matnog',
-                budget: '500-3500',
-                category: 'Adventure',
-            },
-        ],
-        accommodations: [
-            {
-                title: 'Luxury Mountain Cabin',
-                description: 'Stay in a cozy cabin with scenic views and modern amenities.',
-                price: 5000,
-                imageUrl: 'https://via.placeholder.com/200',
-                rating: 5,
-                type: 'Cabins',
-                amenities: ['Wi-Fi', 'Breakfast', 'Parking'],
-                destination: 'Sorsogon City',
-                budget: '4000-10000',
-            },
-            {
-                title: 'Beachfront Resort',
-                description: 'Relax in a luxury resort right on the beach.',
-                price: 8000,
-                imageUrl: 'https://via.placeholder.com/200',
-                rating: 4,
-                type: 'Resorts',
-                amenities: ['Parking', 'Wi-Fi', 'Pool'],
-                destination: 'Bulusan',
-                budget: '3000-7000',
-            },
-        ],
-        restaurant: [
-            {
-                title: 'Mountain View Dining',
-                description: 'Experience local cuisine with a view of the mountains.',
-                price: 1000,
-                imageUrl: 'https://via.placeholder.com/200',
-                rating: 2,
-                type: 'Fine Dining',
-                amenities: ['Wi-Fi', 'Outdoor Seating'],
-                destination: 'Sorsogon City',
-                budget: '1000-2000',
-            },
-            {
-                title: 'Coastal Seafood Feast',
-                description: 'Indulge in fresh seafood dishes by the shore.',
-                price: 1500,
-                imageUrl: 'https://via.placeholder.com/200',
-                rating: 4,
-                type: 'Buffet',
-                amenities: ['Live Music', 'Happy Hour'],
-                destination: 'Gubat',
-                budget: '500-1000',
-            },
-        ],
-        shop: [
-            {
-                title: 'Local Handicrafts',
-                description: 'Shop unique handmade items from local artisans.',
-                price: 500,
-                imageUrl: 'https://via.placeholder.com/200',
-                rating: 3,
-                type: 'Local Crafts',
-                amenities: ['Local Products', 'Gift Wrapping'],
-                destination: 'Sorsogon City',
-                budget: '500-1500',
-            },
-            {
-                title: 'Souvenir Shop',
-                description: 'Get your souvenirs and take home memories of the trip.',
-                price: 700,
-                imageUrl: 'https://via.placeholder.com/200',
-                rating: 2,
-                type: 'Souvenirs',
-                amenities: ['Fitting Rooms', 'Seasonal Sales'],
-                destination: 'Gubat',
-                budget: '1000-3000',
-            },
-        ],
+    const [mockData, setMockData] = useState({
+    activities: [],
+    accommodations: [],
+    restaurant: [],
+    shop: []
+    });
+
+    const [businesses, setBusinesses] = useState([]);
+    const businesscategories = ['activity', 'accommodation', 'restaurant', 'shop'];
+    
+    // Fetch businesses from the backend
+  useEffect(() => {
+    const fetchBusinesses = async (businessType) => {
+      try {
+        const response = await fetch(`http://localhost:5000/getAllBusinesses?businessType=${businessType}`);
+        const contentType = response.headers.get("content-type");
+
+        if (contentType && contentType.includes("application/json")) {
+          const data = await response.json();
+          // console.log('Data:', data);
+          if (data.success) {
+            // console.log(`Fetching data for businessType: ${businessType}`);
+
+            const filteredBusinesses = data.businesses.filter((business) => {
+              return business.businessType === businessType || (businessType === 'activity' && business.businessType === 'attraction');
+            });
+
+            const businessTypeKey = businessType === 'activity' || businessType === 'attraction' ? 'activities' :
+                                    businessType === 'accommodation' ? 'accommodations' :
+                                    businessType === 'restaurant' ? 'restaurant' : 'shop';
+
+            setMockData((prevData) => ({
+              ...prevData,
+              [businessTypeKey]: filteredBusinesses,
+            }));
+
+            // console.log('Filtered Businesses:', filteredBusinesses);
+          } else {
+            console.error(`Failed to fetch ${businessType} data:`, data.message);
+          }
+        } else {
+          console.error(`Unexpected response format for ${businessType}:`, response);
+        }
+      } catch (error) {
+        console.error(`Error fetching ${businessType}:`, error);
+      }
     };
+
+    // Initiate data fetching for each businessType
+    businesscategories.forEach((businessType) => {
+      fetchBusinesses(businessType);
+    });
+  }, []);
+
+  // Update businesses state and document title
+  useEffect(() => {
+    setBusinesses([
+      ...mockData.activities,
+      ...mockData.accommodations,
+      ...mockData.restaurant,
+      ...mockData.shop,
+    ]);
+    document.title = 'RabaSorsogon | Discover';
+    // setLoading(false); // Set loading to false after data is set
+  }, [mockData.activities, mockData.accommodations, mockData.restaurant, mockData.shop]);
+
 
     // Animation Variants
     const containerVariants = {
@@ -170,31 +145,56 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
     };
 
     // Functions from Discover.jsx
-    const handleRatingClick = (rating, setSelectedRatings) => {
-        if (rating === 'All') {
-            setSelectedRatings([]);
-        } else {
-            setSelectedRatings((prevSelected) =>
-                prevSelected.includes(rating)
-                    ? prevSelected.filter((r) => r !== rating)
-                    : [...prevSelected, rating]
-            );
-        }
+    const handleRatingClick = (rating, setFilters) => {
+        setFilters((prevFilters) => {
+            const prevSelectedRatings = prevFilters.selectedRatings || [];
+            if (rating === 'All') {
+            return { ...prevFilters, selectedRatings: [] }; // Reset to an empty array
+            } else {
+            const newSelectedRatings = prevSelectedRatings.includes(rating)
+                ? prevSelectedRatings.filter((r) => r !== rating)
+                : [...prevSelectedRatings, rating];
+            return { ...prevFilters, selectedRatings: newSelectedRatings };
+            }
+        });
     };
 
     const filterData = (data, filters) => {
         return data.filter(item => {
-            const matchesType = filters.selectedType.length === 0 || filters.selectedType.includes(item.type);
-            const matchesCategory = filters.selectedCategory?.length === 0 || filters.selectedCategory.includes(item.category);
-            const matchesAmenities = filters.selectedAmenities.length === 0 || filters.selectedAmenities.every(amenity => item.amenities.includes(amenity));
-            const matchesRatings = filters.selectedRatings.length === 0 || filters.selectedRatings.includes(item.rating);
-            const matchesDestination = filters.selectedDestination === 'All' || filters.selectedDestination === item.destination;
-            const matchesPriceRange = item.price >= filters.priceRange[0] && item.price <= filters.priceRange[1];
-            const matchesSearchQuery = searchQuery === '' || item.title.toLowerCase().includes(searchQuery);
-
-            return matchesType && matchesCategory && matchesAmenities && matchesRatings && matchesDestination && matchesPriceRange && matchesSearchQuery;
+          const matchesType = filters.selectedType.length === 0 || 
+            filters.selectedType.every(type => 
+              item.category.map(cat => cat.toLowerCase().replace(/s$/, '')).includes(type.toLowerCase().replace(/s$/, ''))
+            );
+         
+          const matchesCategory = filters.selectedCategory?.length === 0 || 
+            filters.selectedCategory.every(category => 
+              item.category.map(cat => cat.toLowerCase().replace(/s$/, '')).includes(category.toLowerCase().replace(/s$/, ''))
+            );
+          
+          const matchesCuisine = filters.selectedCuisine?.length === 0 || 
+            filters.selectedCuisine.every(cuisine => 
+              item.category.map(cat => cat.toLowerCase().replace(/s$/, '')).includes(cuisine.toLowerCase().replace(/s$/, ''))
+            );
+    
+          // console.log('selectedCuisine', filters.selectedCuisine);
+          // console.log('item.category', item.category);
+    
+          const matchesAmenities = filters.selectedAmenities.length === 0 || 
+            filters.selectedAmenities.every(amenity => 
+              item.amenities.map(a => a.toLowerCase().replace(/s$/, '')).includes(amenity.toLowerCase().replace(/s$/, ''))
+            );
+    
+          const matchesRatings = filters.selectedRatings.length === 0 || 
+            filters.selectedRatings.includes(Math.floor(item.rating || 0));
+    
+          const matchesDestination = filters.selectedDestination === 'All' || filters.selectedDestination === item.destination;
+          
+          const matchesPriceRange = item.lowest_price <= filters.priceRange[1] && item.highest_price >= filters.priceRange[0];
+    
+          return matchesType && matchesCategory && matchesCuisine && matchesAmenities && matchesRatings && matchesDestination && matchesPriceRange;
         });
     };
+    
 
     const renderFilters = (filters, setFilters, types, additionalFilters = null, isAllTab = false) => (
         <div className="w-full max-h-screen overflow-auto scrollbar-custom  ">
@@ -321,8 +321,8 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                         <label className="flex items-center">
                             <input
                                 type="checkbox"
-                                onChange={() => handleRatingClick('All', (value) => setFilters(prev => ({ ...prev, selectedRatings: value })))}
-                                checked={filters.selectedRatings.length === 0}
+                                onChange={() => handleRatingClick('All', setFilters)}
+                                checked={Array.isArray(filters.selectedRatings) && filters.selectedRatings.length === 0}
                                 className="form-checkbox text-color2"
                             />
                             <span className="ml-2 text-sm">All Ratings</span>
@@ -330,54 +330,19 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                         {[5, 4, 3, 2, 1].map((star) => (
                             <label key={star} className="flex items-center">
                                 <input
-                                    type="checkbox"
-                                    onChange={() => handleRatingClick(star, (value) => setFilters(prev => ({ ...prev, selectedRatings: value })))}
-                                    checked={filters.selectedRatings.includes(star)}
-                                    className="form-checkbox text-color2"
+                                type="checkbox"
+                                onChange={() => handleRatingClick(star, setFilters)}
+                                checked={Array.isArray(filters.selectedRatings) && filters.selectedRatings.includes(star)}
+                                className="form-checkbox text-color2"
                                 />
                                 <span className="ml-2 text-sm flex items-center">
-                                    {'★'.repeat(star)}{'☆'.repeat(5 - star)}
-                                    <span className="ml-1">{star} Star{star > 1 ? 's' : ''}</span>
+                                {'★'.repeat(star)}{'☆'.repeat(5 - star)}
+                                <span className="ml-1">{star} Star{star > 1 ? 's' : ''}</span>
                                 </span>
                             </label>
                         ))}
                     </div>
                 </div>
-
-                {/* Additional Filters for All Tab */}
-                {isAllTab && (
-                    <>
-                        {/* Cuisine Filter */}
-                        <div className="mb-6 max-h-[230px] overflow-auto scrollbar-custom">
-                            <h3 className="text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2">Cuisine</h3>
-                            <CheckboxGroup
-                                value={foodFilters.selectedCuisine}
-                                onChange={(value) => setFoodFilters(prev => ({ ...prev, selectedCuisine: value }))}
-                            >
-                                {cuisines.map((cuisine) => (
-                                    <Checkbox key={cuisine} value={cuisine}>
-                                        {cuisine}
-                                    </Checkbox>
-                                ))}
-                            </CheckboxGroup>
-                        </div>
-
-                        {/* Category Filter */}
-                        <div className="mb-6 max-h-[230px] overflow-auto scrollbar-custom">
-                            <h3 className="text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2">Category</h3>
-                            <CheckboxGroup
-                                value={shopFilters.selectedCategory}
-                                onChange={(value) => setShopFilters(prev => ({ ...prev, selectedCategory: value }))}
-                            >
-                                {categories.map((category) => (
-                                    <Checkbox key={category} value={category}>
-                                        {category}
-                                    </Checkbox>
-                                ))}
-                            </CheckboxGroup>
-                        </div>
-                    </>
-                )}
             </div>
         </div>
     );
@@ -450,7 +415,7 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
         }).then((result) => {
             if (result.isConfirmed) {
                 onAddItem({
-                    title: selectedItem.title,
+                    title: selectedItem.businessName,
                     imageUrl: selectedItem.imageUrl,
                     time: itineraryTime || '',
                     isBooked: isBookingConfirmed,
@@ -574,16 +539,48 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                                 initial="hidden"
                                 animate="visible"
                             >
-                                {Object.keys(mockData).map((category) =>
-                                    (activeTab === 'all' || activeTab === category) && 
-                                    filterData(mockData[category], {
-                                        selectedType: activeTab === 'restaurant' ? foodFilters.selectedType : activeTab === 'shop' ? shopFilters.selectedType : activeTab === 'activities' ? activitiesFilters.selectedType : activeTab === 'accommodations' ? accommodationsFilters.selectedType : allFilters.selectedType,
-                                        selectedCategory: shopFilters.selectedCategory,
-                                        selectedAmenities: activeTab === 'restaurant' ? foodFilters.selectedAmenities : activeTab === 'shop' ? shopFilters.selectedAmenities : activeTab === 'activities' ? activitiesFilters.selectedAmenities : activeTab === 'accommodations' ? accommodationsFilters.selectedAmenities : allFilters.selectedAmenities,
-                                        selectedRatings: activeTab === 'restaurant' ? foodFilters.selectedRatings : activeTab === 'shop' ? shopFilters.selectedRatings : activeTab === 'activities' ? activitiesFilters.selectedRatings : activeTab === 'accommodations' ? accommodationsFilters.selectedRatings : allFilters.selectedRatings,
-                                        selectedDestination: activeTab === 'restaurant' ? foodFilters.selectedDestination : activeTab === 'shop' ? shopFilters.selectedDestination : activeTab === 'activities' ? activitiesFilters.selectedDestination : activeTab === 'accommodations' ? accommodationsFilters.selectedDestination : allFilters.selectedDestination,
-                                        priceRange: activeTab === 'restaurant' ? foodFilters.priceRange : activeTab === 'shop' ? shopFilters.priceRange : activeTab === 'activities' ? activitiesFilters.priceRange : activeTab === 'accommodations' ? accommodationsFilters.priceRange : allFilters.priceRange,
-                                    }).map((item, index) => (
+                                {Object.keys(mockData).map((category) => {
+                                // console.log('Category:', category);
+                                // console.log('Active Tab:', activeTab);
+                                // console.log('mockData:', mockData[category]);
+
+                                if (activeTab !== 'all' && activeTab !== category) return null;
+
+                                const filters = {
+                                selectedType: activeTab === 'restaurant' ? foodFilters.selectedType :
+                                                activeTab === 'shop' ? shopFilters.selectedType :
+                                                activeTab === 'activities' ? activitiesFilters.selectedType :
+                                                activeTab === 'accommodations' ? accommodationsFilters.selectedType :
+                                                allFilters.selectedType,
+                                selectedCategory: activeTab === 'shop' ? shopFilters.selectedCategory : [],
+                                selectedAmenities: activeTab === 'restaurant' ? foodFilters.selectedAmenities :
+                                                    activeTab === 'shop' ? shopFilters.selectedAmenities :
+                                                    activeTab === 'activities' ? activitiesFilters.selectedAmenities :
+                                                    activeTab === 'accommodations' ? accommodationsFilters.selectedAmenities :
+                                                    allFilters.selectedAmenities,
+                                selectedRatings: activeTab === 'restaurant' ? foodFilters.selectedRatings :
+                                                activeTab === 'shop' ? shopFilters.selectedRatings :
+                                                activeTab === 'activities' ? activitiesFilters.selectedRatings :
+                                                activeTab === 'accommodations' ? accommodationsFilters.selectedRatings :
+                                                allFilters.selectedRatings,
+                                selectedDestination: activeTab === 'restaurant' ? foodFilters.selectedDestination :
+                                                    activeTab === 'shop' ? shopFilters.selectedDestination :
+                                                    activeTab === 'activities' ? activitiesFilters.selectedDestination :
+                                                    activeTab === 'accommodations' ? accommodationsFilters.selectedDestination :
+                                                    allFilters.selectedDestination,
+                                priceRange: activeTab === 'restaurant' ? foodFilters.priceRange :
+                                            activeTab === 'shop' ? shopFilters.priceRange :
+                                            activeTab === 'activities' ? activitiesFilters.priceRange :
+                                            activeTab === 'accommodations' ? accommodationsFilters.priceRange :
+                                            allFilters.priceRange,
+                                selectedCuisine: activeTab === 'restaurant' ? foodFilters.selectedCuisine : [],
+                                };
+
+                                const filteredItems = filterData(mockData[category], filters);
+
+                                // console.log('filteredItems:', filteredItems);
+
+                                return filteredItems.map((item, index) => (
                                         <motion.div
                                             key={index}
                                             className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 relative"
@@ -596,60 +593,99 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                                                 <FaPlus />
                                             </button>
                                             <img
-                                                src={item.imageUrl}
-                                                alt={item.title}
+                                                src={`http://localhost:5000/${item.businessLogo}`}
+                                                alt={item.businessName}
                                                 className="w-full h-48 object-cover rounded-t-lg"
                                             />
                                             <div className="p-4">
                                                 <div className="flex justify-between items-center mb-2">
                                                     <div className="flex flex-wrap gap-2">
-                                                        <span className="bg-color2 text-color3 text-xs px-2 py-1 rounded-full">
-                                                            {item.type}
-                                                        </span>
+                                                        {item.category.map((cat, idx) => (
+                                                            <span key={idx} className="bg-color2 text-color3 text-xs px-2 py-1 rounded-full">
+                                                                {cat}
+                                                            </span>
+                                                        ))}
                                                     </div>
                                                     <div className="flex items-center gap-1">
-                                                        <span className="text-[12px]">{item.rating}</span>
+                                                    {item.rating ? (
+                                                        <>
+                                                        <span className="text-[12px]">{parseFloat(item.rating).toFixed(1)}</span>
                                                         <span className="text-yellow-500">
-                                                            {'★'.repeat(item.rating)}
-                                                            {'☆'.repeat(5 - item.rating)}
+                                                            {'★'.repeat(Math.floor(item.rating))}
+                                                            {'☆'.repeat(5 - Math.floor(item.rating))}
                                                         </span>
+                                                        </>
+                                                    ) : (
+                                                        <span className="text-gray-500 text-[12px]">No ratings</span>
+                                                    )}
                                                     </div>
                                                 </div>
                                                 <h3 className="text-lg font-semibold text-gray-800">
-                                                    {renderTitleWithBoldSearch(item.title)}
+                                                    {renderTitleWithBoldSearch(item.businessName)}
                                                 </h3>
                                                 <div className="text-xs text-gray-500 mb-2 flex items-center">
                                                     <GiPositionMarker className="mr-1" />
                                                     {item.destination}
                                                 </div>
                                                 <div className="flex mb-2 max-w-[500px] max-h-[5rem] overflow-y-auto scrollbar-custom flex-col">
+                                                {item.description ? (
                                                     <p className="text-sm text-gray-600 mb-2">
                                                         {item.description}
                                                     </p>
+                                                    ) : (
+                                                    <p className="text-sm text-gray-400 italic mb-2">
+                                                        No description
+                                                    </p>
+                                                    )}
                                                 </div>
                                                 <p className="text-md font-semibold text-black mb-2">
-                                                ₱{item.budget}
+                                                {item.lowest_price && item.highest_price ? (
+                                                    `₱${item.lowest_price} - ₱${item.highest_price}`
+                                                    ) : (
+                                                    <span className="text-gray-400 italic">Price Range Not available</span>
+                                                    )}
                                                 </p>
-                                                <Button as={Link} to="/business" target="_blank" className="w-full bg-color1 text-color3 hover:bg-color2">
+                                                <Button as={Link} to={`/business/${encryptId(item.business_id)}`} target="_blank" className="w-full bg-color1 text-color3 hover:bg-color2">
                                                     View
                                                 </Button>
                                             </div>
                                         </motion.div>
                                     ))
-                                )}
+                                })}
                                 {/* No Results Message */}
                                 {Object.keys(mockData).every(category => 
                                     filterData(mockData[category], {
-                                        selectedType: activeTab === 'restaurant' ? foodFilters.selectedType : activeTab === 'shop' ? shopFilters.selectedType : activeTab === 'activities' ? activitiesFilters.selectedType : activeTab === 'accommodations' ? accommodationsFilters.selectedType : allFilters.selectedType,
-                                        selectedCategory: shopFilters.selectedCategory,
-                                        selectedAmenities: activeTab === 'restaurant' ? foodFilters.selectedAmenities : activeTab === 'shop' ? shopFilters.selectedAmenities : activeTab === 'activities' ? activitiesFilters.selectedAmenities : activeTab === 'accommodations' ? accommodationsFilters.selectedAmenities : allFilters.selectedAmenities,
-                                        selectedRatings: activeTab === 'restaurant' ? foodFilters.selectedRatings : activeTab === 'shop' ? shopFilters.selectedRatings : activeTab === 'activities' ? activitiesFilters.selectedRatings : activeTab === 'accommodations' ? accommodationsFilters.selectedRatings : allFilters.selectedRatings,
-                                        selectedDestination: activeTab === 'restaurant' ? foodFilters.selectedDestination : activeTab === 'shop' ? shopFilters.selectedDestination : activeTab === 'activities' ? activitiesFilters.selectedDestination : activeTab === 'accommodations' ? accommodationsFilters.selectedDestination : allFilters.selectedDestination,
-                                        priceRange: activeTab === 'restaurant' ? foodFilters.priceRange : activeTab === 'shop' ? shopFilters.priceRange : activeTab === 'activities' ? activitiesFilters.priceRange : activeTab === 'accommodations' ? accommodationsFilters.priceRange : allFilters.priceRange,
+                                        selectedType: activeTab === 'restaurant' ? foodFilters.selectedType :
+                                                        activeTab === 'shop' ? shopFilters.selectedType :
+                                                        activeTab === 'activities' ? activitiesFilters.selectedType :
+                                                        activeTab === 'accommodations' ? accommodationsFilters.selectedType :
+                                                        allFilters.selectedType,
+                                        selectedCategory: activeTab === 'shop' ? shopFilters.selectedCategory : [],
+                                        selectedAmenities: activeTab === 'restaurant' ? foodFilters.selectedAmenities :
+                                                            activeTab === 'shop' ? shopFilters.selectedAmenities :
+                                                            activeTab === 'activities' ? activitiesFilters.selectedAmenities :
+                                                            activeTab === 'accommodations' ? accommodationsFilters.selectedAmenities :
+                                                            allFilters.selectedAmenities,
+                                        selectedRatings: activeTab === 'restaurant' ? foodFilters.selectedRatings :
+                                                        activeTab === 'shop' ? shopFilters.selectedRatings :
+                                                        activeTab === 'activities' ? activitiesFilters.selectedRatings :
+                                                        activeTab === 'accommodations' ? accommodationsFilters.selectedRatings :
+                                                        allFilters.selectedRatings,
+                                        selectedDestination: activeTab === 'restaurant' ? foodFilters.selectedDestination :
+                                                            activeTab === 'shop' ? shopFilters.selectedDestination :
+                                                            activeTab === 'activities' ? activitiesFilters.selectedDestination :
+                                                            activeTab === 'accommodations' ? accommodationsFilters.selectedDestination :
+                                                            allFilters.selectedDestination,
+                                        priceRange: activeTab === 'restaurant' ? foodFilters.priceRange :
+                                                    activeTab === 'shop' ? shopFilters.priceRange :
+                                                    activeTab === 'activities' ? activitiesFilters.priceRange :
+                                                    activeTab === 'accommodations' ? accommodationsFilters.priceRange :
+                                                    allFilters.priceRange,
+                                        selectedCuisine: activeTab === 'restaurant' ? foodFilters.selectedCuisine : [],
                                     }).length === 0
                                 ) && (
-                                    <div className="text-center text-gray-500">
-                                        No results found for "{searchQuery}"
+                                    <div className="flex text-center text-gray-500 italic">
+                                        No results found
                                     </div>
                                 )}
                             </motion.div>
@@ -670,18 +706,30 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                                 <Button auto color='danger' flat onClick={() => setIsSideUIVisible(false)}>Close</Button>
                             </div>
                             <div className="mb-4">
-                                <img src={selectedItem.imageUrl} alt={selectedItem.title} className="w-full h-48 object-cover rounded-md" />
+                                <img src={`http://localhost:5000/${selectedItem.businessLogo}`} alt={selectedItem.businessName} className="w-full h-48 object-cover rounded-md" />
                             </div>
                             <h3 className="text-lg font-bold">{selectedItem.title}</h3>
                             <p className="text-sm text-gray-500 mb-2">{selectedItem.destination}</p>
                             <p className="text-sm text-gray-600 mb-2">{selectedItem.description}</p>
-                            <p className="text-md font-semibold text-black mb-2">Budget: ₱{selectedItem.budget}</p>
+                            <p className="text-md font-semibold text-black mb-2">
+                                {selectedItem.lowest_price && selectedItem.highest_price ? (
+                                `₱${selectedItem.lowest_price} - ₱${selectedItem.highest_price}`
+                                ) : (
+                                <span className="text-gray-400 italic">Price Range Not available</span>
+                                )}
+                            </p>
                             <div className="flex items-center mb-4">
-                                <span className="text-yellow-500">
-                                    {'★'.repeat(selectedItem.rating)}
-                                    {'☆'.repeat(5 - selectedItem.rating)}
-                                </span>
-                                <span className="ml-2 text-sm">{selectedItem.rating} Stars</span>
+                                {selectedItem.rating ? (
+                                    <>
+                                    <span className="text-yellow-500">
+                                        {'★'.repeat(Math.floor(selectedItem.rating))}
+                                        {'☆'.repeat(5 - Math.floor(selectedItem.rating))}
+                                    </span>
+                                    <span className="ml-2 text-sm">{parseFloat(selectedItem.rating).toFixed(1)} Stars</span>
+                                    </>
+                                ) : (
+                                    <span className="text-gray-500 text-[12px]">No ratings</span>
+                                )}
                             </div>
                             {selectedItem.type === 'Accommodations' ? (
                                 <>

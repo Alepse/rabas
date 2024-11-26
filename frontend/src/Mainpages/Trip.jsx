@@ -32,7 +32,7 @@ const Trip = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [step, setStep] = useState(1);
   const [progress, setProgress] = useState(10);
-  const totalSteps = 5;
+  const totalSteps = 4;
   const [currentLocation, setCurrentLocation] = useState(null);
   const [destination, setDestination] = useState(null);
   const [tripName, setTripName] = useState('');
@@ -40,6 +40,7 @@ const Trip = () => {
   const [showButton, setShowButton] = useState(false); // State to show/hide button
   const [trips, setTrips] = useState([
     {
+      tripId: 1,
       tripName: "Sample Trip to Sorsogon",
       currentLocation: "Bulusan",
       destination: "Sorsogon City",
@@ -62,10 +63,7 @@ const Trip = () => {
     document.title = 'RabaSorsogon | Trip';
   });
 
-  const [selectedLocations, setSelectedLocations] = useState({
-    "Tuesday, Oct 15": 'Set Location',
-    "Wednesday, Oct 16": 'Set Location'
-  });
+  const [selectedLocations, setSelectedLocations] = useState('');
 
 
   let [value, setValue] = useState({
@@ -302,42 +300,36 @@ const Trip = () => {
               )}
               {step === 2 && (
                 <>
-                  <h2 className="text-2xl font-semibold text-primary">Current Location</h2>
-                  <p className="text-gray-600 mt-2">Click on the map to set your current location.</p>
-                  <MapFeature
-                    currentLocation={currentLocation}
-                    setCurrentLocation={setCurrentLocation}
-                    destination={destination}
-                    setDestination={setDestination}
-                  />
+                  <h1 className="text-2xl font-semibold text-primary mb-4">How Many Days Is Your Trip?</h1>
+                  <h1 className='text-center text-lg font-medium mb-2'>Choose Your Trip Dates</h1>
+                  
+                  <div className='flex justify-center'>
+                    <RangeCalendar
+                      visibleMonths={2}
+                      aria-label="Date (Controlled)"
+                      value={value}
+                      onChange={(newValue) => {
+                        setValue(newValue);
+                        console.log('Selected Dates:', newValue); // Log the selected dates
+                      }}
+                    />
+                  </div>
                 </>
               )}
               {step === 3 && (
                 <>
-                  <h1 className="text-2xl font-semibold text-primary mb-4">How Many Days Is Your Trip?</h1>
-                  <h1 className='text-center text-lg font-medium mb-2'>Choose Your Trip Dates</h1>
-                  
-                  <div className='flex justify-center' >
-                  <RangeCalendar 
-                  visibleMonths={2} 
-                    aria-label="Date (Controlled)" 
-                    value={value} 
-                    onChange={setValue}
+                  <h1 className="text-2xl font-semibold text-primary mb-4">Plan Your Trip</h1>
+                  <h1 className='text-center text-lg font-medium mb-2'>Set Up Your Itinerary for Each Date</h1>
+                  <Planner
+                    selectedLocations={selectedLocations}
+                    setSelectedLocations={setSelectedLocations}
+                    startDate={value.start} // Pass the start date
+                    endDate={value.end}     // Pass the end date
                   />
-                  </div>
+                  {console.log('Planner Dates:', value.start, value.end)}
                 </>
               )}
               {step === 4 && (
-                <>
-                <h1 className="text-2xl font-semibold text-primary mb-4">Plan Your Trip</h1>
-                <h1 className='text-center text-lg font-medium mb-2'>Set Up Your Itinerary for Each Date</h1>
-                <Planner
-                  selectedLocations={selectedLocations}
-                  setSelectedLocations={setSelectedLocations}
-                />
-                </>
-              )}
-              {step === 5 && (
                 <>
                   <h2 className="text-xl font-semibold text-primary">Review & Submit</h2>
                   <p className="text-gray-600 mt-2">Review your answers and submit:</p>
@@ -349,19 +341,6 @@ const Trip = () => {
                         <h3 className="font-semibold mt-2">Trip Dates:</h3>
                         <p>Start: {value.start.toString()}</p>
                         <p>End: {value.end.toString()}</p>
-                      </div>
-                    </AccordionItem>
-                    <AccordionItem title="Locations">
-                      <div className="p-4">
-                        <h3 className="font-semibold">Locations Navigation</h3>
-
-         
-                        <MapFeature
-                          currentLocation={currentLocation}
-                          destination={destination}
-                          setCurrentLocation={setCurrentLocation}
-                          setDestination={setDestination}
-                        />
                       </div>
                     </AccordionItem>
                     <AccordionItem title="Itinerary">

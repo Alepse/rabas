@@ -24,6 +24,7 @@ const TripDetailsModal = ({ isOpen, onClose, trip, onUpdateTrip }) => {
       ...prevDetails,
       [name]: value,
     }));
+    console.log('Edit Trip Details:', editTripDetails);
   };
 
   const handleSave = () => {
@@ -118,7 +119,7 @@ const TripDetailsModal = ({ isOpen, onClose, trip, onUpdateTrip }) => {
                 )}
               </div>
             </AccordionItem>
-            <AccordionItem title=" My Locations">
+            <AccordionItem title="Selected Destinations">
               <div className="p-4">
                 <h3 className="font-semibold text-lg">Locations Navigation:</h3>
                 <li>Donsol, Sorsogon : Business Name</li>
