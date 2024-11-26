@@ -208,7 +208,7 @@ const Trip = () => {
             Plan a Trip
           </Button>
         </div>
-        <div className='border p-4'>
+        <div className='border p-4 overflow-y-auto scrollbar-custom max-h-[500px]'>
           {trips.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {trips.map((trip, index) => (
