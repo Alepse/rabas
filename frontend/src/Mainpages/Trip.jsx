@@ -25,8 +25,26 @@ import Planner from '@/Mainpages/PlanATripComponents/SchedulesPlan'; // Ensure t
 import Swal from 'sweetalert2';
 import TripDetailsModal from './PlanATripComponents/TripDetailsModal';
 import wave from '@/assets/wave2.webp'
-
+import axios from 'axios';
 const MotionBox = motion.div;
+
+// Function to show success alerts
+const showSuccessAlert = (title, message) => {
+  Swal.fire({
+    icon: 'success',
+    title: title,
+    text: message
+  });
+};
+
+// Function to show error alerts
+const showErrorAlert = (title, message) => {
+  Swal.fire({
+    icon: 'error',
+    title: title,
+    text: message
+  });
+};
 
 const Trip = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -38,27 +56,20 @@ const Trip = () => {
   const [tripName, setTripName] = useState('');
   const [loading, setLoading] = useState(true);
   const [showButton, setShowButton] = useState(false); // State to show/hide button
-  const [trips, setTrips] = useState([
-    {
-      tripId: 1,
-      tripName: "Sample Trip to Sorsogon",
-      currentLocation: "Bulusan",
-      destination: "Sorsogon City",
-      startDate: "2023-10-15",
-      endDate: "2023-10-22",
-      itinerary: {
-        "Tuesday, Oct 15": [
-          { title: "Visit Bulusan Lake", time: "09:00", isBooked: true, notes: "Bring a camera" },
-          { title: "Lunch at Local Restaurant", time: "12:00", isBooked: false, notes: "Try the local delicacies" }
-        ],
-        "Wednesday, Oct 16": [
-          { title: "Explore Sorsogon City", time: "10:00", isBooked: true, notes: "Visit the museum" }
-        ]
-      }
-    }
-  ]); // State to store submitted trips
+  const [trips, setTrips] = useState([]); // Initialize with an empty array
 
-  
+  useEffect(() => {
+    // Fetch trips from the endpoint
+    axios.get('http://localhost:5000/trips', { withCredentials: true })
+      .then(response => {
+        // console.log('response', response);
+        setTrips(response.data.trips); // Set the fetched trips to state
+      })
+      .catch(error => {
+        console.error('Error fetching trips:', error);
+        showErrorAlert('Error fetching trips:', error.response ? error.response.data.message : 'An unknown error occurred');
+      });
+  }, []); 
 
     // Title Tab
   useEffect(() => {
@@ -134,19 +145,54 @@ const Trip = () => {
   };
 
   const submitTrip = () => {
-    const newTrip = {
-      tripName,
-      currentLocation: selectedLocations["Tuesday, Oct 15"], // Use selected location
-      destination: selectedLocations["Wednesday, Oct 16"], // Use selected location
-      startDate: value.start.toString(),
-      endDate: value.end.toString(),
-      itinerary, // Include the itinerary
-    };
-    setTrips([...trips, newTrip]); // Add the new trip to the list
-    onClose();
+    // Fetch user_id from the endpoint
+    axios.get('http://localhost:5000/get-userData', { withCredentials: true })
+      .then(response => {
+        // console.log('response', response);
+        const userId = response.data.userData.user_id;
+        // console.log('userId', userId);
+        const firstItineraryItem = Object.values(itinerary).flat()[0] || {};
+        const { imageUrl, location } = firstItineraryItem;
+      
+        const newTrip = {
+          tripName,
+          imageUrl: imageUrl || 'defaultImageUrl.png',
+          destination: location || 'Unknown',
+          startDate: value.start.toString(),
+          endDate: value.end.toString(),
+          itinerary,
+          userId, // Include user_id in the newTrip object
+        };
+      
+        axios.post('http://localhost:5000/add-trip', newTrip)
+        .then(response => {
+          const { tripId } = response.data; // Extract tripId from the response
+          const tripWithId = { ...newTrip, tripId }; // Add tripId to the newTrip object
+
+          // Update the trips state with the new trip including its ID
+          setTrips([...trips, tripWithId]);
+          onClose();
+
+          // Show success message
+          showSuccessAlert('Trip added successfully', 'Your trip has been added to your trips list.');
+
+          // Clear the form
+          setTripName('');
+          setValue({ start: today(getLocalTimeZone()), end: today(getLocalTimeZone()).add({ weeks: 1 }) });
+          setItinerary({});
+        })
+        .catch(error => {
+          // Show message if error
+          showErrorAlert('Error adding trip:', error.response ? error.response.data.message : 'An unknown error occurred');
+        });
+      })
+      .catch(error => {
+        // Handle error in fetching user_id
+        showErrorAlert('Error fetching user data:', error.response ? error.response.data.message : 'An unknown error occurred');
+      });
   };
 
-  const deleteTrip = (index) => {
+  const deleteTrip = (index, tripId) => {
     Swal.fire({
       title: 'Are you sure?',
       text: "You won't be able to revert this!",
@@ -157,13 +203,20 @@ const Trip = () => {
       confirmButtonText: 'Yes, delete it!'
     }).then((result) => {
       if (result.isConfirmed) {
-        setTrips(trips.filter((_, i) => i !== index));
-        Swal.fire({
-          title: 'Deleted!',
-          text: 'Your trip has been deleted.',
-          icon: 'success',
-          confirmButtonColor: '#0BDA51' // Updated success alert confirm button color
-        });
+        // console.log('tripId', tripId);
+        axios.delete(`http://localhost:5000/delete-trip/${tripId}`, { withCredentials: true })
+          .then(() => {
+            setTrips(trips.filter((_, i) => i !== index));
+            Swal.fire({
+              title: 'Deleted!',
+              text: 'Your trip has been deleted.',
+              icon: 'success',
+              confirmButtonColor: '#0BDA51' // Updated success alert confirm button color
+            });
+          })
+          .catch(error => {
+            showErrorAlert('Error deleting trip:', error.response ? error.response.data.message : 'An unknown error occurred');
+          });
       }
     });
   };
@@ -227,19 +280,18 @@ const Trip = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {trips.map((trip, index) => (
                 <div key={index} className="flex flex-col md:flex-row border rounded-lg shadow-md overflow-hidden">
-                  <img src="https://via.placeholder.com/150" alt="Trip" className="w-full md:w-1/3 object-cover" />
+                  <img src={`http://localhost:5000/${trip.imageUrl}`} alt="Trip" className="w-full md:w-1/3 object-cover" />
                   <div className="p-4 flex flex-col justify-between w-full md:w-2/3">
                     <div>
                       <h2 className="text-xl font-semibold">{trip.tripName}</h2>
                       <p className="text-gray-600">{trip.startDate} - {trip.endDate}</p>
-                      <p className="text-gray-600">From: {trip.currentLocation}</p>
                       <p className="text-gray-600">To: {trip.destination}</p>
                     </div>
                     <div className="flex justify-between mt-4">
                       <Button onClick={() => openDetailsModal(trip)} className="bg-primary text-white rounded-lg py-2 px-4">
                         View Details
                       </Button>
-                      <Button onClick={() => deleteTrip(index)} className="bg-red-500 text-white rounded-lg py-2 px-4">
+                      <Button onClick={() => deleteTrip(index, trip.tripId)} className="bg-red-500 text-white rounded-lg py-2 px-4">
                         Delete
                       </Button>
                     </div>
@@ -335,15 +387,13 @@ const Trip = () => {
                   <h1 className="text-2xl font-semibold text-primary mb-4">Plan Your Trip</h1>
                   <h1 className='text-center text-lg font-medium mb-2'>Set Up Your Itinerary for Each Date</h1>
                   <Planner
-                    selectedLocations={selectedLocations}
-                    setSelectedLocations={setSelectedLocations}
                     startDate={value.start}
                     endDate={value.end}
                     itinerary={itinerary}
                     setItinerary={setItinerary}
                     onItineraryChange={handleItineraryChange}
                   />
-                  {console.log('Planner Dates:', value.start, value.end)}
+                  {/* {console.log('Planner Dates:', value.start, value.end)} */}
                 </>
               )}
               {step === 4 && (
@@ -380,7 +430,7 @@ const Trip = () => {
                                     <h3 className="font-semibold text-xl">{item.title}</h3>
                                     <span className="text-sm text-gray-500"> <span className='text-black font-medium'>Time of Visit:</span> {formatTime(item.time)}</span>
                                   </div>
-                                  <img src={item.imageUrl || 'https://via.placeholder.com/300'} alt={item.title} className="w-full h-56 object-cover rounded-md mb-4" />
+                                  <img src={`http://localhost:5000/${item.imageUrl}` || 'https://via.placeholder.com/300'} alt={item.title} className="w-full h-56 object-cover rounded-md mb-4" />
                                   <p className="text-sm mb-2"><strong>Booked:</strong> {item.isBooked ? 'Yes' : 'No'}</p>
                                   <p className="text-sm mb-4"><strong>Notes:</strong> {item.notes}</p>
                                 </div>

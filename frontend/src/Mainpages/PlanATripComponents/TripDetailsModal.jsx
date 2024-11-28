@@ -6,6 +6,8 @@ import PropTypes from 'prop-types';
 import Swal from 'sweetalert2';
 import { FaPlus } from 'react-icons/fa';
 import AddItemModal from './AddItemModal';
+import axios from 'axios';
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
 
 const formatTime = (time) => {
   if (!time || time.trim() === '') return 'None';
@@ -32,6 +34,8 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
   const [editItemIndex, setEditItemIndex] = useState(null);
   const [editItemDetails, setEditItemDetails] = useState({ title: '', time: '', isBooked: false, notes: '' });
 
+  const [currentZoom, setCurrentZoom] = useState(10);
+
   const handleEditToggle = () => {
     setIsEditing(!isEditing);
     setIsEditingItinerary(!isEditing);
@@ -57,17 +61,48 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
       confirmButtonText: 'Yes, save it!',
     }).then((result) => {
       if (result.isConfirmed) {
-        onUpdateTrip({
+        const formatDate = (dateString) => {
+          const date = new Date(dateString);
+          return date.toISOString().split('T')[0]; // 'YYYY-MM-DD'
+        };
+  
+        const updatedTrip = {
           ...trip,
           ...editTripDetails,
+          startDate: formatDate(editTripDetails.startDate),
+          endDate: formatDate(editTripDetails.endDate),
+        };
+  
+        axios.put(`http://localhost:5000/update-trip/${trip.tripId}`, updatedTrip, { withCredentials: true })
+        .then(response => {
+          const data = response.data; // Directly access response.data
+          if (data.success) {
+            Swal.fire({
+              title: 'Updated!',
+              text: 'Your trip details have been updated.',
+              icon: 'success',
+              confirmButtonColor: '#0BDA51',
+            });
+            onUpdateTrip(updatedTrip);
+            setIsEditing(false);
+          } else {
+            Swal.fire({
+              title: 'Error!',
+              text: data.message,
+              icon: 'error',
+              confirmButtonColor: '#D33736',
+            });
+          }
+        })
+        .catch(error => {
+          console.error('Error updating trip:', error);
+          Swal.fire({
+            title: 'Error!',
+            text: 'Failed to update trip.',
+            icon: 'error',
+            confirmButtonColor: '#D33736',
+          });
         });
-        Swal.fire({
-          title: 'Updated!',
-          text: 'Your trip details have been updated.',
-          icon: 'success',
-          confirmButtonColor: '#0BDA51',
-        });
-        setIsEditing(false);
       }
     });
   };
@@ -168,7 +203,7 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
     }));
   };
 
-  console.log('Itinerary Items:', trip.itinerary);
+  // console.log('Itinerary Items:', trip.itinerary);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} isDismissable={false} hideCloseButton className="rounded-lg shadow-lg mx-auto p-3 max-h-screen max-w-[1200px]">
@@ -219,17 +254,47 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
                 )}
               </div>
             </AccordionItem>
+            
             <AccordionItem title="Selected Destinations">
               <div className="p-4">
                 <h3 className="font-semibold text-lg">Locations Navigation:</h3>
-                <li>Donsol, Sorsogon : Business Name</li>
-                <li>Gubat, Sorsogon : Business Name</li>
-                <MapFeature
-                  currentLocation={currentLocation}
-                  destination={destination}
-                  setCurrentLocation={setCurrentLocation}
-                  setDestination={setDestination}
-                />
+                <MapContainer center={[12.9738, 123.9807]} zoom={10} className="w-full h-96">
+                  <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  />
+                  <MapEvents setCurrentZoom={setCurrentZoom} />
+                  {Object.keys(itinerary || {}).map(date => (
+                    itinerary[date].map((item, index) => {
+                      const { pin_location, title, imageUrl } = item;
+                      if (pin_location && currentZoom >= 7) { // Adjust zoom level as needed
+                        const position = [pin_location.latitude, pin_location.longitude];
+                        const locationName = title;
+                        const showLogo = currentZoom >= 10; // Set zoom level to show/hide logo
+                        const fontSize = currentZoom >= 12 ? '1rem' : '0.85rem';
+                        const customDivIcon = L.divIcon({
+                          className: 'custom-icon',
+                          html: `
+                            <div class="custom-popup flex items-center whitespace-nowrap font-bold text-pink-600" style="font-size: ${fontSize};">
+                              ${showLogo ? `<div class="pin-container">
+                                <div class="pin-head">
+                                  <img src="http://localhost:5000/${imageUrl}" alt="${title}" class="pin-logo" />
+                                </div>
+                                <div class="pin-point"></div>
+                              </div><span>${locationName}</span>` : `<div class="business-name">${locationName}</div>`}
+                            </div>
+                          `,
+                          iconSize: [50, 70], 
+                          iconAnchor: [25, 70] 
+                        });      
+                        return (
+                          <Marker key={`${date}-${index}`} position={position} icon={customDivIcon} />
+                        );
+                      }
+                      return null;
+                    })
+                  ))}
+                </MapContainer>
               </div>
             </AccordionItem>
             <AccordionItem title="Itinerary">
@@ -250,13 +315,15 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
                             <h3 className="font-semibold text-xl">{item.title}</h3>
                             <span className="text-sm text-gray-500"> <span className='text-black font-medium'>Time of Visit:</span> {formatTime(item.time)}</span>
                           </div>
-                          <img src={item.imageUrl || 'https://via.placeholder.com/300'} alt={item.title} className="w-full h-56 object-cover rounded-md mb-4" />
+                          <img src={`http://localhost:5000/${item.imageUrl}` || 'https://via.placeholder.com/300'} alt={item.title} className="w-full h-56 object-cover rounded-md mb-4" />
                           <p className="text-sm mb-2"><strong>Booked:</strong> {item.isBooked ? 'Yes' : 'No'}</p>
                           <p className="text-sm mb-4"><strong>Notes:</strong> {item.notes}</p>
-                          <div className="flex space-x-2">
-                            <Button size="sm" color="danger" onClick={() => handleDelete(date, index)}>Delete</Button>
-                            <Button size="sm" onClick={() => handleEdit(date, index)}>Edit</Button>
-                          </div>
+                          {isEditing && (
+                            <div className="flex space-x-2">
+                              <Button size="sm" color="danger" onClick={() => handleDelete(date, index)}>Delete</Button>
+                              <Button size="sm" onClick={() => handleEdit(date, index)}>Edit</Button>
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -307,6 +374,16 @@ TripDetailsModal.propTypes = {
   onClose: PropTypes.func.isRequired,
   trip: PropTypes.object.isRequired,
   onUpdateTrip: PropTypes.func,
+};
+
+// Component to handle map events
+const MapEvents = ({ setCurrentZoom }) => {
+  useMapEvents({
+    zoomend: (e) => {
+      setCurrentZoom(e.target.getZoom());
+    },
+  });
+  return null;
 };
 
 export default TripDetailsModal;

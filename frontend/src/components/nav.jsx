@@ -22,6 +22,7 @@ import { FaPersonWalking } from "react-icons/fa6";
 import { Modal, ModalContent, ModalBody, useDisclosure } from "@nextui-org/react";
 import { Link, useLocation } from 'react-router-dom';
 import UserChatModal from '@/user/userChatSystem/UserChatModal';
+import axios from 'axios';
 
 
 const Nav = () => {
@@ -151,52 +152,44 @@ const Nav = () => {
     clearSearchField();
   };
 
-  const handleLogout = async (e) => {
+  const handleLogout = (e) => {
     e.preventDefault();
-    try {
-      const response = await fetch('http://localhost:5000/logout', {
-        method: 'POST',
-        credentials: 'include'
+    axios.post('http://localhost:5000/logout', {}, { withCredentials: true })
+      .then(response => {
+        if (response.status === 200) {
+          console.log('Logout successful');
+          window.location.href = '/';
+        } else {
+          console.error('Logout failed');
+        }
+      })
+      .catch(error => {
+        console.error('Error logging out:', error.response ? error.response.data.message : 'An unknown error occurred');
       });
-      if (response.ok) {
-        console.log('Logout successful');
-        window.location.href = '/';
-      } else {
-        console.error('Logout failed');
-      }
-    } catch (error) {
-      console.error('Error logging out:', error);
-    }
   };
 
-  const checkLoginStatus = async () => {
-    try {
-      const response = await fetch('http://localhost:5000/check-login', {
-        method: 'GET',
-        credentials: 'include'
+  const checkLoginStatus = () => {
+    axios.get('http://localhost:5000/check-login', { withCredentials: true })
+      .then(response => {
+        if (response.status === 200) {
+          setIsLoggedIn(response.data.isLoggedIn);
+        } else {
+          setIsLoggedIn(false);
+        }
+      })
+      .catch(error => {
+        console.error('Error checking login status:', error.response ? error.response.data.message : 'An unknown error occurred');
       });
-      if (response.ok) {
-        const data = await response.json();
-        setIsLoggedIn(data.isLoggedIn);
-      } else {
-        setIsLoggedIn(false);
-      }
-    } catch (error) {
-      console.error('Error checking login status:', error);
-    }
   };
 
-  const fetchUserData = async () => {
-    try {
-      const response = await fetch('http://localhost:5000/get-userData', {
-        method: 'GET',
-        credentials: 'include'
+  const fetchUserData = () => {
+    axios.get('http://localhost:5000/get-userData', { withCredentials: true })
+      .then(response => {
+        setUserData(response.data.userData);
+      })
+      .catch(error => {
+        console.error('Error fetching username:', error.response ? error.response.data.message : 'An unknown error occurred');
       });
-      const data = await response.json();
-      setUserData(data.userData);
-    } catch (error) {
-      console.error('Error fetching username:', error);
-    }
   };
 
   const firstLetter = userData?.username?.charAt(0).toUpperCase() || '';

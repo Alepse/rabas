@@ -415,8 +415,14 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
         }).then((result) => {
             if (result.isConfirmed) {
                 onAddItem({
+                    id: selectedItem.business_id,
+                    type: selectedItem.businessType,
+                    name: selectedItem.businessName,
+                    description: selectedItem.description,
                     title: selectedItem.businessName,
-                    imageUrl: selectedItem.imageUrl,
+                    imageUrl: selectedItem.businessLogo,
+                    location: selectedItem.destination,
+                    pin_location: selectedItem.pin_location,
                     time: itineraryTime || '',
                     isBooked: isBookingConfirmed,
                     notes: notes || 'No additional notes',

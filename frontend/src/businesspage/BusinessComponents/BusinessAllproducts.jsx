@@ -61,17 +61,14 @@ const ReviewModal = ({ isOpen, onClose, product, isLoggedIn }) => {
   const [newRating, setNewRating] = useState(0);
   const [reviews, setReviews] = useState([]);
 
-  const fetchUserData = async () => {
-    try {
-      const response = await fetch('http://localhost:5000/get-userData', {
-        method: 'GET',
-        credentials: 'include' // Include cookies
+  const fetchUserData = () => {
+    axios.get('http://localhost:5000/get-userData', { withCredentials: true })
+      .then(({ data }) => {
+        setUserData(data.userData);
+      })
+      .catch(error => {
+        console.error('Error fetching user data:', error.response ? error.response.data.message : 'An unknown error occurred');
       });
-      const data = await response.json();
-      setUserData(data.userData);
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-    }
   };
 
   useEffect(() => {
