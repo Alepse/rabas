@@ -1,15 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Accordion, AccordionItem, Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Checkbox, Textarea } from "@nextui-org/react";
-import { FaPlus, FaSearch, FaTimes, FaMapMarkerAlt } from 'react-icons/fa';
+import { FaPlus } from 'react-icons/fa';
 import AddItemModal from './AddItemModal';
 import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import MapFeature from '../../LeafletMap/MapFeature';
 
-const SchedulesPlan = ({ startDate, endDate }) => {
-    console.log('SchedulesPlan Dates:', startDate, endDate);
+const SchedulesPlan = ({ startDate, endDate, step }) => {
+    console.log('Current step:', step); // Ensure step is defined
 
-    const { isOpen: isLocationOpen, onOpen: onLocationOpen, onClose: onLocationClose } = useDisclosure();
     const { isOpen: isAddOpen, onOpen: onAddOpen, onClose: onAddClose } = useDisclosure();
     
     // Utility function to generate dates between startDate and endDate
@@ -43,31 +41,6 @@ const SchedulesPlan = ({ startDate, endDate }) => {
 
     const [editItemIndex, setEditItemIndex] = useState(null);
     const [editItemDetails, setEditItemDetails] = useState({ title: '', time: '', isBooked: false, notes: '' });
-
-    const [searchQuery, setSearchQuery] = useState('');
-    const [searchResults, setSearchResults] = useState([]);
-
-    const [currentLocation, setCurrentLocation] = useState(null);
-    const [destination, setDestination] = useState(null);
-    const [selectedLocations, setSelectedLocations] = useState({});
-
-    const locations = [
-        { name: 'Bulusan' },
-        { name: 'Bulan' },
-        { name: 'Barcelona' },
-        { name: 'Casiguran' },
-        { name: 'Castilla' },
-        { name: 'Donsol' },
-        { name: 'Gubat' },
-        { name: 'Irosin' },
-        { name: 'Juban' },
-        { name: 'Magallanes' },
-        { name: 'Matnog' },
-        { name: 'Pilar' },
-        { name: 'Prieto Diaz' },
-        { name: 'Sta. Magdalena' },
-        { name: 'Sorsogon City' },
-    ];
 
     const addItemToItinerary = (date, item) => {
         setItineraryItems(prevItems => ({
@@ -161,37 +134,6 @@ const SchedulesPlan = ({ startDate, endDate }) => {
         }));
     };
 
-    const handleSearchInputChange = (e) => {
-        const value = e.target.value;
-        setSearchQuery(value);
-
-        if (value.trim()) {
-            performSearch(value);
-        } else {
-            setSearchResults([]);
-        }
-    };
-
-    const performSearch = (query) => {
-        const results = locations.filter(location =>
-            location.name.toLowerCase().startsWith(query.toLowerCase())
-        );
-        setSearchResults(results);
-    };
-
-    const clearSearchField = () => {
-        setSearchQuery('');
-        setSearchResults([]);
-    };
-
-    const handleLocationClick = (locationName) => {
-        setSelectedLocations(prevLocations => ({
-            ...prevLocations,
-            [currentDate]: locationName
-        }));
-        onLocationClose(); // Close the modal after selection
-    };
-
     return (
         <div className='w-full p-4'>
             <Accordion selectionMode="multiple">
@@ -199,12 +141,7 @@ const SchedulesPlan = ({ startDate, endDate }) => {
                     <AccordionItem 
                       className='max-h-[700px] h-full overflow-auto scrollbar-custom'
                       key={date} 
-                      title={date} 
-                      subtitle={
-                          <Button size='sm' onClick={() => { onLocationOpen(); setCurrentDate(date); }}>
-                              {selectedLocations[date] || 'Select Location'}
-                          </Button>
-                      }
+                      title={date}
                     >
                         <div className='flex justify-end mb-4'>
                             <Button className='border-1 m-2 border-color1 rounded-full text-lg p-3 hover:bg-color2 bg-white hover:text-white duration-300 min-w-11' onClick={() => handleAdd(date)}>
@@ -270,59 +207,6 @@ const SchedulesPlan = ({ startDate, endDate }) => {
                     </AccordionItem>
                 ))}
             </Accordion>
-
-            <Modal hideCloseButton isOpen={isLocationOpen} onClose={() => {}}>
-                <ModalContent>
-                    <ModalHeader>
-                        <h2 className="text-xl font-semibold">Set Location</h2>
-                    </ModalHeader>
-                    <ModalBody>
-                        <div className="mb-4 relative">
-                            <div className="flex items-center w-full mb-2">
-                                <FaSearch className="text-gray-500 mr-2" />
-                                <input
-                                    type="text"
-                                    placeholder="Search for locations"
-                                    value={searchQuery}
-                                    onChange={handleSearchInputChange}
-                                    className="flex-grow p-2 border-b border-gray-300 focus:outline-none"
-                                />
-                                {searchQuery && (
-                                    <FaTimes
-                                        onClick={clearSearchField}
-                                        className="text-gray-500 cursor-pointer ml-2"
-                                    />
-                                )}
-                            </div>
-                            <div className="absolute w-full max-h-[200px] z-50 overflow-y-auto scrollbar-custom bg-white shadow-lg rounded-lg">
-                                {searchResults.map((result, index) => (
-                                    <div 
-                                        key={index} 
-                                        className="flex items-center p-2 hover:bg-gray-200 cursor-pointer"
-                                        onClick={() => handleLocationClick(result.name)}
-                                    >
-                                        <FaMapMarkerAlt className="w-8 h-8 text-gray-500 mr-3" />
-                                        <div>
-                                            <h3 className="text-md font-semibold">{result.name}</h3>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                        <div className="mt-4 relative z-10">
-                            <MapFeature
-                                currentLocation={currentLocation}
-                                destination={destination}
-                                setCurrentLocation={setCurrentLocation}
-                                setDestination={setDestination}
-                            />
-                        </div>
-                    </ModalBody>
-                    <ModalFooter>
-                        <Button onClick={onLocationClose} className="bg-red-500 text-white">Close</Button>
-                    </ModalFooter>
-                </ModalContent>
-            </Modal>
 
             <AddItemModal 
                 isOpen={isAddOpen || isSideUIVisible} 

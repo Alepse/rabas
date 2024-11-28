@@ -321,10 +321,9 @@ const Trip = () => {
                   <h1 className="text-2xl font-semibold text-primary mb-4">Plan Your Trip</h1>
                   <h1 className='text-center text-lg font-medium mb-2'>Set Up Your Itinerary for Each Date</h1>
                   <Planner
-                    selectedLocations={selectedLocations}
-                    setSelectedLocations={setSelectedLocations}
                     startDate={value.start} // Pass the start date
                     endDate={value.end}     // Pass the end date
+                    step={step}
                   />
                   {console.log('Planner Dates:', value.start, value.end)}
                 </>
@@ -345,7 +344,11 @@ const Trip = () => {
                     </AccordionItem>
                     <AccordionItem title="Itinerary">
                       <div className='p-4'>
-                        <Planner />
+                        <Planner
+                          startDate={value.start} // Pass the start date
+                          endDate={value.end}     // Pass the end date
+                          step={step}
+                         />
                       </div>
                     </AccordionItem>
                   </Accordion>
