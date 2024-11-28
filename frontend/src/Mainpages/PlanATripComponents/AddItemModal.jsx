@@ -411,7 +411,7 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
             showCancelButton: true,
             confirmButtonColor: '#0BDA51',
             cancelButtonColor: '#D33736',
-            confirmButtonText: 'Yes, add it!'
+            confirmButtonText: 'Yes, add it!',
         }).then((result) => {
             if (result.isConfirmed) {
                 onAddItem({
@@ -425,7 +425,7 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                 Swal.fire({
                     title: 'Added!',
                     icon: 'success',
-                    confirmButtonColor: '#0BDA51'
+                    confirmButtonColor: '#0BDA51',
                 }).then(() => {
                     onClose();
                 });

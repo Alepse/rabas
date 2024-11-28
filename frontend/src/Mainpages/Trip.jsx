@@ -58,6 +58,8 @@ const Trip = () => {
     }
   ]); // State to store submitted trips
 
+  
+
     // Title Tab
   useEffect(() => {
     document.title = 'RabaSorsogon | Trip';
@@ -72,6 +74,7 @@ const Trip = () => {
   });
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedTrip, setSelectedTrip] = useState(null);
+  const [itinerary, setItinerary] = useState({});
 
   useEffect(() => {
 
@@ -137,6 +140,7 @@ const Trip = () => {
       destination: selectedLocations["Wednesday, Oct 16"], // Use selected location
       startDate: value.start.toString(),
       endDate: value.end.toString(),
+      itinerary, // Include the itinerary
     };
     setTrips([...trips, newTrip]); // Add the new trip to the list
     onClose();
@@ -171,20 +175,30 @@ const Trip = () => {
   };
 
   const openDetailsModal = (trip) => {
-    setSelectedTrip({
-      ...trip,
-      itinerary: trip.itinerary || {} // Ensure itinerary is an object
-    });
+    setSelectedTrip(trip);
+    setItinerary(trip.itinerary || {});
     setIsDetailsOpen(true);
   };
 
   const updateTripDetails = (updatedTrip) => {
     setTrips((prevTrips) =>
       prevTrips.map((trip) =>
-        trip.tripName === selectedTrip.tripName ? { ...trip, ...updatedTrip } : trip
+        trip.tripId === updatedTrip.tripId ? updatedTrip : trip
       )
     );
-    setSelectedTrip(updatedTrip); // Update the selected trip to reflect changes in the modal
+    setSelectedTrip(updatedTrip);
+  };
+
+  const handleItineraryChange = (newItinerary) => {
+    setItinerary(newItinerary);
+  };
+
+  const formatTime = (time) => {
+    if (!time || time.trim() === '') return 'None';
+    const [hour, minute] = time.split(':');
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const formattedHour = hour % 12 || 12;
+    return `${formattedHour}:${minute || '00'} ${ampm}`;
   };
 
   return (
@@ -323,8 +337,11 @@ const Trip = () => {
                   <Planner
                     selectedLocations={selectedLocations}
                     setSelectedLocations={setSelectedLocations}
-                    startDate={value.start} // Pass the start date
-                    endDate={value.end}     // Pass the end date
+                    startDate={value.start}
+                    endDate={value.end}
+                    itinerary={itinerary}
+                    setItinerary={setItinerary}
+                    onItineraryChange={handleItineraryChange}
                   />
                   {console.log('Planner Dates:', value.start, value.end)}
                 </>
@@ -336,8 +353,10 @@ const Trip = () => {
                   <Accordion selectionMode="multiple" className="mt-4">
                     <AccordionItem title="Trip Details">
                       <div className="p-4">
-                        <h3 className="font-semibold">Trip Name:</h3>
-                        <p>{tripName}</p>
+                        <div className='flex gap-2'>
+                          <h3 className="font-semibold">Trip Name:</h3>
+                          <p>{tripName}</p>
+                        </div>
                         <h3 className="font-semibold mt-2">Trip Dates:</h3>
                         <p>Start: {value.start.toString()}</p>
                         <p>End: {value.end.toString()}</p>
@@ -345,7 +364,30 @@ const Trip = () => {
                     </AccordionItem>
                     <AccordionItem title="Itinerary">
                       <div className='p-4'>
-                        <Planner />
+                        {Object.keys(itinerary || {}).map(date => (
+                          <div key={date} className="mb-6">
+                            <h4 className="font-semibold text-lg mb-2">{date}</h4>
+                            {itinerary[date].map((item, index) => (
+                              <div key={index} className="flex flex-col sm:flex-row items-start mb-6 bg-white p-4 rounded-lg shadow-lg w-full sm:w-3/4 lg:w-2/3 mx-auto">
+                                <div className="flex-shrink-0 w-12 text-center">
+                                  <div className="bg-color1 text-white rounded-full w-10 h-10 flex items-center justify-center mb-2">
+                                    {index + 1}
+                                  </div>
+                                  <div className="h-full border-l-2 border-gray-300"></div>
+                                </div>
+                                <div className="ml-0 sm:ml-6 w-full">
+                                  <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
+                                    <h3 className="font-semibold text-xl">{item.title}</h3>
+                                    <span className="text-sm text-gray-500"> <span className='text-black font-medium'>Time of Visit:</span> {formatTime(item.time)}</span>
+                                  </div>
+                                  <img src={item.imageUrl || 'https://via.placeholder.com/300'} alt={item.title} className="w-full h-56 object-cover rounded-md mb-4" />
+                                  <p className="text-sm mb-2"><strong>Booked:</strong> {item.isBooked ? 'Yes' : 'No'}</p>
+                                  <p className="text-sm mb-4"><strong>Notes:</strong> {item.notes}</p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ))}
                       </div>
                     </AccordionItem>
                   </Accordion>
@@ -379,12 +421,15 @@ const Trip = () => {
           </ModalFooter>
         </ModalContent>
       </Modal>
-      <TripDetailsModal
-        isOpen={isDetailsOpen}
-        onClose={() => setIsDetailsOpen(false)}
-        trip={selectedTrip}
-        onUpdateTrip={updateTripDetails}
-      />
+      {isDetailsOpen && selectedTrip && (
+          <TripDetailsModal
+              isOpen={isDetailsOpen}
+              onClose={() => setIsDetailsOpen(false)}
+              trip={selectedTrip}
+              onUpdateTrip={updateTripDetails}
+              itinerary={itinerary}
+          />
+      )}
     </div>
   );
 };

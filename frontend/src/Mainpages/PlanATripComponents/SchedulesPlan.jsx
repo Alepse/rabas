@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import MapFeature from '../../LeafletMap/MapFeature';
 
-const SchedulesPlan = ({ startDate, endDate }) => {
+const SchedulesPlan = ({ startDate, endDate, onItineraryChange }) => {
     console.log('SchedulesPlan Dates:', startDate, endDate);
 
     const { isOpen: isLocationOpen, onOpen: onLocationOpen, onClose: onLocationClose } = useDisclosure();
@@ -69,11 +69,27 @@ const SchedulesPlan = ({ startDate, endDate }) => {
         { name: 'Sorsogon City' },
     ];
 
+    // Load itinerary items from local storage when the component mounts
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const savedItems = localStorage.getItem('itineraryItems');
+            if (savedItems) {
+                setItineraryItems(JSON.parse(savedItems));
+            }
+        }
+    }, []);
+
+    // Save itinerary items to local storage whenever they change
+    useEffect(() => {
+        localStorage.setItem('itineraryItems', JSON.stringify(itineraryItems));
+    }, [itineraryItems]);
+
     const addItemToItinerary = (date, item) => {
-        setItineraryItems(prevItems => ({
+        setItineraryItems((prevItems) => ({
             ...prevItems,
-            [date]: [...prevItems[date], item]
+            [date]: [...prevItems[date], item],
         }));
+        console.log('Item added to itinerary:', date, item);
     };
 
     const handleAdd = (date) => {
@@ -191,6 +207,11 @@ const SchedulesPlan = ({ startDate, endDate }) => {
         }));
         onLocationClose(); // Close the modal after selection
     };
+
+    useEffect(() => {
+        console.log('Updated Itinerary Items:', itineraryItems);
+        onItineraryChange(itineraryItems);
+    }, [itineraryItems, onItineraryChange]);
 
     return (
         <div className='w-full p-4'>
