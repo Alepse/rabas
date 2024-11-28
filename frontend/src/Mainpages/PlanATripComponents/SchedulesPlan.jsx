@@ -5,8 +5,8 @@ import AddItemModal from './AddItemModal';
 import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
-const SchedulesPlan = ({ startDate, endDate, step }) => {
-    console.log('Current step:', step); // Ensure step is defined
+const SchedulesPlan = ({ startDate, endDate, onItineraryChange }) => {
+    console.log('SchedulesPlan Dates:', startDate, endDate);
 
     const { isOpen: isAddOpen, onOpen: onAddOpen, onClose: onAddClose } = useDisclosure();
     
@@ -42,11 +42,52 @@ const SchedulesPlan = ({ startDate, endDate, step }) => {
     const [editItemIndex, setEditItemIndex] = useState(null);
     const [editItemDetails, setEditItemDetails] = useState({ title: '', time: '', isBooked: false, notes: '' });
 
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
+
+    const [currentLocation, setCurrentLocation] = useState(null);
+    const [destination, setDestination] = useState(null);
+    const [selectedLocations, setSelectedLocations] = useState({});
+
+    const locations = [
+        { name: 'Bulusan' },
+        { name: 'Bulan' },
+        { name: 'Barcelona' },
+        { name: 'Casiguran' },
+        { name: 'Castilla' },
+        { name: 'Donsol' },
+        { name: 'Gubat' },
+        { name: 'Irosin' },
+        { name: 'Juban' },
+        { name: 'Magallanes' },
+        { name: 'Matnog' },
+        { name: 'Pilar' },
+        { name: 'Prieto Diaz' },
+        { name: 'Sta. Magdalena' },
+        { name: 'Sorsogon City' },
+    ];
+
+    // Load itinerary items from local storage when the component mounts
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const savedItems = localStorage.getItem('itineraryItems');
+            if (savedItems) {
+                setItineraryItems(JSON.parse(savedItems));
+            }
+        }
+    }, []);
+
+    // Save itinerary items to local storage whenever they change
+    useEffect(() => {
+        localStorage.setItem('itineraryItems', JSON.stringify(itineraryItems));
+    }, [itineraryItems]);
+
     const addItemToItinerary = (date, item) => {
-        setItineraryItems(prevItems => ({
+        setItineraryItems((prevItems) => ({
             ...prevItems,
-            [date]: [...prevItems[date], item]
+            [date]: [...prevItems[date], item],
         }));
+        console.log('Item added to itinerary:', date, item);
     };
 
     const handleAdd = (date) => {
@@ -133,6 +174,42 @@ const SchedulesPlan = ({ startDate, endDate, step }) => {
             [name]: type === 'checkbox' ? checked : value
         }));
     };
+
+    const handleSearchInputChange = (e) => {
+        const value = e.target.value;
+        setSearchQuery(value);
+
+        if (value.trim()) {
+            performSearch(value);
+        } else {
+            setSearchResults([]);
+        }
+    };
+
+    const performSearch = (query) => {
+        const results = locations.filter(location =>
+            location.name.toLowerCase().startsWith(query.toLowerCase())
+        );
+        setSearchResults(results);
+    };
+
+    const clearSearchField = () => {
+        setSearchQuery('');
+        setSearchResults([]);
+    };
+
+    const handleLocationClick = (locationName) => {
+        setSelectedLocations(prevLocations => ({
+            ...prevLocations,
+            [currentDate]: locationName
+        }));
+        onLocationClose(); // Close the modal after selection
+    };
+
+    useEffect(() => {
+        console.log('Updated Itinerary Items:', itineraryItems);
+        onItineraryChange(itineraryItems);
+    }, [itineraryItems, onItineraryChange]);
 
     return (
         <div className='w-full p-4'>

@@ -1,11 +1,21 @@
 import React, { useState } from 'react';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Accordion, AccordionItem, Input } from "@nextui-org/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Accordion, AccordionItem, Input, Checkbox, Textarea } from "@nextui-org/react";
 import MapFeature from '../../LeafletMap/MapFeature';
 import SchedulesPlan from './SchedulesPlan';
 import PropTypes from 'prop-types';
 import Swal from 'sweetalert2';
+import { FaPlus } from 'react-icons/fa';
+import AddItemModal from './AddItemModal';
 
-const TripDetailsModal = ({ isOpen, onClose, trip, onUpdateTrip }) => {
+const formatTime = (time) => {
+  if (!time || time.trim() === '') return 'None';
+  const [hour, minute] = time.split(':');
+  const ampm = hour >= 12 ? 'PM' : 'AM';
+  const formattedHour = hour % 12 || 12;
+  return `${formattedHour}:${minute || '00'} ${ampm}`;
+};
+
+const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {}, itinerary }) => {
   if (!trip) return null;
 
   const [isEditing, setIsEditing] = useState(false);
@@ -14,8 +24,17 @@ const TripDetailsModal = ({ isOpen, onClose, trip, onUpdateTrip }) => {
   const [currentLocation, setCurrentLocation] = useState(null);
   const [destination, setDestination] = useState(null);
 
+  const [isEditingItinerary, setIsEditingItinerary] = useState(false);
+
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [currentDate, setCurrentDate] = useState(null);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [editItemIndex, setEditItemIndex] = useState(null);
+  const [editItemDetails, setEditItemDetails] = useState({ title: '', time: '', isBooked: false, notes: '' });
+
   const handleEditToggle = () => {
     setIsEditing(!isEditing);
+    setIsEditingItinerary(!isEditing);
   };
 
   const handleInputChange = (e) => {
@@ -38,12 +57,10 @@ const TripDetailsModal = ({ isOpen, onClose, trip, onUpdateTrip }) => {
       confirmButtonText: 'Yes, save it!',
     }).then((result) => {
       if (result.isConfirmed) {
-        if (typeof onUpdateTrip === 'function') {
-          onUpdateTrip({
-            ...trip,
-            ...editTripDetails,
-          });
-        }
+        onUpdateTrip({
+          ...trip,
+          ...editTripDetails,
+        });
         Swal.fire({
           title: 'Updated!',
           text: 'Your trip details have been updated.',
@@ -71,6 +88,87 @@ const TripDetailsModal = ({ isOpen, onClose, trip, onUpdateTrip }) => {
       }
     });
   };
+
+  const handleItineraryChange = (newItinerary) => {
+    // Update the trip details with the new itinerary
+    setEditTripDetails((prevDetails) => ({
+      ...prevDetails,
+      itinerary: newItinerary,
+    }));
+  };
+
+  const handleAdd = (date) => {
+    setCurrentDate(date);
+    setSelectedItem(null);
+    setIsAddOpen(true);
+  };
+
+  const handleEdit = (date, index) => {
+    const item = itinerary[date][index];
+    setCurrentDate(date);
+    setSelectedItem(item);
+    setEditItemIndex(index);
+    setEditItemDetails(item);
+  };
+
+  const handleDelete = (date, index) => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "Do you want to delete this item?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#0BDA51',
+      cancelButtonColor: '#D33736',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const updatedItinerary = { ...itinerary };
+        updatedItinerary[date].splice(index, 1);
+        onUpdateTrip({ ...trip, itinerary: updatedItinerary });
+        Swal.fire({
+          title: 'Deleted!',
+          text: 'Your item has been deleted.',
+          icon: 'success',
+          confirmButtonColor: '#0BDA51'
+        });
+      }
+    });
+  };
+
+  const handleUpdate = (date) => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "Do you want to update this item?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#0BDA51',
+      cancelButtonColor: '#D33736',
+      confirmButtonText: 'Yes, update it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const updatedItinerary = { ...itinerary };
+        updatedItinerary[date][editItemIndex] = editItemDetails;
+        onUpdateTrip({ ...trip, itinerary: updatedItinerary });
+        setEditItemIndex(null);
+        Swal.fire({
+          title: 'Updated!',
+          text: 'Your item has been updated.',
+          icon: 'success',
+          confirmButtonColor: '#0BDA51'
+        });
+      }
+    });
+  };
+
+  const handleEditInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setEditItemDetails(prevDetails => ({
+      ...prevDetails,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  console.log('Itinerary Items:', trip.itinerary);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} isDismissable={false} hideCloseButton className="rounded-lg shadow-lg mx-auto p-3 max-h-screen max-w-[1200px]">
@@ -110,8 +208,10 @@ const TripDetailsModal = ({ isOpen, onClose, trip, onUpdateTrip }) => {
                   </>
                 ) : (
                   <>
+                     <div className='flex gap-2'>
                     <h3 className="font-semibold">Trip Name:</h3>
                     <p>{trip.tripName}</p>
+                    </div>
                     <h3 className="font-semibold mt-2">Trip Dates:</h3>
                     <p>Start: {trip.startDate}</p>
                     <p>End: {trip.endDate}</p>
@@ -134,7 +234,39 @@ const TripDetailsModal = ({ isOpen, onClose, trip, onUpdateTrip }) => {
             </AccordionItem>
             <AccordionItem title="Itinerary">
               <div className="p-4">
-                <SchedulesPlan itineraryItems={trip.itinerary} />
+                {Object.keys(itinerary || {}).map(date => (
+                  <div key={date} className="mb-6">
+                    <h4 className="font-semibold text-lg mb-2">{date}</h4>
+                    {itinerary[date].map((item, index) => (
+                      <div key={index} className="flex flex-col sm:flex-row items-start mb-6 bg-white p-4 rounded-lg shadow-lg w-full sm:w-3/4 lg:w-2/3 mx-auto">
+                        <div className="flex-shrink-0 w-12 text-center">
+                          <div className="bg-color1 text-white rounded-full w-10 h-10 flex items-center justify-center mb-2">
+                            {index + 1}
+                          </div>
+                          <div className="h-full border-l-2 border-gray-300"></div>
+                        </div>
+                        <div className="ml-0 sm:ml-6 w-full">
+                          <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
+                            <h3 className="font-semibold text-xl">{item.title}</h3>
+                            <span className="text-sm text-gray-500"> <span className='text-black font-medium'>Time of Visit:</span> {formatTime(item.time)}</span>
+                          </div>
+                          <img src={item.imageUrl || 'https://via.placeholder.com/300'} alt={item.title} className="w-full h-56 object-cover rounded-md mb-4" />
+                          <p className="text-sm mb-2"><strong>Booked:</strong> {item.isBooked ? 'Yes' : 'No'}</p>
+                          <p className="text-sm mb-4"><strong>Notes:</strong> {item.notes}</p>
+                          <div className="flex space-x-2">
+                            <Button size="sm" color="danger" onClick={() => handleDelete(date, index)}>Delete</Button>
+                            <Button size="sm" onClick={() => handleEdit(date, index)}>Edit</Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    {isEditing && (
+                      <Button className='border-1 m-2 border-color1 rounded-full text-lg p-3 hover:bg-color2 bg-white hover:text-white duration-300 min-w-11' onClick={() => handleAdd(date)}>
+                        <FaPlus/> Add
+                      </Button>
+                    )}
+                  </div>
+                ))}
               </div>
             </AccordionItem>
           </Accordion>
@@ -146,17 +278,28 @@ const TripDetailsModal = ({ isOpen, onClose, trip, onUpdateTrip }) => {
               <Button onClick={handleCancelEdit} className="bg-red-500 text-white">Cancel</Button>
             </div>
           ) : (
-            <Button onClick={handleEditToggle} className="bg-color1 text-white">Edit</Button>
+            <div className='flex gap-2'>
+              <Button onClick={handleEditToggle} className="bg-color1 text-white">Edit</Button>
+            </div>
           )}
           <Button onClick={onClose} className="bg-red-500 text-white">Close</Button>
         </ModalFooter>
       </ModalContent>
+      <AddItemModal
+        isOpen={isAddOpen}
+        onClose={() => setIsAddOpen(false)}
+        onAddItem={(item) => {
+          const updatedItinerary = { ...itinerary };
+          if (!updatedItinerary[currentDate]) {
+            updatedItinerary[currentDate] = [];
+          }
+          updatedItinerary[currentDate].push(item);
+          onUpdateTrip({ ...trip, itinerary: updatedItinerary });
+          setIsAddOpen(false);
+        }}
+      />
     </Modal>
   );
-};
-
-TripDetailsModal.defaultProps = {
-  onUpdateTrip: () => {},
 };
 
 TripDetailsModal.propTypes = {

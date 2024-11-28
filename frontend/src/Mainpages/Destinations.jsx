@@ -134,7 +134,7 @@ const Destinations = () => {
         </div>
 
         {/* Municipalities grid */}
-        <div className='bg-color3 text-sm grid grid-cols-1 sm:grid-cols-2 font-font1 md:grid-cols-4 lg:grid-cols-5 gap-4'>
+        <div className='bg-transparent text-sm grid grid-cols-1 sm:grid-cols-2 font-font1 md:grid-cols-4 lg:grid-cols-5 gap-4'>
           {[
             { name: 'Bulusan', img: bulusan },
             { name: 'Bulan', img: bulan },
