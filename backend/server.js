@@ -1979,7 +1979,7 @@ app.post('/add-deals', async (req, res) => {
 
 // Endpoint to update existing business deals
 app.put('/update-deal', async (req, res) => {
-  console.log('Received update deal request:', req.body);
+  // console.log('Received update deal request:', req.body);
   const { dealId, discount, expirationDate } = req.body; // Match the key names in the destructure
   const userId = req.session?.user?.user_id; // Get user ID from the session
 
@@ -2177,7 +2177,7 @@ app.post('/book-table', async (req, res) => {
     status
   } = req.body;
 
-  console.log('Request Body Data:', req.body);
+  // console.log('Request Body Data:', req.body);
 
   if (
     !business_id || 
@@ -2577,7 +2577,7 @@ app.put('/update-booking-status/:id', (req, res) => {
 // Endpoint to fetch trips
 app.get('/trips', (req, res) => {
   const userId = req.session?.user?.user_id;
-  console.log(userId);
+  // console.log(userId);
   const sql = 'SELECT * FROM trips WHERE user_id = ?';
   connection.query(sql, [userId], (err, results) => {
     res.json({ success: true, trips: results });
@@ -3231,6 +3231,85 @@ app.put('/updateStatus-businessApplications/:id', async (req, res) => {
 // ************************************************************
 // ************************************************************
 
+// Endpoint to get messages
+// Endpoint to get messages for users using specific userId 
+app.get('/userMessages/:userId', async (req, res) => {
+  const { userId } = req.params; // Extract userId from URL parameters
+
+  try {
+    // Query the database for messages where either sender_id or receiver_id matches the userId
+    connection.query(
+      'SELECT * FROM messages WHERE sender_id = ? OR receiver_id = ? ORDER BY time ASC',
+      [userId, userId], // Pass userId twice for both sender_id and receiver_id
+      (err, results) => {
+        if (err) {
+          console.error('Error fetching messages:', err);
+          return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        if (results.length === 0) {
+          return res.status(404).json({ message: 'No messages found.' });
+        }
+
+        // Group messages by businessId
+        const groupedMessages = results.reduce((acc, message) => {
+          const businessId = message.sender_id === parseInt(userId) ? message.receiver_id : message.sender_id;
+          if (!acc[businessId]) {
+            acc[businessId] = [];
+          }
+          acc[businessId].push({
+            id: message.id,
+            senderId: message.sender_id,
+            receiverId: message.receiver_id,
+            text: message.text,
+            time: message.time,
+            image: message.image,
+            formDetails: message.form_details,
+            additionalInfo: message.additionalInfo,
+            messageNote: message.messageNote
+          });
+          return acc;
+        }, {});
+
+        // Format the response
+        const response = Object.keys(groupedMessages).map(businessId => ({
+          businessId: parseInt(businessId),
+          messages: groupedMessages[businessId]
+        }));
+
+        res.json(response); // Send formatted messages in response
+      }
+    );
+  } catch (error) {
+    console.error('Unexpected error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Endpoint to send messages
+app.post('/sendMessage', upload.single('photo'), (req, res) => {
+  const { sender_id, receiver_id, text } = req.body;
+  const photoPath = req.file ? req.file.path : null; // Get the uploaded photo path if it exists
+
+  // Construct the message object
+  const message = {
+    sender_id,
+    receiver_id,
+    text,
+    image: photoPath, // Include the photo path in the message
+    time: new Date() // Add a timestamp
+  };
+
+  // Insert the message into the database
+  connection.query('INSERT INTO messages SET ?', message, (err, result) => {
+    if (err) {
+      console.error('Error sending message:', err);
+      return res.status(500).json({ success: false, message: 'Failed to send message' });
+    }
+
+    res.json({ success: true, message: 'Message sent successfully', messageId: result.insertId });
+  });
+});
 
 // ************************************************************
 // ************************************************************

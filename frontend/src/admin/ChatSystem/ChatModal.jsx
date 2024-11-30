@@ -225,19 +225,65 @@ const ChatModal = ({ isOpen, onClose }) => {
 
   const initialMessages = {
     1: [
-      { id: 1, sender: 'John Doe 1', text: 'Here are the details of your activity booking:', time: '10:00 AM', formType: 'activityBooking', formDetails: {
-        firstName: 'Bob', lastName: 'Johnson', email: 'bobjohnson@example.com', phone: '321-654-9870', visitDate: '2024-11-01', activityTime: '10:00 AM', numberOfGuests: 3, specialRequests: 'Need a guide, bring extra snacks', productName: 'Hiking Adventure', imageUrl: 'https://via.placeholder.com/200'
-      }},
+      { 
+        id: 1, 
+        sender: 1, 
+        text: 'Here are the details of your activity booking:', 
+        time: '10:00 AM', 
+        formType: 'activityBooking', 
+        formDetails: {
+          productName: 'Hiking Adventure', 
+          numberOfGuests: 3, 
+          email: 'bobjohnson@example.com', 
+          phone: '321-654-9870', 
+          visitDate: '2024-11-01', 
+          activityTime: '10:00 AM', 
+          specialRequests: 'Need a guide, bring extra snacks',
+          amount: '₱0',
+          imageUrl: 'https://via.placeholder.com/200'
+        }
+      },
     ],
     2: [
-      { id: 2, sender: 'John Doe 2', text: 'Here are the details of your accommodation booking:', time: '10:15 AM', formType: 'accommodationBooking', formDetails: {
-        firstName: 'Alice', lastName: 'Smith', email: 'alice.smith@example.com', phone: '789-456-1230', checkInOutDates: { start: 'Oct 20, 2024', end: 'Oct 22, 2024' }, amount: '₱5000', specialRequests: 'Late check-in, vegetarian meal', numberOfGuests: 2, productName: 'Luxury Mountain Cabin', imageUrl: 'https://via.placeholder.com/200'
-      }},
+        { 
+        id: 2, 
+        sender: 'John Doe 2', 
+        text: 'Here are the details of your accommodation booking:', 
+        time: '10:15 AM', 
+        formType: 'accommodationBooking', 
+        formDetails: {
+          firstName: 'Alice', 
+          lastName: 'Smith', 
+          email: 'alice.smith@example.com', 
+          phone: '789-456-1230', 
+          checkInOutDates: { start: 'Oct 20, 2024', end: 'Oct 22, 2024' }, 
+          amount: '₱5000', 
+          specialRequests: 'Late check-in, vegetarian meal', 
+          numberOfGuests: 2, 
+          productName: 'Luxury Mountain Cabin', 
+          imageUrl: 'https://via.placeholder.com/200'
+        }
+      }
     ],
     3: [
-      { id: 3, sender: 'John Doe 3', text: 'Here are the details of your table reservation:', time: '10:25 AM', formType: 'tableReservation', formDetails: {
-        firstName: 'Jane', lastName: 'Doe', email: 'janedoe@example.com', phone: '123-456-7890', reservationDate: '2024-10-15', reservationTime: '6:00 PM', numberOfGuests: 4, productName: 'Mountain View Dining', imageUrl: 'https://via.placeholder.com/200'
-      }},
+      { 
+        id: 3, 
+        sender: 'John Doe 3', 
+        text: 'Here are the details of your table reservation:', 
+        time: '10:25 AM', 
+        formType: 'tableReservation', 
+        formDetails: {
+          firstName: 'Jane', 
+          lastName: 'Doe', 
+          email: 'janedoe@example.com', 
+          phone: '123-456-7890', 
+          reservationDate: '2024-10-15', 
+          reservationTime: '6:00 PM', 
+          numberOfGuests: 4, 
+          productName: 'Mountain View Dining', 
+          imageUrl: 'https://via.placeholder.com/200'
+        }
+      }
     ],
   };
 

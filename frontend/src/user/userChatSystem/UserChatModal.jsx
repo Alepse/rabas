@@ -4,57 +4,40 @@ import { Button, Input, Avatar } from '@nextui-org/react';
 import { FiSend, FiImage, FiDownload } from "react-icons/fi";
 import { toast } from 'react-toastify';
 import { MdDateRange, MdPeople, MdEmail, MdPhone } from "react-icons/md";
+import axios from 'axios';
+
+// Sample data for businesses
+const sampleBusinesses = [
+  { id: 1, name: 'Business One', status: 'online', avatarUrl: 'https://i.pravatar.cc/150?u=business1' },
+  { id: 2, name: 'Business Two', status: 'offline', avatarUrl: 'https://i.pravatar.cc/150?u=business2' },
+  { id: 3, name: 'Business Three', status: 'online', avatarUrl: 'https://i.pravatar.cc/150?u=business3' },
+];
 
 // Component for rendering booking details
 const BookingDetailsCard = ({ message, isSender }) => {
   return (
-    <div className={`bg-white shadow-md text-black p-4 rounded-lg border border-gray-200 ${isSender ? 'ml-auto' : 'mr-auto'} max-w-full sm:max-w-sm`}>
-      <div className="flex justify-between items-center mb-1">
-        <strong className="text-lg">{message.sender}</strong>
-        <span className="text-xs text-gray-500 ">{message.time}</span>
-      </div>
-      <p className="font-semibold mb-2 break-words ">{message.text}</p>
-      {message.additionalInfo && (
-        <p className="text-sm text-gray-700 mb-2 break-words ">{message.additionalInfo}</p>
-      )}
-      {message.messageNote && (
-        <p className="text-sm text-gray-700 mb-2 break-words "><strong>Message:</strong> {message.messageNote}</p>
-      )}
-
-      {/* Image Placeholder */}
-      <div className="my-2 bg-gray-200 flex items-center justify-center rounded-lg w-full h-44">
-        <span>200 x 200</span>
-      </div>
-
-      <div className="p-3 mt-3 bg-gray-50 rounded-lg text-sm text-black border border-gray-200 break-words">
-        <h4 className="font-semibold mb-2">Booking Details:</h4>
-        <ul className="space-y-1">
-          <li><strong>Product:</strong> {message.formDetails?.productName || 'Sample Product'}</li>
-          <li><MdPeople className="inline-block text-lg" /> <strong> Guests:</strong> {message.formDetails?.numberOfGuests || '2'}</li>
-          <li><MdEmail className="inline-block text-lg" /> <strong> Email:</strong> {message.formDetails?.email || 'john.doe@example.com'}</li>
-          <li><MdPhone className="inline-block text-lg" /> <strong> Phone:</strong> {message.formDetails?.phone || '123-456-7890'}</li>
-          {message.formDetails?.visitDate && (
-            <>
-              <li><MdDateRange className="inline-block text-lg" /> <strong> Activity Date:</strong> {message.formDetails.visitDate}</li>
-              <li><strong>Activity Time:</strong> {message.formDetails.activityTime}</li>
-            </>
-          )}
-          {message.formDetails?.checkInOutDates && (
-            <>
-              <li><MdDateRange className="inline-block text-lg" /> <strong> Check-in:</strong> {message.formDetails.checkInOutDates.start}</li>
-              <li><MdDateRange className="inline-block text-lg" /> <strong> Check-out:</strong> {message.formDetails.checkInOutDates.end}</li>
-            </>
-          )}
-          {message.formDetails?.reservationDate && (
-            <>
-              <li><MdDateRange className="inline-block text-lg" /> <strong> Reservation Date:</strong> {message.formDetails.reservationDate}</li>
-              <li><strong>Reservation Time:</strong> {message.formDetails.reservationTime}</li>
-            </>
-          )}
-          <li><strong>Special Requests:</strong> {message.formDetails?.specialRequests || 'None'}</li>
-          <li><strong>Total Amount:</strong> {message.formDetails?.amount || '₱0'}</li>
-        </ul>
-      </div>
+    <div className={`bg-white shadow-md text-black p-4 rounded-lg border border-gray-200 mt-2`}>
+      <h4 className="font-semibold mb-2">Booking Details:</h4>
+      <ul className="space-y-1">
+        <li><strong>Product:</strong> {message.formDetails?.productName || 'Sample Product'}</li>
+        <li><MdPeople className="inline-block text-lg" /> <strong> Guests:</strong> {message.formDetails?.numberOfGuests || '2'}</li>
+        <li><MdEmail className="inline-block text-lg" /> <strong> Email:</strong> {message.formDetails?.email || 'john.doe@example.com'}</li>
+        <li><MdPhone className="inline-block text-lg" /> <strong> Phone:</strong> {message.formDetails?.phone || '123-456-7890'}</li>
+        {message.formDetails?.visitDate && (
+          <>
+            <li><MdDateRange className="inline-block text-lg" /> <strong> Activity Date:</strong> {message.formDetails.visitDate}</li>
+            <li><strong>Activity Time:</strong> {message.formDetails.activityTime}</li>
+          </>
+        )}
+        {message.formDetails?.checkInOutDates && (
+          <>
+            <li><MdDateRange className="inline-block text-lg" /> <strong> Check-in:</strong> {message.formDetails.checkInOutDates.start}</li>
+            <li><MdDateRange className="inline-block text-lg" /> <strong> Check-out:</strong> {message.formDetails.checkInOutDates.end}</li>
+          </>
+        )}
+        <li><strong>Special Requests:</strong> {message.formDetails?.specialRequests || 'None'}</li>
+        <li><strong>Total Amount:</strong> {message.formDetails?.amount || '₱0'}</li>
+      </ul>
     </div>
   );
 };
@@ -88,173 +71,31 @@ const UserChatModal = ({ isOpen, onClose }) => {
   const [messageInput, setMessageInput] = useState('');
   const [messages, setMessages] = useState({});
   const [selectedBusiness, setSelectedBusiness] = useState(null);
-  const [unreadMessages, setUnreadMessages] = useState({ 1: 3, 2: 2, 3: 1 }); // Keep track of unread message counts
+  const [unreadMessages, setUnreadMessages] = useState({ 1: 3, 2: 2, 3: 1 });
   const messageEndRef = useRef(null);
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
-
-  const businesses = [
-    { id: 1, name: 'Business One', status: 'online', avatarUrl: 'https://i.pravatar.cc/150?u=business1' },
-    { id: 2, name: 'Business Two', status: 'offline', avatarUrl: 'https://i.pravatar.cc/150?u=business2' },
-    { id: 3, name: 'Business Three', status: 'online', avatarUrl: 'https://i.pravatar.cc/150?u=business3' },
-  ];
-
-  const initialMessages = {
-    1: [
-      { 
-        id: 1, 
-        sender: 'You', 
-        text: 'Here are the details of your activity booking:', 
-        time: '10:00 AM', 
-        formDetails: {
-          productName: 'Hiking Adventure', 
-          numberOfGuests: 3, 
-          email: 'bobjohnson@example.com', 
-          phone: '321-654-9870', 
-          visitDate: '2024-11-01', 
-          activityTime: '10:00 AM', 
-          specialRequests: 'Need a guide, bring extra snacks', 
-          amount: '₱0'
-        }
-      },
-      { 
-        id: 2, 
-        sender: 'Business One', 
-        text: 'Booking for Hiking Adventure has been accepted.',
-        additionalInfo: 'Activity Date: 2024-11-01\nActivity Time: 10:00 AM',
-        messageNote: 'dad',
-        time: '2:02 PM', 
-        formDetails: {
-          productName: 'Hiking Adventure', 
-          numberOfGuests: 3, 
-          email: 'bobjohnson@example.com', 
-          phone: '321-654-9870', 
-          visitDate: '2024-11-01', 
-          activityTime: '10:00 AM', 
-          specialRequests: 'Need a guide, bring extra snacks', 
-          amount: '₱0'
-        }
-      },
-      // Additional sample messages
-      { 
-        id: 3, 
-        sender: 'You', 
-        text: 'Is this still available?', 
-        time: '3:00 PM',
-        formDetails: {
-          productName: 'Hiking Adventure', // Example product name
-          price: 1500, // Example price
-          imageUrl: 'https://via.placeholder.com/200' // Example image placeholder
-        }
-      },
-      { 
-        id: 4, 
-        sender: 'Business One', 
-        text: 'Sure, please let us know the new date.', 
-        time: '3:05 PM'
-      },
-    ],
-    2: [
-      { 
-        id: 1, 
-        sender: 'You', 
-        text: 'Here are the details of your accommodation booking:', 
-        time: '10:15 AM', 
-        formDetails: {
-          productName: 'Luxury Suite', 
-          numberOfGuests: 2, 
-          email: 'alice.smith@example.com', 
-          phone: '789-456-1230', 
-          checkInOutDates: { start: '2024-10-20', end: '2024-10-22' }, 
-          specialRequests: 'Late check-in', 
-          amount: '₱5000'
-        }
-      },
-      { 
-        id: 2, 
-        sender: 'Business Two', 
-        text: 'Booking for Luxury Suite has been accepted.',
-        additionalInfo: 'Check-in: 2024-10-20\nCheck-out: 2024-10-22',
-        messageNote: 'dad',
-        time: '2:15 PM', 
-        formDetails: {
-          productName: 'Luxury Suite', 
-          numberOfGuests: 2, 
-          email: 'alice.smith@example.com', 
-          phone: '789-456-1230', 
-          checkInOutDates: { start: '2024-10-20', end: '2024-10-22' }, 
-          specialRequests: 'Late check-in', 
-          amount: '₱5000'
-        }
-      },
-      // Additional sample messages
-      { 
-        id: 3, 
-        sender: 'You', 
-        text: 'Is breakfast included?', 
-        time: '3:30 PM'
-      },
-      { 
-        id: 4, 
-        sender: 'Business Two', 
-        text: 'Yes, breakfast is included in your booking.', 
-        time: '3:35 PM'
-      },
-    ],
-    3: [
-      { 
-        id: 1, 
-        sender: 'You', 
-        text: 'Here are the details of your table reservation:', 
-        time: '10:25 AM', 
-        formDetails: {
-          productName: 'Mountain View Dining', 
-          numberOfGuests: 4, 
-          email: 'janedoe@example.com', 
-          phone: '123-456-7890', 
-          reservationDate: '2024-10-15', 
-          reservationTime: '6:00 PM', 
-          specialRequests: 'Window seat', 
-          amount: '₱2000'
-        }
-      },
-      { 
-        id: 2, 
-        sender: 'Business Three', 
-        text: 'Booking for Mountain View Dining has been accepted.',
-        additionalInfo: 'Reservation Date: 2024-10-15\nReservation Time: 6:00 PM',
-        messageNote: 'dad',
-        time: '2:25 PM', 
-        formDetails: {
-          productName: 'Mountain View Dining', 
-          numberOfGuests: 4, 
-          email: 'janedoe@example.com', 
-          phone: '123-456-7890', 
-          reservationDate: '2024-10-15', 
-          reservationTime: '6:00 PM', 
-          specialRequests: 'Window seat', 
-          amount: '₱2000'
-        }
-      },
-      // Additional sample messages
-      { 
-        id: 3, 
-        sender: 'You', 
-        text: 'Can we add one more person to the reservation?', 
-        time: '4:00 PM'
-      },
-      { 
-        id: 4, 
-        sender: 'Business Three', 
-        text: 'Let me check the availability and get back to you.', 
-        time: '4:05 PM'
-      },
-    ],
-  };
+  const user_id = 101;
 
   useEffect(() => {
-    setMessages(initialMessages);
-  }, []);
+    // Fetch messages from the server
+    const fetchMessages = () => {
+      axios.get(`http://localhost:5000/userMessages/${user_id}`)
+        .then(({ data }) => {
+          const fetchedMessages = data.reduce((acc, { businessId, messages }) => {
+            acc[businessId] = messages;
+            return acc;
+          }, {});
+          setMessages(fetchedMessages);
+        })
+        .catch(error => {
+          console.error('Error fetching messages:', error.response ? error.response.data.message : 'An unknown error occurred');
+          toast.error('Failed to load messages');
+        });
+    };
+  
+    fetchMessages();
+  }, [user_id]);
 
   // Scroll chat to the bottom when new messages arrive
   useEffect(() => {
@@ -279,24 +120,58 @@ const UserChatModal = ({ isOpen, onClose }) => {
   };
 
   // Handle sending messages
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if ((messageInput.trim() !== '' || image) && selectedBusiness !== null) {
-      const currentMessages = messages[selectedBusiness] || [];
-      const newMessage = {
-        id: currentMessages.length + 1,
-        sender: 'You',
-        text: messageInput,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        image: imagePreview
-      };
-      setMessages({
-        ...messages,
-        [selectedBusiness]: [...currentMessages, newMessage]
-      });
-      setMessageInput('');
-      setImage(null);
-      setImagePreview(null);
-      toast.success('Message sent!');
+      const formData = new FormData();
+      formData.append('sender_id', user_id);
+      formData.append('receiver_id', selectedBusiness);
+      formData.append('text', messageInput);
+      // formData.append('form_details', ''); // Add any additional form details if needed
+      // formData.append('additionalInfo', ''); // Add any additional info if needed
+      // formData.append('messageNote', ''); // Add any message note if needed
+  
+      if (image) {
+        formData.append('photo', image); // Append the image file
+      }
+  
+      try {
+        const response = await fetch('http://localhost:5000/sendMessage', {
+          method: 'POST',
+          body: formData,
+        });
+  
+        if (!response.ok) {
+          throw new Error('Failed to send message');
+        }
+  
+        const result = await response.json();
+        if (result.success) {
+          const currentMessages = messages[selectedBusiness] || [];
+          const newMessage = {
+            id: result.messageId, // Use the messageId returned from the server
+            sender: 'You',
+            senderId: user_id,
+            receiverId: selectedBusiness,
+            text: messageInput,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            image: imagePreview
+          };
+  
+          setMessages({
+            ...messages,
+            [selectedBusiness]: [...currentMessages, newMessage]
+          });
+          setMessageInput('');
+          setImage(null);
+          setImagePreview(null);
+          toast.success('Message sent!');
+        } else {
+          toast.error('Failed to send message');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        toast.error('An error occurred while sending the message');
+      }
     }
   };
 
@@ -331,6 +206,53 @@ const UserChatModal = ({ isOpen, onClose }) => {
     });
   };
 
+  // Function to render messages
+  const renderMessages = (messages) => {
+    return messages.map((message) => {
+      const isSenderYou = message.senderId === user_id;
+      return (
+        <div
+          key={message.id}
+          className={`flex ${isSenderYou ? 'justify-end' : 'justify-start'} mb-4`}
+        >
+          <div
+            className={`p-4 rounded-lg max-w-[70%] ${
+              isSenderYou ? 'bg-gray-200 text-black' : 'bg-blue-600 text-white'
+            } shadow-md`}
+          >
+            <p className="break-words mb-2">{message.text}</p>
+            {message.image && (
+              <div className="relative">
+                <img
+                  src={message.image}
+                  alt="Sent"
+                  className="mt-2 rounded-md max-w-full cursor-pointer"
+                  style={{ maxHeight: '400px', objectFit: 'cover' }}
+                  onClick={() => handleImageClick(message.image)}
+                />
+                <button
+                  onClick={() => handleImageDownload(message.image)}
+                  className="absolute top-2 right-2 bg-white p-1 rounded-full shadow-md"
+                >
+                  <FiDownload size={16} className="text-black" />
+                </button>
+              </div>
+            )}
+            {message.additionalInfo && (
+              <p className="text-sm text-gray-300 mb-2">{message.additionalInfo}</p>
+            )}
+            {message.messageNote && (
+              <p className="text-sm text-gray-300 mb-2"><strong>Message:</strong> {message.messageNote}</p>
+            )}
+            {message.formDetails && Object.keys(message.formDetails).some(key => message.formDetails[key] !== null) && (
+              <BookingDetailsCard message={message} isSender={isSenderYou} />
+            )}
+          </div>
+        </div>
+      );
+    });
+  };
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} hideCloseButton={true} size="full"
       className="bg-white transition-colors duration-300 w-full h-full">
@@ -349,7 +271,7 @@ const UserChatModal = ({ isOpen, onClose }) => {
           <div className="w-full lg:w-1/4 bg-gray-200 p-4 rounded-lg">
             <h3 className="font-semibold mb-4">Available Businesses</h3>
             <ul className="space-y-3">
-              {businesses.map((business) => (
+              {sampleBusinesses.map((business) => (
                 <li key={business.id}
                   className="p-3 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-300 bg-white"
                   onClick={() => handleBusinessClick(business.id)}>
@@ -371,44 +293,10 @@ const UserChatModal = ({ isOpen, onClose }) => {
             {selectedBusiness ? (
               <>
                 <div className="flex flex-col space-y-3 overflow-y-auto scrollbar-custom">
-                  <h3 className="font-semibold mb-2 text-black">Chat with {businesses.find(b => b.id === selectedBusiness).name}</h3>
-                  {messages[selectedBusiness].map((message) => (
-                    <div
-                      key={message.id}
-                      className={`flex ${message.sender === 'You' ? 'justify-end' : 'justify-start '}`}
-                    >
-                      <div
-                        className={`p-2 rounded-lg max-w-[70%] ${
-                          message.sender === 'You' ? 'bg-gray-300 text-black' : 'bg-color1 text-white max-w-[70%]'
-                        }`}
-                      >
-                        <p className="break-words ">{message.text}</p>
-                        {message.image && (
-                          <div className="relative">
-                            <img
-                              src={message.image}
-                              alt="Sent"
-                              className="mt-2 rounded-md max-w-full cursor-pointer"
-                              style={{ maxHeight: '400px', objectFit: 'cover' }}
-                              onClick={() => handleImageClick(message.image)}
-                            />
-                            <button
-                              onClick={() => handleImageDownload(message.image)}
-                              className="absolute top-2 right-2 bg-white p-1 rounded-full shadow-md"
-                            >
-                              <FiDownload size={16} className="text-black" />
-                            </button>
-                          </div>
-                        )}
-                        {message.id === 3 && message.formDetails && (
-                          <ProductCard product={message.formDetails} />
-                        )}
-                        {message.id !== 3 && message.formDetails && (
-                          <BookingDetailsCard message={message} isSender={message.sender === 'You'} />
-                        )}
-                      </div>
-                    </div>
-                  ))}
+                  <h3 className="font-semibold mb-2 text-black">
+                    Chat with {sampleBusinesses.find(b => b.id === selectedBusiness).name}
+                  </h3>
+                  {renderMessages(messages[selectedBusiness])}
                   <div ref={messageEndRef}></div>
                 </div>
 
