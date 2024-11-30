@@ -2077,7 +2077,8 @@ app.post('/book-accommodation', async (req, res) => {
     discount,         // Added
     discountedPrice,  // Added
     specialRequests,
-    numberOfGuests
+    numberOfGuests,
+    status
   } = req.body;
 
   // console.log('Request Body Data:', req.body);
@@ -2098,8 +2099,8 @@ app.post('/book-accommodation', async (req, res) => {
       INSERT INTO bookings (
         user_id, business_id, product_id, customerName, productName, numberOfGuests, 
         email, phone, type, dateIn, dateOut, specialRequests, 
-        originalPrice, discount, discountedPrice
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        originalPrice, discount, discountedPrice, status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
@@ -2117,7 +2118,8 @@ app.post('/book-accommodation', async (req, res) => {
       specialRequests || '',
       originalPrice || 0,
       discount || 0,
-      discountedPrice || originalPrice || 0
+      discountedPrice || originalPrice || 0,
+      status || 0
     ];
 
     connection.query(query, values, (err, result) => {
@@ -2144,7 +2146,7 @@ app.post('/book-accommodation', async (req, res) => {
         originalPrice,
         discount,
         discountedPrice,
-        status: 0
+        status
       });
     });
     
@@ -2172,6 +2174,7 @@ app.post('/book-table', async (req, res) => {
     specialRequests,
     numberOfGuests,
     type,
+    status
   } = req.body;
 
   console.log('Request Body Data:', req.body);
@@ -2204,8 +2207,8 @@ app.post('/book-table', async (req, res) => {
       INSERT INTO bookings (
         user_id, business_id, product_id, customerName, productName, numberOfGuests, 
         email, phone, type, dateIn, dateOut, specialRequests, 
-        originalPrice, discount, discountedPrice
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        originalPrice, discount, discountedPrice, status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
@@ -2223,7 +2226,8 @@ app.post('/book-table', async (req, res) => {
       specialRequests || '',
       Number(originalPrice) || 0,
       Number(discount) || 0,
-      Number(discountedPrice) || originalPrice || 0
+      Number(discountedPrice) || originalPrice || 0,
+      status || 0
     ];
 
     connection.query(query, values, (err, result) => {
@@ -2250,6 +2254,7 @@ app.post('/book-table', async (req, res) => {
         originalPrice,
         discount,
         discountedPrice,
+        status
       });
     });
   } catch (error) {
@@ -2275,7 +2280,8 @@ app.post('/book-activity', async (req, res) => {
     type,
     specialRequests,
     numberOfGuests,
-    productName
+    productName,
+    status
   } = req.body;
 
   if (
@@ -2303,8 +2309,8 @@ app.post('/book-activity', async (req, res) => {
       INSERT INTO bookings (
         user_id, business_id, product_id, customerName, productName, numberOfGuests, 
         email, phone, type, dateIn, dateOut, specialRequests, 
-        originalPrice, discount, discountedPrice
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        originalPrice, discount, discountedPrice, status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
@@ -2322,7 +2328,8 @@ app.post('/book-activity', async (req, res) => {
       specialRequests || '',
       originalPrice || 0,
       discount || 0,
-      discountedPrice || originalPrice || 0
+      discountedPrice || originalPrice || 0,
+      status || 0
     ];
 
     connection.query(query, values, (err, result) => {
@@ -2349,6 +2356,7 @@ app.post('/book-activity', async (req, res) => {
         originalPrice,
         discount,
         discountedPrice,
+        status
       });
     });
   } catch (error) {
@@ -2500,9 +2508,12 @@ app.get('/business-bookings', (req, res) => {
   }
 
   const sql = `
-    SELECT * FROM bookings 
-    WHERE business_id = ?
-    ORDER BY dateIn DESC
+    SELECT b.*, 
+      p.product_category AS reservationType
+    FROM bookings b
+    LEFT JOIN products p ON b.product_id = p.product_id
+    WHERE b.business_id = ?
+    ORDER BY b.dateIn DESC
   `;
 
   connection.query(sql, [businessId], (err, results) => {
@@ -2566,6 +2577,7 @@ app.put('/update-booking-status/:id', (req, res) => {
 // Endpoint to fetch trips
 app.get('/trips', (req, res) => {
   const userId = req.session?.user?.user_id;
+  console.log(userId);
   const sql = 'SELECT * FROM trips WHERE user_id = ?';
   connection.query(sql, [userId], (err, results) => {
     res.json({ success: true, trips: results });

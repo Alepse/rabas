@@ -5,7 +5,7 @@ const initialState = {
   activeBookings: [],
   bookingHistory: [],
   chatMessages: [],
-  walkInCustomers: [],
+  activeWalkInCustomers: [],
   walkInHistory: [],
   loading: false,
   error: null
@@ -20,7 +20,7 @@ export const fetchBookings = createAsyncThunk(
         credentials: 'include'
       });
       const data = await response.json();
-      
+      // console.log('data', data);
       if (!data.success) {
         throw new Error(data.message);
       }
@@ -29,7 +29,8 @@ export const fetchBookings = createAsyncThunk(
         pendingBookings: [],
         activeBookings: [],
         bookingHistory: [],
-        walkInCustomers: []
+        activeWalkInCustomers: [],
+        walkInHistory: []
       };
 
       data.bookings.forEach(booking => {
@@ -49,6 +50,9 @@ export const fetchBookings = createAsyncThunk(
           userId: booking.user_id,
           businessId: booking.business_id,
           productId: booking.product_id,
+
+          // Reservation type
+          reservationType: booking.reservationType,
           
           // Customer details
           customerName: booking.customerName,
@@ -76,10 +80,14 @@ export const fetchBookings = createAsyncThunk(
           status: getStatusString(booking.status)
         };
 
-        console.log('Formatting booking:', formattedBooking);
+        // console.log('Formatting booking:', formattedBooking);
 
         if (formattedBooking.userId === 0) {
-          transformed.walkInCustomers.push(formattedBooking);
+          if (formattedBooking.status === 'Active') {
+            transformed.activeWalkInCustomers.push(formattedBooking);
+          } else if (formattedBooking.status === 'Completed') {
+            transformed.walkInHistory.push(formattedBooking);
+          }
         } else {
           // Existing sorting logic for regular bookings
           if (formattedBooking.status === 'Pending') {
@@ -92,7 +100,7 @@ export const fetchBookings = createAsyncThunk(
         }
       });
 
-      console.log('Transformed data:', transformed);
+      // console.log('Transformed data:', transformed);
       return transformed;
     } catch (error) {
       console.error('Error in fetchBookings:', error);
@@ -131,22 +139,24 @@ const bookingsSlice = createSlice({
       state.chatMessages.push(action.payload);
     },
     addWalkInCustomer: (state, action) => {
-      state.walkInCustomers.push(action.payload);
+      console.log('action.payload', action.payload);
+      state.activeWalkInCustomers.push(action.payload);
     },
     updateWalkInCustomerStatus: (state, action) => {
       const { id, status } = action.payload;
-      const customer = state.walkInCustomers.find(c => c.id === id);
+      const customer = state.activeWalkInCustomers.find(c => c.id === id);
       if (customer) {
         customer.status = status;
       }
     },
     markWalkInAsCompleted: (state, action) => {
-      const customerId = action.payload;
-      const customerIndex = state.walkInCustomers.findIndex(c => c.id === customerId);
-      if (customerIndex !== -1) {
-        const completedCustomer = state.walkInCustomers.splice(customerIndex, 1)[0];
-        completedCustomer.status = 'Completed';
-        state.walkInHistory.push(completedCustomer);
+      const customer = state.activeWalkInCustomers.find(c => c.id === action.payload);
+      if (customer) {
+        customer.status = 'Completed';  // Use string status
+        state.walkInHistory.push(customer);
+        state.activeWalkInCustomers = state.activeWalkInCustomers.filter(c => c.id !== action.payload);
+      } else {
+        console.error('Walk-in customer not found for completion:', action.payload);
       }
     },
   },
@@ -162,7 +172,8 @@ const bookingsSlice = createSlice({
         state.pendingBookings = action.payload.pendingBookings;
         state.activeBookings = action.payload.activeBookings;
         state.bookingHistory = action.payload.bookingHistory;
-        state.walkInCustomers = action.payload.walkInCustomers;
+        state.activeWalkInCustomers = action.payload.activeWalkInCustomers;
+        state.walkInHistory = action.payload.walkInHistory;
       })
       .addCase(fetchBookings.rejected, (state, action) => {
         state.loading = false;
@@ -171,6 +182,6 @@ const bookingsSlice = createSlice({
   }
 });
 
-export const { addChatMessage, markBookingAsCompleted, updateWalkInCustomerStatus, markWalkInAsCompleted, markBookingAsActive } = bookingsSlice.actions;
+export const { addChatMessage, markBookingAsCompleted, updateWalkInCustomerStatus, addWalkInCustomer, markWalkInAsCompleted, markBookingAsActive } = bookingsSlice.actions;
 
 export default bookingsSlice.reducer;

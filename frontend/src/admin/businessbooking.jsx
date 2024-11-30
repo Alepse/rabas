@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { addChatMessage, markBookingAsCompleted, markBookingAsActive, updateWalkInCustomerStatus, markWalkInAsCompleted, fetchBookings } from '@/redux/bookingSlice';
+import { addChatMessage, markBookingAsCompleted, markBookingAsActive, updateWalkInCustomerStatus, addWalkInCustomer, markWalkInAsCompleted, fetchBookings } from '@/redux/bookingSlice';
 import {
   Button,
   Badge,
@@ -23,6 +23,7 @@ import ChatModal from './ChatSystem/ChatModal';
 import { today, getLocalTimeZone } from '@internationalized/date';
 import { MdPeople, MdEmail, MdPhone, MdDateRange, MdHotel, MdRestaurant, MdDirectionsRun, MdCheck, MdDone, MdClose } from 'react-icons/md';
 import Swal from 'sweetalert2';
+import axios from 'axios';
 
 // Add the formatDate helper function at the top of your file
 const formatDate = (date) => {
@@ -156,6 +157,7 @@ const BookingCard = ({ booking, onOpenChatModal, onMarkAsCompleted, onAcceptBook
 // Form component
 const BookingForm = ({ isOpen, onClose, title, products, onSubmit, type }) => {
   // Product selection states
+  const dispatch = useDispatch();
   const [searchValue, setSearchValue] = useState('');
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -230,8 +232,9 @@ const BookingForm = ({ isOpen, onClose, title, products, onSubmit, type }) => {
         phone,
         numberOfGuests: parseInt(guests),
         specialRequests,
-        discountedPrice: parseFloat(amount),
-        status: 'Active', // For walk-in bookings
+        originalPrice: parseFloat(amount),
+        discountedPrice: parseFloat(totalAmount),
+        status: 1, // For walk-in bookings
         type: selectedProduct.type, // Add type from selected product
         productName: selectedProduct.name // Add product name
       };
@@ -308,6 +311,7 @@ const BookingForm = ({ isOpen, onClose, title, products, onSubmit, type }) => {
       const data = await response.json();
 
       if (data.success) {
+        dispatch(fetchBookings());
         showSuccessAlert('Booking created successfully!');
         handleClose(); // Close and reset form
       } else {
@@ -321,6 +325,8 @@ const BookingForm = ({ isOpen, onClose, title, products, onSubmit, type }) => {
     }
   };
 
+  const totalAmount = amount * guests;
+
   return (
     <Modal 
       isOpen={isOpen} 
@@ -331,7 +337,7 @@ const BookingForm = ({ isOpen, onClose, title, products, onSubmit, type }) => {
       <ModalContent className='max-h-[90vh]'>
         <ModalHeader>{title}</ModalHeader>
         <ModalBody className="space-y-4">
-          <div className="relative">
+        <div className="relative">
             <Input
               label={`Select ${title}`}
               placeholder="Type to search..."
@@ -367,6 +373,7 @@ const BookingForm = ({ isOpen, onClose, title, products, onSubmit, type }) => {
                       onClick={() => {
                         setSearchValue(product.name);
                         setSelectedProduct(product);
+                        setAmount(product.price); // Update the amount with the product price
                         setShowSuggestions(false);
                       }}
                       onMouseDown={(e) => {
@@ -401,6 +408,13 @@ const BookingForm = ({ isOpen, onClose, title, products, onSubmit, type }) => {
               </div>
             )}
           </div>
+          {selectedProduct && (
+            <div className="total-amount">
+              <div className="amount-display">
+                Price: ₱{amount}
+              </div>
+            </div>
+          )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input 
               label="First Name" 
@@ -522,15 +536,12 @@ const BookingForm = ({ isOpen, onClose, title, products, onSubmit, type }) => {
             value={specialRequests}
             onChange={(e) => setSpecialRequests(e.target.value)}
           />
-          <Input 
-            label="Total Amount" 
-            type="number" 
-            fullWidth 
-            min={0} 
-            required 
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-          />
+         <div className="total-amount">
+            <label>Total Amount</label>
+            <div className="amount-display">
+              ₱{totalAmount}
+            </div>
+          </div>
         </ModalBody>
         <ModalFooter className="flex justify-end space-x-4">
           <Button 
@@ -587,15 +598,13 @@ const BusinessBooking = () => {
 
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
-  // log the state 
-  console.log('State:', useSelector(state => state));
   const pendingBookings = useSelector(state => state.bookings.pendingBookings);
   const activeBookings = useSelector(state => state.bookings.activeBookings);
   const bookingHistory = useSelector(state => state.bookings.bookingHistory);
   const chatMessages = useSelector(state => state.bookings.chatMessages);
-  const walkInCustomers = useSelector(state => state.bookings.walkInCustomers);
+  const walkInCustomers = useSelector(state => state.bookings.activeWalkInCustomers);
   // log the walkInCustomers
-  console.log('Walk-In Customers:', walkInCustomers);
+  // console.log('Walk-In Customers:', walkInCustomers);
   const [isChatModalVisible, setChatModalVisible] = useState(false);
   const [currentBookingDetails, setCurrentBookingDetails] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -610,7 +619,7 @@ const BusinessBooking = () => {
   const [walkInTableReservationSearchQuery, setWalkInTableReservationSearchQuery] = useState('');
   const [walkInActivitiesSearchQuery, setWalkInActivitiesSearchQuery] = useState('');
   const walkInHistory = useSelector(state => state.bookings.walkInHistory);
-
+  // console.log('walkinhistoryyyyy', walkInHistory);
   // Title Tab
   useEffect(() => {
     document.title = 'BusinessName | Admin booking';
@@ -748,27 +757,34 @@ const BusinessBooking = () => {
 
   // Add useEffect to fetch real data
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await fetch('http://localhost:5000/getAllBusinessProduct');
-        const data = await response.json();
-        
-        if (data.success) {
-          const products = data.businessProducts;
-          // Log to see available categories
-          console.log('Available product categories:', [...new Set(products.map(p => p.product_category))]);
+    const fetchProducts = () => {
+      // Fetch user_id from the endpoint
+      axios.get('http://localhost:5000/get-userData', { withCredentials: true })
+        .then(response => {
+          const userId = response.data.userData.user_id;
           
-          setAccommodations(products.filter(p => p.product_category === 'accommodation'));
-          setRestaurants(products.filter(p => p.product_category === 'restaurant'));
-          setActivities(products.filter(p => p.product_category === 'activity'));
-        } else {
-          console.error('Failed to fetch products:', data.message);
-        }
-      } catch (error) {
-        console.error('Error fetching products:', error);
-      }
+          axios.get('http://localhost:5000/getAllBusinessProduct')
+            .then(({ data }) => {
+              if (data.success) {
+                const products = data.businessProducts;
+                // Filter products by category and userId
+                setAccommodations(products.filter(p => p.product_category === 'accommodation' && p.user_id === userId));
+                setRestaurants(products.filter(p => p.product_category === 'restaurant' && p.user_id === userId));
+                setActivities(products.filter(p => p.product_category === 'activity' && p.user_id === userId));
+              } else {
+                console.error('Failed to fetch products:', data.message);
+              }
+            })
+            .catch(error => {
+              console.error('Error fetching products:', error.response ? error.response.data.message : 'An unknown error occurred');
+            });
+        })
+        .catch(error => {
+          // Handle error in fetching user_id
+          showErrorAlert('Error fetching user data:', error.response ? error.response.data.message : 'An unknown error occurred');
+        });
     };
-
+  
     fetchProducts();
   }, []);
 
@@ -947,13 +963,11 @@ const BookingTypeSection = ({ type, bookings, searchQuery, setSearchQuery, openC
   // Map API types to display types
   const typeMapping = {
     'Accommodation': ['Cabins'],
-    'Table Reservation': ['Buffet', 'Resorts'],
+    'Table Reservation': ['Buffet', 'Resorts', 'Fine Dining'],
     'Attraction': ['Hiking', 'Water Sports']
   };
 
   const filteredBookings = bookings.filter(booking => {
-    // console.log('Checking booking:', booking.type, 'against type:', type);
-    // Check if the booking type is in the allowed types for this section
     const allowedTypes = typeMapping[type] || [];
     const typeMatch = allowedTypes.includes(booking.type);
     const searchMatch = !searchQuery || 
@@ -1018,8 +1032,8 @@ const WalkInCustomersSection = ({
   setAttractionActivitiesFormOpen
 }) => {
   const [walkInSearchQuery, setWalkInSearchQuery] = useState('');
-  const walkInCustomers = useSelector(state => state.bookings.walkInCustomers);
-
+  const activeWalkInCustomers = useSelector(state => state.bookings.activeWalkInCustomers);
+  // console.log('walkInCustomerssssssssss', activeWalkInCustomers);
   return (
     <div className="w-full space-y-4">
       <div className="text-xl font-bold mb-4 text-gray-700">Walk In Customers</div>
@@ -1052,7 +1066,7 @@ const WalkInCustomersSection = ({
         <WalkInTypeSection
           key={type}
           type={type}
-          customers={walkInCustomers}
+          customers={activeWalkInCustomers}
           searchQuery={walkInSearchQuery}
         />
       ))}
@@ -1069,28 +1083,51 @@ const WalkInTypeSection = ({ type, customers, searchQuery }) => {
     'Attraction': <MdDirectionsRun className="text-xl text-color1" />
   };
 
+  // Define a mapping from type to reservationType
+  const typeToReservationTypeMap = {
+    'Accommodation': 'accommodation',
+    'Table Reservation': 'restaurant',
+    'Attraction': 'activity'
+  };
+
   // Filter customers by type and search query
   const filteredCustomers = customers.filter(customer => {
     const searchTermLower = searchQuery?.toLowerCase() || '';
+    const reservationType = typeToReservationTypeMap[type]; // Get the corresponding reservationType
+
     return (
-      customer?.type === type && 
-      ((customer?.customerName?.toLowerCase() || '').includes(searchTermLower) ||
-       (customer?.email?.toLowerCase() || '').includes(searchTermLower) ||
-       (customer?.phone?.toLowerCase() || '').includes(searchTermLower) ||
-       (customer?.details?.toLowerCase() || '').includes(searchTermLower))
+      customer?.reservationType === reservationType && 
+      (searchTermLower === '' || // Return all if searchTermLower is empty
+        (customer?.customerName?.toLowerCase() || '').includes(searchTermLower) ||
+        (customer?.email?.toLowerCase() || '').includes(searchTermLower) ||
+        (customer?.phone?.toLowerCase() || '').includes(searchTermLower) ||
+        (customer?.details?.toLowerCase() || '').includes(searchTermLower))
     );
   });
 
-  const handleMarkAsComplete = (customerId) => {
-    dispatch(markWalkInAsCompleted(customerId));
-    Swal.fire({
-      title: 'Booking Completed',
-      text: 'Customer booking marked as complete',
-      icon: 'success',
-      confirmButtonText: 'OK',
-      confirmButtonColor: '#0BDA51',
-      cancelButtonColor: '#D33736',
-    });
+  const handleMarkAsComplete = async (customerId) => {
+    try {
+      // setIsLoading(true);
+      const response = await fetch(`http://localhost:5000/update-booking-status/${customerId}`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: 2 }) // Set status to 'Completed'
+      });
+
+      const data = await response.json();
+      if (!data.success) {
+        throw new Error(data.message || 'Failed to mark booking as completed');
+      }
+
+      dispatch(markWalkInAsCompleted(customerId));
+      showSuccessAlert('Booking marked as completed!');
+    } catch (error) {
+      console.error('Error marking booking as completed:', error);
+      showErrorAlert(error.message || 'Failed to mark booking as completed');
+    }
   };
 
   return (
@@ -1105,10 +1142,24 @@ const WalkInTypeSection = ({ type, customers, searchQuery }) => {
               <h2 className="text-lg font-semibold text-gray-900">{customer.customerName}</h2>
               <p className="text-gray-600"><strong>Email:</strong> {customer.email || 'Not provided'}</p>
               <p className="text-gray-600"><strong>Phone:</strong> {customer.phone || 'Not provided'}</p>
-              <p className="text-gray-600"><strong>Details:</strong> {customer.details || 'Not provided'}</p>
+              <p className="text-gray-600"><strong>Product Name:</strong> {customer.productName || 'Not provided'}</p>
+              <p className="text-gray-600">
+              <strong>Schedule:</strong>{' '}
+                {customer.dateIn 
+                  ? new Date(customer.dateIn).toLocaleString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hour12: true,
+                    }) 
+                  : 'Not provided'}
+              </p>
               <p className="text-gray-600"><strong>Special Requests:</strong> {customer.specialRequests || 'None'}</p>
+              <p className="text-gray-600"><strong>Product Price:</strong> ₱{customer.originalPrice || '0'}</p>
+              <p className="text-gray-600"><strong>Discount:</strong> {customer.discount}%</p>
               <p className="text-gray-600"><strong>Total Amount:</strong> ₱{customer.amount || '0'}</p>
-              <p className="text-gray-600"><strong>Payment Method:</strong> {customer.paymentMethod || 'Not specified'}</p>
               <p className="text-gray-600"><strong>Additional Notes:</strong> {customer.additionalNotes || 'None'}</p>
               <div className="flex justify-end items-center mt-4">
                 <Button auto color="success" onClick={() => handleMarkAsComplete(customer.id)}>
@@ -1131,32 +1182,54 @@ const WalkInTypeSection = ({ type, customers, searchQuery }) => {
 };
 
 // New component for walk-in history sections
-const WalkInHistorySection = ({ title, history = [], type, searchQuery }) => (
-  <div className="bg-gray-100 p-4 rounded-lg shadow-lg mt-4">
-    <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
-    <div className="bg-white max-h-[600px] flex flex-col gap-3 overflow-y-auto rounded-lg p-4 shadow-inner">
-      {history.filter(booking => 
-        booking.type === type && 
-        (booking.customerName?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-         booking.productName?.toLowerCase().includes(searchQuery.toLowerCase()))
-      ).length > 0 ? (
-        history.filter(booking => 
-          booking.type === type && 
+const WalkInHistorySection = ({ title, history = [], type, searchQuery }) => {
+  const typeToReservationTypeMap = {
+    'Accommodation': 'accommodation',
+    'Table Reservation': 'restaurant',
+    'Attraction': 'activity'
+  };
+  const reservationType = typeToReservationTypeMap[type]; // Get the corresponding reservationType
+  
+  return (
+    <div className="bg-gray-100 p-4 rounded-lg shadow-lg mt-4">
+      <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
+      <div className="bg-white max-h-[600px] flex flex-col gap-3 overflow-y-auto rounded-lg p-4 shadow-inner">
+        {history.filter(booking => 
+          booking.reservationType === reservationType && 
           (booking.customerName?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-           booking.productName?.toLowerCase().includes(searchQuery.toLowerCase()))
-        ).map((booking) => (
-          <div key={booking.id} className="p-4 bg-gray-200 rounded-lg">
-            <h2 className="text-lg font-semibold">{booking.customerName}</h2>
-            <p>Details: {booking.productName}</p>
-            <p>Date: {booking.date}</p>
-            <p>Amount: ₱{booking.amount}</p>
-          </div>
-        ))
-      ) : (
-        <div className="p-4 text-gray-500">No walk-in {type.toLowerCase()} history available</div>
-      )}
+          booking.productName?.toLowerCase().includes(searchQuery.toLowerCase()))
+        ).length > 0 ? (
+          history.filter(booking => 
+            booking.reservationType === reservationType && 
+            (booking.customerName?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+            booking.productName?.toLowerCase().includes(searchQuery.toLowerCase()))
+          ).map((booking) => (
+            <div key={booking.id} className="p-4 bg-gray-200 rounded-lg">
+              <h2 className="text-lg font-semibold">{booking.customerName}</h2>
+              <p>Email: {booking.email}</p>
+              <h2 className="text-lg">Details:</h2>
+              <p>Product Name: {booking.productName}</p>
+              <p>Number of Guests: {booking.numberOfGuests}</p>
+              <p>Date: {new Date(booking.dateIn).toLocaleString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  hour12: true,
+                })}
+              </p>
+              <p>Product Price: ₱{booking.originalPrice}</p>
+              <p>Discount: {booking.discount}%</p>
+              <p>Total Amount: ₱{booking.amount}</p>
+            </div>
+          ))
+        ) : (
+          <div className="p-4 text-gray-500">No walk-in {type.toLowerCase()} history available</div>
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default BusinessBooking;

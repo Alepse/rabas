@@ -375,12 +375,14 @@ const Nav = () => {
   </NavigationMenuList>
 </NavigationMenu>
 
-            <div
-              className={`cursor-pointer text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1 ${activeLink === '/trip' ? ' border-b-1 border-light p-1 font-semibold ' : ''}`}
-              onClick={() => setActiveLink('/trip')}
-            >
-              <TbNotes /> <a href='/trip'>Trip</a>
-            </div>
+            {isLoggedIn && (
+              <div
+                className={`cursor-pointer text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1 ${activeLink === '/trip' ? ' border-b-1 border-light p-1 font-semibold ' : ''}`}
+                onClick={() => setActiveLink('/trip')}
+              >
+                <TbNotes /> <a href='/trip'>Trip</a>
+              </div>
+            )}
 
             <div
               className={`cursor-pointer text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1 ${activeLink === '/transportation' ? ' border-b-1 border-light p-1 font-semibold ': ''}`}
@@ -590,9 +592,14 @@ const Nav = () => {
                 </NavigationMenuItem>
               </NavigationMenuList>
             </NavigationMenu>
-            <div className="hover:text-gray-700 cursor-pointer hover:font-semibold duration-100 text-lg font-light flex items-center gap-1">
-              <TbNotes /> <a href='/trip'>Trip</a>
-            </div>
+            {isLoggedIn && (
+              <div
+                className={`cursor-pointer text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1 ${activeLink === '/trip' ? ' border-b-1 border-light p-1 font-semibold ' : ''}`}
+                onClick={() => setActiveLink('/trip')}
+              >
+                <TbNotes /> <a href='/trip'>Trip</a>
+              </div>
+            )}
             <div className="hover:text-gray-700 cursor-pointer hover:font-semibold duration-100 text-lg font-light flex items-center gap-1">
               <PiJeep /> <a href='/transportation'>Transportation</a>
             </div>

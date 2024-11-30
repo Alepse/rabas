@@ -64,6 +64,7 @@ const Trip = () => {
       .then(response => {
         // console.log('response', response);
         setTrips(response.data.trips); // Set the fetched trips to state
+        console.log('trips', trips);
       })
       .catch(error => {
         console.error('Error fetching trips:', error);
