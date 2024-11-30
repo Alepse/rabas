@@ -64,7 +64,7 @@ const Trip = () => {
       .then(response => {
         // console.log('response', response);
         setTrips(response.data.trips); // Set the fetched trips to state
-        console.log('trips', trips);
+        // console.log('trips', trips);
       })
       .catch(error => {
         console.error('Error fetching trips:', error);
@@ -285,7 +285,21 @@ const Trip = () => {
                   <div className="p-4 flex flex-col justify-between w-full md:w-2/3">
                     <div>
                       <h2 className="text-xl font-semibold">{trip.tripName}</h2>
-                      <p className="text-gray-600">{trip.startDate} - {trip.endDate}</p>
+                      <p className="text-gray-600">{new Date(trip.startDate).toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: true,
+                      })} - {new Date(trip.endDate).toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: true,
+                      })}</p>
                       <p className="text-gray-600">To: {trip.destination}</p>
                     </div>
                     <div className="flex justify-between mt-4">

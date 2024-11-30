@@ -264,36 +264,53 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                   />
                   <MapEvents setCurrentZoom={setCurrentZoom} />
-                  {Object.keys(itinerary || {}).map(date => (
+                  {Object.keys(itinerary || {}).map(date =>
                     itinerary[date].map((item, index) => {
                       const { pin_location, title, imageUrl } = item;
-                      if (pin_location && currentZoom >= 7) { // Adjust zoom level as needed
+                      if (pin_location && currentZoom >= 7) {
                         const position = [pin_location.latitude, pin_location.longitude];
                         const locationName = title;
-                        const showLogo = currentZoom >= 10; // Set zoom level to show/hide logo
+                        const showLogo = currentZoom >= 10;
                         const fontSize = currentZoom >= 12 ? '1rem' : '0.85rem';
+
                         const customDivIcon = L.divIcon({
                           className: 'custom-icon',
                           html: `
                             <div class="custom-popup flex items-center whitespace-nowrap font-bold text-pink-600" style="font-size: ${fontSize};">
-                              ${showLogo ? `<div class="pin-container">
-                                <div class="pin-head">
-                                  <img src="http://localhost:5000/${imageUrl}" alt="${title}" class="pin-logo" />
-                                </div>
-                                <div class="pin-point"></div>
-                              </div><span>${locationName}</span>` : `<div class="business-name">${locationName}</div>`}
+                              ${showLogo ? `
+                                <div class="pin-container">
+                                  <div class="pin-head">
+                                    <img src="http://localhost:5000/${imageUrl}" alt="${title}" class="pin-logo" />
+                                  </div>
+                                  <div class="pin-point"></div>
+                                </div><span>${locationName}</span>
+                              ` : `<div class="business-name">${locationName}</div>`}
                             </div>
                           `,
-                          iconSize: [50, 70], 
-                          iconAnchor: [25, 70] 
-                        });      
+                          iconSize: [50, 70],
+                          iconAnchor: [25, 70]
+                        });
+
+                        // Click handler to redirect to Google Maps
+                        const handleMarkerClick = () => {
+                          const destination = `${pin_location.latitude},${pin_location.longitude}`;
+                          window.open(`https://www.google.com/maps/dir/?api=1&destination=${destination}`, '_blank');
+                        };
+
                         return (
-                          <Marker key={`${date}-${index}`} position={position} icon={customDivIcon} />
+                          <Marker
+                            key={`${date}-${index}`}
+                            position={position}
+                            icon={customDivIcon}
+                            eventHandlers={{
+                              click: handleMarkerClick, // Attach click handler
+                            }}
+                          />
                         );
                       }
                       return null;
                     })
-                  ))}
+                  )}
                 </MapContainer>
               </div>
             </AccordionItem>
