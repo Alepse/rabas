@@ -6,12 +6,6 @@ import { toast } from 'react-toastify';
 import { MdDateRange, MdPeople, MdEmail, MdPhone } from "react-icons/md";
 import axios from 'axios';
 
-// Sample data for businesses
-const sampleBusinesses = [
-  { id: 1, name: 'Business One', status: 'online', avatarUrl: 'https://i.pravatar.cc/150?u=business1' },
-  { id: 2, name: 'Business Two', status: 'offline', avatarUrl: 'https://i.pravatar.cc/150?u=business2' },
-  { id: 3, name: 'Business Three', status: 'online', avatarUrl: 'https://i.pravatar.cc/150?u=business3' },
-];
 
 // Component for rendering booking details
 const BookingDetailsCard = ({ message, isSender }) => {
@@ -76,32 +70,60 @@ const UserChatModal = ({ isOpen, onClose }) => {
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const user_id = 101;
+  const [businesses, setBusinesses] = useState([]);
 
   useEffect(() => {
-    // Fetch messages from the server
-    const fetchMessages = () => {
-      axios.get(`http://localhost:5000/userMessages/${user_id}`)
-        .then(({ data }) => {
-          const fetchedMessages = data.reduce((acc, { businessId, messages }) => {
-            acc[businessId] = messages;
-            return acc;
-          }, {});
-          setMessages(fetchedMessages);
-        })
-        .catch(error => {
-          console.error('Error fetching messages:', error.response ? error.response.data.message : 'An unknown error occurred');
-          toast.error('Failed to load messages');
-        });
+    const fetchMessages = async () => {
+      try {
+        const { data } = await axios.get(`http://localhost:5000/userMessages/${user_id}`);
+        const fetchedMessages = data.reduce((acc, { businessId, messages }) => {
+          acc[businessId] = messages;
+          return acc;
+        }, {});
+        setMessages(fetchedMessages);
+  
+        // Extract unique business IDs and fetch businesses based on them
+        const uniqueBusinessIds = [...new Set(data.map(({ businessId }) => businessId))];
+        fetchBusinesses(uniqueBusinessIds);
+      } catch (error) {
+        console.error('Error fetching messages:', error.response ? error.response.data.message : 'An unknown error occurred');
+        toast.error('Failed to load messages');
+      }
+    };
+  
+    const fetchBusinesses = async (businessIds) => {
+      try {
+        // Create an array of API requests
+        const businessRequests = businessIds.map(id =>
+          axios.get(`http://localhost:5000/businessesInChat/${id}`)
+        );
+  
+        // Resolve all requests concurrently
+        const responses = await Promise.all(businessRequests);
+        const businessesData = responses.map(response => response.data);
+  
+        setBusinesses(businessesData);
+        console.log('businesses', businessesData);
+      } catch (error) {
+        console.error('Error fetching businesses:', error.response ? error.response.data.message : 'An unknown error occurred');
+        toast.error('Failed to load businesses');
+      }
     };
   
     fetchMessages();
   }, [user_id]);
+  
 
   // Scroll chat to the bottom when new messages arrive
   useEffect(() => {
-    if (messageEndRef.current) {
-      messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
+    // Delay the scroll to ensure the DOM updates
+    const scrollTimeout = setTimeout(() => {
+      if (messageEndRef.current) {
+        messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100); // Adjust the delay as needed
+  
+    return () => clearTimeout(scrollTimeout); // Cleanup timeout on unmount
   }, [messages, selectedBusiness]);
 
   // Handle image selection
@@ -156,6 +178,8 @@ const UserChatModal = ({ isOpen, onClose }) => {
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             image: imagePreview
           };
+
+          console.log('new message', newMessage);
   
           setMessages({
             ...messages,
@@ -181,15 +205,42 @@ const UserChatModal = ({ isOpen, onClose }) => {
   };
 
   // Function to download the image
-  const handleImageDownload = (imageUrl) => {
-    const link = document.createElement('a');
-    link.href = imageUrl;
-    link.download = 'downloaded-image.jpg';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const handleImageDownload = async (imagePath) => {
+    try {
+      if (imagePath.startsWith('blob:')) {
+        // Create a download link directly for the blob URL
+        const link = document.createElement('a');
+        link.href = imagePath;
+        link.download = 'downloaded-image.jpg';  // Default name or customize as needed
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        // Handle regular server image paths
+        const downloadUrl = imagePath.startsWith('http')
+          ? imagePath
+          : `http://localhost:5000/${imagePath.replace(/\\/g, '/')}`;
+        
+        // Fetch the image as a blob from the server
+        const response = await fetch(downloadUrl);
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const blob = await response.blob();
+    
+        // Create a download link with the fetched blob
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = imagePath.split('/').pop();  // Extract filename from the path
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    } catch (error) {
+      console.error('Failed to download image:', error);
+    }
   };
-
+  
   // Handle key press in the input field
   const handleKeyPress = (event) => {
     if (event.key === 'Enter') {
@@ -206,10 +257,23 @@ const UserChatModal = ({ isOpen, onClose }) => {
     });
   };
 
+  // Function to get business by ID
+  const getBusinessById = (businessId) => {
+    return businesses.find(business => business.id === businessId);
+  };
+
   // Function to render messages
   const renderMessages = (messages) => {
     return messages.map((message) => {
-      const isSenderYou = message.senderId === user_id;
+      const isSenderYou = message.senderId === user_id; // Ensure 'user_id' is defined
+  
+      // Determine the image URL format (handle blob or relative paths)
+      const imageUrl = message.image
+        ? message.image.startsWith('blob:')
+          ? message.image
+          : `http://localhost:5000/${message.image.replace(/\\/g, '/')}`  // Adjust for server path
+        : null;
+  
       return (
         <div
           key={message.id}
@@ -220,47 +284,85 @@ const UserChatModal = ({ isOpen, onClose }) => {
               isSenderYou ? 'bg-gray-200 text-black' : 'bg-blue-600 text-white'
             } shadow-md`}
           >
-            <p className="break-words mb-2">{message.text}</p>
-            {message.image && (
+            {/* Message Text */}
+            {message.text && <p className="break-words mb-2">{message.text}</p>}
+  
+            {/* Image Handling */}
+            {imageUrl && (
               <div className="relative">
                 <img
-                  src={message.image}
+                  src={imageUrl}
                   alt="Sent"
                   className="mt-2 rounded-md max-w-full cursor-pointer"
                   style={{ maxHeight: '400px', objectFit: 'cover' }}
-                  onClick={() => handleImageClick(message.image)}
+                  onClick={() => handleImageClick(imageUrl)} // Open image in a modal or new tab
                 />
                 <button
-                  onClick={() => handleImageDownload(message.image)}
+                  onClick={() => handleImageDownload(imageUrl)}
                   className="absolute top-2 right-2 bg-white p-1 rounded-full shadow-md"
                 >
                   <FiDownload size={16} className="text-black" />
                 </button>
               </div>
             )}
+  
+            {/* Additional Information */}
             {message.additionalInfo && (
               <p className="text-sm text-gray-300 mb-2">{message.additionalInfo}</p>
             )}
+  
+            {/* Message Note */}
             {message.messageNote && (
-              <p className="text-sm text-gray-300 mb-2"><strong>Message:</strong> {message.messageNote}</p>
+              <p className="text-sm text-gray-300 mb-2">
+                <strong>Message:</strong> {message.messageNote}
+              </p>
             )}
-            {message.formDetails && Object.keys(message.formDetails).some(key => message.formDetails[key] !== null) && (
-              <BookingDetailsCard message={message} isSender={isSenderYou} />
-            )}
+  
+            {/* Form Details Rendering */}
+            {message.formDetails &&
+              Object.keys(message.formDetails).some((key) => message.formDetails[key] !== null) && (
+                <BookingDetailsCard message={message} isSender={isSenderYou} />
+              )}
           </div>
         </div>
       );
     });
   };
 
+  // Function to render business list
+  const renderBusinessList = () => {
+    // Flatten the nested array structure
+    const flattenedBusinesses = businesses.flat();  // Merge nested arrays into a single array
+    console.log('flattenedBusinesses', flattenedBusinesses);
+    return flattenedBusinesses.map((business) => (
+      <li key={business.id}
+        className="p-3 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-300 bg-white"
+        onClick={() => handleBusinessClick(business.user_id)}>
+        <div className="relative flex items-center gap-3">
+          <div className="relative">
+            <Avatar radius="md" src={`http://localhost:5000/${business.avatarUrl}`} alt={business.name} />
+            <UnreadBadge count={unreadMessages[business.id] || 0} />  {/* Handle missing counts */}
+          </div>
+          <span className="text-black">{business.name}</span>
+        </div>
+        <span className={`w-3 h-3 rounded-full ${business?.status === 'online' ? 'bg-green-500' : 'bg-gray-400'}`}></span>
+      </li>
+    ));
+  };  
+
+  const handleClose = () => {
+    setSelectedBusiness(null); // Set selectedBusiness to null
+    onClose(); // Call the original onClose function
+  };
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} hideCloseButton={true} size="full"
+    <Modal isOpen={isOpen} onClose={handleClose} hideCloseButton={true} size="full"
       className="bg-white transition-colors duration-300 w-full h-full">
       <ModalContent className="w-full h-full">
         <ModalHeader className="flex justify-between items-center px-6 py-4">
           <h2 className="text-2xl font-bold text-black">Chat</h2>
           <div className="flex items-center space-x-4">
-            <Button auto onClick={onClose} className="bg-color1 text-white">
+            <Button auto onClick={handleClose} className="bg-color1 text-white">
               Close
             </Button>
           </div>
@@ -271,20 +373,7 @@ const UserChatModal = ({ isOpen, onClose }) => {
           <div className="w-full lg:w-1/4 bg-gray-200 p-4 rounded-lg">
             <h3 className="font-semibold mb-4">Available Businesses</h3>
             <ul className="space-y-3">
-              {sampleBusinesses.map((business) => (
-                <li key={business.id}
-                  className="p-3 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-300 bg-white"
-                  onClick={() => handleBusinessClick(business.id)}>
-                  <div className="relative flex items-center gap-3">
-                    <div className="relative">
-                      <Avatar radius="md" src={business.avatarUrl} alt={business.name} />
-                      <UnreadBadge count={unreadMessages[business.id]} />
-                    </div>
-                    <span className="text-black">{business.name}</span>
-                  </div>
-                  <span className={`w-3 h-3 rounded-full ${business.status === 'online' ? 'bg-green-500' : 'bg-gray-400'}`}></span>
-                </li>
-              ))}
+              {renderBusinessList()}
             </ul>
           </div>
 
@@ -294,7 +383,7 @@ const UserChatModal = ({ isOpen, onClose }) => {
               <>
                 <div className="flex flex-col space-y-3 overflow-y-auto scrollbar-custom">
                   <h3 className="font-semibold mb-2 text-black">
-                    Chat with {sampleBusinesses.find(b => b.id === selectedBusiness).name}
+                    Chat with {getBusinessById(selectedBusiness)?.name}
                   </h3>
                   {renderMessages(messages[selectedBusiness])}
                   <div ref={messageEndRef}></div>

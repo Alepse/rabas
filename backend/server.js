@@ -3311,6 +3311,31 @@ app.post('/sendMessage', upload.single('photo'), (req, res) => {
   });
 });
 
+app.get('/businessesInChat/:userId', (req, res) => {
+  const { userId } = req.params;
+  const sql = `
+    SELECT DISTINCT
+      b.business_id AS id,
+      b.user_id,
+      b.businessName AS name,
+      b.businessType,
+      b.businessLogo AS avatarUrl,
+      b.location,
+      b.contactInfo
+    FROM businesses b
+    WHERE b.user_id = ?
+    ORDER BY b.business_id
+  `;
+
+  connection.query(sql, [userId], (err, results) => {
+    if (err) {
+      console.error('Error fetching businesses:', err);
+      return res.status(500).json({ success: false, message: 'Failed to fetch businesses' });
+    }
+    res.json(results);
+  });
+});
+
 // ************************************************************
 // ************************************************************
 // ************ Displaying data for the pages *****************
