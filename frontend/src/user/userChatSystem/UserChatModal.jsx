@@ -62,6 +62,7 @@ const ProductCard = ({ product }) => (
 
 // User Chat Modal Component
 const UserChatModal = ({ isOpen, onClose }) => {
+  const [activeChatUser, setActiveChatUser] = useState(null);
   const [messageInput, setMessageInput] = useState('');
   const [messages, setMessages] = useState({});
   const [selectedBusiness, setSelectedBusiness] = useState(null);
@@ -69,49 +70,78 @@ const UserChatModal = ({ isOpen, onClose }) => {
   const messageEndRef = useRef(null);
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
-  const user_id = 101;
+  const [user_id, setUser_id] = useState(null);
   const [businesses, setBusinesses] = useState([]);
 
   useEffect(() => {
-    const fetchMessages = async () => {
-      try {
-        const { data } = await axios.get(`http://localhost:5000/userMessages/${user_id}`);
-        const fetchedMessages = data.reduce((acc, { businessId, messages }) => {
-          acc[businessId] = messages;
-          return acc;
-        }, {});
-        setMessages(fetchedMessages);
+    axios.get('http://localhost:5000/check-login', { withCredentials: true })
+      .then(response => {
+        if (response.data.isLoggedIn) {  // Check if the user is logged in
+          // If logged in, fetch user data
+          axios.get('http://localhost:5000/get-userData', { withCredentials: true })
+            .then(userResponse => {
+              const userId = userResponse.data.userData.user_id;
+              setUser_id(userId);
+              // console.log('Logged-in user ID:', userId);
+            })
+            .catch(error => {
+              console.error('Error fetching user data:', error.response ? error.response.data.message : 'An unknown error occurred');
+              toast.error('Failed to fetch user data');
+            });
+        } else {
+          // console.log('User is not logged in');
+          // toast.warning('Please log in to access this feature');
+        }
+      })
+      .catch(error => {
+        console.error('Error checking login status:', error.response ? error.response.data.message : 'An unknown error occurred');
+        toast.error('Failed to check login status');
+      });
+  }, []);
   
-        // Extract unique business IDs and fetch businesses based on them
-        const uniqueBusinessIds = [...new Set(data.map(({ businessId }) => businessId))];
-        fetchBusinesses(uniqueBusinessIds);
-      } catch (error) {
-        console.error('Error fetching messages:', error.response ? error.response.data.message : 'An unknown error occurred');
-        toast.error('Failed to load messages');
-      }
-    };
+  useEffect(() => {
+    // Only run if user_id is not null
+    if (user_id) {
+      const fetchMessages = async () => {
+        try {
+          // console.log('userId', user_id);
+          const { data } = await axios.get(`http://localhost:5000/userMessages/${user_id}`);
+          // console.log('data', data);
+          const fetchedMessages = data.reduce((acc, { businessId, messages }) => {
+            acc[businessId] = messages;
+            return acc;
+          }, {});
+          setMessages(fetchedMessages);
+          // console.log('fetchedMessages', fetchedMessages);
+          // Extract unique business IDs and fetch businesses based on them
+          const uniqueBusinessIds = [...new Set(data.map(({ businessId }) => businessId))];
+          // console.log('uniqueBusinessIds', uniqueBusinessIds);
+          fetchBusinesses(uniqueBusinessIds);
+        } catch (error) {
+          console.error('Error fetching messages:', error.response ? error.response.data.message : 'An unknown error occurred');
+          toast.error('Failed to load messages');
+        }
+      };
   
-    const fetchBusinesses = async (businessIds) => {
-      try {
-        // Create an array of API requests
-        const businessRequests = businessIds.map(id =>
-          axios.get(`http://localhost:5000/businessesInChat/${id}`)
-        );
+      const fetchBusinesses = async (businessIds) => {
+        try {
+          const businessRequests = businessIds.map(id =>
+            axios.get(`http://localhost:5000/businessesInChat/${id}`)
+          );
+          const responses = await Promise.all(businessRequests);
+          const businessesData = responses.map(response => response.data);
+          setBusinesses(businessesData);
+          // console.log('businesses', businessesData);
+        } catch (error) {
+          console.error('Error fetching businesses:', error.response ? error.response.data.message : 'An unknown error occurred');
+          toast.error('Failed to load businesses');
+        }
+      };
   
-        // Resolve all requests concurrently
-        const responses = await Promise.all(businessRequests);
-        const businessesData = responses.map(response => response.data);
+      fetchMessages();
+    }
+  }, [user_id]);  // Dependency array ensures it re-runs only when user_id changes
   
-        setBusinesses(businessesData);
-        console.log('businesses', businessesData);
-      } catch (error) {
-        console.error('Error fetching businesses:', error.response ? error.response.data.message : 'An unknown error occurred');
-        toast.error('Failed to load businesses');
-      }
-    };
-  
-    fetchMessages();
-  }, [user_id]);
   
 
   // Scroll chat to the bottom when new messages arrive
@@ -251,12 +281,27 @@ const UserChatModal = ({ isOpen, onClose }) => {
   // Handle business selection from list
   const handleBusinessClick = (businessId) => {
     setSelectedBusiness(businessId);
+    
+    // Flatten the businesses array
+    const flattenedBusinesses = businesses.flat();
+    
+    // Find the selected business
+    const selectedBusiness = flattenedBusinesses.find(business => business.user_id === businessId);
+
+    // Check if the business was found
+    if (selectedBusiness) {
+      setActiveChatUser(selectedBusiness.name);
+    } else {
+      console.error(`Business with ID ${businessId} not found.`);
+    }
+    
+    // Reset unread messages for the selected business
     setUnreadMessages({
       ...unreadMessages,
-      [businessId]: 0, // Reset unread messages for the selected business
+      [businessId]: 0,
     });
   };
-
+  
   // Function to get business by ID
   const getBusinessById = (businessId) => {
     return businesses.find(business => business.id === businessId);
@@ -333,7 +378,7 @@ const UserChatModal = ({ isOpen, onClose }) => {
   const renderBusinessList = () => {
     // Flatten the nested array structure
     const flattenedBusinesses = businesses.flat();  // Merge nested arrays into a single array
-    console.log('flattenedBusinesses', flattenedBusinesses);
+    // console.log('flattenedBusinesses', flattenedBusinesses);
     return flattenedBusinesses.map((business) => (
       <li key={business.id}
         className="p-3 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-300 bg-white"
@@ -383,7 +428,7 @@ const UserChatModal = ({ isOpen, onClose }) => {
               <>
                 <div className="flex flex-col space-y-3 overflow-y-auto scrollbar-custom">
                   <h3 className="font-semibold mb-2 text-black">
-                    Chat with {getBusinessById(selectedBusiness)?.name}
+                    Chat with {activeChatUser}
                   </h3>
                   {renderMessages(messages[selectedBusiness])}
                   <div ref={messageEndRef}></div>

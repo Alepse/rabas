@@ -345,7 +345,8 @@ const UserProfile = ({ activities = [] }) => {
         confirmButtonColor: '#0BDA51'
       });
 
-      fetchUserData(); // Refresh user data after update
+      //refresh the page
+      window.location.reload();
 
       // Clear username and profilePicFile states
       setUsername('');  // Clear the username field

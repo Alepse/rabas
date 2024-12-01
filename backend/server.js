@@ -3286,6 +3286,59 @@ app.get('/userMessages/:userId', async (req, res) => {
   }
 });
 
+app.get('/businessMessages/:businessId', async (req, res) => {
+  const { businessId } = req.params; // Extract userId from URL parameters
+
+  try {
+    // Query the database for messages where either sender_id or receiver_id matches the userId
+    connection.query(
+      'SELECT * FROM messages WHERE sender_id = ? OR receiver_id = ? ORDER BY time ASC',
+      [businessId, businessId], // Pass userId twice for both sender_id and receiver_id
+      (err, results) => {
+        if (err) {
+          console.error('Error fetching messages:', err);
+          return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        if (results.length === 0) {
+          return res.status(404).json({ message: 'No messages found.' });
+        }
+
+        // Group messages by businessId
+        const groupedMessages = results.reduce((acc, message) => {
+          const userId = message.sender_id === parseInt(businessId) ? message.receiver_id : message.sender_id;
+          if (!acc[userId]) {
+            acc[userId] = [];
+          }
+          acc[userId].push({
+            id: message.id,
+            senderId: message.sender_id,
+            receiverId: message.receiver_id,
+            text: message.text,
+            time: message.time,
+            image: message.image,
+            formDetails: message.form_details,
+            additionalInfo: message.additionalInfo,
+            messageNote: message.messageNote
+          });
+          return acc;
+        }, {});
+
+        // Format the response
+        const response = Object.keys(groupedMessages).map(userId => ({
+          userId: parseInt(userId),
+          messages: groupedMessages[userId]
+        }));
+
+        res.json(response); // Send formatted messages in response
+      }
+    );
+  } catch (error) {
+    console.error('Unexpected error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 // Endpoint to send messages
 app.post('/sendMessage', upload.single('photo'), (req, res) => {
   const { sender_id, receiver_id, text } = req.body;
@@ -3325,6 +3378,30 @@ app.get('/businessesInChat/:userId', (req, res) => {
     FROM businesses b
     WHERE b.user_id = ?
     ORDER BY b.business_id
+  `;
+
+  connection.query(sql, [userId], (err, results) => {
+    if (err) {
+      console.error('Error fetching businesses:', err);
+      return res.status(500).json({ success: false, message: 'Failed to fetch businesses' });
+    }
+    res.json(results);
+  });
+});
+
+app.get('/usersInChat/:userId', (req, res) => {
+  const { userId } = req.params;
+  const sql = `
+    SELECT DISTINCT
+      u.user_id,
+      u.username AS name,
+      u.email,
+      u.image,
+      u.image_path,
+      u.contact
+    FROM users u
+    WHERE u.user_id = ?
+    ORDER BY u.user_id
   `;
 
   connection.query(sql, [userId], (err, results) => {
