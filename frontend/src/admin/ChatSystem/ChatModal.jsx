@@ -261,7 +261,7 @@ const ChatModal = ({ isOpen, onClose }) => {
         try {
           // console.log('userId', user_id);
           const { data } = await axios.get(`http://localhost:5000/businessMessages/${user_id}`);
-          // console.log('data', data);
+          console.log('data', data);
           const fetchedMessages = data.reduce((acc, { userId, messages }) => {
             acc[userId] = messages;
             return acc;
@@ -586,45 +586,58 @@ const ChatModal = ({ isOpen, onClose }) => {
               isSenderYou ? 'bg-gray-200 text-black' : 'bg-blue-600 text-white'
             } shadow-md`}
           >
-            {/* Message Text */}
-            {message.text && <p className="break-words mb-2">{message.text}</p>}
-  
-            {/* Image Handling */}
-            {imageUrl && (
-              <div className="relative">
-                <img
-                  src={imageUrl}
-                  alt="Sent"
-                  className="mt-2 rounded-md max-w-full cursor-pointer"
-                  style={{ maxHeight: '400px', objectFit: 'cover' }}
-                  onClick={() => handleImageClick(imageUrl)} // Open image in a modal or new tab
+            {message.formType ? (
+                <BookingDetailsCard 
+                  message={message} 
+                  onCheckAvailability={handleCheckAvailability}
                 />
-                <button
-                  onClick={() => handleImageDownload(imageUrl)}
-                  className="absolute top-2 right-2 bg-white p-1 rounded-full shadow-md"
-                >
-                  <FiDownload size={16} className="text-black" />
-                </button>
-              </div>
-            )}
-  
-            {/* Additional Information */}
-            {message.additionalInfo && (
-              <p className="text-sm text-gray-300 mb-2">{message.additionalInfo}</p>
-            )}
-  
-            {/* Message Note */}
-            {message.messageNote && (
-              <p className="text-sm text-gray-300 mb-2">
-                <strong>Message:</strong> {message.messageNote}
-              </p>
-            )}
-  
-            {/* Form Details Rendering */}
-            {message.formDetails &&
-              Object.keys(message.formDetails).some((key) => message.formDetails[key] !== null) && (
-                <BookingDetailsCard message={message} isSender={isSenderYou} />
+            ) : (
+              <>
+              {/* Message Text */}
+              {message.text && <p className="break-words mb-2">{message.text}</p>}
+    
+              {/* Image Handling */}
+              {imageUrl && (
+                <div className="relative">
+                  <img
+                    src={imageUrl}
+                    alt="Sent"
+                    className="mt-2 rounded-md max-w-full cursor-pointer"
+                    style={{ maxHeight: '400px', objectFit: 'cover' }}
+                    onClick={() => handleImageClick(imageUrl)} // Open image in a modal or new tab
+                  />
+                  <button
+                    onClick={() => handleImageDownload(imageUrl)}
+                    className="absolute top-2 right-2 bg-white p-1 rounded-full shadow-md"
+                  >
+                    <FiDownload size={16} className="text-black" />
+                  </button>
+                </div>
               )}
+    
+              {/* Additional Information */}
+              {message.additionalInfo && (
+                <p className="text-sm text-gray-300 mb-2">{message.additionalInfo}</p>
+              )}
+    
+              {/* Message Note */}
+              {message.messageNote && (
+                <p className="text-sm text-gray-300 mb-2">
+                  <strong>Message:</strong> {message.messageNote}
+                </p>
+              )}
+    
+              {/* Form Details Rendering */}
+              {message.formDetails &&
+                Object.keys(message.formDetails).some((key) => message.formDetails[key] !== null) && (
+                  <BookingDetailsCard 
+                    message={message} 
+                    isSender={isSenderYou} 
+                    onCheckAvailability={handleCheckAvailability}
+                  />
+              )}
+              </>
+            )}
           </div>
         </div>
       );

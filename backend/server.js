@@ -3267,6 +3267,7 @@ app.get('/userMessages/:userId', async (req, res) => {
             text: message.text,
             time: message.time,
             image: message.image,
+            formType: message.form_type,
             formDetails: message.form_details,
             additionalInfo: message.additionalInfo,
             messageNote: message.messageNote
@@ -3323,6 +3324,7 @@ app.get('/businessMessages/:businessId', async (req, res) => {
             text: message.text,
             time: message.time,
             image: message.image,
+            formType: message.formType,
             formDetails: message.form_details,
             additionalInfo: message.additionalInfo,
             messageNote: message.messageNote
