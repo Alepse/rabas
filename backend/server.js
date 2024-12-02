@@ -3235,12 +3235,13 @@ app.put('/updateStatus-businessApplications/:id', async (req, res) => {
 // Endpoint to get messages for users using specific userId 
 app.get('/userMessages/:userId', async (req, res) => {
   const { userId } = req.params; // Extract userId from URL parameters
+  const account = 'user';
 
   try {
     // Query the database for messages where either sender_id or receiver_id matches the userId
     connection.query(
-      'SELECT * FROM messages WHERE sender_id = ? OR receiver_id = ? ORDER BY time ASC',
-      [userId, userId], // Pass userId twice for both sender_id and receiver_id
+      'SELECT * FROM messages WHERE (sender_id = ? AND sender_account = ?) OR (receiver_id = ? AND receiver_account = ?) ORDER BY time ASC',
+      [userId, account, userId, account], // Pass userId twice for both sender_id and receiver_id
       (err, results) => {
         if (err) {
           console.error('Error fetching messages:', err);
@@ -3260,7 +3261,9 @@ app.get('/userMessages/:userId', async (req, res) => {
           acc[businessId].push({
             id: message.id,
             senderId: message.sender_id,
+            senderAccount: message.sender_account,
             receiverId: message.receiver_id,
+            receiverAccount: message.receiver_account,
             text: message.text,
             time: message.time,
             image: message.image,
@@ -3288,12 +3291,13 @@ app.get('/userMessages/:userId', async (req, res) => {
 
 app.get('/businessMessages/:businessId', async (req, res) => {
   const { businessId } = req.params; // Extract userId from URL parameters
+  const account = 'business';
 
   try {
     // Query the database for messages where either sender_id or receiver_id matches the userId
     connection.query(
-      'SELECT * FROM messages WHERE sender_id = ? OR receiver_id = ? ORDER BY time ASC',
-      [businessId, businessId], // Pass userId twice for both sender_id and receiver_id
+      'SELECT * FROM messages WHERE (sender_id = ? AND sender_account = ?) OR (receiver_id = ? AND receiver_account = ?) ORDER BY time ASC',
+      [businessId, account, businessId, account], // Pass userId twice for both sender_id and receiver_id
       (err, results) => {
         if (err) {
           console.error('Error fetching messages:', err);
@@ -3313,7 +3317,9 @@ app.get('/businessMessages/:businessId', async (req, res) => {
           acc[userId].push({
             id: message.id,
             senderId: message.sender_id,
+            senderAccount: message.sender_account,
             receiverId: message.receiver_id,
+            receiverAccount: message.receiver_account,
             text: message.text,
             time: message.time,
             image: message.image,
@@ -3341,13 +3347,15 @@ app.get('/businessMessages/:businessId', async (req, res) => {
 
 // Endpoint to send messages
 app.post('/sendMessage', upload.single('photo'), (req, res) => {
-  const { sender_id, receiver_id, text } = req.body;
+  const { sender_id, sender_account, receiver_id, receiver_account, text } = req.body;
   const photoPath = req.file ? req.file.path : null; // Get the uploaded photo path if it exists
 
   // Construct the message object
   const message = {
     sender_id,
+    sender_account,
     receiver_id,
+    receiver_account,
     text,
     image: photoPath, // Include the photo path in the message
     time: new Date() // Add a timestamp

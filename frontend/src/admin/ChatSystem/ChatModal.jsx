@@ -397,7 +397,9 @@ const ChatModal = ({ isOpen, onClose }) => {
     if ((messageInput.trim() !== '' || image) && selectedUser !== null) {
       const formData = new FormData();
       formData.append('sender_id', user_id);
+      formData.append('sender_account', 'business');
       formData.append('receiver_id', selectedUser);
+      formData.append('receiver_account', 'user');
       formData.append('text', messageInput);
       // formData.append('form_details', ''); // Add any additional form details if needed
       // formData.append('additionalInfo', ''); // Add any additional info if needed
@@ -424,7 +426,9 @@ const ChatModal = ({ isOpen, onClose }) => {
             id: result.messageId, // Use the messageId returned from the server
             sender: 'You',
             senderId: user_id,
+            senderAccount: 'business',
             receiverId: selectedUser,
+            receiverAccount: 'user',
             text: messageInput,
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             image: imagePreview
