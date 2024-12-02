@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import CryptoJS from 'crypto-js';
@@ -15,6 +15,8 @@ import Section from './BusinessComponents/BusinessSectionDeals';
 import Allproducts from '../businesspage/BusinessComponents/BusinessAllproducts';
 import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
+import { FiSend } from 'react-icons/fi';
+
 
 const BusinessPage = () => {
   const { businessId: encryptedBusinessId } = useParams();
@@ -22,6 +24,48 @@ const BusinessPage = () => {
   const [isLiked, setIsLiked] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showButton, setShowButton] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [message, setMessage] = useState('');
+  const [userData, setUserData] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // Function to check login status
+  const checkLoginStatus = useCallback(async () => {
+    try {
+      const response = await fetch('http://localhost:5000/check-login', {
+        method: 'GET',
+        credentials: 'include' // Include cookies
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setIsLoggedIn(data.isLoggedIn); // Set login status
+      } else {
+        setIsLoggedIn(false);
+      }
+    } catch (error) {
+      console.error('Error checking login status:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    checkLoginStatus();
+  }, []);
+
+  const fetchUserData = () => {
+    axios.get('http://localhost:5000/get-userData', { withCredentials: true })
+      .then(({ data }) => {
+        setUserData(data.userData);
+      })
+      .catch(error => {
+        console.error('Error fetching user data:', error.response ? error.response.data.message : 'An unknown error occurred');
+      });
+  };
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      fetchUserData();
+    }
+  }, [isLoggedIn]);
 
   // Function to decrypt the business_id
   const decryptId = (encryptedId) => {
@@ -66,6 +110,38 @@ const BusinessPage = () => {
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleModalOpen = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setMessage('');
+  };
+
+  const handleKeyPress = (event) => {
+    if (event.key === 'Enter') {
+      handleSendMessage();
+    }
+  };
+
+  const handleSendMessage = async () => {
+    const formData = new FormData();
+    formData.append('sender_id', userData.user_id);
+    formData.append('sender_account', 'user');
+    formData.append('receiver_id', businessData.user_id);
+    formData.append('receiver_account', 'business');
+    formData.append('text', message);
+
+    try {
+      const response = await axios.post('http://localhost:5000/sendMessage', formData);
+      console.log(response);
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
+    handleModalClose();
   };
 
   if (loading) {
@@ -118,10 +194,14 @@ const BusinessPage = () => {
       <div className='container mx-auto px-4'>
         <AnimatedSection>
           <div className='flex flex-wrap items-center gap-4 py-4'>
-            <img className='h-16 sm:h-24 rounded-full object-cover' src={`http://localhost:5000/${businessData.businessLogo}`} alt="Business Logo" />
+            <img 
+              className='w-16 h-16 sm:w-24 sm:h-24 rounded-full object-cover' 
+              src={`http://localhost:5000/${businessData.businessLogo}`} 
+              alt="Business Logo" 
+            />
             <h1 className='text-xl sm:text-2xl font-medium mr-16'>{businessData.businessName}</h1>
             <div className='flex flex-wrap items-center gap-3'>
-              <Button className='h-9 px-3 bg-slate-300 hover:text-white hover:bg-color2/90'>
+              <Button className='h-9 px-3 bg-slate-300 hover:text-white hover:bg-color2/90' onClick={handleModalOpen}>
                 <div className='text-sm flex items-center gap-2'>
                   <IoChatbubbleEllipsesOutline />Message
                 </div>
@@ -138,13 +218,49 @@ const BusinessPage = () => {
                 </div>
               </Button>
               <div className="flex items-center">
-                {renderStars(businessData.rating)}
-                <span className="ml-1 text-sm">{parseFloat(businessData.rating).toFixed(1)}</span>
+                {businessData.rating ? (
+                  <>
+                    {renderStars(businessData.rating)}
+                    <span className="ml-1 text-sm">{parseFloat(businessData.rating).toFixed(1)}</span>
+                  </>
+                ) : (
+                  <span className="ml-1 text-sm">No ratings</span>
+                )}
               </div>
             </div>
           </div>
         </AnimatedSection>
       </div>
+
+      {/* Modal for sending message */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-5 rounded-md shadow-lg w-full max-w-md mx-4 relative">
+            <button 
+              className="absolute top-2 right-2 text-gray-600 hover:text-gray-800 bg-transparent rounded-full w-8 h-8 flex items-center justify-center"
+              onClick={handleModalClose}
+            >
+              <span className="text-xl">&times;</span>
+            </button>
+            <h2 className="text-lg font-medium mb-4">Send a Message to {businessData.businessName}</h2>
+            <div className="flex flex-col space-y-2">
+              <div className="flex items-center border rounded-md p-2">
+                <input
+                  type="text"
+                  className="flex-grow p-2 outline-none"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  onKeyDown={handleKeyPress}
+                  placeholder="Type a message..."
+                />
+                <button className="p-2 bg-blue-500 text-white rounded-md ml-2" onClick={handleSendMessage}>
+                  <FiSend />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Info Section with Animation */}
       <AnimatedSection>

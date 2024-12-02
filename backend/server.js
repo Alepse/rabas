@@ -3248,9 +3248,9 @@ app.get('/userMessages/:userId', async (req, res) => {
           return res.status(500).json({ error: 'Internal Server Error' });
         }
 
-        if (results.length === 0) {
-          return res.status(404).json({ message: 'No messages found.' });
-        }
+        // if (results.length === 0) {
+        //   return res.status(404).json({ message: 'No messages found.' });
+        // }
 
         // Group messages by businessId
         const groupedMessages = results.reduce((acc, message) => {
@@ -3305,9 +3305,9 @@ app.get('/businessMessages/:businessId', async (req, res) => {
           return res.status(500).json({ error: 'Internal Server Error' });
         }
 
-        if (results.length === 0) {
-          return res.status(404).json({ message: 'No messages found.' });
-        }
+        // if (results.length === 0) {
+        //   return res.status(404).json({ message: 'No messages found.' });
+        // }
 
         // Group messages by businessId
         const groupedMessages = results.reduce((acc, message) => {
@@ -3436,6 +3436,7 @@ app.get('/getAllBusinesses', (req, res) => {
   const sql = `
     SELECT 
       b.business_id,
+      b.user_id,
       b.businessName,
       b.businessType,
       b.category,
