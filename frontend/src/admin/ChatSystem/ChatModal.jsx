@@ -154,13 +154,9 @@ const AvailabilityModalActivity = ({ isOpen, onClose, currentBookingDetails, onA
 };
 
 // Component for rendering booking details
-const BookingDetailsCard = ({ message, onCheckAvailability }) => {
+const BookingDetailsCard = ({ message, onCheckAvailability, isSenderYou }) => {
   return (
-    <div className={`bg-white shadow-md text-black p-4 rounded-lg border border-gray-200 ${message.sender === 'You' ? 'ml-auto' : 'mr-auto'} max-w-full sm:max-w-sm break-words`}>
-      <div className="flex justify-between items-center mb-1">
-        <strong className="text-lg">{message.sender}</strong>
-        <span className="text-xs text-gray-500">{message.time}</span>
-      </div>
+    <div className={`bg-white shadow-md text-black p-4 rounded-lg border border-gray-200 ${isSenderYou ? 'ml-auto' : 'mr-auto'} max-w-full sm:max-w-sm break-words`}>
       <p className="font-semibold mb-2 break-words">{message.text}</p>
       {message.formDetails?.imageUrl && (
         <img
@@ -176,30 +172,37 @@ const BookingDetailsCard = ({ message, onCheckAvailability }) => {
           <li><MdPeople className="inline-block text-lg" /> <strong> Guests:</strong> {message.formDetails?.numberOfGuests || '2'}</li>
           <li><MdEmail className="inline-block text-lg" /> <strong> Email:</strong> {message.formDetails?.email || 'john.doe@example.com'}</li>
           <li><MdPhone className="inline-block text-lg" /> <strong> Phone:</strong> {message.formDetails?.phone || '123-456-7890'}</li>
+          
           {message.formType === 'accommodationBooking' && (
             <>
               <li><MdDateRange className="inline-block text-lg" /> <strong> Check-in:</strong> {message.formDetails?.checkInOutDates?.start || '2024-10-20'}</li>
               <li><MdDateRange className="inline-block text-lg" /> <strong> Check-out:</strong> {message.formDetails?.checkInOutDates?.end || '2024-10-22'}</li>
             </>
           )}
+          
           {message.formType === 'tableReservation' && (
             <>
               <li><MdDateRange className="inline-block text-lg" /> <strong> Reservation Date:</strong> {message.formDetails?.reservationDate || '2024-10-15'}</li>
               <li><strong>Reservation Time:</strong> {message.formDetails?.reservationTime || '6:00 PM'}</li>
             </>
           )}
+          
           {message.formType === 'activityBooking' && (
             <>
               <li><MdDateRange className="inline-block text-lg" /> <strong> Activity Date:</strong> {message.formDetails?.visitDate || '2024-11-01'}</li>
               <li><strong>Activity Time:</strong> {message.formDetails?.activityTime || '10:00 AM'}</li>
             </>
           )}
+          
           <li><strong>Special Requests:</strong> {message.formDetails?.specialRequests || 'None'}</li>
           <li><strong>Total Amount:</strong> ₱{message.formDetails?.amount || '0'}</li>
         </ul>
-        <Button auto color="primary" onClick={() => onCheckAvailability(message)} className="mt-2">
-          Check Availability
-        </Button>
+
+        {message.formType !== 'bookingAccepted' && (
+          <Button auto color="primary" onClick={() => onCheckAvailability(message)} className="mt-2">
+            Check Availability
+          </Button>
+        )}
       </div>
     </div>
   );
@@ -261,7 +264,7 @@ const ChatModal = ({ isOpen, onClose }) => {
         try {
           // console.log('userId', user_id);
           const { data } = await axios.get(`http://localhost:5000/businessMessages/${user_id}`);
-          console.log('data', data);
+          // console.log('data', data);
           const fetchedMessages = data.reduce((acc, { userId, messages }) => {
             acc[userId] = messages;
             return acc;
@@ -434,7 +437,7 @@ const ChatModal = ({ isOpen, onClose }) => {
             image: imagePreview
           };
 
-          console.log('new message', newMessage);
+          // console.log('new message', newMessage);
   
           setMessages({
             ...messages,
@@ -488,53 +491,60 @@ const ChatModal = ({ isOpen, onClose }) => {
   };  
 
   // Handle accepting a booking
-  const handleAcceptBooking = (bookingDetails, customMessage) => {
-    const baseMessage = (
-      <div className="p-4 bg-green-100 rounded-lg">
-        <p className="font-bold ">
-          Booking for {bookingDetails.formDetails.productName} ha been accepted.
-        </p>
-        <div className="mt-2">
-          {bookingDetails.formType === 'accommodationBooking' && (
-            <>
-              <p>Check-in Date: {bookingDetails.formDetails.checkInOutDates.start}</p>
-              <p>Check-out Date: {bookingDetails.formDetails.checkInOutDates.end}</p>
-            </>
-          )}
-          {bookingDetails.formType === 'tableReservation' && (
-            <>
-              <p>Reservation Date: {bookingDetails.formDetails.reservationDate}</p>
-              <p>Reservation Time: {bookingDetails.formDetails.reservationTime}</p>
-            </>
-          )}
-          {bookingDetails.formType === 'activityBooking' && (
-            <>
-              <p>Activity Date: {bookingDetails.formDetails.visitDate}</p>
-              <p>Activity Time: {bookingDetails.formDetails.activityTime}</p>
-            </>
-          )}
-        </div>
-        {customMessage && (
-          <p className="mt-4">
-            Message: {customMessage}
-          </p>
-        )}
-      </div>
-    );
+  const handleAcceptBooking = async (bookingDetails, customMessage) => {
+    const baseMessage = `Booking for ${bookingDetails.formDetails.productName} has been accepted.`;
 
-    const newMessage = {
-      id: messages[selectedUser].length + 1,
-      sender: 'You',
-      text: baseMessage, // Store the JSX element directly
-      time: formatTime(new Date()),
-      formType: 'bookingAccepted',
-      formDetails: bookingDetails.formDetails
-    };
+    console.log('customMessage', customMessage);
+  
+    const formData = new FormData();
+    formData.append('sender_id', user_id);
+    formData.append('sender_account', 'business');
+    formData.append('receiver_id', selectedUser);
+    formData.append('receiver_account', 'user');
+    formData.append('text', baseMessage);
+    formData.append('formType', 'bookingAccepted');
+    formData.append('form_details', JSON.stringify(bookingDetails.formDetails));
+  
+    try {
+      const response = await fetch('http://localhost:5000/sendMessage', {
+        method: 'POST',
+        body: formData,
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to send message');
+      }
+  
+      const result = await response.json();
+      if (result.success) {
+        const currentMessages = messages[selectedUser] || [];
+        const newMessage = {
+          id: result.messageId, // Use the messageId returned from the server
+          sender: 'You',
+          senderId: user_id,
+          senderAccount: 'business',
+          receiverId: selectedUser,
+          receiverAccount: 'user',
+          text: baseMessage, // Store the JSX element directly
+          time: formatTime(new Date()),
+          formType: 'bookingAccepted',
+          formDetails: bookingDetails.formDetails
+        };
 
-    setMessages({
-      ...messages,
-      [selectedUser]: [...messages[selectedUser], newMessage]
-    });
+        // console.log('bookingDetails', bookingDetails);
+  
+        setMessages({
+          ...messages,
+          [selectedUser]: [...currentMessages, newMessage]
+        });
+        toast.success('Booking accepted and message sent!');
+      } else {
+        toast.error('Failed to send message');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error('An error occurred while sending the message');
+    }
   };
 
   const renderUserList = () => {
@@ -590,6 +600,7 @@ const ChatModal = ({ isOpen, onClose }) => {
                 <BookingDetailsCard 
                   message={message} 
                   onCheckAvailability={handleCheckAvailability}
+                  isSenderYou={isSenderYou}
                 />
             ) : (
               <>
@@ -644,6 +655,11 @@ const ChatModal = ({ isOpen, onClose }) => {
     });
   };
 
+  const handleClose = () => {
+    setSelectedUser(null); // Set selectedUser to null
+    onClose(); // Call the original onClose function
+  };
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} hideCloseButton={true} size="full"
       className="bg-white transition-colors duration-300 w-full h-full">
@@ -651,7 +667,7 @@ const ChatModal = ({ isOpen, onClose }) => {
         <ModalHeader className="flex justify-between items-center px-6 py-4">
           <h2 className="text-2xl font-bold text-black">Chat</h2>
           <div className="flex items-center space-x-4">
-            <Button auto onClick={onClose} className="bg-color1 text-white">
+            <Button auto onClick={handleClose} className="bg-color1 text-white">
               Close
             </Button>
           </div>

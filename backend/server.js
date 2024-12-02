@@ -3349,7 +3349,7 @@ app.get('/businessMessages/:businessId', async (req, res) => {
 
 // Endpoint to send messages
 app.post('/sendMessage', upload.single('photo'), (req, res) => {
-  const { sender_id, sender_account, receiver_id, receiver_account, text } = req.body;
+  const { sender_id, sender_account, receiver_id, receiver_account, text, formType, form_details } = req.body;
   const photoPath = req.file ? req.file.path : null; // Get the uploaded photo path if it exists
 
   // Construct the message object
@@ -3359,6 +3359,8 @@ app.post('/sendMessage', upload.single('photo'), (req, res) => {
     receiver_id,
     receiver_account,
     text,
+    formType,
+    form_details,
     image: photoPath, // Include the photo path in the message
     time: new Date() // Add a timestamp
   };
