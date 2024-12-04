@@ -3267,7 +3267,7 @@ app.get('/userMessages/:userId', async (req, res) => {
             text: message.text,
             time: message.time,
             image: message.image,
-            formType: message.form_type,
+            formType: message.formType,
             formDetails: message.form_details,
             additionalInfo: message.additionalInfo,
             messageNote: message.messageNote

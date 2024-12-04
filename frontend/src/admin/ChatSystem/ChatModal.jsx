@@ -175,22 +175,83 @@ const BookingDetailsCard = ({ message, onCheckAvailability, isSenderYou }) => {
           
           {message.formType === 'accommodationBooking' && (
             <>
-              <li><MdDateRange className="inline-block text-lg" /> <strong> Check-in:</strong> {message.formDetails?.checkInOutDates?.start || '2024-10-20'}</li>
-              <li><MdDateRange className="inline-block text-lg" /> <strong> Check-out:</strong> {message.formDetails?.checkInOutDates?.end || '2024-10-22'}</li>
+              <li>
+                <MdDateRange className="inline-block text-lg" /> 
+                <strong> Check-in: </strong> 
+                {`${message.formDetails?.checkInOutDates?.start?.day}-${message.formDetails?.checkInOutDates?.start?.month}-${message.formDetails?.checkInOutDates?.start?.year}`}
+              </li>
+              <li>
+                <MdDateRange className="inline-block text-lg" /> 
+                <strong> Check-out: </strong> 
+                {`${message.formDetails?.checkInOutDates?.end?.day}-${message.formDetails?.checkInOutDates?.end?.month}-${message.formDetails?.checkInOutDates?.end?.year}`}
+              </li>
             </>
           )}
           
           {message.formType === 'tableReservation' && (
             <>
-              <li><MdDateRange className="inline-block text-lg" /> <strong> Reservation Date:</strong> {message.formDetails?.reservationDate || '2024-10-15'}</li>
-              <li><strong>Reservation Time:</strong> {message.formDetails?.reservationTime || '6:00 PM'}</li>
+              <li><MdDateRange className="inline-block text-lg" /> 
+              <strong> Reservation Date:</strong> {`${message.formDetails?.reservationDate?.day}-${message.formDetails?.reservationDate?.month}-${message.formDetails?.reservationDate?.year}`}</li>
+              <li><strong>Reservation Time:</strong> {new Date(`1970-01-01T${message.formDetails?.reservationTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</li>
             </>
           )}
           
           {message.formType === 'activityBooking' && (
             <>
-              <li><MdDateRange className="inline-block text-lg" /> <strong> Activity Date:</strong> {message.formDetails?.visitDate || '2024-11-01'}</li>
-              <li><strong>Activity Time:</strong> {message.formDetails?.activityTime || '10:00 AM'}</li>
+              <li>
+                <MdDateRange className="inline-block text-lg" /> 
+                <strong> Activity Date: </strong> 
+                {`${message.formDetails?.visitDate?.day}-${message.formDetails?.visitDate?.month}-${message.formDetails?.visitDate?.year}`}
+              </li>
+              <li>
+                <strong>Activity Time:</strong> 
+                {new Date(`1970-01-01T${message.formDetails?.activityTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
+              </li>
+            </>
+          )}
+
+          {message.formType === 'bookingAccepted' && (
+            <>
+              
+              {message.formDetails?.checkInOutDates ? (
+                <>
+                  <li>
+                    <MdDateRange className="inline-block text-lg" /> 
+                    <strong> Check-in: </strong>
+                    {`${message.formDetails?.checkInOutDates?.start?.day}-${message.formDetails?.checkInOutDates?.start?.month}-${message.formDetails?.checkInOutDates?.start?.year}`}
+                  </li>
+                  <li>
+                    <MdDateRange className="inline-block text-lg" /> 
+                    <strong> Check-out: </strong>
+                    {`${message.formDetails?.checkInOutDates?.end?.day}-${message.formDetails?.checkInOutDates?.end?.month}-${message.formDetails?.checkInOutDates?.end?.year}`}
+                  </li>
+                </>
+              ) : message.formDetails?.reservationDate ? (
+                <>
+                  <li>
+                    <MdDateRange className="inline-block text-lg" /> 
+                    <strong> Reservation Date: </strong>
+                    {`${message.formDetails?.reservationDate?.day}-${message.formDetails?.reservationDate?.month}-${message.formDetails?.reservationDate?.year}`}
+                  </li>
+                  <li>
+                    <strong> Reservation Time: </strong>
+                    {new Date(`1970-01-01T${message.formDetails?.reservationTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
+                  </li>
+                </>
+              ) : message.formDetails?.visitDate ? (
+                <>
+                  <li>
+                    <MdDateRange className="inline-block text-lg" /> 
+                    <strong> Activity Date: </strong>
+                    {`${message.formDetails?.visitDate?.day}-${message.formDetails?.visitDate?.month}-${message.formDetails?.visitDate?.year}`}
+                  </li>
+                  <li>
+                    <strong> Activity Time: </strong>
+                    {new Date(`1970-01-01T${message.formDetails?.activityTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
+                  </li>
+                </>
+              ) : null}
+             
             </>
           )}
           
@@ -218,8 +279,10 @@ const UnreadBadge = ({ count }) => (
 );
 
 // Chat Modal Component with dynamic check availability logic
-const ChatModal = ({ isOpen, onClose }) => {
-  const [selectedUser, setSelectedUser] = useState(null);
+const ChatModal = ({ isOpen, onClose, selectedUserId }) => {
+  const [selectedUser, setSelectedUser] = useState(parseInt(selectedUserId) || null);
+  console.log('selectedUserrrr', selectedUser);
+  console.log('isOpen', isOpen);
   const [messages, setMessages] = useState({});
   const [user_id, setUser_id] = useState(null);
   const [unreadMessages, setUnreadMessages] = useState({ 1: 3, 2: 2, 3: 1 }); // Keep track of unread message counts
@@ -576,7 +639,7 @@ const ChatModal = ({ isOpen, onClose }) => {
   };
 
   const renderMessages = (messages) => {
-    return messages.map((message) => {
+    return messages?.map((message) => {
       const isSenderYou = message.senderId === user_id; // Ensure 'user_id' is defined
   
       // Determine the image URL format (handle blob or relative paths)

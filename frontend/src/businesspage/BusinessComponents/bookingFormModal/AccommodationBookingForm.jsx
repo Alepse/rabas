@@ -100,13 +100,45 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData), // Convert formData to JSON format
+        body: JSON.stringify(formData),
       });
-  
+
       if (!response.ok) {
         throw new Error('Failed to create booking');
       }
-  
+
+      // Construct the message object
+      const message = {
+        sender_id: userId, // Assuming formData contains userId
+        sender_account: 'user', // Assuming formData contains userAccount
+        receiver_id: product.user_id, // Assuming formData contains businessId
+        receiver_account: 'business', // Assuming formData contains businessAccount
+        text: `You have successfully reserved: ${product.name} for ₱${Number(formData.discountedPrice).toFixed(2)}.`,
+        formType: 'accommodationBooking',
+        form_details: JSON.stringify({
+          email: formData.email,
+          phone: formData.phone,
+          amount: `${Number(formData.discountedPrice).toFixed(2)}`,
+          checkInOutDates: formData.checkInOutDates,
+          productName: product.name,
+          numberOfGuests: formData.numberOfGuests,
+          specialRequests: formData.specialRequests
+        })
+      };
+
+      // Send the message
+      const messageResponse = await fetch(`http://localhost:5000/sendMessage`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(message),
+      });
+
+      if (!messageResponse.ok) {
+        throw new Error('Failed to send message');
+      }
+
       Swal.fire({
         title: 'Reservation Confirmed!',
         text: `You have successfully reserved: ${product.name} for ₱${Number(formData.discountedPrice).toFixed(2)}.`,

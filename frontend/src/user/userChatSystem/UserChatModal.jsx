@@ -13,20 +13,89 @@ const BookingDetailsCard = ({ message, isSender }) => {
     <div className={`bg-white shadow-md text-black p-4 rounded-lg border border-gray-200 mt-2`}>
       <h4 className="font-semibold mb-2">Booking Details:</h4>
       <ul className="space-y-1">
-        <li><strong>Product:</strong> {message.formDetails?.productName || 'Sample Product'}</li>
-        <li><MdPeople className="inline-block text-lg" /> <strong> Guests:</strong> {message.formDetails?.numberOfGuests || '2'}</li>
-        <li><MdEmail className="inline-block text-lg" /> <strong> Email:</strong> {message.formDetails?.email || 'john.doe@example.com'}</li>
-        <li><MdPhone className="inline-block text-lg" /> <strong> Phone:</strong> {message.formDetails?.phone || '123-456-7890'}</li>
-        {message.formDetails?.visitDate && (
+        <li><strong>Product:</strong> {message.formDetails?.productName || 'No product provided'}</li>
+        <li><MdPeople className="inline-block text-lg" /> <strong> Guests:</strong> {message.formDetails?.numberOfGuests || 'No guests provided'}</li>
+        <li><MdEmail className="inline-block text-lg" /> <strong> Email:</strong> {message.formDetails?.email || 'No email provided'}</li>
+        <li><MdPhone className="inline-block text-lg" /> <strong> Phone:</strong> {message.formDetails?.phone || 'No number provided'}</li>
+         
+        {message.formType === 'accommodationBooking' && (
           <>
-            <li><MdDateRange className="inline-block text-lg" /> <strong> Activity Date:</strong> {message.formDetails.visitDate}</li>
-            <li><strong>Activity Time:</strong> {message.formDetails.activityTime}</li>
+            <li>
+              <MdDateRange className="inline-block text-lg" /> 
+              <strong> Check-in: </strong> 
+              {`${message.formDetails?.checkInOutDates?.start?.day}-${message.formDetails?.checkInOutDates?.start?.month}-${message.formDetails?.checkInOutDates?.start?.year}`}
+            </li>
+            <li>
+              <MdDateRange className="inline-block text-lg" /> 
+              <strong> Check-out: </strong> 
+              {`${message.formDetails?.checkInOutDates?.end?.day}-${message.formDetails?.checkInOutDates?.end?.month}-${message.formDetails?.checkInOutDates?.end?.year}`}
+            </li>
           </>
         )}
-        {message.formDetails?.checkInOutDates && (
+        
+        {message.formType === 'tableReservation' && (
           <>
-            <li><MdDateRange className="inline-block text-lg" /> <strong> Check-in:</strong> {message.formDetails.checkInOutDates.start}</li>
-            <li><MdDateRange className="inline-block text-lg" /> <strong> Check-out:</strong> {message.formDetails.checkInOutDates.end}</li>
+            <li><MdDateRange className="inline-block text-lg" /> <strong> Reservation Date:</strong> {`${message.formDetails?.reservationDate?.day}-${message.formDetails?.reservationDate?.month}-${message.formDetails?.reservationDate?.year}`}</li>
+            <li><strong>Reservation Time:</strong> {new Date(`1970-01-01T${message.formDetails?.reservationTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</li>
+          </>
+        )}
+        
+        {message.formType === 'activityBooking' && (
+          <>
+            <li>
+              <MdDateRange className="inline-block text-lg" /> 
+              <strong> Activity Date: </strong> 
+              {`${message.formDetails?.visitDate?.day}-${message.formDetails?.visitDate?.month}-${message.formDetails?.visitDate?.year}`}
+            </li>
+            <li>
+              <strong>Activity Time: </strong> 
+              {new Date(`1970-01-01T${message.formDetails?.activityTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
+            </li>
+          </>
+        )}
+
+        {message.formType === 'bookingAccepted' && (
+          <>
+            
+            {message.formDetails?.checkInOutDates ? (
+              <>
+                <li>
+                  <MdDateRange className="inline-block text-lg" /> 
+                  <strong> Check-in: </strong>
+                  {`${message.formDetails?.checkInOutDates?.start?.day}-${message.formDetails?.checkInOutDates?.start?.month}-${message.formDetails?.checkInOutDates?.start?.year}`}
+                </li>
+                <li>
+                  <MdDateRange className="inline-block text-lg" /> 
+                  <strong> Check-out: </strong>
+                  {`${message.formDetails?.checkInOutDates?.end?.day}-${message.formDetails?.checkInOutDates?.end?.month}-${message.formDetails?.checkInOutDates?.end?.year}`}
+                </li>
+              </>
+            ) : message.formDetails?.reservationDate ? (
+              <>
+                <li>
+                  <MdDateRange className="inline-block text-lg" /> 
+                  <strong> Reservation Date: </strong>
+                  {`${message.formDetails?.reservationDate?.day}-${message.formDetails?.reservationDate?.month}-${message.formDetails?.reservationDate?.year}`}
+                </li>
+                <li>
+                  <strong> Reservation Time: </strong>
+                  {new Date(`1970-01-01T${message.formDetails?.reservationTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
+                </li>
+              </>
+            ) : message.formDetails?.visitDate ? (
+              <>
+                <li>
+                  <MdDateRange className="inline-block text-lg" /> 
+                  <strong> Activity Date: </strong>
+                  {`${message.formDetails?.visitDate?.day}-${message.formDetails?.visitDate?.month}-${message.formDetails?.visitDate?.year}`}
+                </li>
+                <li>
+                  <strong> Activity Time: </strong>
+                  {new Date(`1970-01-01T${message.formDetails?.activityTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
+                </li>
+              </>
+            ) : null}
+            
           </>
         )}
         <li><strong>Special Requests:</strong> {message.formDetails?.specialRequests || 'None'}</li>

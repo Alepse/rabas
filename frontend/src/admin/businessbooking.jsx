@@ -762,7 +762,7 @@ const BusinessBooking = () => {
       axios.get('http://localhost:5000/get-userData', { withCredentials: true })
         .then(response => {
           const userId = response.data.userData.user_id;
-          
+
           axios.get('http://localhost:5000/getAllBusinessProduct')
             .then(({ data }) => {
               if (data.success) {
@@ -878,8 +878,7 @@ const BusinessBooking = () => {
           isOpen={isChatModalVisible}
           onClose={closeChatModal}
           chatMessages={chatMessages}
-          handleSendMessage={handleSendMessage}
-          currentBookingDetails={currentBookingDetails}
+          selectedUserId={currentBookingDetails?.userId}
         />
 
         {/* Booking Forms */}
