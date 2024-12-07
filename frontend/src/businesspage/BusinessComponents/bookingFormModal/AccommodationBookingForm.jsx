@@ -107,6 +107,9 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
         throw new Error('Failed to create booking');
       }
 
+      const responseData = await response.json();
+      const bookingId = responseData.booking_id;
+
       // Construct the message object
       const message = {
         sender_id: userId, // Assuming formData contains userId
@@ -116,6 +119,7 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
         text: `You have successfully reserved: ${product.name} for ₱${Number(formData.discountedPrice).toFixed(2)}.`,
         formType: 'accommodationBooking',
         form_details: JSON.stringify({
+          booking_id: bookingId,
           email: formData.email,
           phone: formData.phone,
           amount: `${Number(formData.discountedPrice).toFixed(2)}`,

@@ -158,14 +158,18 @@ const TableReservationForm = ({ isOpen, onClose, product = {} }) => {
         throw new Error('Failed to create booking');
       }
 
+      const responseData = await response.json();
+      const bookingId = responseData.booking_id;
+
       const message = {
-        sender_id: userId, // Assuming formData contains userId
-        sender_account: 'user', // Assuming formData contains userAccount
-        receiver_id: product.user_id, // Assuming formData contains businessId
-        receiver_account: 'business', // Assuming formData contains businessAccount
+        sender_id: userId,
+        sender_account: 'user',
+        receiver_id: product.user_id,
+        receiver_account: 'business',
         text: `You have successfully reserved: ${product.name} for ₱${Number(formData.discountedPrice).toFixed(2)}.`,
         formType: 'tableReservation',
         form_details: JSON.stringify({
+          booking_id: bookingId,
           email: formData.email,
           phone: formData.phone,
           amount: `${Number(formData.discountedPrice).toFixed(2)}`,

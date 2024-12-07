@@ -9,6 +9,33 @@ import { useLocale } from "@react-aria/i18n";
 import { toast } from 'react-toastify';
 import { MdDateRange, MdPeople, MdEmail, MdPhone } from "react-icons/md";
 import axios from "axios";
+import Swal from 'sweetalert2';
+import { useSelector, useDispatch } from 'react-redux';
+import { markBookingAsActive } from '@/redux/bookingSlice';
+
+// SweetAlert functions
+const showSuccessAlert = (message) => {
+  Swal.fire({
+    title: 'Success!',
+    text: message,
+    icon: 'success',
+    confirmButtonText: 'OK',
+    confirmButtonColor: '#0BDA51', // Green color for confirmation
+    cancelButtonColor: '#D33736',  // Red color for cancellation
+  });
+};
+
+const showErrorAlert = (message) => {
+  Swal.fire({
+    title: 'Error!',
+    text: message,
+    icon: 'error',
+    confirmButtonText: 'Try Again',
+    confirmButtonColor: '#0BDA51', // Green color for confirmation
+    cancelButtonColor: '#D33736',  // Red color for cancellation
+  });
+};
+
 // Function to determine unavailable dates
 const useUnavailableDates = () => {
   let now = today(getLocalTimeZone());
@@ -279,10 +306,11 @@ const UnreadBadge = ({ count }) => (
 );
 
 // Chat Modal Component with dynamic check availability logic
-const ChatModal = ({ isOpen, onClose, selectedUserId }) => {
-  const [selectedUser, setSelectedUser] = useState(parseInt(selectedUserId) || null);
-  console.log('selectedUserrrr', selectedUser);
-  console.log('isOpen', isOpen);
+const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
+  const [selectedBookingDetails, setSelectedBookingDetails] = useState(selectedBooking);
+  console.log('selectedBooking', selectedBookingDetails);
+  const [selectedUser, setSelectedUser] = useState(selectedUserId);
+  console.log('selectedUser', selectedUser);
   const [messages, setMessages] = useState({});
   const [user_id, setUser_id] = useState(null);
   const [unreadMessages, setUnreadMessages] = useState({ 1: 3, 2: 2, 3: 1 }); // Keep track of unread message counts
@@ -294,6 +322,7 @@ const ChatModal = ({ isOpen, onClose, selectedUserId }) => {
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [users, setUsers] = useState([]);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     axios.get('http://localhost:5000/check-login', { withCredentials: true })
@@ -556,8 +585,9 @@ const ChatModal = ({ isOpen, onClose, selectedUserId }) => {
   // Handle accepting a booking
   const handleAcceptBooking = async (bookingDetails, customMessage) => {
     const baseMessage = `Booking for ${bookingDetails.formDetails.productName} has been accepted.`;
-
+  
     console.log('customMessage', customMessage);
+    console.log('Booking details', bookingDetails);
   
     const formData = new FormData();
     formData.append('sender_id', user_id);
@@ -569,16 +599,34 @@ const ChatModal = ({ isOpen, onClose, selectedUserId }) => {
     formData.append('form_details', JSON.stringify(bookingDetails.formDetails));
   
     try {
-      const response = await fetch('http://localhost:5000/sendMessage', {
+      // Update booking status
+      const updateResponse = await fetch(`http://localhost:5000/update-booking-status/${bookingDetails?.formDetails?.booking_id}`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: 1 }) // Set status to 'Active'
+      });
+  
+      const updateData = await updateResponse.json();
+      if (!updateData.success) {
+        throw new Error(updateData.message || 'Failed to accept booking');
+      }
+
+      dispatch(markBookingAsActive(bookingDetails?.formDetails?.booking_id));
+  
+      // Send message after successful booking status update
+      const messageResponse = await fetch('http://localhost:5000/sendMessage', {
         method: 'POST',
         body: formData,
       });
   
-      if (!response.ok) {
+      if (!messageResponse.ok) {
         throw new Error('Failed to send message');
       }
   
-      const result = await response.json();
+      const result = await messageResponse.json();
       if (result.success) {
         const currentMessages = messages[selectedUser] || [];
         const newMessage = {
@@ -593,8 +641,6 @@ const ChatModal = ({ isOpen, onClose, selectedUserId }) => {
           formType: 'bookingAccepted',
           formDetails: bookingDetails.formDetails
         };
-
-        // console.log('bookingDetails', bookingDetails);
   
         setMessages({
           ...messages,
@@ -608,7 +654,7 @@ const ChatModal = ({ isOpen, onClose, selectedUserId }) => {
       console.error('Error:', error);
       toast.error('An error occurred while sending the message');
     }
-  };
+  };  
 
   const renderUserList = () => {
     // Flatten the nested array structure
@@ -640,8 +686,8 @@ const ChatModal = ({ isOpen, onClose, selectedUserId }) => {
 
   const renderMessages = (messages) => {
     return messages?.map((message) => {
-      const isSenderYou = message.senderId === user_id; // Ensure 'user_id' is defined
-  
+      const isSenderYou = ((message.senderId === user_id)&&(message.senderAccount === 'business')) ; // Ensure 'user_id' is defined
+
       // Determine the image URL format (handle blob or relative paths)
       const imageUrl = message.image
         ? message.image.startsWith('blob:')
@@ -720,6 +766,7 @@ const ChatModal = ({ isOpen, onClose, selectedUserId }) => {
 
   const handleClose = () => {
     setSelectedUser(null); // Set selectedUser to null
+    setSelectedBookingDetails(null);
     onClose(); // Call the original onClose function
   };
 

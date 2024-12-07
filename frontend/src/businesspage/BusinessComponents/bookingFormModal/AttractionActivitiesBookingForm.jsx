@@ -176,6 +176,9 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
         throw new Error(errorData.message || 'Failed to create booking');
       }
 
+      const responseData = await response.json(); // Parse the response to get the data
+      const bookingId = responseData.booking_id; // Assuming the server returns the booking ID as 'booking_id'
+
       const message = {
         sender_id: userId, // Assuming formData contains userId
         sender_account: 'user', // Assuming formData contains userAccount
@@ -184,6 +187,7 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
         text: `You have successfully reserved: ${product.name} for ₱${Number(formData.discountedPrice).toFixed(2)}.`,
         formType: 'activityBooking',
         form_details: JSON.stringify({
+          booking_id: bookingId, // Use the extracted booking ID
           email: formData.email,
           phone: formData.phone,
           amount: `${Number(formData.discountedPrice).toFixed(2)}`,

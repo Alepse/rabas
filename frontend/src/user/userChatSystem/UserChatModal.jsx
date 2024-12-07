@@ -383,7 +383,7 @@ const UserChatModal = ({ isOpen, onClose }) => {
   // Function to render messages
   const renderMessages = (messages) => {
     return messages.map((message) => {
-      const isSenderYou = message.senderId === user_id; // Ensure 'user_id' is defined
+      const isSenderYou = ((message.senderId === user_id) && (message.senderAccount === 'user')); // Ensure 'user_id' is defined
   
       // Determine the image URL format (handle blob or relative paths)
       const imageUrl = message.image

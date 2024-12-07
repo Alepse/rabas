@@ -699,6 +699,11 @@ const BusinessBooking = () => {
   const handleAcceptBooking = async (bookingId) => {
     try {
       setIsLoading(true);
+  
+      // Fetch user data to get the user_id
+      const userResponse = await axios.get('http://localhost:5000/get-userData', { withCredentials: true });
+      const userId = userResponse.data.userData.user_id;
+  
       const response = await fetch(`http://localhost:5000/update-booking-status/${bookingId}`, {
         method: 'PUT',
         credentials: 'include',
@@ -707,14 +712,41 @@ const BusinessBooking = () => {
         },
         body: JSON.stringify({ status: 1 }) // Set status to 'Active'
       });
-
+  
       const data = await response.json();
+      console.log('response:', data);
       if (!data.success) {
         throw new Error(data.message || 'Failed to accept booking');
       }
-
+  
       dispatch(markBookingAsActive(bookingId));
       showSuccessAlert('Booking accepted successfully!');
+  
+      // Send a message after accepting the booking
+      const messageData = {
+        sender_id: userId, // Use the fetched user_id
+        sender_account: 'business',
+        receiver_id: data.receiver_id, // Assuming the receiver_id is part of the response
+        receiver_account: 'user',
+        text: `Booking for ${data.title} has been accepted.`,
+        formType: 'bookingAccepted',
+        form_details: JSON.stringify({ bookingId }) // Include any additional details if necessary
+      };
+  
+      const messageResponse = await fetch('http://localhost:5000/sendMessage', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(messageData)
+      });
+  
+      const messageResult = await messageResponse.json();
+      if (!messageResult.success) {
+        throw new Error('Failed to send acceptance message');
+      }
+  
+      showSuccessAlert('Acceptance message sent successfully!');
     } catch (error) {
       console.error('Error accepting booking:', error);
       showErrorAlert(error.message || 'Failed to accept booking');
@@ -722,6 +754,7 @@ const BusinessBooking = () => {
       setIsLoading(false);
     }
   };
+  
 
   const handleMarkAsCompleted = async (bookingId) => {
     try {
@@ -877,6 +910,7 @@ const BusinessBooking = () => {
         <ChatModal
           isOpen={isChatModalVisible}
           onClose={closeChatModal}
+          selectedBooking={currentBookingDetails}
           chatMessages={chatMessages}
           selectedUserId={currentBookingDetails?.userId}
         />

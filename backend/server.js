@@ -2567,9 +2567,25 @@ app.put('/update-booking-status/:id', (req, res) => {
       });
     }
 
-    res.json({ 
-      success: true, 
-      message: 'Booking status updated successfully' 
+    // Fetch the user_id associated with the booking
+    connection.query('SELECT user_id, productName FROM bookings WHERE booking_id = ?', [bookingId], (err, results) => {
+      if (err || results.length === 0) {
+        console.error('Error fetching user_id:', err);
+        return res.status(500).json({ 
+          success: false, 
+          message: 'Failed to fetch user_id' 
+        });
+      }
+
+      const userId = results[0].user_id;
+      const product = results[0].productName;
+
+      res.json({ 
+        success: true, 
+        message: 'Booking status updated successfully',
+        receiver_id: userId, // set receiver id for messaging purposes
+        title: product,
+      });
     });
   });
 });

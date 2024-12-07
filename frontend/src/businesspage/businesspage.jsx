@@ -16,7 +16,30 @@ import Allproducts from '../businesspage/BusinessComponents/BusinessAllproducts'
 import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { FiSend } from 'react-icons/fi';
+import Swal from 'sweetalert2';
 
+const showSuccessAlert = (message) => {
+  Swal.fire({
+    title: 'Success!',
+    text: message,
+    icon: 'success',
+    confirmButtonText: 'OK',
+    confirmButtonColor: '#0BDA51', // Green color for confirmation
+    cancelButtonColor: '#D33736',  // Red color for cancellation
+  });
+};
+
+const showErrorAlert = (message) => {
+  Swal.fire({
+    title: 'Error!',
+    text: message,
+    icon: 'error',
+    confirmButtonText: 'Try Again',
+    confirmButtonColor: '#0BDA51', // Green color for confirmation
+    cancelButtonText: 'Close',
+    cancelButtonColor: '#D33736',  // Red color for cancellation
+  });
+};
 
 const BusinessPage = () => {
   const { businessId: encryptedBusinessId } = useParams();
@@ -113,6 +136,9 @@ const BusinessPage = () => {
   };
 
   const handleModalOpen = () => {
+    if (!isLoggedIn){
+      return  showErrorAlert('Please login to send a message.');
+    }
     setIsModalOpen(true);
   };
 
@@ -138,6 +164,7 @@ const BusinessPage = () => {
     try {
       const response = await axios.post('http://localhost:5000/sendMessage', formData);
       console.log(response);
+      showSuccessAlert('Message send successfully.');
     } catch (error) {
       console.error('Error sending message:', error);
     }
@@ -174,6 +201,9 @@ const BusinessPage = () => {
   };
 
   const handleLikeClick = () => {
+    if (!isLoggedIn){
+      return  showErrorAlert('Please login to like a page.');
+    }
     setIsLiked(!isLiked);
   };
 
