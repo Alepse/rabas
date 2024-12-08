@@ -65,7 +65,7 @@ const Juban = () => {
       
       {/* Image Collage */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-6">
-        <img src={jubanpic1 } className="col-span-2 md:col-span-2 row-span-2 rounded-lg w-full h-[31rem]  " />
+        <img src={jubanpic1 } className="col-span-2 md:col-span-2 row-span-2 rounded-lg w-full h-full  " />
         <img src={jubanpic2 }  className="rounded-lg w-full h-60 " />
         <img src={jubanpic3 } className="rounded-lg object-cover w-full h-60" />
         <img src={jubanpic4}  className="rounded-lg object-cover w-full h-60" />

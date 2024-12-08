@@ -1332,10 +1332,12 @@ const BusinessProfile = () => {
                 </div>
               </CardBody>
             </Card>
+            <div className='flex gap-2'>
             <Button onClick={() => dispatch(addFacility())} className="mt-2 bg-color1 text-white hover:bg-color2 transition">Add Facility</Button>
             <Button onClick={() => handleSaveFacilities()} className="mt-2 bg-color1 text-white hover:bg-color2 transition">
               Save
             </Button>
+            </div>
           </Tab>
 
           <Tab key="policies" title="Policies">

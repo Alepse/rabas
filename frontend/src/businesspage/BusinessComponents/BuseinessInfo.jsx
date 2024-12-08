@@ -149,7 +149,7 @@ const BusinessInfo = () => {
               <div className="flex flex-col lg:flex-row h-auto lg:h-[47em] overflow-y-auto scrollbar-custom gap-8">
                 <div className="flex-1 p-4">
                   <h2 className="text-2xl md:text-3xl font-bold mb-4">About Our Business</h2>
-                  <div className='max-w-full lg:max-w-[40rem] w-full flex flex-col justify-center items-center'>
+                  <div className='max-w-full lg:max-w-[40rem] w-full flex flex-col justify-center items-start'>
                     <div className="text-black mb-6 break-words whitespace-normal">
                       <h1 className="text-md font-normal">
                         {businessData.aboutUs}
@@ -250,26 +250,23 @@ const BusinessInfo = () => {
           <Card>
             <CardBody>
               <h2 className="text-2xl font-bold mb-4">Our Facilities & Amenities</h2>
-              <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {businessData.facilities && businessData.facilities.length > 0 ? (
-                  businessData.facilities.map((facility, index) => (
-                    <div key={index} className='h-auto flex flex-col items-center w-full p-4 bg-gray-100 rounded-lg shadow-md'>
-                      <div className='flex items-center gap-2 mb-2'>
-                        {React.createElement(
-                          businessIcons.find(icon => icon.name === facility.icon)?.icon || FaCheckCircle,
-                          { size: 20 }
-                        )}
-                        <p className='font-semibold text-lg'>{facility.name}</p>
-                      </div>
-                      <ul className='space-y-1'>
-                        <li className='font-normal text-sm'>{facility.description || 'No description available'}</li>
-                      </ul>
-                    </div>
-                  ))
-                ) : (
-                  <div className="italic text-gray-500 p-4 bg-gray-100 rounded-md">No facilities available</div>
-                )}
-              </div>
+              <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+            {businessData.facilities && businessData.facilities.length > 0 ? (
+              businessData.facilities.map((facility, index) => (
+                <div key={index} className="flex flex-col items-center w-full h-auto p-4 bg-white shadow-md rounded-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    {React.createElement(
+                      businessIcons.find(icon => icon.name === facility.icon)?.icon || FaCheckCircle,
+                      { size: 20 }
+                    )}
+                    <p className="font-medium text-md">{facility.name}</p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="italic text-gray-500 p-4 bg-gray-100 rounded-md">No facilities available</div>
+            )}
+          </div>
             </CardBody>
           </Card>
         </Tab>
@@ -324,26 +321,26 @@ const BusinessInfo = () => {
             <CardBody>
               <h2 className="text-2xl font-bold mb-4">Our Policies</h2>
               <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {businessData.policies && businessData.policies.length > 0 ? (
-                  businessData.policies.map((policy, index) => (
-                    <div key={index} className='h-auto flex flex-col items-center w-full p-4 bg-gray-100 rounded-lg shadow-md'>
-                      <div className='flex items-center gap-2 mb-2'>
-                        <FaClipboardList size={20} />
-                        <p className='font-semibold text-lg'>{policy.title}</p>
-                      </div>
-                      <ul className='pl-5 space-y-1'>
-                        {policy.items.map((item, itemIndex) => (
-                          <li key={itemIndex} className='font-normal text-sm list-disc items-center gap-2'>
-                            <span className='flex-grow'>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
+              {businessData.policies && businessData.policies.length > 0 ? (
+                businessData.policies.map((policy, index) => (
+                  <div key={index} className="flex flex-col items-start w-full h-auto p-4 bg-white shadow-md rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <FaClipboardList size={20} />
+                      <p className="font-semibold text-lg">{policy.title}</p>
                     </div>
-                  ))
-                ) : (
-                  <div className="italic text-gray-500 p-4 bg-gray-100 rounded-md">No policies available</div>
-                )}
-              </div>
+                    <ul className="pl-5 space-y-1">
+                      {policy.items.map((item, itemIndex) => (
+                        <li key={itemIndex} className="font-normal text-sm list-disc">
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))
+              ) : (
+                <div className="italic text-gray-500 p-4 bg-gray-100 rounded-md">No policies available</div>
+              )}
+            </div>
             </CardBody>
           </Card>
         </Tab>
