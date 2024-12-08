@@ -65,7 +65,7 @@ const Matnog = () => {
       
       {/* Image Collage */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-6">
-        <img src={matnogpic1} className="col-span-2 md:col-span-2 row-span-2 rounded-lg w-full h-[31rem]  " />
+        <img src={matnogpic1} className="col-span-2 md:col-span-2 row-span-2 rounded-lg w-full h-full  " />
         <img src={matnogpic2 }  className="rounded-lg w-full h-60 " />
         <img src={matnogpic3 } className="rounded-lg object-cover w-full h-60" />
         <img src={matnogpic4}  className="rounded-lg object-cover w-full h-60" />
