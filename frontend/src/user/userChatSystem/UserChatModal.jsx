@@ -282,7 +282,7 @@ const UserChatModal = ({ isOpen, onClose }) => {
             image: imagePreview
           };
 
-          console.log('new message', newMessage);
+          // console.log('new message', newMessage);
   
           setMessages({
             ...messages,
@@ -364,9 +364,9 @@ const UserChatModal = ({ isOpen, onClose }) => {
     // Check if the business was found
     if (selectedBusiness) {
       setActiveChatUser(selectedBusiness);
-      console.log('active chat user: ', activeChatUser);
+      // console.log('active chat user: ', activeChatUser);
     } else {
-      console.error(`Business with ID ${businessId} not found.`);
+      // console.error(`Business with ID ${businessId} not found.`);
     }
     
     // Reset unread messages for the selected business

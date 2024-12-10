@@ -308,9 +308,9 @@ const UnreadBadge = ({ count }) => (
 // Chat Modal Component with dynamic check availability logic
 const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
   const [selectedBookingDetails, setSelectedBookingDetails] = useState(selectedBooking);
-  console.log('selectedBooking', selectedBookingDetails);
+  // console.log('selectedBooking', selectedBookingDetails);
   const [selectedUser, setSelectedUser] = useState(selectedUserId);
-  console.log('selectedUser', selectedUser);
+  // console.log('selectedUser', selectedUser);
   const [messages, setMessages] = useState({});
   const [user_id, setUser_id] = useState(null);
   const [unreadMessages, setUnreadMessages] = useState({ 1: 3, 2: 2, 3: 1 }); // Keep track of unread message counts
@@ -336,7 +336,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
       // Check if the user was found before accessing properties
       if (selectedUser) {
         setActiveChatUser(selectedUser);
-        console.log('activeChatUser', selectedUser);
+        // console.log('activeChatUser', selectedUser);
       } else {
         // console.error(`User with ID ${selectedUserId} not found.`);
       }
@@ -611,8 +611,8 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
   const handleAcceptBooking = async (bookingDetails, customMessage) => {
     const baseMessage = `Booking for ${bookingDetails.formDetails.productName} has been accepted.`;
   
-    console.log('customMessage', customMessage);
-    console.log('Booking details', bookingDetails);
+    // console.log('customMessage', customMessage);
+    // console.log('Booking details', bookingDetails);
   
     const formData = new FormData();
     formData.append('sender_id', user_id);
