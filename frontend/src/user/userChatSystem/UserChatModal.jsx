@@ -363,7 +363,8 @@ const UserChatModal = ({ isOpen, onClose }) => {
 
     // Check if the business was found
     if (selectedBusiness) {
-      setActiveChatUser(selectedBusiness.name);
+      setActiveChatUser(selectedBusiness);
+      console.log('active chat user: ', activeChatUser);
     } else {
       console.error(`Business with ID ${businessId} not found.`);
     }
@@ -381,30 +382,37 @@ const UserChatModal = ({ isOpen, onClose }) => {
   };
 
   // Function to render messages
-  const renderMessages = (messages) => {
-    return messages.map((message) => {
-      const isSenderYou = ((message.senderId === user_id) && (message.senderAccount === 'user')); // Ensure 'user_id' is defined
-  
-      // Determine the image URL format (handle blob or relative paths)
-      const imageUrl = message.image
-        ? message.image.startsWith('blob:')
-          ? message.image
-          : `http://localhost:5000/${message.image.replace(/\\/g, '/')}`  // Adjust for server path
-        : null;
-  
-      return (
-        <div
-          key={message.id}
-          className={`flex ${isSenderYou ? 'justify-end' : 'justify-start'} mb-4`}
-        >
-          <div
-            className={`p-4 rounded-lg max-w-[70%] ${
-              isSenderYou ? 'bg-gray-200 text-black' : 'bg-blue-600 text-white'
-            } shadow-md`}
-          >
+const renderMessages = (messages) => {
+  let lastMessageTime = null;
+
+  return messages.map((message, index) => {
+    const isSenderYou = ((message.senderId === user_id) && (message.senderAccount === 'user'));
+    const imageUrl = message.image
+      ? message.image.startsWith('blob:')
+        ? message.image
+        : `http://localhost:5000/${message.image.replace(/\\/g, '/')}`
+      : null;
+
+    const messageTime = new Date(message.time);
+    const now = new Date();
+    const isToday = messageTime.toDateString() === now.toDateString();
+    const showTime = index === 0 || (lastMessageTime && (messageTime - lastMessageTime) > 600000);
+    lastMessageTime = messageTime;
+
+    return (
+      <div key={message.id}>
+        {showTime && (
+          <div className="text-center text-xs text-gray-500 mb-2">
+            {isToday
+              ? messageTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })
+              : messageTime.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true })}
+          </div>
+        )}
+        <div className={`flex ${isSenderYou ? 'justify-end' : 'justify-start'} mb-4`}>
+          <div className={`p-4 rounded-lg max-w-[70%] ${isSenderYou ? 'bg-gray-200 text-black' : 'bg-blue-600 text-white'} shadow-md`}>
             {/* Message Text */}
             {message.text && <p className="break-words mb-2">{message.text}</p>}
-  
+
             {/* Image Handling */}
             {imageUrl && (
               <div className="relative">
@@ -413,7 +421,7 @@ const UserChatModal = ({ isOpen, onClose }) => {
                   alt="Sent"
                   className="mt-2 rounded-md max-w-full cursor-pointer"
                   style={{ maxHeight: '400px', objectFit: 'cover' }}
-                  onClick={() => handleImageClick(imageUrl)} // Open image in a modal or new tab
+                  onClick={() => handleImageClick(imageUrl)}
                 />
                 <button
                   onClick={() => handleImageDownload(imageUrl)}
@@ -423,19 +431,19 @@ const UserChatModal = ({ isOpen, onClose }) => {
                 </button>
               </div>
             )}
-  
+
             {/* Additional Information */}
             {message.additionalInfo && (
               <p className="text-sm text-gray-300 mb-2">{message.additionalInfo}</p>
             )}
-  
+
             {/* Message Note */}
             {message.messageNote && (
               <p className="text-sm text-gray-300 mb-2">
                 <strong>Message:</strong> {message.messageNote}
               </p>
             )}
-  
+
             {/* Form Details Rendering */}
             {message.formDetails &&
               Object.keys(message.formDetails).some((key) => message.formDetails[key] !== null) && (
@@ -443,9 +451,10 @@ const UserChatModal = ({ isOpen, onClose }) => {
               )}
           </div>
         </div>
-      );
-    });
-  };
+      </div>
+    );
+  });
+};
 
   // Function to render business list
   const renderBusinessList = () => {
@@ -454,7 +463,9 @@ const UserChatModal = ({ isOpen, onClose }) => {
     // console.log('flattenedBusinesses', flattenedBusinesses);
     return flattenedBusinesses.map((business) => (
       <li key={business.id}
-        className="p-3 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-300 bg-white"
+        className={`p-3 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-300 bg-white ${
+          business.user_id === selectedBusiness ? 'bg-blue-100' : '' // Highlight active business
+        }`}
         onClick={() => handleBusinessClick(business.user_id)}>
         <div className="relative flex items-center gap-3">
           <div className="relative">
@@ -466,7 +477,7 @@ const UserChatModal = ({ isOpen, onClose }) => {
         <span className={`w-3 h-3 rounded-full ${business?.status === 'online' ? 'bg-green-500' : 'bg-gray-400'}`}></span>
       </li>
     ));
-  };  
+  };
 
   const handleClose = () => {
     setSelectedBusiness(null); // Set selectedBusiness to null
@@ -499,22 +510,36 @@ const UserChatModal = ({ isOpen, onClose }) => {
           <div className="flex flex-col justify-between w-full lg:w-3/4 h-full bg-white rounded-md p-4">
             {selectedBusiness ? (
               <>
-                <div className="flex flex-col space-y-3 overflow-y-auto scrollbar-custom">
-                  <h3 className="font-semibold mb-2 text-black">
-                    Chat with {activeChatUser}
-                  </h3>
+                <div className="flex items-center space-x-3 p-3 bg-blue-900 text-white rounded-t-lg">
+                  <img
+                    src={activeChatUser.avatarUrl 
+                      ? `http://localhost:5000/${activeChatUser.avatarUrl}` 
+                      : activeChatUser.image 
+                        ? activeChatUser.image 
+                        : `https://ui-avatars.com/api/?name=${activeChatUser.name}`} 
+                    alt="User Avatar"
+                    className="w-10 h-10 rounded-full"
+                  />
+                  <div className="flex flex-col">
+                    <span className="font-semibold">{activeChatUser.name}</span>
+                    <span className="text-sm text-green-400">Active now</span>
+                  </div>
+                </div>
+
+                {/* Render messages */}
+                <div className="flex-grow overflow-y-auto">
                   {renderMessages(messages[selectedBusiness])}
                   <div ref={messageEndRef}></div>
                 </div>
 
-                <div className="flex items-center space-x-2 mt-4 justify-between ">
+                <div className="flex items-center space-x-2 mt-4 justify-between">
                   <textarea
                     value={messageInput}
                     onChange={(e) => setMessageInput(e.target.value)}
                     onKeyDown={handleKeyPress}
                     placeholder="Type a message..."
                     className="w-full bg-white text-black rounded-lg border border-gray-300 focus:border-black focus:ring resize-none p-2"
-                    rows="2" 
+                    rows="2"
                   />
                   <input
                     type="file"
@@ -526,7 +551,9 @@ const UserChatModal = ({ isOpen, onClose }) => {
                   <label htmlFor="image-upload" className="cursor-pointer">
                     <FiImage size={24} className="text-gray-500 hover:text-black" />
                   </label>
-                  <Button onClick={handleSendMessage} color="primary" className="rounded-lg h-full max-w-[100px] w-full"><FiSend /></Button>
+                  <Button onClick={handleSendMessage} color="primary" className="rounded-lg h-full max-w-[100px] w-full">
+                    <FiSend />
+                  </Button>
                 </div>
                 {imagePreview && (
                   <div className="mt-2 relative">

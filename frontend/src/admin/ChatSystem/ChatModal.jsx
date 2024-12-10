@@ -325,6 +325,31 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    if (isOpen) {
+      setSelectedUser(selectedUserId);
+      // Flatten the users array if it contains nested arrays
+      const flattenedUsers = users.flat();
+      
+      // Find the selected user
+      const selectedUser = flattenedUsers.find(user => user.user_id === selectedUserId);
+      
+      // Check if the user was found before accessing properties
+      if (selectedUser) {
+        setActiveChatUser(selectedUser);
+        console.log('activeChatUser', selectedUser);
+      } else {
+        // console.error(`User with ID ${selectedUserId} not found.`);
+      }
+      
+      // Reset unread messages for the selected user using a functional update
+      setUnreadMessages(prevUnreadMessages => ({
+        ...prevUnreadMessages,
+        [selectedUserId]: 0,
+      }));
+    }
+  }, [isOpen, selectedUserId, users]);
+
+  useEffect(() => {
     axios.get('http://localhost:5000/check-login', { withCredentials: true })
       .then(response => {
         if (response.data.isLoggedIn) {  // Check if the user is logged in
@@ -569,7 +594,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
     
     // Check if the user was found before accessing properties
     if (selectedUser) {
-      setActiveChatUser(selectedUser.name);
+      setActiveChatUser(selectedUser);
       // console.log('activeChatUser', selectedUser.name);
     } else {
       // console.error(`User with ID ${userId} not found.`);
@@ -662,7 +687,9 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
     // console.log('flattenedUsers', flattenedUsers);
     return flattenedUsers.map((user) => (
       <li key={user.user_id}
-        className="p-3 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-300 bg-white"
+        className={`p-3 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-300 bg-white ${
+          user.user_id === selectedUser ? 'bg-blue-100' : '' // Highlight active user
+        }`}
         onClick={() => handleUserClick(user.user_id)}>
         <div className="relative flex items-center gap-3">
           <div className="relative">
@@ -685,79 +712,78 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
   };
 
   const renderMessages = (messages) => {
-    return messages?.map((message) => {
-      const isSenderYou = ((message.senderId === user_id)&&(message.senderAccount === 'business')) ; // Ensure 'user_id' is defined
-
-      // Determine the image URL format (handle blob or relative paths)
+    let lastMessageTime = null;
+  
+    return messages?.map((message, index) => {
+      const isSenderYou = ((message.senderId === user_id) && (message.senderAccount === 'business'));
       const imageUrl = message.image
         ? message.image.startsWith('blob:')
           ? message.image
-          : `http://localhost:5000/${message.image.replace(/\\/g, '/')}`  // Adjust for server path
+          : `http://localhost:5000/${message.image.replace(/\\/g, '/')}`
         : null;
   
+      const messageTime = new Date(message.time);
+      const now = new Date();
+      const isToday = messageTime.toDateString() === now.toDateString();
+      const showTime = index === 0 || (lastMessageTime && (messageTime - lastMessageTime) > 600000);
+      lastMessageTime = messageTime;
+  
       return (
-        <div
-          key={message.id}
-          className={`flex ${isSenderYou ? 'justify-end' : 'justify-start'} mb-4`}
-        >
-          <div
-            className={`p-4 rounded-lg max-w-[70%] ${
-              isSenderYou ? 'bg-gray-200 text-black' : 'bg-blue-600 text-white'
-            } shadow-md`}
-          >
-            {message.formType ? (
-                <BookingDetailsCard 
-                  message={message} 
+        <div key={message.id}>
+          {showTime && (
+            <div className="text-center text-xs text-gray-500 mb-2">
+              {isToday
+                ? messageTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })
+                : messageTime.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true })}
+            </div>
+          )}
+          <div className={`flex ${isSenderYou ? 'justify-end' : 'justify-start'} mb-4`}>
+            <div className={`p-4 rounded-lg max-w-[70%] ${isSenderYou ? 'bg-gray-200 text-black' : 'bg-blue-600 text-white'} shadow-md`}>
+              {message.formType ? (
+                <BookingDetailsCard
+                  message={message}
                   onCheckAvailability={handleCheckAvailability}
                   isSenderYou={isSenderYou}
                 />
-            ) : (
-              <>
-              {/* Message Text */}
-              {message.text && <p className="break-words mb-2">{message.text}</p>}
-    
-              {/* Image Handling */}
-              {imageUrl && (
-                <div className="relative">
-                  <img
-                    src={imageUrl}
-                    alt="Sent"
-                    className="mt-2 rounded-md max-w-full cursor-pointer"
-                    style={{ maxHeight: '400px', objectFit: 'cover' }}
-                    onClick={() => handleImageClick(imageUrl)} // Open image in a modal or new tab
-                  />
-                  <button
-                    onClick={() => handleImageDownload(imageUrl)}
-                    className="absolute top-2 right-2 bg-white p-1 rounded-full shadow-md"
-                  >
-                    <FiDownload size={16} className="text-black" />
-                  </button>
-                </div>
+              ) : (
+                <>
+                  {message.text && <p className="break-words mb-2">{message.text}</p>}
+                  {imageUrl && (
+                    <div className="relative">
+                      <img
+                        src={imageUrl}
+                        alt="Sent"
+                        className="mt-2 rounded-md max-w-full cursor-pointer"
+                        style={{ maxHeight: '400px', objectFit: 'cover' }}
+                        onClick={() => handleImageClick(imageUrl)}
+                      />
+                      <button
+                        onClick={() => handleImageDownload(imageUrl)}
+                        className="absolute top-2 right-2 bg-white p-1 rounded-full shadow-md"
+                      >
+                        <FiDownload size={16} className="text-black" />
+                      </button>
+                    </div>
+                  )}
+                  {message.additionalInfo && (
+                    <p className="text-sm text-gray-300 mb-2">{message.additionalInfo}</p>
+                  )}
+                  {message.messageNote && (
+                    <p className="text-sm text-gray-300 mb-2">
+                      <strong>Message:</strong> {message.messageNote}
+                    </p>
+                  )}
+                  {message.formDetails &&
+                    Object.keys(message.formDetails).some((key) => message.formDetails[key] !== null) && (
+                      <BookingDetailsCard
+                        message={message}
+                        isSender={isSenderYou}
+                        onCheckAvailability={handleCheckAvailability}
+                      />
+                    )}
+                </>
               )}
-    
-              {/* Additional Information */}
-              {message.additionalInfo && (
-                <p className="text-sm text-gray-300 mb-2">{message.additionalInfo}</p>
-              )}
-    
-              {/* Message Note */}
-              {message.messageNote && (
-                <p className="text-sm text-gray-300 mb-2">
-                  <strong>Message:</strong> {message.messageNote}
-                </p>
-              )}
-    
-              {/* Form Details Rendering */}
-              {message.formDetails &&
-                Object.keys(message.formDetails).some((key) => message.formDetails[key] !== null) && (
-                  <BookingDetailsCard 
-                    message={message} 
-                    isSender={isSenderYou} 
-                    onCheckAvailability={handleCheckAvailability}
-                  />
-              )}
-              </>
-            )}
+            </div>
           </div>
         </div>
       );
@@ -796,8 +822,24 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
           <div className="flex flex-col justify-between w-full lg:w-3/4 h-full bg-white rounded-md p-4">
             {selectedUser ? (
               <>
-                <div className="flex flex-col space-y-3 overflow-y-auto scrollbar-custom">
-                  <h3 className="font-semibold mb-4 text-black">Chat with {activeChatUser}</h3>
+                <div className="flex items-center space-x-3 p-3 bg-blue-900 text-white rounded-t-lg">
+                  <img
+                    src={activeChatUser.image_path 
+                      ? `http://localhost:5000/${activeChatUser.image_path}` 
+                      : activeChatUser.image 
+                        ? activeChatUser.image 
+                        : `https://ui-avatars.com/api/?name=${activeChatUser.name}`} 
+                    alt="User Avatar"
+                    className="w-10 h-10 rounded-full"
+                  />
+                  <div className="flex flex-col">
+                    <span className="font-semibold">{activeChatUser.name}</span>
+                    <span className="text-sm text-green-400">Active now</span>
+                  </div>
+                </div>
+
+                {/* Render messages */}
+                <div className="flex-grow overflow-y-auto">
                   {renderMessages(messages[selectedUser])}
                   <div ref={messageEndRef}></div>
                 </div>
@@ -822,7 +864,9 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
                   <label htmlFor="image-upload" className="cursor-pointer">
                     <FiImage size={24} className="text-gray-500 hover:text-black" />
                   </label>
-                  <Button onClick={handleSendMessage} color="primary" className="rounded-lg h-full max-w-[100px] w-full"><FiSend /></Button>
+                  <Button onClick={handleSendMessage} color="primary" className="rounded-lg h-full max-w-[100px] w-full">
+                    <FiSend />
+                  </Button>
                 </div>
                 {imagePreview && (
                   <div className="mt-2 relative">

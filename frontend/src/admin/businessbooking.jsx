@@ -636,7 +636,10 @@ const BusinessBooking = () => {
     setChatModalVisible(true);
   };
 
-  const closeChatModal = () => setChatModalVisible(false);
+  const closeChatModal = () => {
+    setCurrentBookingDetails(null)
+   setChatModalVisible(false)
+  };
 
   const handleSendMessage = (message) => {
     if (message.trim()) {

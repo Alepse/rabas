@@ -3340,7 +3340,7 @@ app.get('/usersInChat/:userId', async (req, res) => {
   const sql = `
     SELECT DISTINCT
       u.user_id,
-      u.username AS name,
+      CONCAT(u.Fname, ' ', u.Lname) AS name,
       u.email,
       u.image,
       u.image_path,
