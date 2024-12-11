@@ -594,7 +594,7 @@ const Nav = () => {
             </NavigationMenu>
             {isLoggedIn && (
               <div
-                className={`cursor-pointer text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1 ${activeLink === '/trip' ? ' border-b-1 border-light p-1 font-semibold ' : ''}`}
+                className={`cursor-pointer  hover:font-semibold duration-100 text-lg font-light flex items-center gap-1 ${activeLink === '/trip' ? ' border-b-1 border-light p-1 font-semibold ' : ''}`}
                 onClick={() => setActiveLink('/trip')}
               >
                 <TbNotes /> <a href='/trip'>Trip</a>
