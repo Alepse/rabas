@@ -612,10 +612,10 @@ const UserProfile = ({ activities = [] }) => {
                 <div key={`approved-${application.application_id}`} className='mb-4'>
                   <h1 className='font-bold mb-2'>Switch to Business:</h1>
                   <button 
-                    className='text-gray-500 hover:bg-color2 hover:text-white flex items-center p-2 rounded-lg gap-1'
+                    className='text-gray-500 hover:bg-color2 hover:text-white flex items-center p-2 rounded-lg gap-1 border-2 border-color1 shadow-md transition duration-300 ease-in-out transform hover:scale-105'
                     onClick={() => handleBusinessClick(businessData.business_id)}
                     key={application.application_id}>
-                    <Avatar src=''/>
+                    <Avatar src={ businessData.businessLogo ? `http://localhost:5000/${businessData.businessLogo}` : ''}/>
                     <p>{businessData.businessName}</p>
                   </button>
                 </div>
