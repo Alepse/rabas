@@ -510,87 +510,79 @@ const UserProfile = ({ activities = [] }) => {
         <Search />
       </div>
 
-      <div className='container mx-auto flex flex-col md:flex-row mb-4 gap-4'>
-        {/* Sidebar */}
-        <div className='bg-white p-4 w-full md:w-1/4 flex flex-col justify-between shadow-lg rounded-md items-center'>
-          <div className='flex flex-col items-center gap-2 flex-grow justify-center'>
-            <div className='relative flex items-center w-28 h-28'>
-              <Avatar className='w-full h-full object-cover rounded-full' 
-              src={profilePic 
-                ? profilePic 
-                : (userData?.image_path 
-                  ? `http://localhost:5000/${userData.image_path}`
-                  : userData?.google_id
-                    ? userData.image
-                    : `https://ui-avatars.com/api/?name=${username?.charAt(0).toUpperCase()}`)}  
-              />
-              <input type='file' className='hidden' accept='image/*' onChange={handleFileChange} id='fileInput' />
-              <div
-                onClick={() => document.getElementById('fileInput').click()}
-                className='absolute bottom-0 right-0 bg-color1 text-white rounded-full w-9 h-9 hover:bg-color2 flex justify-center items-center cursor-pointer'
-              >
-                +
-              </div>
-            </div>
-            <div className='text-2xl font-light'>
-              {userData?.username ? userData.username : 'Loading...'}
-            </div>
+      {/* Header Section */}
+      <div className='container mx-auto flex flex-col items-center mb-8 bg-white mt-2 shadow-md rounded-xl shadow-gray-400 ' style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat' }}>
+        <div className='relative flex items-center w-36 h-36 mb-4'>
+          <Avatar className='w-full h-full object-cover rounded-full border-4 border-color1' 
+            src={profilePic 
+              ? profilePic 
+              : (userData?.image_path 
+                ? `http://localhost:5000/${userData.image_path}`
+                : userData?.google_id
+                  ? userData.image
+                  : `https://ui-avatars.com/api/?name=${username?.charAt(0).toUpperCase()}`)}  
+          />
+          <input type='file' className='hidden' accept='image/*' onChange={handleFileChange} id='fileInput' />
+          <div
+            onClick={() => document.getElementById('fileInput').click()}
+            className='absolute bottom-0 right-0 bg-color1 text-white rounded-full w-10 h-10 hover:bg-color2 flex justify-center items-center cursor-pointer'
+          >
+            +
           </div>
-          {businessApplications.length > 0 ? (
-            businessApplications.map((application) => {
-              if (application.status === 0) {
-                return (
-                  <div key={`pending-${application.application_id}`}>
-                    <Button className='text-white bg-yellow-500 hover:bg-yellow-600'>
-                      Pending Application
-                    </Button>
-                  </div>
-                );
-              } else if (application.status === 1) {
-                return (
-                  <div key={`approved-${application.application_id}`}>
-                    <h1 className='font-bold mb-2'>Switch to Business:</h1>
-                    <button 
-                      className='text-gray-500 hover:bg-color2 hover:text-white flex items-center p-2 rounded-lg gap-1'
-                      onClick={() => handleBusinessClick(businessData.business_id)}
-                      key={application.application_id}>
-                      <Avatar src=''/>
-                      <p>{businessData.businessName}</p>
-                    </button>
-                  </div>
-                );
-              } else if (application.status === -1) {
-                return (
-                  <div key={`denied-${application.application_id}`}>
-                    <Button className='text-white bg-red-500 hover:bg-red-600'>
-                      Denied
-                    </Button>
-                  </div>
-                );
-              }
-            })
-          ) : (
-            <Button className='text-white bg-color1 hover:bg-color2' onPress={onBusinessOpen}> 
-              + Apply Business Account 
-            </Button>
-          )}
         </div>
+        <div className='text-3xl font-semibold mb-4'>
+          {userData?.username ? userData.username : 'Loading...'}
+        </div>
+        {businessApplications.length > 0 ? (
+          businessApplications.map((application) => {
+            if (application.status === 0) {
+              return (
+                <Button key={`pending-${application.application_id}`} className='text-white bg-yellow-500 hover:bg-yellow-600 mb-4'>
+                  Pending Application
+                </Button>
+              );
+            } else if (application.status === 1) {
+              return (
+                <div key={`approved-${application.application_id}`} className='mb-4'>
+                  <h1 className='font-bold mb-2'>Switch to Business:</h1>
+                  <button 
+                    className='text-gray-500 hover:bg-color2 hover:text-white flex items-center p-2 rounded-lg gap-1'
+                    onClick={() => handleBusinessClick(businessData.business_id)}
+                    key={application.application_id}>
+                    <Avatar src=''/>
+                    <p>{businessData.businessName}</p>
+                  </button>
+                </div>
+              );
+            } else if (application.status === -1) {
+              return (
+                <Button key={`denied-${application.application_id}`} className='text-white bg-red-500 hover:bg-red-600 mb-4'>
+                  Denied
+                </Button>
+              );
+            }
+          })
+        ) : (
+          <Button className='text-white bg-color1 hover:bg-color2 mb-4' onPress={onBusinessOpen}> 
+            + Apply Business Account 
+          </Button>
+        )}
+      </div>
 
-        {/* Main content */}
-        <div className='w-full md:w-3/4'>
-          <Tabs aria-label="Options" selectedKey={selected} onSelectionChange={setSelected} className='overflow-y-auto scrollbar-hide'>
-            {/* Profile Tab */}
-            <Tab key="profile" title="Profile">
-              <Card className='p-2'>
-                <CardBody className='p-6 min-h-[600px]'>
-                  <h1 className='text-4xl font-bold mb-3'>User Profile</h1>
-                  <div className='bg-gray-300 w-full h-[1px] mb-8'></div>
-                  
+      {/* Main content */}
+      <div className='container mx-auto'>
+        <Tabs aria-label="Options" selectedKey={selected} onSelectionChange={setSelected} className='overflow-y-auto scrollbar-hide'>
+          {/* Profile Tab */}
+          <Tab key="profile" title="Profile">
+            <Card className='p-4 shadow-lg'>
+              <CardBody className='p-6'>
+                <h1 className='text-4xl font-bold mb-6'>User Profile</h1>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
                   {/* Username field */}
-                  <div className='mb-6'>
-                    <h1 className='text-slate-500'>Username</h1>
+                  <div>
+                    <h1 className='text-slate-500 mb-2'>Username</h1>
                     <input
-                      className='border-[.5px] rounded-md p-2 w-full md:w-64 focus:border-gray-500 focus:outline-none'
+                      className='border-[.5px] rounded-md p-3 w-full focus:border-gray-500 focus:outline-none'
                       placeholder='Enter your username'
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
@@ -598,11 +590,11 @@ const UserProfile = ({ activities = [] }) => {
                   </div>
                   
                   {/* Email field */}
-                  <div className='mb-6'>
-                    <h1 className='text-slate-500'>Email</h1>
+                  <div>
+                    <h1 className='text-slate-500 mb-2'>Email</h1>
                     <div className="flex items-center">
                       <input
-                        className='border-[.5px] rounded-md p-2 w-full md:w-64 focus:border-gray-500 focus:outline-none'
+                        className='border-[.5px] rounded-md p-3 w-full focus:border-gray-500 focus:outline-none'
                         placeholder='Enter your email'
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
@@ -613,10 +605,10 @@ const UserProfile = ({ activities = [] }) => {
                   </div>
 
                   {/* Phone number field */}
-                  <div className='mb-6'>
-                    <h1 className='text-slate-500'>Phone Number</h1>
+                  <div>
+                    <h1 className='text-slate-500 mb-2'>Phone Number</h1>
                     <input
-                      className='border-[.5px] rounded-md p-2 w-full md:w-64 focus:border-gray-500 focus:outline-none'
+                      className='border-[.5px] rounded-md p-3 w-full focus:border-gray-500 focus:outline-none'
                       placeholder='Add your phone number'
                       value={phoneNumber}
                       onChange={(e) => setPhoneNumber(e.target.value)}
@@ -625,44 +617,44 @@ const UserProfile = ({ activities = [] }) => {
                   </div>
 
                   {/* Password field */}
-                  <div className='mb-6'>
-                    <h1 className='text-slate-500'>Password</h1>
+                  <div>
+                    <h1 className='text-slate-500 mb-2'>Password</h1>
                     <input
-                      className='border-[.5px] rounded-md p-2 w-full md:w-64 focus:border-gray-500 focus:outline-none'
+                      className='border-[.5px] rounded-md p-3 w-full focus:border-gray-500 focus:outline-none'
                       placeholder='Enter your new password'
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       type='password'
                     />
                   </div>      
-                </CardBody>
-                <Button className='bg-color1 text-white hover:bg-color2' onPress={handleUpdateProfile}>Update Profile</Button>
-              </Card>
-            </Tab>
+                </div>
+                <Button className='mt-6 bg-color1 text-white hover:bg-color2 w-full md:w-auto' onPress={handleUpdateProfile}>Update Profile</Button>
+              </CardBody>
+            </Card>
+          </Tab>
 
-            {/* Liked Pages Tab */}
-            <Tab key="likedPages" title="Liked Pages">
-              <Card>
-                <CardBody className='p-6 min-h-[700px]'>
-                  <h1 className='text-4xl font-bold mb-3'>Liked Pages</h1>
-                  <div className='bg-gray-300 w-full h-[1px] mb-8'></div>
-                  <div className='overflow-y-auto max-h-[600px] scrollbar-custom flex flex-col items-center'>
-                    {renderLikedPages(likedPages, handleUnlikePage)}
-                  </div>
-                </CardBody>
-              </Card>
-            </Tab>
+          {/* Liked Pages Tab */}
+          <Tab key="likedPages" title="Liked Pages">
+            <Card>
+              <CardBody className='p-6 min-h-[700px]'>
+                <h1 className='text-4xl font-bold mb-3'>Liked Pages</h1>
+                <div className='bg-gray-300 w-full h-[1px] mb-8'></div>
+                <div className='overflow-y-auto max-h-[600px] scrollbar-custom flex flex-col items-center'>
+                  {renderLikedPages(likedPages, handleUnlikePage)}
+                </div>
+              </CardBody>
+            </Card>
+          </Tab>
 
-            {/* My Booking Tab */}
-            <Tab key="myBookings" title="My Bookings">
-              <Card>
-                <CardBody className='p-6 min-h-[700px]'>
-                  <MyBookingTab bookings={bookings} onCancelBooking={handleCancelBooking} />
-                </CardBody>
-              </Card>
-            </Tab>
-          </Tabs>
-        </div>
+          {/* My Booking Tab */}
+          <Tab key="myBookings" title="My Bookings">
+            <Card>
+              <CardBody className='p-6 min-h-[700px]'>
+                <MyBookingTab bookings={bookings} onCancelBooking={handleCancelBooking} />
+              </CardBody>
+            </Card>
+          </Tab>
+        </Tabs>
       </div>
 
       <BusinessApplicationModal
