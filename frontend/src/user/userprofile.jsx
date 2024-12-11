@@ -530,7 +530,7 @@ const UserProfile = ({ activities = [] }) => {
       </div>
 
       {/* Header Section */}
-      <div className='container mx-auto flex flex-col items-center mb-8 bg-white mt-2 shadow-md rounded-xl shadow-gray-400 ' style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat' }}>
+      <div className='container mx-auto flex flex-col items-center mb-8 bg-white mt-2 shadow-md rounded-xl shadow-gray-400 p-5 ' style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat' }}>
         <div className='relative flex items-center w-36 h-36 mb-4'>
           <Avatar className='w-full h-full object-cover rounded-full border-4 border-color1' 
             src={profilePic 
