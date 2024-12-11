@@ -3527,6 +3527,48 @@ app.get('/getAllBusinesses', async (req, res) => {
   }
 });
 
+// Endpoint to fetch businesses base on business location
+app.get('/getBusinessesByLocation/:location', async (req, res) => {
+  const { location } = req.params;
+  const sql = `
+            SELECT 
+              b.business_id, 
+              b.businessName AS name, 
+              b.businessType, 
+              b.businessLogo AS image, 
+              b.location AS destination, 
+              b.contactInfo, 
+              b.openingHours, 
+              b.facilities, 
+              b.policies, 
+              IF(
+                JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.description')) IS NULL OR 
+                JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.description')) = '', 
+                NULL, 
+                JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.description'))
+              ) AS description,
+              b.aboutUs, 
+              MIN(CAST(p.price AS DECIMAL)) AS lowest_price,
+              MAX(CAST(p.price AS DECIMAL)) AS highest_price,
+              AVG(r.ratings) AS rating 
+            FROM businesses b
+            LEFT JOIN products p ON b.business_id = p.business_id
+            LEFT JOIN business_ratings r ON b.business_id = r.business_id
+            WHERE b.location = ?
+            GROUP BY b.business_id, b.businessName, b.businessType, b.businessLogo, 
+              b.location, b.contactInfo, b.openingHours, b.facilities, 
+              b.policies, b.aboutUs
+  `;
+
+  try {
+    const [results] = await pool.query(sql, [location]);
+    res.json(results);
+  } catch (err) {
+    console.error('Error fetching businesses by location:', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
 // Endpoint for reviews and ratings
 app.get('/getAllReviewsAndRatings', async (req, res) => {
   const sql = `
