@@ -457,7 +457,7 @@ app.use('/uploads', express.static('uploads'));
 // Endpoint for updating user profile
 app.put('/updateUserProfile/:id', upload.single('profilePic'), async (req, res) => {
   const userId = req.params.id;
-  let { username } = req.body;
+  let { username, email, phoneNumber } = req.body;
   let imagePath = req.body.image_path; // Existing image path
   let imageFileName = req.body.image;  // Existing image filename
 
@@ -476,6 +476,16 @@ app.put('/updateUserProfile/:id', upload.single('profilePic'), async (req, res) 
     if (username) {
       sql += 'username = ?, ';
       params.push(username);
+    }
+
+    if (email) {
+      sql += 'email = ?, ';
+      params.push(email);
+    }
+
+    if (phoneNumber) {
+      sql += 'contact = ?, ';
+      params.push(phoneNumber);
     }
 
     // Always update image filename and image path if file was uploaded
@@ -499,7 +509,7 @@ app.put('/updateUserProfile/:id', upload.single('profilePic'), async (req, res) 
     return res.json({
       success: true,
       message: 'User updated successfully',
-      updatedUserData: { username, imageFileName, imagePath }
+      updatedUserData: { username, email, phoneNumber, imageFileName, imagePath }
     });
   } catch (err) {
     console.error('Error updating user profile:', err);

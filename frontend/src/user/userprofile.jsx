@@ -14,6 +14,7 @@ import { motion } from 'framer-motion';
 import wave from '@/assets/wave2.webp';
 import CryptoJS from 'crypto-js';
 import axios from 'axios';
+import { FaCamera } from 'react-icons/fa';
 
 // Function to encrypt the business_id
 const encryptId = (id) => {
@@ -192,7 +193,6 @@ const MyBookingTab = ({ bookings, onCancelBooking }) => {
 
 const UserProfile = ({ activities = [] }) => {
   const [selected, setSelected] = useState("profile");
-  const [profilePicFile, setProfilePicFile] = useState(null);
   const [profilePic, setProfilePic] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -376,9 +376,57 @@ const UserProfile = ({ activities = [] }) => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setProfilePicFile(file);
       setProfilePic(URL.createObjectURL(file));
-      e.target.value = '';
+      e.target.value = ''; // Clear the input value to allow re-uploading the same file
+      updateProfilePic(file); // Call the update function with the new file
+    }
+  };
+  
+  const updateProfilePic = async (file) => {
+    if (!file) {
+      Swal.fire({
+        title: 'Error!',
+        text: 'No file selected for upload',
+        icon: 'error',
+        confirmButtonColor: '#D33736'
+      });
+      return;
+    }
+  
+    try {
+      const formData = new FormData();
+      formData.append('profilePic', file);
+  
+      const response = await axios.put(`http://localhost:5000/updateUserProfile/${userData.user_id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        },
+        withCredentials: true
+      });
+  
+      if (response.data.success) {
+        Swal.fire({
+          title: 'Success!',
+          text: 'Profile picture updated successfully!',
+          icon: 'success',
+          confirmButtonColor: '#0BDA51'
+        }).then(() => {
+          setTimeout(() => {
+            window.location.reload();
+          });
+        });
+      } else {
+        console.error('Failed to update profile picture:', response.data.message);
+        throw new Error('Failed to update profile picture');
+      }
+    } catch (error) {
+      console.error('Error updating profile picture:', error);
+      Swal.fire({
+        title: 'Error!',
+        text: 'Failed to update profile picture',
+        icon: 'error',
+        confirmButtonColor: '#D33736'
+      });
     }
   };
 
@@ -389,10 +437,6 @@ const UserProfile = ({ activities = [] }) => {
       formData.append('email', email);
       formData.append('phoneNumber', phoneNumber);
       formData.append('password', password);
-
-      if (profilePicFile) {
-        formData.append('profilePic', profilePicFile);
-      }
 
       const response = await fetch(`http://localhost:5000/updateUserProfile/${userData.user_id}`, {
         method: 'PUT',
@@ -408,14 +452,14 @@ const UserProfile = ({ activities = [] }) => {
         text: 'Profile updated successfully!',
         icon: 'success',
         confirmButtonColor: '#0BDA51'
-      }).then(() => {
-        setTimeout(() => {
-          window.location.reload();
-        });
       });
 
-      setUsername('');
-      setProfilePicFile(null);
+      setUserData(prevUserData => ({
+        ...prevUserData,
+        username: username,
+        email: email,
+        phoneNumber: phoneNumber,
+      }));
 
     } catch (error) {
       console.error(error);
