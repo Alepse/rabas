@@ -510,7 +510,7 @@ const renderMessages = (messages) => {
           <div className="flex flex-col justify-between w-full lg:w-3/4 h-full bg-white rounded-md p-4">
             {selectedBusiness ? (
               <>
-                <div className="flex items-center space-x-3 p-3 bg-blue-900 text-white rounded-t-lg">
+                <div className="flex items-center space-x-3 p-3 bg-color2 text-white rounded-t-lg">
                   <img
                     src={activeChatUser.avatarUrl 
                       ? `http://localhost:5000/${activeChatUser.avatarUrl}` 
