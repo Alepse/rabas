@@ -197,7 +197,7 @@ const UserProfile = ({ activities = [] }) => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [password, setPassword] = useState('');
+  const [address, setAddress] = useState('');
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const { isOpen: isBusinessOpen, onOpen: onBusinessOpen, onOpenChange: onBusinessOpenChange } = useDisclosure();
   const [isLoggedIn, setIsLoggedIn] = useState(null);
@@ -302,6 +302,7 @@ const UserProfile = ({ activities = [] }) => {
       setUsername(data.userData.username);
       setEmail(data.userData.email);
       setPhoneNumber(data.userData.contact || '');
+      setAddress(data.userData.address || '');
     } catch (error) {
       console.error('Error fetching user data:', error);
     }
@@ -436,7 +437,7 @@ const UserProfile = ({ activities = [] }) => {
       formData.append('username', username);
       formData.append('email', email);
       formData.append('phoneNumber', phoneNumber);
-      formData.append('password', password);
+      formData.append('address', address);
 
       const response = await fetch(`http://localhost:5000/updateUserProfile/${userData.user_id}`, {
         method: 'PUT',
@@ -459,6 +460,7 @@ const UserProfile = ({ activities = [] }) => {
         username: username,
         email: email,
         phoneNumber: phoneNumber,
+        address: address,
       }));
 
     } catch (error) {
@@ -680,15 +682,14 @@ const UserProfile = ({ activities = [] }) => {
                     />
                   </div>
 
-                  {/* Password field */}
+                  {/* Address field */}
                   <div>
-                    <h1 className='text-slate-500 mb-2'>Password</h1>
+                    <h1 className='text-slate-500 mb-2'>Address</h1>
                     <input
                       className='border-[.5px] rounded-md p-3 w-full focus:border-gray-500 focus:outline-none'
-                      placeholder='Enter your new password'
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      type='password'
+                      placeholder='Enter your address'
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
                     />
                   </div>      
                 </div>
