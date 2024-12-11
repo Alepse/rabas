@@ -402,12 +402,29 @@ app.get('/liked-pages', async (req, res) => {
   }
 });
 
-// Endpoint to unlike pages
-app.delete('/unlike-page/:id', async (req, res) => {
-  const { id } = req.params;
+// Endpoint to get liked businesses
+app.get('/liked-businesses', async (req, res) => {
   const userId = req.session.user.user_id;
-  const sql = 'DELETE FROM liked_pages WHERE id = ? AND user_id = ?';
-  const [results] = await pool.query(sql, [id, userId]);
+  const sql = 'SELECT * FROM liked_pages WHERE user_id = ?';
+  const [results] = await pool.query(sql, [userId]);
+  res.json({ success: true, likedBusinesses: results });
+});
+
+// Endpoint to like pages
+app.post('/like-business', async (req, res) => {
+  const { businessId } = req.body;
+  const userId = req.session.user.user_id;
+  const sql = 'INSERT INTO liked_pages (business_id, user_id) VALUES (?, ?)';
+  const [results] = await pool.query(sql, [businessId, userId]);
+  res.json({ success: results.affectedRows > 0, message: results.affectedRows > 0 ? 'Page liked successfully' : 'Page not found' });
+});
+
+// Endpoint to unlike pages
+app.delete('/unlike-business/:business_id', async (req, res) => {
+  const { business_id } = req.params;
+  const userId = req.session.user.user_id;
+  const sql = 'DELETE FROM liked_pages WHERE business_id = ? AND user_id = ?';
+  const [results] = await pool.query(sql, [business_id, userId]);
   res.json({ success: results.affectedRows > 0, message: results.affectedRows > 0 ? 'Page unliked successfully' : 'Page not found' });
 });
 
@@ -3506,6 +3523,48 @@ app.get('/getAllBusinesses', async (req, res) => {
     return res.json({ success: true, businesses: cleanedResults });
   } catch (err) {
     console.error('Error executing SQL query:', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+// Endpoint to fetch businesses base on business location
+app.get('/getBusinessesByLocation/:location', async (req, res) => {
+  const { location } = req.params;
+  const sql = `
+            SELECT 
+              b.business_id, 
+              b.businessName AS name, 
+              b.businessType, 
+              b.businessLogo AS image, 
+              b.location AS destination, 
+              b.contactInfo, 
+              b.openingHours, 
+              b.facilities, 
+              b.policies, 
+              IF(
+                JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.description')) IS NULL OR 
+                JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.description')) = '', 
+                NULL, 
+                JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.description'))
+              ) AS description,
+              b.aboutUs, 
+              MIN(CAST(p.price AS DECIMAL)) AS lowest_price,
+              MAX(CAST(p.price AS DECIMAL)) AS highest_price,
+              AVG(r.ratings) AS rating 
+            FROM businesses b
+            LEFT JOIN products p ON b.business_id = p.business_id
+            LEFT JOIN business_ratings r ON b.business_id = r.business_id
+            WHERE b.location = ?
+            GROUP BY b.business_id, b.businessName, b.businessType, b.businessLogo, 
+              b.location, b.contactInfo, b.openingHours, b.facilities, 
+              b.policies, b.aboutUs
+  `;
+
+  try {
+    const [results] = await pool.query(sql, [location]);
+    res.json(results);
+  } catch (err) {
+    console.error('Error fetching businesses by location:', err);
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 });

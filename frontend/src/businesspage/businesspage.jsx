@@ -171,6 +171,60 @@ const BusinessPage = () => {
     handleModalClose();
   };
 
+  const fetchLikedBusinesses = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/liked-businesses', { withCredentials: true });
+      const likedBusinesses = response.data.likedBusinesses;
+      setIsLiked(likedBusinesses.some(b => b.business_id === businessData.business_id));
+    } catch (error) {
+      console.error('Error fetching liked businesses:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (isLoggedIn && businessData) {
+      fetchLikedBusinesses();
+    }
+  }, [isLoggedIn, businessData]);
+
+  const likeBusiness = async (businessId) => {
+    try {
+      const response = await axios.post('http://localhost:5000/like-business', { businessId }, { withCredentials: true });
+      if (response.data.success) {
+        setIsLiked(true);
+      } else {
+        showErrorAlert('Failed to like the business.');
+      }
+    } catch (error) {
+      console.error('Error liking business:', error);
+      showErrorAlert('An error occurred while liking the business.');
+    }
+  };
+
+  const unlikeBusiness = async (businessId) => {
+    try {
+      const response = await axios.delete(`http://localhost:5000/unlike-business/${businessId}`, { withCredentials: true });
+      if (response.data.success) {
+        setIsLiked(false);
+      } else {
+        showErrorAlert('Failed to unlike the business.');
+      }
+    } catch (error) {
+      console.error('Error unliking business:', error);
+    }
+  };
+
+  const handleLikeClick = () => {
+    if (!isLoggedIn) {
+      return showErrorAlert('Please login to like a page.');
+    }
+    if (!isLiked) {
+      likeBusiness(businessData.business_id);
+    } else {
+      unlikeBusiness(businessData.business_id);
+    }
+  };
+
   if (loading) {
     return (
       <Spinner 
@@ -198,13 +252,6 @@ const BusinessPage = () => {
       }
     }
     return stars;
-  };
-
-  const handleLikeClick = () => {
-    if (!isLoggedIn){
-      return  showErrorAlert('Please login to like a page.');
-    }
-    setIsLiked(!isLiked);
   };
 
   return (

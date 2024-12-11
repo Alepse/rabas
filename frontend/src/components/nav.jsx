@@ -319,61 +319,61 @@ const Nav = () => {
             </div>
 
             <NavigationMenu className='z-50'>
-  <NavigationMenuList>
-    <NavigationMenuItem>
-      <NavigationMenuTrigger className={`cursor-pointer rounded-none text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1  ${activeLink === '/destinations' ? 'font-semibold border-b-1 border-light p-1' : ''}`}>
-        <GiPositionMarker />
-        <a href='/destinations'> Destinations</a>
-      </NavigationMenuTrigger>
-      <NavigationMenuContent>
-        <NavigationMenuLink>
-          <div className="p-9 w-max bg-light shadow-md">
-            <ul className="space-y-2 text-dark text-sm">
-              <Link to='/destinations?name=Barcelona'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Barcelona</li></Link>
-              <Link to='/destinations?name=Bulan'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Bulan</li></Link>
-              <Link to='/destinations?name=Bulusan'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Bulusan</li></Link>
-              <Link to='/destinations?name=Casiguran'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Casiguran</li></Link>
-              <Link to='/destinations?name=Castilla'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Castilla</li></Link>
-              <Link to='/destinations?name=Donsol'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Donsol</li></Link>
-              <Link to='/destinations?name=Gubat'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Gubat</li></Link>
-              <Link to='/destinations?name=Irosin'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Irosin</li></Link>
-              <Link to='/destinations?name=Juban'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Juban</li></Link>
-              <Link to='/destinations?name=Magallanes'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Magallanes</li></Link>
-              <Link to='/destinations?name=Matnog'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Matnog</li></Link>
-              <Link to='/destinations?name=Pilar'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Pilar</li></Link>
-              <Link to='/destinations?name=PrietoDiaz'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Prieto Diaz</li></Link>
-              <Link to='/destinations?name=StaMagdalena'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Sta. Magdalena</li></Link>
-              <Link to='/destinations?name=Sorsogon'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Sorsogon City</li></Link>
-            </ul>
-          </div>
-        </NavigationMenuLink>
-      </NavigationMenuContent>
-    </NavigationMenuItem>
-  </NavigationMenuList>
-</NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className={`cursor-pointer rounded-none text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1  ${activeLink === '/destinations' ? 'font-semibold border-b-1 border-light p-1' : ''}`}>
+                    <GiPositionMarker />
+                    <a href='/destinations'> Destinations</a>
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <NavigationMenuLink>
+                      <div className="p-9 w-max bg-light shadow-md">
+                        <ul className="space-y-2 text-dark text-sm">
+                          <Link to='/destinations?name=Barcelona'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Barcelona</li></Link>
+                          <Link to='/destinations?name=Bulan'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Bulan</li></Link>
+                          <Link to='/destinations?name=Bulusan'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Bulusan</li></Link>
+                          <Link to='/destinations?name=Casiguran'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Casiguran</li></Link>
+                          <Link to='/destinations?name=Castilla'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Castilla</li></Link>
+                          <Link to='/destinations?name=Donsol'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Donsol</li></Link>
+                          <Link to='/destinations?name=Gubat'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Gubat</li></Link>
+                          <Link to='/destinations?name=Irosin'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Irosin</li></Link>
+                          <Link to='/destinations?name=Juban'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Juban</li></Link>
+                          <Link to='/destinations?name=Magallanes'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Magallanes</li></Link>
+                          <Link to='/destinations?name=Matnog'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Matnog</li></Link>
+                          <Link to='/destinations?name=Pilar'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Pilar</li></Link>
+                          <Link to='/destinations?name=PrietoDiaz'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Prieto Diaz</li></Link>
+                          <Link to='/destinations?name=StaMagdalena'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Sta. Magdalena</li></Link>
+                          <Link to='/destinations?name=Sorsogon'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Sorsogon City</li></Link>
+                        </ul>
+                      </div>
+                    </NavigationMenuLink>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
 
             <NavigationMenu className='z-40 '>
-  <NavigationMenuList>
-    <NavigationMenuItem>
-      <NavigationMenuTrigger className={`cursor-pointer rounded-none text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1  ${activeLink === '/Discover' ? 'font-semibold border-b-1 border-light p-1' : ''}`}>
-        <FaPersonWalking />
-        <a href='/Discover'> Discover </a>
-      </NavigationMenuTrigger>
-      <NavigationMenuContent>
-        <NavigationMenuLink>
-          <div className="w-max p-9 bg-light">
-            <ul className="text-dark text-sm space-y-3">
-              <a href='/activities'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Activities</li></a>
-              <a href='/accomodations'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Accommodations</li></a>
-              <a href='/foodplaces'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Food Places</li></a>
-              <a href='/shops'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Shops</li></a>
-            </ul>
-          </div>
-        </NavigationMenuLink>
-      </NavigationMenuContent>
-    </NavigationMenuItem>
-  </NavigationMenuList>
-</NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className={`cursor-pointer rounded-none text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1  ${activeLink === '/Discover' ? 'font-semibold border-b-1 border-light p-1' : ''}`}>
+                    <FaPersonWalking />
+                    <a href='/Discover'> Discover </a>
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <NavigationMenuLink>
+                      <div className="w-max p-9 bg-light">
+                        <ul className="text-dark text-sm space-y-3">
+                          <a href='/activities'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Activities</li></a>
+                          <a href='/accommodations'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Accommodations</li></a>
+                          <a href='/foodplaces'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Food Places</li></a>
+                          <a href='/shops'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Shops</li></a>
+                        </ul>
+                      </div>
+                    </NavigationMenuLink>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
 
             {isLoggedIn && (
               <div
@@ -582,7 +582,7 @@ const Nav = () => {
                       <div className="w-max p-9 bg-light">
                         <ul className="text-dark text-sm space-y-3">
                           <a href='/activities'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Activities</li></a>
-                          <a href='/accomodations'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Accommodations</li></a>
+                          <a href='/accommodations'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Accommodations</li></a>
                           <a href='/foodplaces'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Food Places</li></a>
                           <a href='/shops'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Shops</li></a>
                         </ul>
