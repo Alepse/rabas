@@ -4,15 +4,80 @@ import Footer from '@/components/Footer';
 import { Avatar } from '@nextui-org/react';
 import Search from '@/components/Search';
 import { Tabs, Tab, Card, CardBody, Button, useDisclosure } from "@nextui-org/react";
-import BusinessApplicationModal from '@/businesspage/BusinessComponents/BusinessApplicationModal'; // Import the modal
+import BusinessApplicationModal from '@/businesspage/BusinessComponents/BusinessApplicationModal';
 import { GiPositionMarker } from 'react-icons/gi';
-import {Spinner} from "@nextui-org/react";
+import { Spinner } from "@nextui-org/react";
 import { AiOutlineLike } from 'react-icons/ai';
 import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import { motion } from 'framer-motion'; // Import Framer Motion
-import wave from '@/assets/wave2.webp'
+import { motion } from 'framer-motion';
+import wave from '@/assets/wave2.webp';
+import CryptoJS from 'crypto-js';
 
+// Function to encrypt the business_id
+const encryptId = (id) => {
+  const secretKey = import.meta.env.VITE_SECRET_KEY;
+  if (!secretKey) {
+    console.error('Secret key is not defined');
+    return null;
+  }
+  const ciphertext = CryptoJS.AES.encrypt(id.toString(), secretKey).toString();
+  return encodeURIComponent(ciphertext);
+};
+
+// Function to render liked pages
+const renderLikedPages = (likedPages, handleUnlikePage) => {
+  return likedPages.length === 0 ? (
+    <p className='text-slate-500'>You haven't liked any pages yet.</p>
+  ) : (
+    likedPages.map((item, index) => (
+      <div key={item.id || index} className='bg-white max-w-[800px] w-full rounded-lg shadow-lg hover:shadow-slate-500 duration-300 mb-4'>
+        <img
+          src={`http://localhost:5000/${item.image}`}
+          alt={item.name}
+          className='w-full h-48 object-cover rounded-t-lg'
+        />
+        <div className='p-4'>
+          <div className='flex items-center justify-between gap-2'>
+            <div className='mb-2'>
+              <span className='inline-block bg-color2 text-white text-xs px-2 py-1 rounded-full'>
+                {item.category}
+              </span>
+            </div>
+            <div className='flex items-center gap-2'>
+              <div className='flex items-center gap-1'>
+                <span className='text-black text-[12px]'>{item.rating}</span>
+                <span className='text-yellow-500'>
+                  {'★'.repeat(item.rating)}{'☆'.repeat(5 - item.rating)}
+                </span>
+              </div>
+            </div>
+          </div>
+          <h3 className='font-semibold text-lg text-color1'>{item.name}</h3>
+          <div className='text-xs text-gray-500 mb-2 flex items-center'>
+            <GiPositionMarker /> {item.destination}
+          </div>
+          <p className='text-sm text-gray-600 mb-2'>{item.description}</p>
+          <p className='font-semibold text-md mb-2'>₱{item.lowest_price} - ₱{item.highest_price}</p>
+          <div className='flex items-center justify-between'>
+            <Link to={`/business/${encryptId(item.business_id)}`}>
+              <Button className='bg-color1 text-white hover:bg-color2'>Visit</Button>
+            </Link>
+            <Button
+              className='h-9 px-3 bg-color2 text-white'
+              onClick={() => handleUnlikePage(item.id)}
+            >
+              <div className='text-sm flex items-center gap-2'>
+                <AiOutlineLike />
+                Unlike
+              </div>
+            </Button>
+          </div>
+        </div>
+      </div>
+    ))
+  );
+};
 
 // Simplified component for the "My Booking" tab
 const MyBookingTab = ({ bookings, onCancelBooking }) => {
@@ -118,56 +183,47 @@ const MyBookingTab = ({ bookings, onCancelBooking }) => {
 };
 
 const UserProfile = ({ activities = [] }) => {
-  // Debugging: Log activities to ensure data is passed correctly
-  // console.log('Activities:', activities);
-
   const [selected, setSelected] = useState("profile");
-  const [profilePicFile, setProfilePicFile] = useState(null); // State to hold uploaded file for profile pic
-  const [profilePic, setProfilePic] = useState(''); // URL of the current or uploaded profile picture
-  const [username, setUsername] = useState(''); // Username of the logged-in user
-  const [email, setEmail] = useState(''); // Email of the logged-in user
-  const [phoneNumber, setPhoneNumber] = useState(''); // Phone number of the logged-in user
-  const [password, setPassword] = useState(''); // Password of the logged-in user
+  const [profilePicFile, setProfilePicFile] = useState(null);
+  const [profilePic, setProfilePic] = useState('');
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [password, setPassword] = useState('');
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const { isOpen: isBusinessOpen, onOpen: onBusinessOpen, onOpenChange: onBusinessOpenChange } = useDisclosure(); // Modal state for business account application
-  const [isLoggedIn, setIsLoggedIn] = useState(null); // User login status
-  const [userData, setUserData] = useState(null); // State to store fetched user data
-  const [likedPages, setLikedPages] = useState([]); // Initialize with an empty array
+  const { isOpen: isBusinessOpen, onOpen: onBusinessOpen, onOpenChange: onBusinessOpenChange } = useDisclosure();
+  const [isLoggedIn, setIsLoggedIn] = useState(null);
+  const [userData, setUserData] = useState(null);
+  const [likedPages, setLikedPages] = useState([]);
   const [businessApplications, setBusinessApplications] = useState([]);
-  const [businessData, setBusinessData] = useState(null); // State
+  const [businessData, setBusinessData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [showButton, setShowButton] = useState(false); // State to show/hide button
+  const [showButton, setShowButton] = useState(false);
   const [bookings, setBookings] = useState([]);
 
-  
-     // Title Tab
-     useEffect(() => {
-      document.title = 'RabaSorsogon | Profile';
-    });
-    useEffect(() => {
+  useEffect(() => {
+    document.title = 'RabaSorsogon | Profile';
+  });
 
-      // Simulate data fetching
-      setTimeout(() => setLoading(false), 1000);
+  useEffect(() => {
+    setTimeout(() => setLoading(false), 1000);
 
-      // Show button when scrolled down
-      const handleScroll = () => {
-        if (window.scrollY > 300) {
-          setShowButton(true);
-        } else {
-          setShowButton(false);
-        }
-      };
-
-      window.addEventListener('scroll', handleScroll);
-      return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
-  
-    const scrollToTop = () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    const handleScroll = () => {
+      if (window.scrollY > 300) {
+        setShowButton(true);
+      } else {
+        setShowButton(false);
+      }
     };
 
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
-  // Function to handle booking cancellation
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleCancelBooking = async (bookingId) => {
     try {
       const response = await fetch(`http://localhost:5000/cancel-booking/${bookingId}`, {
@@ -178,7 +234,6 @@ const UserProfile = ({ activities = [] }) => {
       const data = await response.json();
       
       if (data.success) {
-        // Update the local state to reflect the cancellation
         setBookings(prevBookings => 
           prevBookings.map(booking => 
             booking.booking_id === bookingId 
@@ -207,16 +262,15 @@ const UserProfile = ({ activities = [] }) => {
     }
   };
 
-  // Function to check login status
   const checkLoginStatus = useCallback(async () => {
     try {
       const response = await fetch('http://localhost:5000/check-login', {
         method: 'GET',
-        credentials: 'include' // Include cookies
+        credentials: 'include'
       });
       if (response.ok) {
         const data = await response.json();
-        setIsLoggedIn(data.isLoggedIn); // Set login status
+        setIsLoggedIn(data.isLoggedIn);
 
         if (!data.isLoggedIn) {
           window.location.href = '/';
@@ -229,42 +283,49 @@ const UserProfile = ({ activities = [] }) => {
     }
   }, []);
   
-  // Fetching user data
   const fetchUserData = async () => {
     try {
       const response = await fetch('http://localhost:5000/get-userData', {
         method: 'GET',
-        credentials: 'include' // Include cookies
+        credentials: 'include'
       });
       const data = await response.json();
       setUserData(data.userData);
-      setUsername(data.userData.username); // Set username
-      setEmail(data.userData.email); // Set email
-      setPhoneNumber(data.userData.contact || ''); // Set phone number (if available)
-      // Fetch liked pages
-      setLikedPages(data.userData.likedPages || []); // Set liked pages (default to empty array if not present)
+      setUsername(data.userData.username);
+      setEmail(data.userData.email);
+      setPhoneNumber(data.userData.contact || '');
     } catch (error) {
       console.error('Error fetching user data:', error);
     }
   };
 
-  // Fetching business applications for the logged-in user
+  const fetchLikedPages = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/liked-pages', {
+        method: 'GET',
+        credentials: 'include',
+      });
+      const data = await response.json();
+      setLikedPages(data.likedPages || []);
+    } catch (error) {
+      console.error('Error fetching liked pages:', error);
+    }
+  };
+
   const fetchBusinessApplications = async () => {
     try {
       const response = await fetch('http://localhost:5000/businesses-application', {
         method: 'GET',
-        credentials: 'include', // Include cookies for session-based authentication
+        credentials: 'include',
       });
       const data = await response.json();
       
       if (response.ok) {
-        setBusinessApplications(data.business_applications); // Set fetched applications
+        setBusinessApplications(data.business_applications);
 
-        // Check if there's any application with status 1
         const approvedApplication = data.business_applications.find(application => application.status === 1);
         
         if (approvedApplication) {
-          // Fetch business data if there's an approved application
           try {
             const response = await fetch('http://localhost:5000/get-businessData', {
               method: 'GET',
@@ -288,10 +349,9 @@ const UserProfile = ({ activities = [] }) => {
   };
 
   useEffect(() => {
-    checkLoginStatus(); // Check login status when component mounts
+    checkLoginStatus();
 
-    // Set the initial tab based on the URL hash
-    const hash = window.location.hash.substring(1); // Remove the '#' character
+    const hash = window.location.hash.substring(1);
     if (hash) {
       setSelected(hash);
     }
@@ -299,23 +359,21 @@ const UserProfile = ({ activities = [] }) => {
 
   useEffect(() => {
     if (isLoggedIn) {
-      Promise.all([fetchUserData(), fetchBusinessApplications()])
-        .then(() => setLoading(false)) // Set loading to false when all data is fetched
+      Promise.all([fetchUserData(), fetchBusinessApplications(), fetchLikedPages()])
+        .then(() => setLoading(false))
         .catch((error) => console.error('Error fetching initial data:', error));
     }
   }, [isLoggedIn]);
 
-  // Handle profile picture file selection
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setProfilePicFile(file);
-      setProfilePic(URL.createObjectURL(file)); // Preview image
-      e.target.value = ''; // Clear input
+      setProfilePic(URL.createObjectURL(file));
+      e.target.value = '';
     }
   };
 
-  // Handle profile update
   const handleUpdateProfile = async () => {
     try {
       const formData = new FormData();
@@ -324,7 +382,6 @@ const UserProfile = ({ activities = [] }) => {
       formData.append('phoneNumber', phoneNumber);
       formData.append('password', password);
 
-      // Append profile picture if updated
       if (profilePicFile) {
         formData.append('profilePic', profilePicFile);
       }
@@ -343,14 +400,14 @@ const UserProfile = ({ activities = [] }) => {
         text: 'Profile updated successfully!',
         icon: 'success',
         confirmButtonColor: '#0BDA51'
+      }).then(() => {
+        setTimeout(() => {
+          window.location.reload();
+        });
       });
 
-      //refresh the page
-      window.location.reload();
-
-      // Clear username and profilePicFile states
-      setUsername('');  // Clear the username field
-      setProfilePicFile(null);  // Clear the profilePicFile
+      setUsername('');
+      setProfilePicFile(null);
 
     } catch (error) {
       console.error(error);
@@ -363,8 +420,7 @@ const UserProfile = ({ activities = [] }) => {
     }
   };
 
-  // Function to handle unliking a page
-  const handleUnlikePage = (index) => {
+  const handleUnlikePage = async (id) => {
     Swal.fire({
       title: 'Are you sure?',
       text: "Do you want to unlike this page?",
@@ -373,25 +429,31 @@ const UserProfile = ({ activities = [] }) => {
       confirmButtonColor: '#0BDA51',
       cancelButtonColor: '#D33736',
       confirmButtonText: 'Yes, unlike it!'
-    }).then((result) => {
+    }).then(async (result)  => {
       if (result.isConfirmed) {
-        // Simulate unliking by updating the local state
-        setLikedPages((prevLikedPages) => {
-          const updatedPages = [...prevLikedPages];
-          updatedPages.splice(index, 1); // Remove the unliked page
-          return updatedPages;
+        const response = await fetch(`http://localhost:5000/unlike-page/${id}`, {
+          method: 'DELETE',
+          credentials: 'include'
         });
-        Swal.fire({
-          title: 'Unliked!',
-          text: 'Page unliked successfully!',
-          icon: 'success',
-          confirmButtonColor: '#0BDA51',
-        });
+        const data = await response.json();
+
+        if (data.success) {
+          setLikedPages((prevLikedPages) => {
+            // Filter out the page with the specified id
+            const updatedPages = prevLikedPages.filter(page => page.id !== id);
+            return updatedPages;
+          });
+          Swal.fire({
+            title: 'Unliked!',
+            text: 'Page unliked successfully!',
+            icon: 'success',
+            confirmButtonColor: '#0BDA51',
+          });
+        }
       }
     });
   };
 
-  // Add this useEffect to fetch bookings
   useEffect(() => {
     const fetchBookings = async () => {
       try {
@@ -434,12 +496,11 @@ const UserProfile = ({ activities = [] }) => {
       window.location.href = '/businessprofileadmin';
     } catch (error) {
       console.error('Error setting business ID:', error);
-      // Handle error (e.g., show a notification)
     }
   };
 
   if (loading) {
-    return     <Spinner className='flex justify-center items-center h-screen ' size='lg' label="Loading..." color="primary" />;  // dapat may design to
+    return <Spinner className='flex justify-center items-center h-screen ' size='lg' label="Loading..." color="primary" />;
   }
 
   return (
@@ -478,7 +539,6 @@ const UserProfile = ({ activities = [] }) => {
           {businessApplications.length > 0 ? (
             businessApplications.map((application) => {
               if (application.status === 0) {
-                // Show 'Pending Application' button if status is 0
                 return (
                   <div key={`pending-${application.application_id}`}>
                     <Button className='text-white bg-yellow-500 hover:bg-yellow-600'>
@@ -487,39 +547,33 @@ const UserProfile = ({ activities = [] }) => {
                   </div>
                 );
               } else if (application.status === 1) {
-                // Show business name if status is 1
                 return (
                   <div key={`approved-${application.application_id}`}>
                     <h1 className='font-bold mb-2'>Switch to Business:</h1>
-                    {/* <div className='max-h-[130px] bg-light shadow-md rounded-md shadow-slate-600 ring-gray-200 ring-1   p-3 flex flex-col gap-2 overflow-y-auto scrollbar-custom'>         */}
-                      <button 
+                    <button 
                       className='text-gray-500 hover:bg-color2 hover:text-white flex items-center p-2 rounded-lg gap-1'
                       onClick={() => handleBusinessClick(businessData.business_id)}
                       key={application.application_id}>
                       <Avatar src=''/>
-                        <p>{businessData.businessName}</p>
-                      </button>
+                      <p>{businessData.businessName}</p>
+                    </button>
                   </div>
                 );
               } else if (application.status === -1) {
-                // Show 'Denied' message if status is -1
                 return (
                   <div key={`denied-${application.application_id}`}>
                     <Button className='text-white bg-red-500 hover:bg-red-600'>
                       Denied
                     </Button>
                   </div>
-                  
                 );
               }
             })
           ) : (
-            // If no application exists, show 'Apply Business Account' button
             <Button className='text-white bg-color1 hover:bg-color2' onPress={onBusinessOpen}> 
               + Apply Business Account 
             </Button>
           )}
-
         </div>
 
         {/* Main content */}
@@ -529,60 +583,58 @@ const UserProfile = ({ activities = [] }) => {
             <Tab key="profile" title="Profile">
               <Card className='p-2'>
                 <CardBody className='p-6 min-h-[600px]'>
-                
-                    <h1 className='text-4xl font-bold mb-3'>User Profile</h1>
-                    <div className='bg-gray-300 w-full h-[1px] mb-8'></div>
-                    
-                    {/* Username field */}
-                    <div className='mb-6'>
-                      <h1 className='text-slate-500'>Username</h1>
+                  <h1 className='text-4xl font-bold mb-3'>User Profile</h1>
+                  <div className='bg-gray-300 w-full h-[1px] mb-8'></div>
+                  
+                  {/* Username field */}
+                  <div className='mb-6'>
+                    <h1 className='text-slate-500'>Username</h1>
+                    <input
+                      className='border-[.5px] rounded-md p-2 w-full md:w-64 focus:border-gray-500 focus:outline-none'
+                      placeholder='Enter your username'
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                    />
+                  </div>
+                  
+                  {/* Email field */}
+                  <div className='mb-6'>
+                    <h1 className='text-slate-500'>Email</h1>
+                    <div className="flex items-center">
                       <input
                         className='border-[.5px] rounded-md p-2 w-full md:w-64 focus:border-gray-500 focus:outline-none'
-                        placeholder='Enter your username'
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        placeholder='Enter your email'
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        type='email'
                       />
+                      <span className="ml-2 text-green-500">Verified</span>
                     </div>
-                    
-                    {/* Email field */}
-                    <div className='mb-6'>
-                      <h1 className='text-slate-500'>Email</h1>
-                      <div className="flex items-center">
-                        <input
-                          className='border-[.5px] rounded-md p-2 w-full md:w-64 focus:border-gray-500 focus:outline-none'
-                          placeholder='Enter your email'
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          type='email'
-                        />
-                        <span className="ml-2 text-green-500">Verified</span>
-                      </div>
-                    </div>
+                  </div>
 
-                    {/* Phone number field */}
-                    <div className='mb-6'>
-                      <h1 className='text-slate-500'>Phone Number</h1>
-                      <input
-                        className='border-[.5px] rounded-md p-2 w-full md:w-64 focus:border-gray-500 focus:outline-none'
-                        placeholder='Add your phone number'
-                        value={phoneNumber}
-                        onChange={(e) => setPhoneNumber(e.target.value)}
-                        type='tel'
-                      />
-                    </div>
+                  {/* Phone number field */}
+                  <div className='mb-6'>
+                    <h1 className='text-slate-500'>Phone Number</h1>
+                    <input
+                      className='border-[.5px] rounded-md p-2 w-full md:w-64 focus:border-gray-500 focus:outline-none'
+                      placeholder='Add your phone number'
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      type='tel'
+                    />
+                  </div>
 
-                    {/* Password field */}
-                    <div className='mb-6'>
-                      <h1 className='text-slate-500'>Password</h1>
-                      <input
-                        className='border-[.5px] rounded-md p-2 w-full md:w-64 focus:border-gray-500 focus:outline-none'
-                        placeholder='Enter your new password'
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        type='password'
-                      />
-                    </div>      
-          
+                  {/* Password field */}
+                  <div className='mb-6'>
+                    <h1 className='text-slate-500'>Password</h1>
+                    <input
+                      className='border-[.5px] rounded-md p-2 w-full md:w-64 focus:border-gray-500 focus:outline-none'
+                      placeholder='Enter your new password'
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      type='password'
+                    />
+                  </div>      
                 </CardBody>
                 <Button className='bg-color1 text-white hover:bg-color2' onPress={handleUpdateProfile}>Update Profile</Button>
               </Card>
@@ -594,100 +646,8 @@ const UserProfile = ({ activities = [] }) => {
                 <CardBody className='p-6 min-h-[700px]'>
                   <h1 className='text-4xl font-bold mb-3'>Liked Pages</h1>
                   <div className='bg-gray-300 w-full h-[1px] mb-8'></div>
-
-                  {/* Sample activities data */}
-                  {likedPages.length === 0 && (
-                    setLikedPages([
-                      {
-                        name: 'Beautiful Beach',
-                        description: 'Relax and enjoy the scenic beach view.',
-                        image: 'https://via.placeholder.com/150', // Placeholder image
-                        category: 'Relaxation',
-                        rating: 5,
-                        destination: 'Donsol',
-                        budget: '500-2000',
-                      },
-                      {
-                        name: 'Mountain Adventure',
-                        description: 'Hike through the mountains and enjoy nature.',
-                        image: 'https://via.placeholder.com/150',
-                        category: 'Adventure',
-                        rating: 4,
-                        destination: 'Bulusan',
-                        budget: '250-3000',
-                      },
-                      {
-                        name: 'Mountain Adventure',
-                        description: 'Hike through the mountains and enjoy nature.',
-                        image: 'https://via.placeholder.com/150',
-                        category: 'Adventure',
-                        rating: 4,
-                        destination: 'Bulusan',
-                        budget: '250-3000',
-                      },
-                      {
-                        name: 'Mountain Adventure',
-                        description: 'Hike through the mountains and enjoy nature.',
-                        image: 'https://via.placeholder.com/150',
-                        category: 'Adventure',
-                        rating: 4,
-                        destination: 'Bulusan',
-                        budget: '250-3000',
-                      },
-                    ])
-                  )}
-
                   <div className='overflow-y-auto max-h-[600px] scrollbar-custom flex flex-col items-center'>
-                    {likedPages.length === 0 ? (
-                      <p className='text-slate-500'>You haven't liked any pages yet.</p>
-                    ) : (
-                      likedPages.map((activity, index) => (
-                        <div key={index} className='bg-white max-w-[800px]  w-full rounded-lg shadow-lg hover:shadow-slate-500  duration-300 mb-4'>
-                          <img
-                            src={activity.image}
-                            alt={activity.name}
-                            className='w-full h-48 object-cover rounded-t-lg'
-                          />
-                          <div className='p-4'>
-                            <div className='flex items-center justify-between gap-2'>
-                              <div className='mb-2'>
-                                <span className='inline-block bg-color2 text-white text-xs px-2 py-1 rounded-full'>
-                                  {activity.category}
-                                </span>
-                              </div>
-                              <div className='flex items-center gap-2'>
-                                <div className='flex items-center gap-1'>
-                                  <span className='text-black text-[12px]'>{activity.rating}</span>
-                                  <span className='text-yellow-500'>
-                                    {'★'.repeat(activity.rating)}{'☆'.repeat(5 - activity.rating)}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                            <h3 className='font-semibold text-lg text-color1'>{activity.name}</h3>
-                            <div className='text-xs text-gray-500 mb-2 flex items-center'>
-                              <GiPositionMarker /> {activity.destination}
-                            </div>
-                            <p className='text-sm text-gray-600 mb-2'>{activity.description}</p>
-                            <p className='font-semibold text-md mb-2'>₱{activity.budget}</p>
-                            <div className=' flex items-center justify-between'>
-                            <Link to="/business">  
-                            <Button className='bg-color1 text-white hover:bg-color2'>Visit</Button>  
-                            </Link> 
-                            <Button 
-                              className='h-9 px-3 bg-color2 text-white' 
-                              onClick={() => handleUnlikePage(index)}
-                            >
-                              <div className='text-sm flex items-center gap-2'>
-                                <AiOutlineLike />
-                                Unlike
-                              </div>
-                            </Button>
-                            </div>
-                          </div>
-                        </div>
-                      ))
-                    )}
+                    {renderLikedPages(likedPages, handleUnlikePage)}
                   </div>
                 </CardBody>
               </Card>
@@ -711,27 +671,24 @@ const UserProfile = ({ activities = [] }) => {
         userData={userData}
       />
 
-       
-
       <Footer />
 
       {showButton && (
         <motion.button
-           className="fixed bottom-5 right-2 p-3 rounded-full shadow-lg z-10"
+          className="fixed bottom-5 right-2 p-3 rounded-full shadow-lg z-10"
           onClick={scrollToTop}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           animate={{ y: [0, -10, 0] }}
           transition={{ duration: 0.6, repeat: Infinity, repeatType: "loop" }}
           style={{
-            background: 'linear-gradient(135deg, #688484  0%, #092635 100%)', // Gradient color
+            background: 'linear-gradient(135deg, #688484  0%, #092635 100%)',
             color: 'white',
           }}
         >
           ↑
         </motion.button>
       )}
-
     </div>
   );
 };

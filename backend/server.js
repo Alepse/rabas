@@ -342,6 +342,75 @@ app.put('/update-profile', async (req, res) => {
   }
 });
 
+// Endpoint to get liked pages
+app.get('/liked-pages', async (req, res) => {
+  try {
+    if (!req.session.user) {
+      return res.status(401).json({ success: false, message: 'Unauthorized access' });
+    }
+
+    const userId = req.session.user.user_id;
+    const sql = `SELECT liked_pages.*, 
+                  b.business_id, 
+                  b.businessLogo as image, 
+                  b.businessName as name, 
+                  b.location AS destination,
+                  IF(
+                    JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.description')) IS NULL OR 
+                    JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.description')) = '', 
+                    NULL, 
+                    JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.description'))
+                  ) AS description,
+                  b.category,
+                  AVG(r.ratings) AS rating,
+                  MIN(CAST(p.price AS DECIMAL)) AS lowest_price,
+                  MAX(CAST(p.price AS DECIMAL)) AS highest_price
+                FROM liked_pages
+                LEFT JOIN 
+                  businesses b ON liked_pages.business_id = b.business_id
+                LEFT JOIN
+                  business_ratings r ON b.business_id = r.business_id
+                LEFT JOIN 
+                  products p ON b.business_id = p.business_id
+                WHERE liked_pages.user_id = ?
+                GROUP BY liked_pages.id, b.business_id;`;
+    const [results] = await pool.query(sql, [userId]);
+
+    if (results.length > 0) {
+      const likedPages = results.map(result => ({
+        id: result.id,
+        business_id: result.business_id,
+        user_id: result.user_id,
+        liked_at: result.liked_at,
+        name: result.name,
+        description: result.description,
+        budget: result.budget,
+        image: result.image,
+        category: result.category,
+        rating: result.rating,
+        lowest_price: result.lowest_price,
+        highest_price: result.highest_price,
+        destination: result.destination
+      }));
+      res.json({ success: true, likedPages });
+    } else {
+      return res.status(404).json({ success: false, message: 'No liked pages found' });
+    }
+  } catch (error) {
+    console.error('Error fetching liked pages:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+// Endpoint to unlike pages
+app.delete('/unlike-page/:id', async (req, res) => {
+  const { id } = req.params;
+  const userId = req.session.user.user_id;
+  const sql = 'DELETE FROM liked_pages WHERE id = ? AND user_id = ?';
+  const [results] = await pool.query(sql, [id, userId]);
+  res.json({ success: results.affectedRows > 0, message: results.affectedRows > 0 ? 'Page unliked successfully' : 'Page not found' });
+});
+
 // Endpoint to set business_id in session
 app.post('/set-business-id', (req, res) => {
   const { businessId } = req.body;
