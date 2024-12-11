@@ -14,6 +14,7 @@ import Swal from 'sweetalert2';
 
 const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
   const [userId, setUserId] = useState(null);
+  const [userData, setUserData] = useState(null);
   const [formData, setFormData] = useState({
     business_id: product.business_id || null,
     user_id: null,
@@ -44,6 +45,7 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
       });
       const data = await response.json();
       setUserId(data.userData?.user_id || null);
+      setUserData(data.userData || null);
     } catch (error) {
       console.error('Error fetching user data:', error);
     }
@@ -59,6 +61,10 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
       setFormData((prevFormData) => ({
         ...prevFormData,
         user_id: parseInt(userId),
+        firstName: userData.Fname || '',
+        lastName: userData.Lname || '',
+        email: userData.email || '',
+        phone: userData.contact || '',
       }));
     }
   }, [userId]);
@@ -172,10 +178,40 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
 
   const steps = [
     <div key="step1" className="space-y-4">
-      <Input label="First Name" required fullWidth placeholder="Enter your first name" value={formData.firstName} onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} />
-      <Input label="Last Name" required fullWidth placeholder="Enter your last name" value={formData.lastName} onChange={(e) => setFormData({ ...formData, lastName: e.target.value })} />
-      <Input type="tel" label="Phone Number" required fullWidth placeholder="Enter your phone number" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
-      <Input type="email" label="Email Address" required fullWidth placeholder="Enter your email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
+      <Input 
+        label="First Name" 
+        required 
+        fullWidth 
+        placeholder="Enter your first name" 
+        value={formData.firstName} 
+        onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} 
+      />
+      <Input 
+        label="Last Name" 
+        required 
+        fullWidth 
+        placeholder="Enter your last name" 
+        value={formData.lastName} 
+        onChange={(e) => setFormData({ ...formData, lastName: e.target.value })} 
+      />
+      <Input 
+        type="tel" 
+        label="Phone Number" 
+        required 
+        fullWidth 
+        placeholder="Enter your phone number" 
+        value={formData.phone} 
+        onChange={(e) => setFormData({ ...formData, phone: e.target.value })} 
+      />
+      <Input 
+        type="email" 
+        label="Email Address" 
+        required 
+        fullWidth 
+        placeholder="Enter your email" 
+        value={formData.email} 
+        onChange={(e) => setFormData({ ...formData, email: e.target.value })} 
+      />
     </div>,
     <div key="step2" className="space-y-4">
       <h1 className='text-center font-medium'>Availability: Select Check-in and Check-out Dates  </h1>

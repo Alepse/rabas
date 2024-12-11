@@ -119,6 +119,7 @@ const MyBookingTab = ({ bookings, onCancelBooking }) => {
                   <h4 className="font-semibold mb-2">Booking Details:</h4>
                   <ul className="space-y-1">
                     <li><strong>Product:</strong> {booking.productName}</li>
+                    <li><strong>Booked Name:</strong> {booking.customerName}</li>
                     <li><strong>Guests:</strong> {booking.numberOfGuests}</li>
                     <li><strong>Email:</strong> {booking.email}</li>
                     <li><strong>Phone:</strong> {booking.phone}</li>

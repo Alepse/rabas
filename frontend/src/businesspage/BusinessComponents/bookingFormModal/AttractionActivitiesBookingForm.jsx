@@ -24,6 +24,7 @@ const formatDate = (date) => {
 
 const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
   const [userId, setUserId] = useState(null);
+  const [userData, setUserData] = useState(null);
   const [formData, setFormData] = useState({
     business_id: product.business_id || null,
     user_id: null,
@@ -54,6 +55,7 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
       });
       const data = await response.json();
       setUserId(data.userData?.user_id || null);
+      setUserData(data.userData || null);
     } catch (error) {
       console.error('Error fetching user data:', error);
     }
@@ -69,6 +71,10 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
       setFormData((prevFormData) => ({
         ...prevFormData,
         user_id: parseInt(userId),
+        firstName: userData.Fname || '',
+        lastName: userData.Lname || '',
+        email: userData.email || '',
+        phone: userData.contact || '',
       }));
     }
   }, [userId]);
