@@ -402,12 +402,29 @@ app.get('/liked-pages', async (req, res) => {
   }
 });
 
-// Endpoint to unlike pages
-app.delete('/unlike-page/:id', async (req, res) => {
-  const { id } = req.params;
+// Endpoint to get liked businesses
+app.get('/liked-businesses', async (req, res) => {
   const userId = req.session.user.user_id;
-  const sql = 'DELETE FROM liked_pages WHERE id = ? AND user_id = ?';
-  const [results] = await pool.query(sql, [id, userId]);
+  const sql = 'SELECT * FROM liked_pages WHERE user_id = ?';
+  const [results] = await pool.query(sql, [userId]);
+  res.json({ success: true, likedBusinesses: results });
+});
+
+// Endpoint to like pages
+app.post('/like-business', async (req, res) => {
+  const { businessId } = req.body;
+  const userId = req.session.user.user_id;
+  const sql = 'INSERT INTO liked_pages (business_id, user_id) VALUES (?, ?)';
+  const [results] = await pool.query(sql, [businessId, userId]);
+  res.json({ success: results.affectedRows > 0, message: results.affectedRows > 0 ? 'Page liked successfully' : 'Page not found' });
+});
+
+// Endpoint to unlike pages
+app.delete('/unlike-business/:business_id', async (req, res) => {
+  const { business_id } = req.params;
+  const userId = req.session.user.user_id;
+  const sql = 'DELETE FROM liked_pages WHERE business_id = ? AND user_id = ?';
+  const [results] = await pool.query(sql, [business_id, userId]);
   res.json({ success: results.affectedRows > 0, message: results.affectedRows > 0 ? 'Page unliked successfully' : 'Page not found' });
 });
 

@@ -13,6 +13,7 @@ import Swal from 'sweetalert2';
 import { motion } from 'framer-motion';
 import wave from '@/assets/wave2.webp';
 import CryptoJS from 'crypto-js';
+import axios from 'axios';
 
 // Function to encrypt the business_id
 const encryptId = (id) => {
@@ -46,10 +47,16 @@ const renderLikedPages = (likedPages, handleUnlikePage) => {
             </div>
             <div className='flex items-center gap-2'>
               <div className='flex items-center gap-1'>
-                <span className='text-black text-[12px]'>{item.rating}</span>
-                <span className='text-yellow-500'>
-                  {'★'.repeat(item.rating)}{'☆'.repeat(5 - item.rating)}
-                </span>
+                {item.rating ? (
+                  <>
+                    <span className='text-black text-[12px]'>{parseFloat(item.rating).toFixed(1)}</span>
+                    <span className='text-yellow-500'>
+                      {'★'.repeat(item.rating)}{'☆'.repeat(5 - item.rating)}
+                    </span>
+                  </>
+                ) : (
+                  <span className='text-black text-[12px]'>No ratings</span>
+                )}
               </div>
             </div>
           </div>
@@ -65,7 +72,7 @@ const renderLikedPages = (likedPages, handleUnlikePage) => {
             </Link>
             <Button
               className='h-9 px-3 bg-color2 text-white'
-              onClick={() => handleUnlikePage(item.id)}
+              onClick={() => handleUnlikePage(item.business_id)}
             >
               <div className='text-sm flex items-center gap-2'>
                 <AiOutlineLike />
@@ -420,7 +427,7 @@ const UserProfile = ({ activities = [] }) => {
     }
   };
 
-  const handleUnlikePage = async (id) => {
+  const handleUnlikePage = async (businessId) => {
     Swal.fire({
       title: 'Are you sure?',
       text: "Do you want to unlike this page?",
@@ -429,25 +436,37 @@ const UserProfile = ({ activities = [] }) => {
       confirmButtonColor: '#0BDA51',
       cancelButtonColor: '#D33736',
       confirmButtonText: 'Yes, unlike it!'
-    }).then(async (result)  => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        const response = await fetch(`http://localhost:5000/unlike-page/${id}`, {
-          method: 'DELETE',
-          credentials: 'include'
-        });
-        const data = await response.json();
-
-        if (data.success) {
-          setLikedPages((prevLikedPages) => {
-            // Filter out the page with the specified id
-            const updatedPages = prevLikedPages.filter(page => page.id !== id);
-            return updatedPages;
-          });
+        try {
+          const response = await axios.delete(`http://localhost:5000/unlike-business/${businessId}`, { withCredentials: true });
+          if (response.data.success) {
+            setLikedPages((prevLikedPages) => {
+              // Filter out the page with the specified businessId
+              const updatedPages = prevLikedPages.filter(page => page.business_id !== businessId);
+              return updatedPages;
+            });
+            Swal.fire({
+              title: 'Unliked!',
+              text: 'Page unliked successfully!',
+              icon: 'success',
+              confirmButtonColor: '#0BDA51',
+            });
+          } else {
+            Swal.fire({
+              title: 'Error!',
+              text: response.data.message || 'Failed to unlike the page.',
+              icon: 'error',
+              confirmButtonColor: '#D33736'
+            });
+          }
+        } catch (error) {
+          console.error('Error unliking page:', error);
           Swal.fire({
-            title: 'Unliked!',
-            text: 'Page unliked successfully!',
-            icon: 'success',
-            confirmButtonColor: '#0BDA51',
+            title: 'Error!',
+            text: 'Failed to unlike the page.',
+            icon: 'error',
+            confirmButtonColor: '#D33736'
           });
         }
       }
