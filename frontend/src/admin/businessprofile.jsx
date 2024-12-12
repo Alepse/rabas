@@ -1382,15 +1382,76 @@ const BusinessProfile = () => {
           <Tab key="Location" title="Location">
             <Card>
               <CardBody>
-               
-               
+                <div className="flex flex-col gap-4">
+                  <h2 className="text-lg lg:text-xl font-semibold text-gray-700">Business Location</h2>
+                  
+                  {/* Map Container */}
+                  <div className="w-full h-[400px] bg-gray-200 rounded-lg flex items-center justify-center">
+                    {/* Placeholder for the actual map implementation */}
+                    <p className="text-gray-500">Map will be displayed here</p>
+                  </div>
+
+                  {/* Location Controls */}
+                  <div className="flex flex-col gap-3">
+                    <div className="flex gap-3">
+                      <Input
+                        type="text"
+                        label="Latitude"
+                        placeholder="Enter latitude"
+                        className="flex-1"
+                      />
+                      <Input
+                        type="text"
+                        label="Longitude"
+                        placeholder="Enter longitude"
+                        className="flex-1"
+                      />
+                    </div>
+                    
+                    <div className="flex gap-3">
+                      <Button 
+                        className="flex-1 bg-color1 text-white hover:bg-color2 transition"
+                        onClick={() => {
+                          // Add logic to get current pin location
+                          console.log('Getting pin location...');
+                        }}
+                      >
+                        Get Pin Current Location
+                      </Button>
+                      
+                      <Button 
+                        className="flex-1 bg-green-500 text-white hover:bg-green-600 transition"
+                        onClick={() => {
+                          // Add logic to save location
+                          console.log('Saving location...');
+                        }}
+                      >
+                        Save Location
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Location Preview */}
+                  <div className="mt-4">
+                    <h3 className="text-md font-semibold mb-2">Current Location</h3>
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                      <p className="text-sm text-gray-600">
+                        No location set. Place a pin on the map or enter coordinates manually.
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </CardBody>
             </Card>
           </Tab>
         </Tabs>
       </div>
 
-      <Modal isOpen={isIconModalOpen} onClose={() => setIsIconModalOpen(false)}>
+      <Modal 
+        isOpen={isIconModalOpen} 
+        onClose={() => setIsIconModalOpen(false)}
+        scrollBehavior="inside"  // Enable internal scrolling
+      >
         <ModalContent>
           <ModalHeader>Select an Icon</ModalHeader>
           <ModalBody>

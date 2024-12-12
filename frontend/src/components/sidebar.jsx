@@ -41,7 +41,7 @@ const Sidebar = () => {
 
       {/* Sidebar for desktop and mobile */}
       <div
-        className={`fixed lg:flex flex-col top-0 left-0 justify-between h-full bg-color1 p-6 w-[250px] transform transition-transform duration-300 lg:translate-x-0 ${
+        className={`fixed lg:flex flex-col top-0 left-0 justify-between h-full bg-color1 p-6 w-[220px] transform transition-transform duration-300 lg:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         } lg:static z-50`}
       >
@@ -55,7 +55,7 @@ const Sidebar = () => {
           </div>
 
           {/* Nav Items */}
-          <nav className="mt-12">
+          <nav className="mt-12 text-sm">
             <ul className="flex flex-col gap-4">
               {navItems.map((item) => (
                 <Link to={item.path} key={item.label}>

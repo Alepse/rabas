@@ -33,7 +33,8 @@ const showSuccessAlert = (title, message) => {
   Swal.fire({
     icon: 'success',
     title: title,
-    text: message
+    text: message,
+    confirmButtonColor: '#0BDA51'
   });
 };
 

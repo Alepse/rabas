@@ -134,7 +134,7 @@ const AccommodationSwiper = ({ title, link, isLast }) => (
 const AccommodationsTab = () => (
   <div className='lg:container'>
     <AccommodationSwiper title="Design Meets Comfort: Accommodation Recommendations" link="/accommodations" />
-    <AccommodationSwiper title="Traveler's Choice: Most Reviewed Stays" link="/accommodations" />
+    <AccommodationSwiper title="Traveler's Choice: Liked Stays" link="/accommodations" />
     <AccommodationSwiper title="Top Accommodation Offers" isLast />
   </div>
 );

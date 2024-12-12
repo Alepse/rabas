@@ -1,6 +1,5 @@
 import React from 'react';
-import { Card, CardHeader, CardBody, Button, Accordion, AccordionItem } from "@nextui-org/react";
-import { FaPhone } from 'react-icons/fa';
+import { Card, CardHeader, CardBody, Button } from "@nextui-org/react";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -44,63 +43,52 @@ const EmergencyHotlines = () => {
   const HotlineButton = ({ name, number }) => {
     const handleCopy = () => {
       navigator.clipboard.writeText(number)
-        .then(() => {
-          toast.success(`Copied ${number} to clipboard`);
-        })
-        .catch(err => {
-          toast.error('Failed to copy');
-          console.error('Failed to copy: ', err);
-        });
+        .then(() => toast.success(`Copied ${number} to clipboard`))
+        .catch(() => toast.error('Failed to copy'));
     };
 
     return (
       <Button
-        className="w-full h-full flex-col justify-center mb-2"
-        color="primary"
-        variant="bordered"
-        startContent={<FaPhone className="h-5 w-5" />}
-        endContent={<span className="font-semibold">{number}</span>}
+        className="flex justify-between items-center w-full p-4 rounded-lg shadow-md hover:shadow-lg transition-all border border-gray-200"
         onClick={handleCopy}
       >
-        {name}
+        <span className="text-sm font-medium text-gray-800">{name}</span>
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-semibold text-gray-600">{number}</span>
+        </div>
       </Button>
     );
   };
 
   return (
-    <Card className="container mx-auto mt-6">
-      <CardHeader className="flex-col items-start px-6 py-4">
-        <h2 className="text-2xl font-bold">Sorsogon Emergency Hotlines</h2>
-        <p className="text-default-500">Important numbers to call during emergencies</p>
-      </CardHeader>
-      <CardBody className="px-6 py-4">
-        <div className="mb-6">
-          <h3 className="text-xl font-semibold mb-3">Important Hotlines</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            {importantHotlines.map((hotline, index) => (
-              <HotlineButton key={index} name={hotline.name} number={hotline.number} />
-            ))}
-          </div>
-        </div>
-        <Accordion>
-          <AccordionItem 
-            key="1" 
-            aria-label="Local Hotlines" 
-            title={<span className="font-semibold">Local Hotlines</span>}
-            className='border-b-1 border-gray-600'
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+    <div className="container mx-auto mt-8 px-4">
+      <Card className="shadow-lg rounded-lg">
+        <CardHeader className="px-6 py-4 border-b flex-col border-gray-200">
+          <h2 className="text-2xl font-bold text-gray-800">Sorsogon Emergency Hotlines</h2>
+          <p className="text-gray-600 mt-1">Important numbers to call during emergencies</p>
+        </CardHeader>
+        <CardBody className="px-6 py-6">
+          <section className="mb-8">
+            <h3 className="text-lg font-semibold text-gray-700 mb-4">Important Hotlines</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {importantHotlines.map((hotline, index) => (
+                <HotlineButton key={index} name={hotline.name} number={hotline.number} />
+              ))}
+            </div>
+          </section>
+          <section>
+            <h3 className="text-lg font-semibold text-gray-700 mb-4">Local Hotlines</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {localHotlines.map((hotline, index) => (
                 <HotlineButton key={index} name={hotline.name} number={hotline.number} />
               ))}
             </div>
-          </AccordionItem>
-        </Accordion>
-      </CardBody>
+          </section>
+        </CardBody>
+      </Card>
       <ToastContainer />
-    </Card>
+    </div>
   );
 };
 
 export default EmergencyHotlines;
-

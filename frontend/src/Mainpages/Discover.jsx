@@ -523,9 +523,16 @@ const Discover = () => {
         <Tabs
           aria-label="Discover Tabs"
           variant="underlined"
-          className="mb-4 overflow-x-auto w-full"
           onSelectionChange={(key) => setActiveTab(key)}
           selectedKey={activeTab}
+          classNames={{
+          base: "w-full overflow-x-auto mb-4",
+          tabList: "gap-6 w-full  p-4  container ",
+          tab: "max-w-fit px-0 h-12 ",
+          tabContent: " text-color1  ",
+          cursor: "w-full bg-color1",
+        
+        }}
         >
           <Tab key="all" title="All" />
           <Tab key="activities" title="Activities" />
@@ -582,7 +589,7 @@ const Discover = () => {
           )}
 
           {/* Content Section */}
-          <div className="w-full lg:w-3/4 max-h-screen overflow-y-auto scrollbar-custom p-2">
+          <div className="w-full lg:w-3/4 max-h-[1300px]  overflow-y-auto scrollbar-custom p-2">
             <motion.div 
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
               variants={containerVariants}
@@ -719,7 +726,7 @@ const Discover = () => {
        
        <div className='flex justify-center '>
         {/* Map Section */}
-        <div className="mt-8  bg-color1 rounded-lg shadow-md p-4 w-full bg-gradient-to-r from-color1 to-color2">
+        <div className="mt-8 z-10  bg-color1 rounded-lg shadow-md p-4 w-full bg-gradient-to-r from-color1 to-color2">
           <h2 className="text-lg font-semibold text-light mb-4">Locations</h2>
           <MapContainer center={[12.9738, 123.9807]} zoom={10} className="w-full h-96">
             <TileLayer
@@ -737,7 +744,7 @@ const Discover = () => {
                 const customDivIcon = L.divIcon({
                   className: 'custom-icon',
                   html: `
-                    <div class="custom-popup flex items-center whitespace-nowrap font-bold text-pink-600" style="font-size: ${fontSize};">
+                    <div class="custom-popup flex items-center whitespace-nowrap font-bold text-color1" style="font-size: ${fontSize};">
                       ${showLogo ? `<div class="pin-container">
                         <div class="pin-head">
                           <img src="http://localhost:5000/${business.businessLogo}" alt="${business.businessName}" class="pin-logo" />

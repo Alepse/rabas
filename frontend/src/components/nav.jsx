@@ -328,22 +328,22 @@ const Nav = () => {
                   <NavigationMenuContent>
                     <NavigationMenuLink>
                       <div className="p-9 w-max bg-light shadow-md">
-                        <ul className="space-y-2 text-dark text-sm">
-                          <Link to='/destinations?name=Barcelona'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Barcelona</li></Link>
-                          <Link to='/destinations?name=Bulan'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Bulan</li></Link>
-                          <Link to='/destinations?name=Bulusan'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Bulusan</li></Link>
-                          <Link to='/destinations?name=Casiguran'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Casiguran</li></Link>
-                          <Link to='/destinations?name=Castilla'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Castilla</li></Link>
-                          <Link to='/destinations?name=Donsol'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Donsol</li></Link>
-                          <Link to='/destinations?name=Gubat'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Gubat</li></Link>
-                          <Link to='/destinations?name=Irosin'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Irosin</li></Link>
-                          <Link to='/destinations?name=Juban'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Juban</li></Link>
-                          <Link to='/destinations?name=Magallanes'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Magallanes</li></Link>
-                          <Link to='/destinations?name=Matnog'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Matnog</li></Link>
-                          <Link to='/destinations?name=Pilar'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Pilar</li></Link>
-                          <Link to='/destinations?name=PrietoDiaz'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Prieto Diaz</li></Link>
-                          <Link to='/destinations?name=StaMagdalena'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Sta. Magdalena</li></Link>
-                          <Link to='/destinations?name=Sorsogon'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Sorsogon City</li></Link>
+                        <ul className="space-y-2 text-dark text-md ">
+                          <Link to='/destinations?name=Barcelona'><li className=' py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Barcelona</li></Link>
+                          <Link to='/destinations?name=Bulan'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Bulan</li></Link>
+                          <Link to='/destinations?name=Bulusan'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Bulusan</li></Link>
+                          <Link to='/destinations?name=Casiguran'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Casiguran</li></Link>
+                          <Link to='/destinations?name=Castilla'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Castilla</li></Link>
+                          <Link to='/destinations?name=Donsol'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Donsol</li></Link>
+                          <Link to='/destinations?name=Gubat'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Gubat</li></Link>
+                          <Link to='/destinations?name=Irosin'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Irosin</li></Link>
+                          <Link to='/destinations?name=Juban'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Juban</li></Link>
+                          <Link to='/destinations?name=Magallanes'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Magallanes</li></Link>
+                          <Link to='/destinations?name=Matnog'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Matnog</li></Link>
+                          <Link to='/destinations?name=Pilar'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Pilar</li></Link>
+                          <Link to='/destinations?name=PrietoDiaz'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Prieto Diaz</li></Link>
+                          <Link to='/destinations?name=StaMagdalena'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Sta. Magdalena</li></Link>
+                          <Link to='/destinations?name=Sorsogon'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Sorsogon City</li></Link>
                         </ul>
                       </div>
                     </NavigationMenuLink>
@@ -362,11 +362,11 @@ const Nav = () => {
                   <NavigationMenuContent>
                     <NavigationMenuLink>
                       <div className="w-max p-9 bg-light">
-                        <ul className="text-dark text-sm space-y-3">
-                          <a href='/activities'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Activities</li></a>
-                          <a href='/accommodations'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Accommodations</li></a>
-                          <a href='/foodplaces'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Food Places</li></a>
-                          <a href='/shops'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Shops</li></a>
+                        <ul className="text-dark text-md space-y-3">
+                          <a href='/activities'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Activities</li></a>
+                          <a href='/accommodations'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Accommodations</li></a>
+                          <a href='/foodplaces'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Food Places</li></a>
+                          <a href='/shops'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Shops</li></a>
                         </ul>
                       </div>
                     </NavigationMenuLink>
@@ -402,7 +402,7 @@ const Nav = () => {
          
 
           {isLoggedIn ? (
-            <Dropdown placement="bottom-end">
+            <Dropdown className='bg-light' placement="bottom-end">
               <DropdownTrigger>
                 <div className="cursor-pointer ml-6">
                   <Avatar
@@ -416,23 +416,23 @@ const Nav = () => {
                   />
                 </div>
               </DropdownTrigger>
-              <DropdownMenu>
+              <DropdownMenu  >
                 <DropdownItem key="profile">
-                  <Link to='/userprofile' className="block w-full text-left p-2">
+                  <Link to='/userprofile' className="block w-full text-left text-md p-1">
                     Profile
                   </Link>
                 </DropdownItem>
                 <DropdownItem key="messages" onClick={openChatModal}>
-                  <div className='flex items-center gap-4 p-2'>
+                  <div className='flex items-center gap-4 text-md  p-1'>
                     Messages
                     <Badge color='danger' placement='top-right' content='2' />
                   </div>
                 </DropdownItem>
                 <DropdownItem key="Bookings">
-                  <Link to='/userprofile#myBookings' className="block w-full text-left p-2">Bookings</Link>
+                  <Link to='/userprofile#myBookings' className="block w-full text-left p-1">Bookings</Link>
                 </DropdownItem>
                 <DropdownItem key="logout" onClick={handleLogout}>
-                  <div className="block w-full text-left p-2">Logout</div>
+                  <div className="block w-full text-left p-1">Logout</div>
                 </DropdownItem>
               </DropdownMenu>
             </Dropdown>
@@ -547,21 +547,21 @@ const Nav = () => {
                     <NavigationMenuLink>
                       <div className="p-9 w-max bg-light shadow-md">
                         <ul className="space-y-2 text-dark text-sm">
-                          <Link to='/destinations?name=Barcelona'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Barcelona</li></Link>
-                          <Link to='/destinations?name=Bulan'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Bulan</li></Link>
-                          <Link to='/destinations?name=Bulusan'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Bulusan</li></Link>
-                          <Link to='/destinations?name=Casiguran'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Casiguran</li></Link>
-                          <Link to='/destinations?name=Castilla'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Castilla</li></Link>
-                          <Link to='/destinations?name=Donsol'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Donsol</li></Link>
-                          <Link to='/destinations?name=Gubat'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Gubat</li></Link>
-                          <Link to='/destinations?name=Irosin'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Irosin</li></Link>
-                          <Link to='/destinations?name=Juban'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Juban</li></Link>
-                          <Link to='/destinations?name=Magallanes'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Magallanes</li></Link>
-                          <Link to='/destinations?name=Matnog'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Matnog</li></Link>
-                          <Link to='/destinations?name=Pilar'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Pilar</li></Link>
-                          <Link to='/destinations?name=PrietoDiaz'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Prieto Diaz</li></Link>
-                          <Link to='/destinations?name=StaMagdalena'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Sta. Magdalena</li></Link>
-                          <Link to='/destinations?name=Sorsogon'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Sorsogon City</li></Link>
+                          <Link to='/destinations?name=Barcelona'><li className=' py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Barcelona</li></Link>
+                          <Link to='/destinations?name=Bulan'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Bulan</li></Link>
+                          <Link to='/destinations?name=Bulusan'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Bulusan</li></Link>
+                          <Link to='/destinations?name=Casiguran'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Casiguran</li></Link>
+                          <Link to='/destinations?name=Castilla'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Castilla</li></Link>
+                          <Link to='/destinations?name=Donsol'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Donsol</li></Link>
+                          <Link to='/destinations?name=Gubat'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Gubat</li></Link>
+                          <Link to='/destinations?name=Irosin'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Irosin</li></Link>
+                          <Link to='/destinations?name=Juban'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Juban</li></Link>
+                          <Link to='/destinations?name=Magallanes'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Magallanes</li></Link>
+                          <Link to='/destinations?name=Matnog'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Matnog</li></Link>
+                          <Link to='/destinations?name=Pilar'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Pilar</li></Link>
+                          <Link to='/destinations?name=PrietoDiaz'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Prieto Diaz</li></Link>
+                          <Link to='/destinations?name=StaMagdalena'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Sta. Magdalena</li></Link>
+                          <Link to='/destinations?name=Sorsogon'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Sorsogon City</li></Link>
                         </ul>
                       </div>
                     </NavigationMenuLink>

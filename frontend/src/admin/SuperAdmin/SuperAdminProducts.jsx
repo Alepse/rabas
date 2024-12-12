@@ -14,6 +14,7 @@ import { HiOutlineDotsVertical } from 'react-icons/hi';
 import { CheckboxGroup, Checkbox } from "@nextui-org/checkbox";
 import SuperAdminSidebar from './superadmincomponents/superadminsidebar';
 import SearchBar from './superadmincomponents/SearchBar'; // Import the SearchBar component
+import { Bar } from 'react-chartjs-2';
 
 
 // Sample Business Listings Data
@@ -70,52 +71,113 @@ const businessListings = {
 
 // Dashboard component for product counts
 const Dashboard = ({ productCounts }) => (
-  <div className="flex justify-around py-6 space-x-4">
-    <div className="bg-red-400 text-white w-72 h-40 flex flex-col justify-center items-center rounded-lg shadow-lg hover:shadow-xl transition-shadow">
-      <p className="text-lg">Attractions</p>
-      <p className="text-4xl font-bold">{productCounts.activities}</p>
+  <div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 py-4 md:py-6">
+      <div className="bg-red-400 text-white p-4 flex flex-col justify-center items-center rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+        <p className="text-base md:text-lg">Attractions</p>
+        <p className="text-2xl md:text-4xl font-bold">{productCounts.activities}</p>
+      </div>
+      <div className="bg-teal-400 text-white p-4 flex flex-col justify-center items-center rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+        <p className="text-base md:text-lg">Accommodations</p>
+        <p className="text-2xl md:text-4xl font-bold">{productCounts.accommodations}</p>
+      </div>
+      <div className="bg-purple-400 text-white p-4 flex flex-col justify-center items-center rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+        <p className="text-base md:text-lg">Foods</p>
+        <p className="text-2xl md:text-4xl font-bold">{productCounts.foods}</p>
+      </div>
+      <div className="bg-yellow-400 text-white p-4 flex flex-col justify-center items-center rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+        <p className="text-base md:text-lg">Shops</p>
+        <p className="text-2xl md:text-4xl font-bold">{productCounts.shops}</p>
+      </div>
+      <div className="bg-pink-400 text-white p-4 flex flex-col justify-center items-center rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+        <p className="text-base md:text-lg">Total Products</p>
+        <p className="text-2xl md:text-4xl font-bold">{productCounts.total}</p>
+      </div>
     </div>
-    <div className="bg-teal-400 text-white w-72 h-40 flex flex-col justify-center items-center rounded-lg shadow-lg hover:shadow-xl transition-shadow">
-      <p className="text-lg">Accommodations</p>
-      <p className="text-4xl font-bold">{productCounts.accommodations}</p>
-    </div>
-    <div className="bg-purple-400 text-white w-72  h-40 flex flex-col justify-center items-center rounded-lg shadow-lg hover:shadow-xl transition-shadow">
-      <p className="text-lg">Foods</p>
-      <p className="text-4xl font-bold">{productCounts.foods}</p>
-    </div>
-    <div className="bg-yellow-400 text-white w-72 h-40 flex flex-col justify-center items-center rounded-lg shadow-lg hover:shadow-xl transition-shadow">
-      <p className="text-lg">Shops</p>
-      <p className="text-4xl font-bold">{productCounts.shops}</p>
-    </div>
-    <div className="bg-pink-400 text-white w-72 h-40 flex flex-col justify-center items-center rounded-lg shadow-lg hover:shadow-xl transition-shadow">
-      <p className="text-lg">Total Products</p>
-      <p className="text-4xl font-bold">{productCounts.total}</p>
+    
+    {/* Add Chart Container */}
+    <div className="mb-6 md:mb-8 container max-h-[500px] md:max-h-[600px] flex justify-center flex-col items-center">
+      <h2 className="text-xl md:text-2xl font-bold mb-4">Products Summary</h2>
+      <div className="w-full max-w-4xl h-[400px] md:h-[500px]">
+        <Bar 
+          data={{
+            labels: ['Attractions', 'Accommodations', 'Foods', 'Shops', 'Total'],
+            datasets: [{
+              label: '# of Products',
+              data: [
+                productCounts.activities,
+                productCounts.accommodations,
+                productCounts.foods,
+                productCounts.shops,
+                productCounts.total
+              ],
+              backgroundColor: [
+                '#f87171',  // red-400
+                '#2dd4bf', // teal-400
+                '#c084fc', // purple-400
+                '#facc15', // yellow-400
+                '#f472b6'  // pink-400
+              ]
+            }]
+          }}
+          options={{
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                labels: {
+                  font: {
+                    size: window.innerWidth < 768 ? 12 : 14
+                  }
+                }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  font: {
+                    size: window.innerWidth < 768 ? 12 : 14
+                  }
+                }
+              },
+              x: {
+                ticks: {
+                  font: {
+                    size: window.innerWidth < 768 ? 12 : 14
+                  }
+                }
+              }
+            }
+          }}
+        />
+      </div>
     </div>
   </div>
 );
 
 // Dashboard component for business counts
 const BusinessDashboard = ({ businessCounts }) => (
-  <div className="flex justify-around py-6 space-x-4">
-    <div className="bg-blue-400 text-white w-72 h-40 flex flex-col justify-center text-center items-center rounded-lg shadow-lg hover:shadow-xl transition-shadow">
-      <p className="text-lg">Activities & Attractions</p>
-      <p className="text-4xl font-bold">{businessCounts.activitiesAndAttractions}</p>
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 py-4 md:py-6">
+    <div className="bg-blue-400 text-white p-4 flex flex-col justify-center text-center items-center rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+      <p className="text-base md:text-lg">Activities & Attractions</p>
+      <p className="text-2xl md:text-4xl font-bold">{businessCounts.activitiesAndAttractions}</p>
     </div>
-    <div className="bg-green-400 text-white w-72 h-40 flex flex-col justify-center items-center rounded-lg shadow-lg hover:shadow-xl transition-shadow">
-      <p className="text-lg">Accommodations</p>
-      <p className="text-4xl font-bold">{businessCounts.accommodations}</p>
+    <div className="bg-green-400 text-white p-4 flex flex-col justify-center items-center rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+      <p className="text-base md:text-lg">Accommodations</p>
+      <p className="text-2xl md:text-4xl font-bold">{businessCounts.accommodations}</p>
     </div>
-    <div className="bg-yellow-400 text-white w-72 h-40 flex flex-col justify-center items-center rounded-lg shadow-lg hover:shadow-xl transition-shadow">
-      <p className="text-lg">Food Places</p>
-      <p className="text-4xl font-bold">{businessCounts.foodPlaces}</p>
+    <div className="bg-yellow-400 text-white p-4 flex flex-col justify-center items-center rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+      <p className="text-base md:text-lg">Food Places</p>
+      <p className="text-2xl md:text-4xl font-bold">{businessCounts.foodPlaces}</p>
     </div>
-    <div className="bg-orange-400 text-white w-72 h-40 flex flex-col justify-center items-center rounded-lg shadow-lg hover:shadow-xl transition-shadow">
-      <p className="text-lg">Shops</p>
-      <p className="text-4xl font-bold">{businessCounts.shops}</p>
+    <div className="bg-orange-400 text-white p-4 flex flex-col justify-center items-center rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+      <p className="text-base md:text-lg">Shops</p>
+      <p className="text-2xl md:text-4xl font-bold">{businessCounts.shops}</p>
     </div>
-    <div className="bg-gray-500 text-white w-72 h-40 flex flex-col justify-center items-center rounded-lg shadow-lg hover:shadow-xl transition-shadow">
-        <p className="text-lg">Total Businesses</p>
-        <p className="text-4xl font-bold">{businessCounts.total}</p>
+    <div className="bg-gray-500 text-white p-4 flex flex-col justify-center items-center rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+        <p className="text-base md:text-lg">Total Businesses</p>
+        <p className="text-2xl md:text-4xl font-bold">{businessCounts.total}</p>
       </div>
   </div>
 );
@@ -469,26 +531,20 @@ const SuperAdminProducts = () => {
   };
 
   const renderProductCards = (productList) => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {productList.map((product, index) => (
         <Card key={index} className="shadow-lg rounded-lg hover:scale-105 transition-transform">
-          <CardBody className="p-4">
+          <CardBody className="p-3 md:p-4">
             <img
               src={product.imageUrl}
               alt={product.title}
-              className="object-cover w-full h-40 rounded-lg mb-2"
+              className="object-cover w-full h-32 md:h-40 rounded-lg mb-2"
             />
-            <h3 className="font-bold text-lg">
-              <Highlight
-                content={product.title}
-                match={searchTerm}
-              />
+            <h3 className="font-bold text-base md:text-lg">
+              <Highlight content={product.title} match={searchTerm} />
             </h3>
-            <p className="text-gray-700">
-              <Highlight
-                content={product.description}
-                match={searchTerm}
-              />
+            <p className="text-gray-700 text-sm md:text-base">
+              <Highlight content={product.description} match={searchTerm} />
             </p>
             {product.businessName && (
               <p className="text-sm text-gray-600 mt-1">
@@ -523,19 +579,19 @@ const SuperAdminProducts = () => {
   );
 
   const renderBusinessCards = (businessList) => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {businessList.map((business, index) => (
         <Card key={index} className="shadow-lg rounded-lg hover:scale-105 transition-transform">
-          <CardBody className="p-4">
+          <CardBody className="p-3 md:p-4">
             <img
               src={business.imageUrl}
               alt={business.title}
-              className="object-cover w-full h-40 rounded-lg mb-2"
+              className="object-cover w-full h-32 md:h-40 rounded-lg mb-2"
             />
-            <h3 className="font-bold text-lg">
+            <h3 className="font-bold text-base md:text-lg">
               <Highlight content={business.title} match={businessSearchTerm} />
             </h3>
-            <p className="text-gray-700 mb-2">
+            <p className="text-gray-700 text-sm md:text-base mb-2">
               <Highlight content={business.description} match={businessSearchTerm} />
             </p>
             <div className="text-sm space-y-1">
@@ -614,38 +670,44 @@ const SuperAdminProducts = () => {
   const filteredAllBusinesses = filterBusinesses(allBusinesses);
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
       <SuperAdminSidebar />
 
-      <div className="flex-1 p-6 max-h-screen overflow-y-auto">
-        <h1 className="text-3xl font-bold mb-4">Products and Businesses</h1>
+      <div className="flex-1 p-4 md:p-6 max-h-screen overflow-y-auto">
+        <h1 className="text-2xl md:text-3xl font-bold mb-4">Products and Businesses</h1>
 
-        <Tabs className="mb-6" variant="highlight" color="primary">
+        <Tabs className="mb-4 md:mb-6" variant="highlight" color="primary">
           <Tab title="Products List">
             <Dashboard productCounts={productCounts} />
-            <div className="mb-4">
-              <label htmlFor="productFilter" className="mr-2">Filter Products: </label>
-              <select
-                id="productFilter"
-                value={selectedProductFilter}
-                onChange={(e) => setSelectedProductFilter(e.target.value)}
-              >
-                <option value="all">All Products</option>
-                <option value="topRated">Top Rated</option>
-                <option value="budgetFriendly">Budget Friendly</option>
-                <option value="luxury">Luxury</option>
-              </select>
+            <div className="mb-4 space-y-2">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                <label htmlFor="productFilter" className="text-sm md:text-base">
+                  Filter Products:
+                </label>
+                <select
+                  id="productFilter"
+                  value={selectedProductFilter}
+                  onChange={(e) => setSelectedProductFilter(e.target.value)}
+                  className="p-2 rounded border text-sm md:text-base"
+                >
+                  <option value="all">All Products</option>
+                  <option value="topRated">Top Rated</option>
+                  <option value="budgetFriendly">Budget Friendly</option>
+                  <option value="luxury">Luxury</option>
+                </select>
+              </div>
+              <SearchBar
+                placeholder="Search products..."
+                onSearch={setSearchTerm}
+                className="w-full"
+              />
             </div>
-            <SearchBar
-              placeholder="Search products..."
-              onSearch={setSearchTerm}
-            />
+
             <Tabs>
-              <Tab title="All Products">
-                {renderProductCards(filteredProducts)}
-              </Tab>
+              <Tab title="All Products">{renderProductCards(filteredProducts)}</Tab>
               <Tab title="Activities">
-                {renderProductCards(filteredProducts.filter((product) => product.type === 'Hiking' || product.type === 'Water Sports'))}
+                {renderProductCards(filteredProducts.filter((product) => 
+                  product.type === 'Hiking' || product.type === 'Water Sports'))}
               </Tab>
               <Tab title="Accommodations">
                 {renderProductCards(filteredProducts.filter((product) => product.type === 'Cabins' || product.type === 'Resorts'))}
@@ -698,12 +760,16 @@ const SuperAdminProducts = () => {
           </Tab>
         </Tabs>
 
-        <Modal isOpen={isOpen} onClose={onClose}>
+        <Modal 
+          isOpen={isOpen} 
+          onClose={onClose}
+          className="max-w-[90%] md:max-w-[500px] mx-auto"
+        >
           <ModalContent>
             <ModalHeader>
-              <h2 className="text-2xl font-bold">{selectedProduct?.title}</h2>
+              <h2 className="text-xl md:text-2xl font-bold">{selectedProduct?.title}</h2>
             </ModalHeader>
-            <ModalBody>
+            <ModalBody className="text-sm md:text-base">
               <p className="mb-4">{selectedProduct?.description}</p>
               <p className="mb-2 font-semibold">
                 Price: {new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(selectedProduct?.price || 0)}
@@ -726,7 +792,7 @@ const SuperAdminProducts = () => {
               </CheckboxGroup>
             </ModalBody>
             <ModalFooter>
-              <button className="bg-blue-500 text-white p-2 rounded" onClick={onClose}>
+              <button className="bg-blue-500 text-white px-4 py-2 rounded text-sm md:text-base" onClick={onClose}>
                 Close
               </button>
             </ModalFooter>
@@ -736,9 +802,9 @@ const SuperAdminProducts = () => {
         <Modal isOpen={isBusinessModalOpen} onClose={onBusinessModalClose}>
           <ModalContent>
             <ModalHeader>
-              <h2 className="text-2xl font-bold">{selectedBusiness?.title}</h2>
+              <h2 className="text-xl md:text-2xl font-bold">{selectedBusiness?.title}</h2>
             </ModalHeader>
-            <ModalBody>
+            <ModalBody className="text-sm md:text-base">
               <p className="mb-4">{selectedBusiness?.description}</p>
               <p className="mb-2 font-semibold">
                 Price Range: {selectedBusiness?.businessInfo?.businessCard?.priceRange || 'Price range not available'}
@@ -761,7 +827,7 @@ const SuperAdminProducts = () => {
               </CheckboxGroup>
             </ModalBody>
             <ModalFooter>
-              <button className="bg-blue-500 text-white p-2 rounded" onClick={onBusinessModalClose}>
+              <button className="bg-blue-500 text-white px-4 py-2 rounded text-sm md:text-base" onClick={onBusinessModalClose}>
                 Close
               </button>
             </ModalFooter>

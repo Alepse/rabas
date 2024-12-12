@@ -738,7 +738,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
             </div>
           )}
           <div className={`flex ${isSenderYou ? 'justify-end' : 'justify-start'} mb-4`}>
-            <div className={`p-4 rounded-lg max-w-[70%] ${isSenderYou ? 'bg-gray-200 text-black' : 'bg-blue-600 text-white'} shadow-md`}>
+            <div className={`p-4 rounded-lg max-w-[70%] ${isSenderYou ? 'bg-gray-200 text-black' : 'bg-color1 text-white'} shadow-md`}>
               {message.formType ? (
                 <BookingDetailsCard
                   message={message}
@@ -822,7 +822,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
           <div className="flex flex-col justify-between w-full lg:w-3/4 h-full bg-white rounded-md p-4">
             {selectedUser ? (
               <>
-                <div className="flex items-center space-x-3 p-3 bg-blue-900 text-white rounded-t-lg">
+                <div className="flex items-center space-x-3 p-3 bg-color2 text-white rounded-t-lg">
                   <img
                     src={activeChatUser.image_path 
                       ? `http://localhost:5000/${activeChatUser.image_path}` 

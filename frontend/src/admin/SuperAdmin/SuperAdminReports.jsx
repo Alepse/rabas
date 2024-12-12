@@ -8,55 +8,59 @@ import { FaEye, FaTrashAlt } from 'react-icons/fa';
 
 // Summary Card Component
 const SummaryCard = ({ title, count, color }) => (
-  <div className={`${color} text-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow`}>
-    <h2 className="text-lg mb-2 font-semibold">{title}</h2>
-    <p className="text-4xl font-bold">{count}</p>
+  <div className={`${color} text-white p-4 md:p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow`}>
+    <h2 className="text-base md:text-lg mb-2 font-semibold">{title}</h2>
+    <p className="text-2xl md:text-4xl font-bold">{count}</p>
   </div>
 );
 
 // Table Component with Action Column
 const Table = ({ title, headers, data, requestSort, handleSearch, onViewDetails, onForceDelete }) => {
   return (
-    <div className="mb-8">
-      <h2 className="text-2xl font-bold mb-4 text-left">{title}</h2>
+    <div className="mb-8 overflow-x-auto">
+      <h2 className="text-xl md:text-2xl font-bold mb-4 text-left">{title}</h2>
       <SearchBar placeholder="Search by name..." onSearch={handleSearch} />
-      <table className="min-w-full bg-white shadow-md rounded-lg">
-        <thead className="bg-gray-200">
-          <tr>
-            {headers.map((header, index) => (
-              <th
-                key={index}
-                className="py-3 px-6 text-center cursor-pointer hover:bg-gray-300 transition"
-                onClick={() => requestSort(index)}
-              >
-                {header}
-              </th>
-            ))}
-            <th className="py-3 px-6 text-center">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((row, index) => (
-            <tr key={index} className="border-b hover:bg-gray-100 transition duration-300">
-              {row.map((cell, cellIndex) => (
-                <td key={cellIndex} className="py-3 px-6 text-center">{cell}</td>
+      <div className="overflow-x-auto">
+        <table className="min-w-full bg-white shadow-md rounded-lg">
+          <thead className="bg-gray-200">
+            <tr>
+              {headers.map((header, index) => (
+                <th
+                  key={index}
+                  className="py-2 md:py-3 px-3 md:px-6 text-center text-sm md:text-base cursor-pointer hover:bg-gray-300 transition"
+                  onClick={() => requestSort(index)}
+                >
+                  {header}
+                </th>
               ))}
-              <td className="py-3 px-6 flex justify-center space-x-2">
-                <Tooltip content="View Details">
-                  <button className="text-blue-500 px-4 py-2 rounded" onClick={() => onViewDetails(row)}>
-                    <FaEye />
-                  </button>
-                </Tooltip>
-                <Tooltip content="Force Delete">
-                  <button className="text-red-500 px-4 py-2 rounded" onClick={() => onForceDelete(row)}>
-                    <FaTrashAlt />
-                  </button>
-                </Tooltip>
-              </td>
+              <th className="py-2 md:py-3 px-3 md:px-6 text-center text-sm md:text-base">Action</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {data.map((row, index) => (
+              <tr key={index} className="border-b hover:bg-gray-100 transition duration-300">
+                {row.map((cell, cellIndex) => (
+                  <td key={cellIndex} className="py-2 md:py-3 px-3 md:px-6 text-center text-sm md:text-base">
+                    {cell}
+                  </td>
+                ))}
+                <td className="py-2 md:py-3 px-3 md:px-6 flex justify-center space-x-2">
+                  <Tooltip content="View Details">
+                    <button className="text-blue-500 p-2 rounded" onClick={() => onViewDetails(row)}>
+                      <FaEye className="text-sm md:text-base" />
+                    </button>
+                  </Tooltip>
+                  <Tooltip content="Force Delete">
+                    <button className="text-red-500 p-2 rounded" onClick={() => onForceDelete(row)}>
+                      <FaTrashAlt className="text-sm md:text-base" />
+                    </button>
+                  </Tooltip>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
@@ -119,9 +123,28 @@ const SuperAdminReports = () => {
   const barData = {
     labels: ['Deactivated Accounts', 'Reported Tourists', 'Reported Business Owners', 'Total Reports'],
     datasets: [{
-      label: '# of Reports',
+      label: 'Number of Reports',
       data: [1, 0, 3, 3],
-      backgroundColor: ['#f87171', '#2dd4bf', '#a78bfa', '#f472b6']
+      backgroundColor: [
+        'rgba(248, 113, 113, 0.8)', // red-400 with opacity
+        'rgba(45, 212, 191, 0.8)',  // teal-400 with opacity
+        'rgba(167, 139, 250, 0.8)', // purple-400 with opacity
+        'rgba(244, 114, 182, 0.8)'  // pink-400 with opacity
+      ],
+      borderColor: [
+        'rgb(248, 113, 113)', // red-400
+        'rgb(45, 212, 191)',  // teal-400
+        'rgb(167, 139, 250)', // purple-400
+        'rgb(244, 114, 182)'  // pink-400
+      ],
+      borderWidth: 2,
+      borderRadius: 6,
+      hoverBackgroundColor: [
+        'rgba(248, 113, 113, 1)', // full opacity on hover
+        'rgba(45, 212, 191, 1)',
+        'rgba(167, 139, 250, 1)',
+        'rgba(244, 114, 182, 1)'
+      ],
     }]
   };
 
@@ -161,22 +184,97 @@ const SuperAdminReports = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex flex-col md:flex-row min-h-screen bg-gray-100"> 
       <SuperAdminSidebar />
 
-      <div className="flex-1 p-8 max-h-screen overflow-y-auto">
-        <h1 className="text-3xl font-bold mb-6">Reports</h1>
+      <div className="flex-1 p-4 md:p-8 max-h-screen overflow-y-auto">
+        <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6">Reports</h1>
 
-        <div className="grid grid-cols-4 gap-6 mb-8 text-center">
+        {/* Summary Cards Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8 text-center">
           {summaryData.map((item, index) => (
             <SummaryCard key={index} title={item.title} count={item.count} color={item.color} />
           ))}
         </div>
 
         {/* Graphical Representation */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4">Reports Summary</h2>
-          <Bar data={barData} />
+        <div className="mb-6 md:mb-8 container max-h-[500px] md:max-h-[600px] flex justify-center flex-col items-center">
+          <h2 className="text-xl md:text-2xl font-bold mb-4">Reports Summary</h2>
+          <div className="w-full max-w-4xl h-[400px] md:h-[500px]">
+            <Bar 
+              data={barData}
+              options={{
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                      font: {
+                        size: window.innerWidth < 768 ? 12 : 14,
+                        weight: 'bold'
+                      },
+                      padding: 20
+                    }
+                  },
+                  tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    titleFont: {
+                      size: 14,
+                      weight: 'bold'
+                    },
+                    bodyFont: {
+                      size: 13
+                    },
+                    displayColors: true,
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    borderWidth: 1
+                  }
+                },
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                    grid: {
+                      color: 'rgba(0, 0, 0, 0.1)',
+                      drawBorder: false
+                    },
+                    ticks: {
+                      font: {
+                        size: window.innerWidth < 768 ? 12 : 14
+                      },
+                      padding: 8,
+                      stepSize: 1
+                    }
+                  },
+                  x: {
+                    grid: {
+                      display: false
+                    },
+                    ticks: {
+                      font: {
+                        size: window.innerWidth < 768 ? 12 : 14
+                      },
+                      padding: 8
+                    }
+                  }
+                },
+                animation: {
+                  duration: 1500,
+                  easing: 'easeInOutQuart'
+                },
+                layout: {
+                  padding: {
+                    top: 20,
+                    right: 20,
+                    bottom: 20,
+                    left: 20
+                  }
+                }
+              }}
+            />
+          </div>
         </div>
 
         {/* Pending Reports Table */}
@@ -213,14 +311,22 @@ const SuperAdminReports = () => {
         />
 
         {/* Modal for Viewing Details */}
-        <Modal isOpen={isOpen} onOpenChange={onOpenChange} isDismissable={false} isKeyboardDismissDisabled={true}>
+        <Modal 
+          isOpen={isOpen} 
+          onOpenChange={onOpenChange} 
+          isDismissable={false} 
+          isKeyboardDismissDisabled={true}
+          className="max-w-[90%] md:max-w-[500px] mx-auto"
+        >
           <ModalContent>
             {(onClose) => (
               <>
-                <ModalHeader className="flex flex-col gap-1">Report Details</ModalHeader>
+                <ModalHeader className="flex flex-col gap-1 text-lg md:text-xl">
+                  Report Details
+                </ModalHeader>
                 <ModalBody>
                   {selectedReport && (
-                    <div className="space-y-4">
+                    <div className="space-y-3 md:space-y-4 text-sm md:text-base">
                       <p><strong>ID:</strong> {selectedReport.id}</p>
                       <p><strong>Name:</strong> {selectedReport.name}</p>
                       <p><strong>Status:</strong> {selectedReport.status}</p>
@@ -230,7 +336,12 @@ const SuperAdminReports = () => {
                   )}
                 </ModalBody>
                 <ModalFooter>
-                  <Button color="danger" variant="light" onPress={onClose}>
+                  <Button 
+                    color="danger" 
+                    variant="light" 
+                    onPress={onClose}
+                    className="text-sm md:text-base"
+                  >
                     Close
                   </Button>
                 </ModalFooter>

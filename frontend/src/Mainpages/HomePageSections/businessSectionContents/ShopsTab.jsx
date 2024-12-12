@@ -134,7 +134,7 @@ const ShopSwiper = ({ title, link, isLast }) => (
 const ShopsTab = () => (
   <div className='lg:container'>
     <ShopSwiper title="Must-Visit: Recommended Stores" link="/shops" />
-    <ShopSwiper title="Shopper's Picks: Most Reviewed Shops" link="/shops" />
+    <ShopSwiper title="Shopper's Picks: Liked Shops" link="/shops" />
     <ShopSwiper title="Retail Therapy: Top Shopping Offers" isLast />
   </div>
 );
