@@ -289,7 +289,7 @@ app.get('/get-userData', async (req, res) => {
     // Check if user is logged in and session contains user_id
     if (req.session.user && req.session.user.user_id) {
       const userId = req.session.user.user_id;
-      const sql = 'SELECT user_id, google_id, Fname, Lname, username, contact, email, image, image_path FROM users WHERE user_id = ?';
+      const sql = 'SELECT user_id, google_id, Fname, Lname, username, contact, email, address, image, image_path FROM users WHERE user_id = ?';
       
       // Query the database to fetch user data based on user_id
       const [results] = await pool.query(sql, [userId]);
@@ -457,7 +457,7 @@ app.use('/uploads', express.static('uploads'));
 // Endpoint for updating user profile
 app.put('/updateUserProfile/:id', upload.single('profilePic'), async (req, res) => {
   const userId = req.params.id;
-  let { username } = req.body;
+  let { username, email, phoneNumber, address } = req.body;
   let imagePath = req.body.image_path; // Existing image path
   let imageFileName = req.body.image;  // Existing image filename
 
@@ -476,6 +476,21 @@ app.put('/updateUserProfile/:id', upload.single('profilePic'), async (req, res) 
     if (username) {
       sql += 'username = ?, ';
       params.push(username);
+    }
+
+    if (email) {
+      sql += 'email = ?, ';
+      params.push(email);
+    }
+
+    if (phoneNumber) {
+      sql += 'contact = ?, ';
+      params.push(phoneNumber);
+    }
+
+    if (address) {
+      sql += 'address = ?, ';
+      params.push(address);
     }
 
     // Always update image filename and image path if file was uploaded
@@ -499,7 +514,7 @@ app.put('/updateUserProfile/:id', upload.single('profilePic'), async (req, res) 
     return res.json({
       success: true,
       message: 'User updated successfully',
-      updatedUserData: { username, imageFileName, imagePath }
+      updatedUserData: { username, email, phoneNumber, imageFileName, imagePath }
     });
   } catch (err) {
     console.error('Error updating user profile:', err);
