@@ -739,7 +739,6 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
           )}
           <div className={`flex ${isSenderYou ? 'justify-end' : 'justify-start'} mb-4`}>
             <div className={`p-4 rounded-lg max-w-[70%] ${isSenderYou ? 'bg-gray-200 text-black' : 'bg-color1 text-white'} shadow-md`}>
-            <div className={`p-4 rounded-lg max-w-[70%] ${isSenderYou ? 'bg-gray-200 text-black' : 'bg-color1 text-white'} shadow-md`}>
               {message.formType ? (
                 <BookingDetailsCard
                   message={message}
