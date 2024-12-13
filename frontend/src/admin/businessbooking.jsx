@@ -998,14 +998,14 @@ const BookingTypeSection = ({ type, bookings, searchQuery, setSearchQuery, openC
 
   // Map API types to display types
   const typeMapping = {
-    'Accommodation': ['Cabins'],
-    'Table Reservation': ['Buffet', 'Resorts', 'Fine Dining'],
-    'Attraction': ['Hiking', 'Water Sports']
+    'Accommodation': 'accommodation',
+    'Table Reservation': 'restaurant',
+    'Attraction': 'activity'
   };
 
   const filteredBookings = bookings.filter(booking => {
     const allowedTypes = typeMapping[type] || [];
-    const typeMatch = allowedTypes.includes(booking.type);
+    const typeMatch = allowedTypes.includes(booking.reservationType);
     const searchMatch = !searchQuery || 
       booking.customerName.toLowerCase().includes(searchQuery.toLowerCase());
     

@@ -409,7 +409,7 @@ const renderMessages = (messages) => {
           </div>
         )}
         <div className={`flex ${isSenderYou ? 'justify-end' : 'justify-start'} mb-4`}>
-          <div className={`p-4 rounded-lg max-w-[70%] ${isSenderYou ? 'bg-gray-200 text-black' : 'bg-blue-600 text-white'} shadow-md`}>
+          <div className={`p-4 rounded-lg max-w-[70%] ${isSenderYou ? 'bg-gray-200 text-black' : 'bg-color1 text-white'} shadow-md`}>
             {/* Message Text */}
             {message.text && <p className="break-words mb-2">{message.text}</p>}
 
@@ -460,11 +460,12 @@ const renderMessages = (messages) => {
   const renderBusinessList = () => {
     // Flatten the nested array structure
     const flattenedBusinesses = businesses.flat();  // Merge nested arrays into a single array
-    // console.log('flattenedBusinesses', flattenedBusinesses);
+    console.log('flattenedBusinesses', flattenedBusinesses);
+    console.log('selectedBusienss: ', selectedBusiness);
     return flattenedBusinesses.map((business) => (
       <li key={business.id}
-        className={`p-3 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-300 bg-white ${
-          business.user_id === selectedBusiness ? 'bg-blue-100' : '' // Highlight active business
+        className={`p-3 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-300 ${
+          selectedBusiness == business.user_id ? 'bg-gray-300' : 'bg-white' // Highlight active business
         }`}
         onClick={() => handleBusinessClick(business.user_id)}>
         <div className="relative flex items-center gap-3">
@@ -510,7 +511,7 @@ const renderMessages = (messages) => {
           <div className="flex flex-col justify-between w-full lg:w-3/4 h-full bg-white rounded-md p-4">
             {selectedBusiness ? (
               <>
-                <div className="flex items-center space-x-3 p-3 bg-color2 text-white rounded-t-lg">
+                <div className="flex items-center space-x-3 p-3 bg-color1 text-white rounded-t-lg">
                   <img
                     src={activeChatUser.avatarUrl 
                       ? `http://localhost:5000/${activeChatUser.avatarUrl}` 
