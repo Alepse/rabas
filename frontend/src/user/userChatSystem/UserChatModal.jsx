@@ -3,7 +3,7 @@ import { ModalContent, ModalHeader, ModalBody, Modal } from "@nextui-org/modal";
 import { Button, Input, Avatar } from '@nextui-org/react';
 import { FiSend, FiImage, FiDownload } from "react-icons/fi";
 import { toast } from 'react-toastify';
-import { MdDateRange, MdPeople, MdEmail, MdPhone } from "react-icons/md";
+import { MdDateRange, MdPeople, MdEmail, MdPhone, MdClose } from "react-icons/md";
 import axios from 'axios';
 
 
@@ -568,7 +568,7 @@ const renderMessages = (messages) => {
                       onClick={handleImageRemove}
                       className="absolute top-2 right-2 bg-white p-1 rounded-full shadow-md"
                     >
-                      <span className="text-black">✖</span>
+                     <MdClose className='text-red-500 text-xl'></MdClose>
                     </button>
                   </div>
                 )}

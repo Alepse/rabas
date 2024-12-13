@@ -134,7 +134,7 @@ const FoodPlaceSwiper = ({ title, link, isLast }) => (
 const FoodPlacesTab = () => (
   <div className='lg:container'>
     <FoodPlaceSwiper title="Culinary Delights: Must-Try Food Spots" link="/foodplaces" />
-    <FoodPlaceSwiper title="Taste-Tested: Most Reviewed Eateries" link="/foodplaces" />
+    <FoodPlaceSwiper title="Taste-Tested: Liked Eateries" link="/foodplaces" />
     <FoodPlaceSwiper title="Savor the Savings: Top Food Offers" isLast />
   </div>
 );

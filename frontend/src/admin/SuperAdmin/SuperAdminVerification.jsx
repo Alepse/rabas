@@ -385,13 +385,13 @@ const SuperAdminVerification = () => {
   const filteredDataRejected = filterData(verificationData.filter(item => item.status === -1), searchTermRejected);
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
       <SuperAdminSidebar />
 
-      <div className="flex-1 p-8 max-h-screen overflow-y-auto">
-        <h1 className="text-3xl font-bold mb-6">Verification</h1>
+      <div className="flex-1 p-4 md:p-8 max-h-screen overflow-y-auto">
+        <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6">Verification</h1>
 
-        <div className="grid grid-cols-5 gap-6 mb-8 text-center">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6 mb-6 md:mb-8 text-center">
           <SummaryCard title="Applied for Attraction" count={appliedAttractions} color="bg-red-400" />
           <SummaryCard title="Applied for Accommodation" count={appliedAccommodations} color="bg-teal-400" />
           <SummaryCard title="Applied for Food Places" count={appliedFoods} color="bg-purple-400" />
@@ -399,14 +399,125 @@ const SuperAdminVerification = () => {
           <SummaryCard title="Pending Verification" count={totalPending} color="bg-pink-400" />
         </div>
 
-        <h2 className="text-2xl font-bold mb-4">All Applications</h2>
-        <SearchBar placeholder="Search all applications..." onSearch={setSearchTermAll} />
-        <VerificationTable 
-          data={filteredDataAll} 
-          title="All Applications" 
-          onUpdateStatus={updateStatus} 
-          searchTerm={searchTermAll} 
-        />
+        <div className="overflow-x-auto">
+          <h2 className="text-xl md:text-2xl font-bold mb-4">All Applications</h2>
+          <SearchBar placeholder="Search all applications..." onSearch={setSearchTermAll} />
+          <div className="overflow-x-auto">
+            <table className="min-w-full">
+              <thead className="text-xs md:text-sm">
+                <tr>
+                  <th className="py-3 px-6 text-left">Business Name</th>
+                  <th className="py-3 px-6 text-left">Owner</th>
+                  <th className="py-3 px-6 text-left">Business Type</th>
+                  <th className="py-3 px-6 text-left">Category</th>
+                  <th className="py-3 px-6 text-left">Certificate No</th>
+                  <th className="py-3 px-6 text-left">Location</th>
+                  <th className="py-3 px-6 text-left">Submission Date</th>
+                  <th className="py-3 px-6 text-left">Status</th>
+                  <th className="py-3 px-6 text-left">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="text-xs md:text-sm">
+                {filteredDataAll.map((item, index) => (
+                  <tr key={index} className="border-b hover:bg-gray-100 transition duration-300">
+                    <td className="py-3 px-6">
+                      {item.updatedBusinessName && item.updatedBusinessName !== item.businessName ? (
+                        <div>
+                          <span className="line-through text-gray-500">
+                            <Highlight
+                              content={item.businessName}
+                              match={searchTermAll}
+                            />  
+                          </span>
+                          <div className="text-blue-600 font-semibold">
+                            {'Updated: '}
+                            <Highlight
+                              content={item.updatedBusinessName}
+                              match={searchTermAll}
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <Highlight
+                          content={item.businessName}
+                          match={searchTermAll}
+                        />
+                      )}
+                    </td>
+                    <td className="py-3 px-6">
+                      <Highlight
+                        content={`${item.firstName} ${item.lastName}`}
+                        match={searchTermAll}
+                      />
+                    </td>
+                    <td className="py-3 px-6">
+                      <Highlight
+                        content={item.businessType}
+                        match={searchTermAll}
+                      />
+                    </td>
+                    <td className="py-3 px-6">
+                      <Highlight
+                        content={Array.isArray(item.category) ? item.category.join(', ') : item.category}
+                        match={searchTermAll}
+                      />
+                    </td>
+                    <td className="py-3 px-6">
+                      <Highlight
+                        content={item.certNumber}
+                        match={searchTermAll}
+                      />
+                    </td>
+                    <td className="py-3 px-6">
+                      <Highlight
+                        content={item.location}
+                        match={searchTermAll}
+                      />
+                    </td>
+                    <td className="py-3 px-6">
+                      {new Date(item.application_date).toISOString().split('T')[0]}
+                    </td>
+                    <td className="py-3 px-6">
+                      <StatusBadge 
+                        status={
+                          item.status === 1 
+                            ? 'Approved' 
+                            : item.status === -1 
+                            ? 'Rejected' 
+                            : 'Pending'
+                        } 
+                      />
+                    </td>
+                    <td className="py-3 px-6 flex gap-2">
+                      <ActionButton 
+                        icon={<FaEye />} 
+                        tooltip="View Details" 
+                        onClick={() => handleViewClick(item)} 
+                        color="blue" 
+                      />
+                      {item.status === 0 && (
+                        <>
+                          <ActionButton 
+                            icon={<FaCheck />} 
+                            tooltip="Approve" 
+                            onClick={() => handleApprove(item)} 
+                            color="green" 
+                          />
+                          <ActionButton 
+                            icon={<FaTimes />} 
+                            tooltip="Reject" 
+                            onClick={() => handleReject(item)} 
+                            color="red" 
+                          />
+                        </>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
 
         <h2 className="text-2xl font-bold mb-4">Pending Applications</h2>
         <SearchBar placeholder="Search pending applications..." onSearch={setSearchTermPending} />

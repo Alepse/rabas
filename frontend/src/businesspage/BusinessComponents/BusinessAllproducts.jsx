@@ -704,6 +704,12 @@ const BusinessAllproducts = () => {
             className="mb-4"
             onSelectionChange={(key) => setActiveTab(key)}
             selectedKey={activeTab}
+            classNames={{
+          base: "w-full overflow-x-auto mb-4",
+          tabList: "gap-6 w-full p-4 container",
+          tab: "max-w-fit px-0 h-12",
+          tabContent: "text-color1"
+        }}
           >
             <Tab key="all" title="All Products" />
             <Tab key="activities" title="Activities" />

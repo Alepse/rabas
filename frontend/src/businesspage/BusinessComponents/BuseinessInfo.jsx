@@ -142,7 +142,17 @@ const BusinessInfo = () => {
 
   return (
     <div className='container mx-auto mt-4 px-4'>
-      <Tabs aria-label="Business Information " className='max-w-full overflow-x-auto'>
+         <Tabs 
+        aria-label="Business Information" 
+        className="max-w-full overflow-x-auto" 
+        variant="underlined"  
+        classNames={{
+          base: "w-full overflow-x-auto mb-4",
+          tabList: "gap-6 w-full p-4 container",
+          tab: "max-w-fit px-0 h-12",
+          tabContent: "text-color1"
+        }}
+      >
         <Tab key="about-location" title="About Us">
           <Card>
             <CardBody>
@@ -218,7 +228,7 @@ const BusinessInfo = () => {
                         const customDivIcon = L.divIcon({
                           className: 'custom-icon',
                           html: `
-                            <div class="custom-popup flex items-center whitespace-nowrap font-bold text-pink-600" style="font-size: ${fontSize};">
+                            <div class="custom-popup flex items-center whitespace-nowrap font-bold text-color1 " style="font-size: ${fontSize};">
                               ${showLogo ? `<div class="pin-container">
                                 <div class="pin-head">
                                   <img src="http://localhost:5000/${businessLogo}" alt="${businessName}" class="pin-logo" />

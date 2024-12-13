@@ -276,7 +276,7 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
                         const customDivIcon = L.divIcon({
                           className: 'custom-icon',
                           html: `
-                            <div class="custom-popup flex items-center whitespace-nowrap font-bold text-pink-600" style="font-size: ${fontSize};">
+                            <div class="custom-popup flex items-center whitespace-nowrap font-bold text-color1" style="font-size: ${fontSize};">
                               ${showLogo ? `
                                 <div class="pin-container">
                                   <div class="pin-head">

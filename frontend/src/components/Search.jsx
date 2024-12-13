@@ -157,8 +157,15 @@ const Search = () => {
         <Tabs
           aria-label="Search Options"
           onSelectionChange={handleTabChange}
-          className="flex justify-center w-full"
           variant="underlined"
+          classNames={{
+          base: "w-full overflow-x-auto rounded shadow-md",
+          tabList: "gap-6 flex justify-center w-full p-4  container ",
+          tab: "max-w-fit px-0 h-12 ",
+          tabContent: " text-color1  ",
+          cursor: "w-full bg-color1",
+        
+        }}
         >
           <Tab key="all" title={<span className="flex items-center"><FaSearch className="mr-2" />Search All</span>} />
           <Tab key="activities" title={<span className="flex items-center"><FaHiking className="mr-2" />Activities</span>} />

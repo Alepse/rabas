@@ -124,26 +124,69 @@ const BusinessDashboard = () => {
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-        <div className='flex justify-center '>
-          <ChartSection title="Page Visitation" >
-            <LineChart width={700} height={200} data={data}>
-              <Line type="monotone" dataKey="visits" stroke="#4f46e5" />
-              <CartesianGrid stroke="#e5e7eb" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-            </LineChart>
+        <div className='flex justify-center'>
+          <ChartSection title="Page Visitation">
+            <div className="h-[400px] md:h-[500px] w-full flex items-center justify-center">
+              <LineChart 
+                width={window.innerWidth < 768 ? 350 : 600} 
+                height={window.innerWidth < 768 ? 300 : 400} 
+                data={data}
+                margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+              >
+                <Line 
+                  type="monotone" 
+                  dataKey="visits" 
+                  stroke="#4f46e5" 
+                  strokeWidth={2}
+                />
+                <CartesianGrid stroke="#e5e7eb" />
+                <XAxis 
+                  dataKey="name" 
+                  tick={{ fontSize: window.innerWidth < 768 ? 12 : 14 }}
+                />
+                <YAxis 
+                  tick={{ fontSize: window.innerWidth < 768 ? 12 : 14 }}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    fontSize: window.innerWidth < 768 ? 12 : 14,
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)'
+                  }} 
+                />
+              </LineChart>
+            </div>
           </ChartSection>
           </div>
-          <div className='flex justify-center '>
+          <div className='flex justify-center'>
           <ChartSection title="Tourist Statistical Review">
-            <BarChart width={700} height={200} data={reviewData}>
-              <Bar dataKey="reviews" fill="#10b981" />
-              <CartesianGrid stroke="#e5e7eb" />
-              <XAxis dataKey="year" />
-              <YAxis />
-              <Tooltip />
-            </BarChart>
+            <div className="h-[400px] md:h-[500px] w-full flex items-center justify-center">
+              <BarChart 
+                width={window.innerWidth < 768 ? 350 : 600} 
+                height={window.innerWidth < 768 ? 300 : 400} 
+                data={reviewData}
+                margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+              >
+                <Bar 
+                  dataKey="reviews" 
+                  fill="#10b981" 
+                  radius={[4, 4, 0, 0]}
+                />
+                <CartesianGrid stroke="#e5e7eb" />
+                <XAxis 
+                  dataKey="year" 
+                  tick={{ fontSize: window.innerWidth < 768 ? 12 : 14 }}
+                />
+                <YAxis 
+                  tick={{ fontSize: window.innerWidth < 768 ? 12 : 14 }}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    fontSize: window.innerWidth < 768 ? 12 : 14,
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)'
+                  }} 
+                />
+              </BarChart>
+            </div>
           </ChartSection>
           </div>
         </div>
@@ -171,8 +214,8 @@ DashboardCard.propTypes = {
 };
 
 const ChartSection = ({ title, children }) => (
-  <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-    <h2 className="text-xl font-semibold mb-4 text-gray-800">{title}</h2>
+  <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 w-full">
+    <h2 className="text-xl font-semibold mb-6 text-gray-800 text-center">{title}</h2>
     {children}
   </div>
 );

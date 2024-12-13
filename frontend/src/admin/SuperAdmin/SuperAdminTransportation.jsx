@@ -95,55 +95,57 @@ const SuperAdminTransportation = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-light">
+    <div className="flex flex-col md:flex-row min-h-screen font-sans">
       <SuperAdminSidebar />
 
-      <div className="flex-1 p-8 max-h-screen overflow-y-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-black">Transportation Management</h1>
+      <div className="flex-1 p-4 md:p-8 max-h-screen overflow-y-auto">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-0">Transportation Management</h1>
         </div>
 
         {transportData.map((terminal, terminalIndex) => (
-          <Card key={terminalIndex} className="mb-8 shadow-xl rounded-lg">
-            <CardBody>
-              <div className="flex justify-between items-center mb-3">
-                <h2 className="text-2xl font-semibold" style={{ color: 'color1' }}>{terminal.terminal}</h2>
+          <Card key={terminalIndex} className="mb-6 md:mb-8 shadow-xl rounded-lg">
+            <CardBody className="p-4 md:p-6">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-3">
+                <h2 className="text-xl md:text-2xl font-semibold mb-2 md:mb-0">{terminal.terminal}</h2>
                 <Button
                   auto
-                  className='bg-color1 text-white'
+                  className="bg-color1 text-white mt-2 md:mt-0"
                   icon={<FaPlus />}
                   onClick={() => handleAddRoute(terminalIndex)}
                 >
                   Add New Route
                 </Button>
               </div>
-              <table className="min-w-full bg-white rounded-lg shadow-md overflow-hidden">
-                <thead className='bg-color1 text-white'>
-                  <tr>
-                    <th className="py-3 px-6 text-left font-medium">Origin</th>
-                    <th className="py-3 px-6 text-left font-medium">Destination</th>
-                    <th className="py-3 px-6 text-left font-medium">Schedule</th>
-                    <th className="py-3 px-6 text-left font-medium">Fare</th>
-                    <th className="py-3 px-6 text-left font-medium">Mode</th>
-                    <th className="py-3 px-6 text-center font-medium">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {terminal.routes.map((route, routeIndex) => (
-                    <tr key={routeIndex} className="border-b hover:bg-blue-50 transition">
-                      <td className="py-3 px-6">{route.origin}</td>
-                      <td className="py-3 px-6">{route.destination}</td>
-                      <td className="py-3 px-6">{route.schedule}</td>
-                      <td className="py-3 px-6">{route.fare}</td>
-                      <td className="py-3 px-6">{route.mode}</td>
-                      <td className="py-3 px-6 flex justify-center space-x-2">
-                        <Button auto className='bg-color1 text-white' icon={<FaEdit />} onClick={() => handleEdit(terminalIndex, routeIndex)}>Edit</Button>
-                        <Button auto color="danger" icon={<FaTrashAlt />} onClick={() => handleDelete(terminalIndex, routeIndex)}>Delete</Button>
-                      </td>
+              <div className="overflow-x-auto">
+                <table className="min-w-full">
+                  <thead className="text-xs md:text-sm">
+                    <tr>
+                      <th className="py-3 px-6 text-left font-medium">Origin</th>
+                      <th className="py-3 px-6 text-left font-medium">Destination</th>
+                      <th className="py-3 px-6 text-left font-medium">Schedule</th>
+                      <th className="py-3 px-6 text-left font-medium">Fare</th>
+                      <th className="py-3 px-6 text-left font-medium">Mode</th>
+                      <th className="py-3 px-6 text-center font-medium">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="text-xs md:text-sm">
+                    {terminal.routes.map((route, routeIndex) => (
+                      <tr key={routeIndex} className="border-b hover:bg-blue-50 transition">
+                        <td className="py-3 px-6">{route.origin}</td>
+                        <td className="py-3 px-6">{route.destination}</td>
+                        <td className="py-3 px-6">{route.schedule}</td>
+                        <td className="py-3 px-6">{route.fare}</td>
+                        <td className="py-3 px-6">{route.mode}</td>
+                        <td className="py-3 px-6 flex justify-center space-x-2">
+                          <Button auto className='bg-color1 text-white' icon={<FaEdit />} onClick={() => handleEdit(terminalIndex, routeIndex)}>Edit</Button>
+                          <Button auto color="danger" icon={<FaTrashAlt />} onClick={() => handleDelete(terminalIndex, routeIndex)}>Delete</Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </CardBody>
           </Card>
         ))}

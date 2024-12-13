@@ -45,21 +45,21 @@ const SuperAdminSidebar = () => {
 
       {/* Sidebar for desktop and mobile */}
       <div
-        className={`fixed lg:flex flex-col top-0 left-0 justify-between h-full bg-color1 p-6 w-[250px] transform transition-transform duration-300 lg:translate-x-0 ${
+        className={`fixed lg:flex flex-col top-0 left-0 justify-between h-full bg-color1 p-6 w-[220px] transform transition-transform duration-300 lg:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         } lg:static z-50`}
       >
         <div>
           {/* Logo and title */}
           <div className="flex flex-col items-center mt-3">
-            <h1 className="font-bold text-2xl lg:text-3xl text-white text-center">RabaSorsogon</h1>
+            <h1 className="font-bold text-xl lg:text-2xl text-white text-center">RabaSorsogon</h1>
             <div className="w-full flex justify-center mt-3">
               <div className="w-[150px] lg:w-[200px] mt-3 bg-slate-600 h-[2px]"></div>
             </div>
           </div>
 
           {/* Nav Items */}
-          <nav className="mt-12">
+          <nav className="mt-12 text-sm">
             <ul className="flex flex-col gap-4">
               {navItems.map((item) => (
                 <Link to={item.path} key={item.label}>
@@ -83,15 +83,7 @@ const SuperAdminSidebar = () => {
           </nav>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex flex-col gap-2 mt-9 items-center">
-          <Button className="bg-color3 text-black font-medium w-full flex items-center justify-center gap-2">
-            <TbWorld /> Go to Business Page
-          </Button>
-          <Button className="bg-red-500 text-white font-medium w-full flex items-center justify-center gap-2">
-            <CgLogOut /> Logout
-          </Button>
-        </div>
+      
       </div>
 
       {/* Overlay for mobile when sidebar is open */}

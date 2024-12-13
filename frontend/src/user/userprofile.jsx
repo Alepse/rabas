@@ -609,7 +609,7 @@ const UserProfile = ({ activities = [] }) => {
               );
             } else if (application.status === 1) {
               return (
-                <div key={`approved-${application.application_id}`} className='mb-4'>
+                <div key={`approved-${application.application_id}`} className='mb-4 flex justify-center items-center flex-col'>
                   <h1 className='font-bold mb-2'>Switch to Business:</h1>
                   <button 
                     className='text-gray-500 hover:bg-color2 hover:text-white flex items-center p-2 rounded-lg gap-1 border-2 border-color1 shadow-md transition duration-300 ease-in-out transform hover:scale-105'
@@ -637,7 +637,13 @@ const UserProfile = ({ activities = [] }) => {
 
       {/* Main content */}
       <div className='container mx-auto'>
-        <Tabs aria-label="Options" selectedKey={selected} onSelectionChange={setSelected} className='overflow-y-auto scrollbar-hide'>
+        <Tabs aria-label="Options" selectedKey={selected} onSelectionChange={setSelected}    variant="underlined"  
+        classNames={{
+          base: "w-full overflow-x-auto mb-4",
+          tabList: "gap-6 w-full p-4 container",
+          tab: "max-w-fit px-0 h-12",
+          tabContent: "text-color1"
+        }}>
           {/* Profile Tab */}
           <Tab key="profile" title="Profile">
             <Card className='p-4 shadow-lg'>

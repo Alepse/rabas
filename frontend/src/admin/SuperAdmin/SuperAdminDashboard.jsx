@@ -152,16 +152,16 @@ const SuperAdminDashboard = () => {
   }, []);
 
   return (
-    <div className="flex min-h-screen font-sans">
+    <div className="flex flex-col md:flex-row min-h-screen font-sans">
       {/* Sidebar */}
       <SuperAdminSidebar />
 
       {/* Main Dashboard Content */}
-      <div className="flex-1 p-6 bg-gray-100 max-h-screen overflow-y-auto">
-        <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
+      <div className="flex-1 p-4 md:p-6 bg-gray-100 max-h-screen overflow-y-auto">
+        <h1 className="text-2xl md:text-3xl font-bold mb-4">Dashboard</h1>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-4 gap-4 mb-6 text-center">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 text-center">
           <div className="bg-red-400 text-white p-4 rounded shadow-md">
             <h2 className="text-lg">Pending Verifications</h2>
             <p className="text-2xl font-bold">{pendingVerifications}</p>
@@ -181,28 +181,98 @@ const SuperAdminDashboard = () => {
         </div>
 
         {/* Charts */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-white shadow-md rounded p-4 flex justify-center items-center flex-col">
-            <h2 className="text-xl font-semibold mb-2">Business Owners Application Reports</h2>
-            <div className="h-40 ">
-              <Bar data={businessOwnersData} options={options} ref={chartRef} />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div className="bg-white shadow-md rounded-lg p-4 md:p-6">
+            <h2 className="text-lg md:text-xl font-semibold mb-4 text-center">Business Owners Application Reports</h2>
+            <div className="h-[400px] md:h-[500px] w-full">
+              <Bar 
+                data={businessOwnersData} 
+                options={{
+                  ...options,
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    ...options.plugins,
+                    legend: {
+                      position: 'top',
+                      labels: {
+                        font: {
+                          size: window.innerWidth < 768 ? 12 : 14
+                        }
+                      }
+                    }
+                  },
+                  scales: {
+                    y: {
+                      beginAtZero: true,
+                      ticks: {
+                        font: {
+                          size: window.innerWidth < 768 ? 12 : 14
+                        }
+                      }
+                    },
+                    x: {
+                      ticks: {
+                        font: {
+                          size: window.innerWidth < 768 ? 12 : 14
+                        }
+                      }
+                    }
+                  }
+                }} 
+              />
             </div>
           </div>
-          <div className="bg-white shadow-md rounded p-4 flex justify-center items-center flex-col">
-            <h2 className="text-xl font-semibold mb-2">Active Users Reports</h2>
-            <div className="h-40">
-              <Bar data={activeUsersData} options={options} ref={chartRef} />
+          <div className="bg-white shadow-md rounded-lg p-4 md:p-6">
+            <h2 className="text-lg md:text-xl font-semibold mb-4 text-center">Active Users Reports</h2>
+            <div className="h-[400px] md:h-[500px] w-full">
+              <Bar 
+                data={activeUsersData} 
+                options={{
+                  ...options,
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    ...options.plugins,
+                    legend: {
+                      position: 'top',
+                      labels: {
+                        font: {
+                          size: window.innerWidth < 768 ? 12 : 14
+                        }
+                      }
+                    }
+                  },
+                  scales: {
+                    y: {
+                      beginAtZero: true,
+                      ticks: {
+                        font: {
+                          size: window.innerWidth < 768 ? 12 : 14
+                        }
+                      }
+                    },
+                    x: {
+                      ticks: {
+                        font: {
+                          size: window.innerWidth < 768 ? 12 : 14
+                        }
+                      }
+                    }
+                  }
+                }}
+              />
             </div>
           </div>
         </div>
 
         {/* Business Owners Table */}
-        <div className="mt-6">
-          <h2 className="text-2xl font-bold mb-4">Business Owners</h2>
-          <div className="overflow-x-auto">
-            <table className="min-w-full bg-white shadow-md rounded">
+        <div className="mt-6 overflow-x-auto">
+          <h2 className="text-xl md:text-2xl font-bold mb-4">Business Owners</h2>
+          <div className="min-w-full bg-white shadow-md rounded">
+            <table className="min-w-full">
               <thead>
-                <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                <tr className="bg-gray-200 text-gray-600 text-xs md:text-sm leading-normal">
                   <th className="py-3 px-6 text-left">Name</th>
                   <th className="py-3 px-6 text-left">Type of Business Owner</th>
                   <th className="py-3 px-6 text-left">No. Products</th>
@@ -211,7 +281,7 @@ const SuperAdminDashboard = () => {
                   <th className="py-3 px-6 text-left">Ranking</th>
                 </tr>
               </thead>
-              <tbody className="text-gray-600 text-sm font-light">
+              <tbody className="text-gray-600 text-xs md:text-sm">
                 {tableData.map((item, index) => (
                   <tr key={item.name + index}>
                     <td className="py-3 px-6 text-left whitespace-nowrap">{item.name}</td>

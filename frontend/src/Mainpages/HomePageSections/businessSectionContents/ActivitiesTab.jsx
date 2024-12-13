@@ -113,7 +113,7 @@ const ActivityCard = ({ activity }) => (
 
 const ActivitiesTab = () => (
   <div className='lg:container'>
-    {['Adventure Awaits: Top Activity Spots', 'Popular Now: Most Reviewed Activities', 'Top Activity Offers'].map((title, idx) => (
+    {['Adventure Awaits: Top Activity Spots', 'Things To Do: Liked Activities', 'Top Activity Offers'].map((title, idx) => (
       <div key={idx} className="p-4 md:p-6">
         <div className='flex flex-col md:flex-row justify-between items-center'>
           <h1 className={`text-xl md:text-2xl font-bold mb-4 md:mb-6 text-center lg:text-start ${title === 'Top Activity Offers' ? 'text-white' : ''}`}>
