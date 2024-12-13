@@ -3542,6 +3542,43 @@ app.get('/getAllBusinesses', async (req, res) => {
   }
 });
 
+// Endpoint to fetch businesses likes count
+app.get('/getLikesCount/:businessId', async (req, res) => {
+  const { businessId } = req.params;
+
+  // SQL query to count likes for the specified business
+  const sql = `
+    SELECT 
+      b.business_id,
+      (
+        SELECT COUNT(*) 
+        FROM liked_pages l 
+        WHERE l.business_id = b.business_id
+      ) AS likes
+    FROM 
+      businesses b
+    WHERE 
+      b.business_id = ?
+    GROUP BY 
+      b.business_id;
+  `;
+
+  try {
+    // Use pooled connection to query the database
+    const [results] = await pool.query(sql, [businessId]);
+
+    // Check if a result was found
+    if (results.length === 0) {
+      return res.status(404).json({ success: false, message: 'Business not found' });
+    }
+
+    return res.json({ success: true, businessLikes: results[0] });
+  } catch (err) {
+    console.error('Error executing SQL query:', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
 // Endpoint to fetch businesses base on business location
 app.get('/getBusinessesByLocation/:location', async (req, res) => {
   const { location } = req.params;

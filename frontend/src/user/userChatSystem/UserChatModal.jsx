@@ -460,8 +460,8 @@ const renderMessages = (messages) => {
   const renderBusinessList = () => {
     // Flatten the nested array structure
     const flattenedBusinesses = businesses.flat();  // Merge nested arrays into a single array
-    console.log('flattenedBusinesses', flattenedBusinesses);
-    console.log('selectedBusienss: ', selectedBusiness);
+    // console.log('flattenedBusinesses', flattenedBusinesses);
+    // console.log('selectedBusienss: ', selectedBusiness);
     return flattenedBusinesses.map((business) => (
       <li key={business.id}
         className={`p-3 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-300 ${

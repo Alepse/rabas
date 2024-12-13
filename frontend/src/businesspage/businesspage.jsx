@@ -41,9 +41,20 @@ const showErrorAlert = (message) => {
   });
 };
 
+const formatNumber = (num) => {
+  if (num >= 1_000_000) {
+    return (num / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'm';
+  }
+  if (num >= 1_000) {
+    return (num / 1_000).toFixed(1).replace(/\.0$/, '') + 'k';
+  }
+  return num;
+};
+
 const BusinessPage = () => {
   const { businessId: encryptedBusinessId } = useParams();
   const [businessData, setBusinessData] = useState(null);
+  const [likesCount, setLikesCount] = useState(null);
   const [isLiked, setIsLiked] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showButton, setShowButton] = useState(false);
@@ -184,14 +195,31 @@ const BusinessPage = () => {
   useEffect(() => {
     if (isLoggedIn && businessData) {
       fetchLikedBusinesses();
+      fetchLikeCounts(businessData.business_id);
     }
   }, [isLoggedIn, businessData]);
 
+  const fetchLikeCounts = async (businessId) => {
+    try {
+      const response = await axios.get(`http://localhost:5000/getLikesCount/${businessId}`, { withCredentials: true });
+      if (response.data.success) {
+        const likes = response.data.businessLikes.likes; // Extract the likes count
+        setLikesCount(likes); // Update the state with the likes count
+      } else {
+        showErrorAlert('Failed to fetch likes count for the business.');
+      }
+    } catch (error) {
+      console.error('Error fetching likes count:', error);
+      showErrorAlert('An error occurred while fetching the likes count.');
+    }
+  };
+  
   const likeBusiness = async (businessId) => {
     try {
       const response = await axios.post('http://localhost:5000/like-business', { businessId }, { withCredentials: true });
       if (response.data.success) {
         setIsLiked(true);
+        fetchLikeCounts(businessId); // Pass businessId here
       } else {
         showErrorAlert('Failed to like the business.');
       }
@@ -200,19 +228,20 @@ const BusinessPage = () => {
       showErrorAlert('An error occurred while liking the business.');
     }
   };
-
+  
   const unlikeBusiness = async (businessId) => {
     try {
       const response = await axios.delete(`http://localhost:5000/unlike-business/${businessId}`, { withCredentials: true });
       if (response.data.success) {
         setIsLiked(false);
+        fetchLikeCounts(businessId); // Pass businessId here
       } else {
         showErrorAlert('Failed to unlike the business.');
       }
     } catch (error) {
       console.error('Error unliking business:', error);
     }
-  };
+  };  
 
   const handleLikeClick = () => {
     if (!isLoggedIn) {
@@ -289,11 +318,12 @@ const BusinessPage = () => {
                 }`}
                 onClick={handleLikeClick}
               >
-                <div className='text-sm flex items-center gap-2'>
-                  <AiOutlineLike />
-                  {isLiked ? 'Liked' : 'Like'}
-                </div>
+              <div className='text-sm flex items-center gap-2'>
+                <AiOutlineLike />
+                {likesCount > 0 ? formatNumber(likesCount) : ''}
+              </div>
               </Button>
+              {/* <span className="ml-1 text-sm">{businessData.likes}</span> */}
               <div className="flex items-center">
                 {businessData.rating ? (
                   <>
