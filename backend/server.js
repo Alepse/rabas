@@ -3593,6 +3593,7 @@ app.get('/getBusinessesByLocation/:location', async (req, res) => {
               b.openingHours, 
               b.facilities, 
               b.policies, 
+              b.pin_location,
               IF(
                 JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.description')) IS NULL OR 
                 JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.description')) = '', 
