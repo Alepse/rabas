@@ -13,9 +13,9 @@ import { Link } from 'react-router-dom';
 import { Button } from '@nextui-org/react';
 import { GiPositionMarker } from 'react-icons/gi';
 import img from '@/assets/shop.webp'; // Sample image
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa'
 import axios from 'axios';
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
 
 const renderSwiperActivitySection = (title, link, spots) => {
   const activitySpots = spots.filter(spot => spot.businessType === 'attraction');
@@ -101,7 +101,7 @@ const renderSwiperActivitySection = (title, link, spots) => {
           </div>
         </Swiper>
       ) : (
-        <p className="text-center text-gray-500 mt-4">No activities available at the moment.</p>
+        <p className="h-48 bg-gray-100 flex items-center justify-center italic text-center text-gray-500 mt-4 rounded-t-lg">No activities available at the moment.</p>
       )}
     </div>
   );
@@ -191,7 +191,7 @@ const renderSwiperAccommodationSection = (title, link, spots) => {
           </div>
         </Swiper>
       ) : (
-        <p className="text-center text-gray-500 mt-4">No accommodations available at the moment.</p>
+        <p className="h-48 bg-gray-100 flex items-center justify-center italic text-center text-gray-500 mt-4 rounded-t-lg">No accommodations available at the moment.</p>
       )}
     </div>
   );
@@ -281,7 +281,7 @@ const renderSwiperEaterySection = (title, link, spots) => {
           </div>
         </Swiper>
       ) : (
-        <p className="text-center text-gray-500 mt-4">No eateries available at the moment.</p>
+        <p className="h-48 bg-gray-100 flex items-center justify-center italic text-center text-gray-500 mt-4 rounded-t-lg">No eateries available at the moment.</p>
       )}
     </div>
   );
@@ -372,7 +372,7 @@ const renderSwiperShopSection = (title, link, spots) => {
           </div>
         </Swiper>
       ) : (
-        <p className="text-center text-gray-500 mt-4">No shops available at the moment.</p>
+        <p className="h-48 bg-gray-100 flex items-center justify-center italic text-center text-gray-500 mt-4 rounded-t-lg">No shops available at the moment.</p>
       )}
     </div>
   );
@@ -494,7 +494,7 @@ const Barcelona = () => {
           {renderSwiperShopSection('Explore Local Shops', '/shops', businesses)}
         </>
       ) : (
-        <p>No businesses available at the moment.</p>
+        <p className="h-48 bg-gray-100 flex items-center justify-center italic text-center text-gray-500 mt-4 rounded-t-lg">No businesses available at the moment.</p>
       )}
     </div>
   )
