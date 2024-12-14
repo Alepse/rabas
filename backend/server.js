@@ -3581,7 +3581,9 @@ app.get('/getLikesCount/:businessId', async (req, res) => {
 
 // Endpoint to fetch businesses based on business location
 app.get('/getBusinessesByLocation/:location', async (req, res) => {
-  const { location } = req.params;
+  // Normalize the input by removing spaces and converting to lowercase
+  const location = req.params.location.replace(/\s+/g, '').toLowerCase();
+
   const sql = `
     SELECT 
       b.business_id, 
@@ -3607,7 +3609,7 @@ app.get('/getBusinessesByLocation/:location', async (req, res) => {
     FROM businesses b
     LEFT JOIN products p ON b.business_id = p.business_id
     LEFT JOIN business_ratings r ON b.business_id = r.business_id
-    WHERE LOWER(b.location) = LOWER(?)
+    WHERE REPLACE(LOWER(b.location), ' ', '') = ?
     GROUP BY b.business_id, b.businessName, b.businessType, b.businessLogo, 
       b.location, b.contactInfo, b.openingHours, b.facilities, 
       b.policies, b.aboutUs
