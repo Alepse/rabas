@@ -321,7 +321,13 @@ const SuperAdminVerification = () => {
   const [searchTermPending, setSearchTermPending] = useState('');
   const [searchTermApproved, setSearchTermApproved] = useState('');
   const [searchTermRejected, setSearchTermRejected] = useState('');
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [selectedItem, setSelectedItem] = useState(null);
 
+  const handleViewClick = (item) => {
+    setSelectedItem(item);
+    onOpen();
+  };
   
     // Simulate data fetching
   const fetchData = async () => {
@@ -605,6 +611,48 @@ const SuperAdminVerification = () => {
                 ))}
               </tbody>
             </table>
+
+            <Modal isOpen={isOpen} onOpenChange={onOpenChange} isDismissable={false} isKeyboardDismissDisabled={true}>
+              <ModalContent>
+                {(onClose) => (
+                  <>
+                    <ModalHeader className="flex flex-col gap-1">Application Details</ModalHeader>
+                    <ModalBody>
+                      {selectedItem && (
+                        <div className="space-y-4">
+                          <p><strong>Business Name:</strong> {selectedItem.businessName}</p>
+                          <p><strong>Owner:</strong> {`${selectedItem.firstName} ${selectedItem.lastName}`}</p>
+                          <p><strong>Business Type:</strong> {selectedItem.businessType}</p>
+                          <p><strong>Category:</strong> {Array.isArray(selectedItem.category) ? selectedItem.category.join(', ') : selectedItem.category}</p>
+                          <p><strong>Certificate No:</strong> {selectedItem.certNumber}</p>
+                          <p><strong>Location:</strong> {selectedItem.location}</p>
+                          <p><strong>Submission Date:</strong> 
+                            {selectedItem.application_date 
+                            ? new Date(selectedItem.application_date).toISOString().split('T')[0] 
+                            : 'N/A'}
+                          </p>
+                          <p><strong>Status:</strong> <StatusBadge 
+                            status={
+                              selectedItem.status === 1 
+                                ? 'Approved' 
+                                : selectedItem.status === -1 
+                                ? 'Rejected' 
+                                : 'Pending'
+                            } 
+                          /></p>
+                        </div>
+                      )}
+                    </ModalBody>
+                    <ModalFooter>
+                      <Button color="danger" variant="light" onPress={onClose}>
+                        Close
+                      </Button>
+                    </ModalFooter>
+                  </>
+                )}
+              </ModalContent>
+            </Modal>
+
           </div>
         </div>
 
