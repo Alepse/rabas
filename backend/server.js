@@ -927,6 +927,7 @@ app.post('/submitBusinessApplication', async (req, res) => {
     businessScope,
     businessType,
     category,
+    completeAddress,
     latitude,
     longitude    
   } = req.body;
@@ -970,7 +971,7 @@ app.post('/submitBusinessApplication', async (req, res) => {
     const sql = `
       INSERT INTO business_applications (
         application_id, user_id, firstName, lastName, businessName, businessTerritory,
-        certNumber, businessScope, businessType, category, location, pin_location
+        certNumber, businessScope, businessType, category, completeAddress, pin_location
       ) 
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
@@ -978,7 +979,7 @@ app.post('/submitBusinessApplication', async (req, res) => {
     // Execute the SQL query
     const [results] = await pool.query(
       sql, 
-      [application_id, user_id, firstName, lastName, businessName, businessTerritory, certificateNo, businessScope, businessType, categoryJSON, businessScope, pinLocationJSON]
+      [application_id, user_id, firstName, lastName, businessName, businessTerritory, certificateNo, businessScope, businessType, categoryJSON, completeAddress, pinLocationJSON]
     );
 
     console.log('Business application submitted successfully. Affected rows:', results.affectedRows);
@@ -3223,28 +3224,32 @@ app.put('/updateStatus-businessApplications/:id', async (req, res) => {
         user_id,
         application_id,
         businessName,
+        certNumber,
         businessType,
         category,
-        location,
+        businessScope,
+        completeAddress,
         pin_location,
       } = applicationData;
 
       // Prepare to insert into businesses table
       const insertQuery = `
         INSERT INTO businesses 
-        (user_id, application_id, businessName, businessType, category, location, pin_location, businessLogo, businessCard, heroImages, aboutUs, facilities, policies, contactInfo, openingHours) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        (user_id, application_id, businessName, certNumber, businessType, category, location, completeAddress, pin_location, businessLogo, businessCard, heroImages, aboutUs, facilities, policies, contactInfo, openingHours) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
       const insertValues = [
         user_id,
         application_id,
         businessName,
+        certNumber,
         businessType,
         JSON.stringify(category),
-        location,
+        businessScope,
+        completeAddress,
         JSON.stringify(pin_location),
         null, // businessLogo
-        JSON.stringify({ category, location, cardImage: '', priceRange: '', description: '' }), // businessCard
+        JSON.stringify({ category, location: businessScope, cardImage: '', priceRange: '', description: '' }), // businessCard
         null, // heroImages
         null, // aboutUs
         null, // facilities
@@ -3479,6 +3484,7 @@ app.get('/getAllBusinesses', async (req, res) => {
       b.category,
       b.businessLogo,
       b.location AS destination,
+      b.completeAddress,
       b.pin_location,
       b.contactInfo,
       b.openingHours,

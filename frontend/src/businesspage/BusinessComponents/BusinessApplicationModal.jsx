@@ -27,8 +27,9 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
     businessType: "",
     category: [],
     customCategory: "",
+    completeAddress: "",
     latitude: null,
-    longitude: null
+    longitude: null,
   });
 
   const [categoryOptions, setCategoryOptions] = useState({
@@ -282,6 +283,18 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
             <MapPicker
               setLatitude={handleLatitudeChange}
               setLongitude={handleLongitudeChange}
+            />
+            <Input
+              clearable
+              bordered
+              fullWidth
+              label={<span className="font-bold">Complete Address</span>}
+              name="completeAddress"
+              placeholder="Enter Complete Address"
+              value={formData.completeAddress}
+              onChange={handleInputChange}
+              className="mt-4"
+              required
             />
           </div>
         );

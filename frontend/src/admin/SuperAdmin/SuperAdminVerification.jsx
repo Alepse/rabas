@@ -165,7 +165,8 @@ const VerificationTable = ({ data, title, onUpdateStatus, searchTerm }) => {
             <th className="py-3 px-6 text-left">Business Type</th>
             <th className="py-3 px-6 text-left">Category</th>
             <th className="py-3 px-6 text-left">Certificate No</th>
-            <th className="py-3 px-6 text-left">Location</th>
+            <th className="py-3 px-6 text-left">Business Scope</th>
+            <th className="py-3 px-6 text-left">Complete Address</th>
             <th className="py-3 px-6 text-left">Submission Date</th>
             <th className="py-3 px-6 text-left">Status</th>
             <th className="py-3 px-6 text-left">Actions</th>
@@ -224,7 +225,13 @@ const VerificationTable = ({ data, title, onUpdateStatus, searchTerm }) => {
               </td>
               <td className="py-3 px-6">
                 <Highlight
-                  content={item.location}
+                  content={item.businessScope}
+                  match={searchTerm}
+                />
+              </td>
+              <td className="py-3 px-6">
+                <Highlight
+                  content={item.completeAddress}
                   match={searchTerm}
                 />
               </td>
@@ -284,7 +291,8 @@ const VerificationTable = ({ data, title, onUpdateStatus, searchTerm }) => {
                     <p><strong>Business Type:</strong> {selectedItem.businessType}</p>
                     <p><strong>Category:</strong> {Array.isArray(selectedItem.category) ? selectedItem.category.join(', ') : selectedItem.category}</p>
                     <p><strong>Certificate No:</strong> {selectedItem.certNumber}</p>
-                    <p><strong>Location:</strong> {selectedItem.location}</p>
+                    <p><strong>Business Scope:</strong> {selectedItem.businessScope}</p>
+                    <p><strong>Complete Address:</strong> {selectedItem.completeAddress}</p>
                     <p><strong>Submission Date:</strong> 
                       {selectedItem.application_date 
                       ? new Date(selectedItem.application_date).toISOString().split('T')[0] 
@@ -506,7 +514,8 @@ const SuperAdminVerification = () => {
                   <th className="py-3 px-6 text-left">Business Type</th>
                   <th className="py-3 px-6 text-left">Category</th>
                   <th className="py-3 px-6 text-left">Certificate No</th>
-                  <th className="py-3 px-6 text-left">Location</th>
+                  <th className="py-3 px-6 text-left">Business Scope</th>
+                  <th className="py-3 px-6 text-left">Complete Address</th>
                   <th className="py-3 px-6 text-left">Submission Date</th>
                   <th className="py-3 px-6 text-left">Status</th>
                   <th className="py-3 px-6 text-left">Actions</th>
@@ -565,7 +574,13 @@ const SuperAdminVerification = () => {
                     </td>
                     <td className="py-3 px-6">
                       <Highlight
-                        content={item.location}
+                        content={item.businessScope}
+                        match={searchTermAll}
+                      />
+                    </td>
+                    <td className="py-3 px-6">
+                      <Highlight
+                        content={item.completeAddress}
                         match={searchTermAll}
                       />
                     </td>
@@ -625,7 +640,8 @@ const SuperAdminVerification = () => {
                           <p><strong>Business Type:</strong> {selectedItem.businessType}</p>
                           <p><strong>Category:</strong> {Array.isArray(selectedItem.category) ? selectedItem.category.join(', ') : selectedItem.category}</p>
                           <p><strong>Certificate No:</strong> {selectedItem.certNumber}</p>
-                          <p><strong>Location:</strong> {selectedItem.location}</p>
+                          <p><strong>Business Scope:</strong> {selectedItem.businessScope}</p>
+                          <p><strong>Complete Address:</strong> {selectedItem.completeAddress}</p>
                           <p><strong>Submission Date:</strong> 
                             {selectedItem.application_date 
                             ? new Date(selectedItem.application_date).toISOString().split('T')[0] 
