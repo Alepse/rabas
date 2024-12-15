@@ -742,47 +742,47 @@ const Discover = () => {
           </div>
         </div>
        
-       <div className='flex justify-center '>
-        {/* Map Section */}
-        <div className="mt-8 z-10  bg-color1 rounded-lg shadow-md p-4 w-full bg-gradient-to-r from-color1 to-color2">
-          <h2 className="text-lg font-semibold text-light mb-4">Locations</h2>
-          <MapContainer center={[12.9738, 123.9807]} zoom={10} className="w-full h-96">
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            />
-            <MapEvents setCurrentZoom={setCurrentZoom} />
-            {businesses.map((business, index) => {
-              const { pin_location } = business;
-              if (pin_location && currentZoom >= 7) { // Adjust zoom level as needed
-                const position = [pin_location.latitude, pin_location.longitude];
-                const locationName = business.businessName;
-                const showLogo = currentZoom >= 12; // Set zoom level to show/hide logo
-                const fontSize = currentZoom >= 12 ? '1rem' : '0.85rem';
-                const customDivIcon = L.divIcon({
-                  className: 'custom-icon',
-                  html: `
-                    <div class="custom-popup flex items-center whitespace-nowrap font-bold text-color1" style="font-size: ${fontSize};">
-                      ${showLogo ? `<div class="pin-container">
-                        <div class="pin-head">
-                          <img src="http://localhost:5000/${business.businessLogo}" alt="${business.businessName}" class="pin-logo" />
-                        </div>
-                        <div class="pin-point"></div>
-                      </div><span>${locationName}</span>` : `<div class="business-name">${locationName}</div>`}
-                      
-                    </div>
-                  `,
-                  iconSize: [50, 70], 
-                  iconAnchor: [25, 70] 
-                });      
-                return (
-                  <Marker key={index} position={position} icon={customDivIcon} />
-                );
-              }
-              return null;
-            })}
-          </MapContainer>
-        </div>
+        <div className='flex justify-center '>
+          {/* Map Section */}
+          <div className="mt-8 z-10  bg-color1 rounded-lg shadow-md p-4 w-full bg-gradient-to-r from-color1 to-color2">
+            <h2 className="text-lg font-semibold text-light mb-4">Locations</h2>
+            <MapContainer center={[12.9738, 123.9807]} zoom={10} className="w-full h-96">
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              />
+              <MapEvents setCurrentZoom={setCurrentZoom} />
+              {businesses.map((business, index) => {
+                const { pin_location } = business;
+                if (pin_location && currentZoom >= 7) { // Adjust zoom level as needed
+                  const position = [pin_location.latitude, pin_location.longitude];
+                  const locationName = business.businessName;
+                  const showLogo = currentZoom >= 12; // Set zoom level to show/hide logo
+                  const fontSize = currentZoom >= 12 ? '1rem' : '0.85rem';
+                  const customDivIcon = L.divIcon({
+                    className: 'custom-icon',
+                    html: `
+                      <div class="custom-popup flex items-center whitespace-nowrap font-bold text-color1" style="font-size: ${fontSize};">
+                        ${showLogo ? `<div class="pin-container">
+                          <div class="pin-head">
+                            <img src="http://localhost:5000/${business.businessLogo}" alt="${business.businessName}" class="pin-logo" />
+                          </div>
+                          <div class="pin-point"></div>
+                        </div><span>${locationName}</span>` : `<div class="business-name">${locationName}</div>`}
+                        
+                      </div>
+                    `,
+                    iconSize: [50, 70], 
+                    iconAnchor: [25, 70] 
+                  });      
+                  return (
+                    <Marker key={index} position={position} icon={customDivIcon} />
+                  );
+                }
+                return null;
+              })}
+            </MapContainer>
+          </div>
         </div>
       </div>
    
