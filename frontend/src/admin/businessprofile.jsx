@@ -1426,14 +1426,8 @@ const BusinessProfile = () => {
                     <div className="flex gap-3">
                       <Input
                         type="text"
-                        label="Latitude"
-                        placeholder="Enter latitude"
-                        className="flex-1"
-                      />
-                      <Input
-                        type="text"
-                        label="Longitude"
-                        placeholder="Enter longitude"
+                        label="Address"
+                        placeholder="Enter address"
                         className="flex-1"
                       />
                     </div>
