@@ -25,7 +25,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
     certificateNo: "",
     businessScope: "",
     businessType: "",
-    category: [],
+    category: [""],
     customCategory: "",
     completeAddress: "",
     latitude: null,
@@ -302,17 +302,22 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
         return (
           <div className="mt-4">
             <h3 className="text-xl font-semibold mb-4">Application Summary</h3>
-            <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
+            <div className="bg-gray-50 p-6 rounded-lg shadow-sm grid grid-cols-1 sm:grid-cols-2 gap-4">
               {Object.entries(formData).map(([key, value]) => {
-                // Skip rendering the customCategory field
-                if (key === 'customCategory') return null;
-                
+                // Skip rendering the customCategory, latitude, and longitude fields
+                if (key === 'customCategory' || key === 'latitude' || key === 'longitude') return null;
+
+                // Format the category field to display as a comma-separated string with capitalized words
+                const displayValue = key === 'category' && Array.isArray(value)
+                  ? value.map(v => v.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase())).join(', ')
+                  : value || "Not provided";
+
                 return (
                   <div key={key} className="mb-4 last:mb-0">
                     <p className="text-sm font-medium text-gray-500 mb-1">
                       {key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1').trim()}
                     </p>
-                    <p className="text-base text-gray-900">{value || "Not provided"}</p>
+                    <p className="text-base text-gray-900">{displayValue}</p>
                   </div>
                 );
               })}
@@ -453,7 +458,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
           Back
         </Button>
       )}
-      <Button auto color="primary" onClick={handleNext}>  
+      <Button auto color={step === 4 ? "success" : "primary"} className='text-white' onClick={handleNext}>  
         {step === 4 ? (  
           <>  
             <FaCheck className="mr-2" />  
