@@ -134,6 +134,18 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
     }
   };
 
+  const getBusinessTypeLabel = (value) => {
+    const option = businessTypeOptions.find(option => option.value === value);
+    return option ? option.label : "Not provided";
+  };
+
+  const getCategoryLabels = (values) => {
+    return values.map(value => {
+      const category = Object.values(categoryOptions).flat().find(cat => cat.value === value);
+      return category ? category.label : value;
+    }).join(', ');
+  };
+
   const renderStep = () => {
     switch (step) {
       case 1:
@@ -306,13 +318,17 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
               {Object.entries(formData).map(([key, value]) => {
                 // Skip rendering the customCategory field
                 if (key === 'customCategory') return null;
-                
+
+                // Use label for businessType and separate categories by comma
+                const displayValue = key === 'businessType' ? getBusinessTypeLabel(value) :
+                                     key === 'category' ? getCategoryLabels(value) : value;
+
                 return (
                   <div key={key} className="mb-4 last:mb-0">
                     <p className="text-sm font-medium text-gray-500 mb-1">
                       {key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1').trim()}
                     </p>
-                    <p className="text-base text-gray-900">{value || "Not provided"}</p>
+                    <p className="text-base text-gray-900">{displayValue || "Not provided"}</p>
                   </div>
                 );
               })}
