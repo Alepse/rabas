@@ -316,8 +316,8 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
             <h3 className="text-xl font-semibold mb-4">Application Summary</h3>
             <div className="bg-gray-50 p-6 rounded-lg shadow-sm grid grid-cols-1 sm:grid-cols-2 gap-4">
               {Object.entries(formData).map(([key, value]) => {
-                // Skip rendering the customCategory field
-                if (key === 'customCategory') return null;
+                // Skip rendering the customCategory, latitude, and longitude fields
+                if (key === 'customCategory' || key === 'latitude' || key === 'longitude') return null;
 
                 // Use label for businessType and separate categories by comma
                 const displayValue = key === 'businessType' ? getBusinessTypeLabel(value) :
