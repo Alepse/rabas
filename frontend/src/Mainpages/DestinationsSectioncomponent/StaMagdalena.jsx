@@ -383,7 +383,7 @@ const StaMagdalena = () => {
   useEffect(() => {
     const fetchBusinesses = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/getBusinessesByLocation/StaMagdalena');
+        const response = await axios.get('http://localhost:5000/getBusinessesByLocation/Sta.Magdalena');
         // console.log(response.data);
         setBusinesses(Array.isArray(response.data) ? response.data : []);
       } catch (error) {
