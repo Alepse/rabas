@@ -47,7 +47,7 @@ const [showButton, setShowButton] = useState(false); // State to show/hide butto
   }
 
   return (
-    <div className="bg-gray-100 min-h-screen font-sans" style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>
+    <div className="bg-gray-100 min-h-screen font-sans" style={{ backgroundImage: `url(${wave})`, backgroundSize: 'auto', backgroundRepeat: 'repeat', backgroundPosition: 'center' }}>
       <Nav />
       <Hero />
       <Search />

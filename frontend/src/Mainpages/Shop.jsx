@@ -170,7 +170,7 @@ const Shop = () => {
   };
 
   return (
-    <div className='mx-auto bg-light min-h-screen font-sans'style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>
+    <div className='mx-auto bg-light min-h-screen font-sans' style={{ backgroundImage: `url(${wave})`, backgroundSize: 'auto', backgroundRepeat: 'repeat', backgroundPosition: 'center' }}>
       <Nav />
       <Hero />
       <Search/>

@@ -40,6 +40,7 @@ import Sorsogon from './DestinationsSectioncomponent/Sorsogon';
 import EmergencyHotlines from '../Mainpages/DestinationsSectioncomponent/EmergencyHotlines';
 import wave from '@/assets/wave2.webp'
 
+
 const destinationComponents = {
   Bulusan,
   Bulan,
@@ -114,7 +115,7 @@ const Destinations = () => {
   }
 
   return (
-    <div className='mx-auto min-h-screen bg-light font-sans'style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>
+    <div className='mx-auto min-h-screen bg-light font-sans' style={{ backgroundImage: `url(${wave})`, backgroundSize: 'auto', backgroundRepeat: 'repeat', backgroundPosition: 'center' }}>
       <Nav />
 
       {/* Hero Section */}

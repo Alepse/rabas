@@ -360,7 +360,7 @@ const BusinessPage = () => {
                   onKeyDown={handleKeyPress}
                   placeholder="Type a message..."
                 />
-                <button className="p-2 bg-blue-500 text-white rounded-md ml-2" onClick={handleSendMessage}>
+                <button className="p-2 bg-color1 text-white rounded-md ml-2" onClick={handleSendMessage}>
                   <FiSend />
                 </button>
               </div>

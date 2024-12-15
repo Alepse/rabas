@@ -174,46 +174,46 @@ const BusinessSection = () => {
           >
             {discountedProducts.map((deal, index) => (
               <SwiperSlide key={`${deal.id}-${index}`} className='flex justify-center'>
-                <div className='shadow-lg rounded-lg overflow-hidden bg-white relative max-w-sm mx-1 transform transition-transform duration-300 hover:scale-105 hover:shadow-xl' style={{ height: '400px' }}>
+                <div className='shadow-lg rounded-lg overflow-hidden bg-white relative max-w-sm mx-1 transform transition-transform duration-300 hover:scale-105 hover:shadow-xl' style={{ height: '450px', width: '300px' }}>
                   {deal.images && deal.images.length > 0 && (
                     <img src={`http://localhost:5000/${deal.images[0].path}`} alt={deal.name} className='w-full h-48 object-cover' />
                   )}
                   <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
                     {deal.discount}% OFF
                   </div>
-                  {/* <Button size="sm" className="absolute top-2 right-2 text-white bg-color1">
-                    View Images
-                  </Button> */}
-                  <div className='p-4'>
-                    <h3 className='text-lg font-semibold text-gray-800'>{deal.name}</h3>
-                    <p className='text-sm text-gray-600 mt-1'>{deal.description}</p>
-                    <p className='text-xs text-red-500 mt-1'>Expires on: {new Date(deal.expiration).toLocaleDateString()}</p>
-                    <div className='flex justify-between mt-3'>
-                      <p className='mt-2 font-bold text-gray-800'>
+                  <div className='p-4 flex flex-col justify-between h-[calc(100%-12rem)]'>
+                    <div className='mb-4'>
+                      <h3 className='text-lg font-semibold text-gray-800'>{deal.name}</h3>
+                      <p className='text-sm text-gray-600 mt-1'>{deal.description}</p>
+                      <p className='text-xs text-red-500 mt-1'>Expires on: {new Date(deal.expiration).toLocaleDateString()}</p>
+                    </div>
+                    <div className='flex justify-between items-center mt-4'>
+                      <p className='font-bold text-gray-800'>
                         <span className="line-through text-gray-500">₱{parseFloat(deal.price).toFixed(2)}</span> 
-                        <span className="text-red-500">
+                        <span className="text-red-500 ml-2">
                           ₱{(parseFloat(deal.price) * (1 - deal.discount / 100)).toFixed(2)}
                         </span>
                       </p>
-                      <div className='flex gap-2'>
-                        <Button auto size="sm" color="primary">Inquire</Button>
-                        <Button
-                          auto size="sm"
-                          color="primary"
-                          onClick={() => {
-                            if (isLoggedIn) {
-                              openBookingModal(deal);
-                            } else {
-                              showErrorAlert('Please log in to book this product.');
-                            }
-                          }}
-                        >
-                          {deal.product_category === 'restaurant' ? 'Reserve Table' : 
-                          deal.product_category === 'activity' ? 'Book Activity' : 
-                          deal.product_category === 'accommodation' ? 'Book Stay' : 
-                          'Book'}
-                        </Button>
-                      </div>
+                    </div>
+                    <div className='flex justify-between gap-2 mt-4'>
+                      <Button auto size="sm" color="primary" className='w-full'>Inquire</Button>
+                      <Button
+                        auto size="sm"
+                        color="success"
+                        className='w-full text-white'
+                        onClick={() => {
+                          if (isLoggedIn) {
+                            openBookingModal(deal);
+                          } else {
+                            showErrorAlert('Please log in to book this product.');
+                          }
+                        }}
+                      >
+                        {deal.product_category === 'restaurant' ? 'Reserve Table' : 
+                        deal.product_category === 'activity' ? 'Book Activity' : 
+                        deal.product_category === 'accommodation' ? 'Book Stay' : 
+                        'Book'}
+                      </Button>
                     </div>
                   </div>
                 </div>

@@ -3,13 +3,13 @@ import { motion } from 'framer-motion';
 import Nav from '@/components/nav';
 import Hero from '@/components/herodiscover';
 import Footer from '@/components/Footer';
-import { Button, Checkbox, CheckboxGroup, Select, SelectItem, Slider, Tabs, Tab, Spinner} from '@nextui-org/react';
+import { Button, Checkbox, CheckboxGroup, Select, SelectItem, Slider, Tabs, Tab, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from '@nextui-org/react';
 import { GiPositionMarker } from 'react-icons/gi';
 import { Link } from 'react-router-dom';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Search from '@/components/Search';
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import wave from '@/assets/wave2.webp'
@@ -485,9 +485,17 @@ const Discover = () => {
     setShowFilters(!showFilters);
   };
   useEffect(() => {
+    const MIN_LOADING_TIME = 3000; // Minimum loading time in milliseconds
 
-    // Simulate data fetching
-    setTimeout(() => setLoading(false), 1000);
+    const fetchData = async () => {
+      // Simulate data fetching
+      await new Promise((resolve) => setTimeout(resolve, 3000)); // Simulate fetch delay
+      setLoading(false); // Set loading to false after data is set
+    };
+
+    const timer = setTimeout(() => {
+      fetchData();
+    }, MIN_LOADING_TIME);
 
     // Show button when scrolled down
     const handleScroll = () => {
@@ -499,11 +507,53 @@ const Discover = () => {
     };
 
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [currentTags, setCurrentTags] = useState([]);
+  const [selectedFilters, setSelectedFilters] = useState([]);
+
+  const renderTags = (tags, selectedFilters) => {
+    const maxVisibleTags = 3;
+    const visibleTags = tags.slice(0, maxVisibleTags);
+    const hiddenTags = tags.slice(maxVisibleTags);
+
+    return (
+      <div className="flex flex-wrap gap-2">
+        {visibleTags.map((tag, idx) => (
+          <span
+            key={idx}
+            className={`text-xs px-2 py-1 rounded-full ${
+              selectedFilters.some(filter => filter.toLowerCase() === tag.toLowerCase())
+                ? 'bg-color2 text-white'
+                : 'bg-gray-200 text-gray-700'
+            }`}
+          >
+            {tag}
+          </span>
+        ))}
+        {hiddenTags.length > 0 && (
+          <span
+            className="text-xs underline cursor-pointer text-color2"
+            onClick={() => {
+              setCurrentTags(tags);
+              setSelectedFilters(selectedFilters);
+              onOpen();
+            }}
+          >
+            See More
+          </span>
+        )}
+      </div>
+    );
   };
 
   if (loading) {
@@ -511,7 +561,7 @@ const Discover = () => {
   }
 
   return (
-    <div className="mx-auto bg-light min-h-screen font-sans" style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>
+    <div className="mx-auto bg-light min-h-screen font-sans" style={{ backgroundImage: `url(${wave})`, backgroundSize: 'auto', backgroundRepeat: 'repeat', backgroundPosition: 'center' }}>
       <Nav />
       <Hero />
       <Search/>
@@ -650,28 +700,7 @@ const Discover = () => {
                     />
                     <div className="p-4 flex-grow">
                       <div className="flex justify-between  items-center mb-2">
-                        <div className="flex flex-wrap gap-2">
-                          {item.category.map((cat, idx) => {
-                            const isSelected = filters.selectedType.some(type => 
-                              type.toLowerCase().replace(/s$/, '') === cat.toLowerCase().replace(/s$/, '') 
-                            ) || shopFilters.selectedCategory.some(type => 
-                              type.toLowerCase() === cat.toLowerCase() 
-                            ) || foodFilters.selectedCuisine.some(type => 
-                              type.toLowerCase() === cat.toLowerCase() 
-                            );
-
-                            return (
-                              <span
-                                key={idx}
-                                className={`text-xs px-2 py-1 rounded-full ${
-                                  isSelected ? 'bg-color2 text-white' : 'bg-gray-200 text-gray-700'
-                                }`}
-                              >
-                                {cat}
-                              </span>
-                            );
-                          })}
-                        </div>
+                        {renderTags(item.category, filters.selectedType)}
                         <div className="flex items-center gap-1">
                           {item.rating ? (
                             <>
@@ -787,6 +816,36 @@ const Discover = () => {
           ↑
         </motion.button>
       )}
+
+      {/* Modal for displaying all tags */}
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalContent>
+          <ModalHeader>
+            <h2>All Tags</h2>
+          </ModalHeader>
+          <ModalBody>
+            <div className="flex flex-wrap gap-2">
+              {currentTags.map((tag, idx) => (
+                <span
+                  key={idx}
+                  className={`text-xs px-2 py-1 rounded-full ${
+                    selectedFilters.some(filter => filter.toLowerCase() === tag.toLowerCase())
+                      ? 'bg-color2 text-white'
+                      : 'bg-gray-200 text-gray-700'
+                  }`}
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </ModalBody>
+          <ModalFooter>
+            <Button auto flat onClick={onClose}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
 
     </div>
   );
