@@ -25,7 +25,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
     certificateNo: "",
     businessScope: "",
     businessType: "",
-    category: [],
+    category: [""],
     customCategory: "",
     completeAddress: "",
     latitude: null,
@@ -314,7 +314,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
         return (
           <div className="mt-4">
             <h3 className="text-xl font-semibold mb-4">Application Summary</h3>
-            <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
+            <div className="bg-gray-50 p-6 rounded-lg shadow-sm grid grid-cols-1 sm:grid-cols-2 gap-4">
               {Object.entries(formData).map(([key, value]) => {
                 // Skip rendering the customCategory field
                 if (key === 'customCategory') return null;
@@ -469,7 +469,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
           Back
         </Button>
       )}
-      <Button auto color="primary" onClick={handleNext}>  
+      <Button auto color={step === 4 ? "success" : "primary"} className='text-white' onClick={handleNext}>  
         {step === 4 ? (  
           <>  
             <FaCheck className="mr-2" />  
