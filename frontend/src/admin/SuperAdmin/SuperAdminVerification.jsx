@@ -356,6 +356,95 @@ const SuperAdminVerification = () => {
     );
   };
 
+  const submitUpdateStatus = async (item, newStatus) => {
+    try {
+      const response = await fetch(`http://localhost:5000/updateStatus-businessApplications/${item.application_id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        console.log('Status updated:', data.message);
+        return true;
+      } else {
+        console.error('Error updating status:', data.message);
+        return false;
+      }
+    } catch (error) {
+      console.error('Error sending request:', error);
+      return false;
+    }
+  };
+
+  const handleApprove = (item) => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You want to approve this application!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#28a745',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, approve it!',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const updateSuccessful = await submitUpdateStatus(item, 1);
+        if (updateSuccessful) {
+          Swal.fire({
+            title: 'Approved!',
+            text: 'The application has been approved.',
+            icon: 'success',
+            confirmButtonColor: '#0BDA51',
+          });
+          updateStatus(item, 'Approved');
+        } else {
+          Swal.fire({
+            title: 'Error!',
+            text: 'Failed to update the status. Please try again later.',
+            icon: 'error',
+            confirmButtonColor: '#d33',
+          });
+        }
+      }
+    });
+  };
+
+  const handleReject = (item) => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You want to reject this application!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#28a745',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, reject it!',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const updateSuccessful = await submitUpdateStatus(item, -1);
+        if (updateSuccessful) {
+          Swal.fire({
+            title: 'Rejected!',
+            text: 'The application has been rejected.',
+            icon: 'success',
+            confirmButtonColor: '#0BDA51',
+          });
+          updateStatus(item, 'Rejected');
+        } else {
+          Swal.fire({
+            title: 'Error!',
+            text: 'Failed to update the status. Please try again later.',
+            icon: 'error',
+            confirmButtonColor: '#d33',
+          });
+        }
+      }
+    });
+  };
+
   // Derived counts
   const appliedAttractions = verificationData.filter(item => item.businessType === ('attractions' || 'activity')).length;
   const appliedAccommodations = verificationData.filter(item => item.businessType === 'accommodations').length;

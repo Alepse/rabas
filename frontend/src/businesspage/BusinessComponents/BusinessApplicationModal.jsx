@@ -27,7 +27,6 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
     businessType: "",
     category: [],
     customCategory: "",
-    location: "",
     latitude: null,
     longitude: null
   });
@@ -283,18 +282,6 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
             <MapPicker
               setLatitude={handleLatitudeChange}
               setLongitude={handleLongitudeChange}
-            />
-            <Input
-              clearable
-              bordered
-              fullWidth
-              label={<span className="font-bold">Location</span>}
-              name="location"
-              placeholder="Enter or select your business location"
-              value={formData.location}
-              onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-              className="mt-4"
-              required
             />
           </div>
         );
