@@ -41,7 +41,7 @@ const About = () => {
   }
 
   return (
-    <div className="min-h-screen bg-light mx-auto font-sans" style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>
+    <div className="min-h-screen bg-light mx-auto font-sans" style={{ backgroundImage: `url(${wave})`, backgroundSize: 'auto', backgroundRepeat: 'repeat', backgroundPosition: 'center' }}>
       <Nav />
       <Hero />
       <Search />

@@ -485,9 +485,17 @@ const Discover = () => {
     setShowFilters(!showFilters);
   };
   useEffect(() => {
+    const MIN_LOADING_TIME = 3000; // Minimum loading time in milliseconds
 
-    // Simulate data fetching
-    setTimeout(() => setLoading(false), 1000);
+    const fetchData = async () => {
+      // Simulate data fetching
+      await new Promise((resolve) => setTimeout(resolve, 3000)); // Simulate fetch delay
+      setLoading(false); // Set loading to false after data is set
+    };
+
+    const timer = setTimeout(() => {
+      fetchData();
+    }, MIN_LOADING_TIME);
 
     // Show button when scrolled down
     const handleScroll = () => {
@@ -499,7 +507,10 @@ const Discover = () => {
     };
 
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   const scrollToTop = () => {
@@ -550,7 +561,7 @@ const Discover = () => {
   }
 
   return (
-    <div className="mx-auto bg-light min-h-screen font-sans" style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>
+    <div className="mx-auto bg-light min-h-screen font-sans" style={{ backgroundImage: `url(${wave})`, backgroundSize: 'auto', backgroundRepeat: 'repeat', backgroundPosition: 'center' }}>
       <Nav />
       <Hero />
       <Search/>

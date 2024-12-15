@@ -596,14 +596,14 @@ const UserProfile = ({ activities = [] }) => {
   }
 
   return (
-    <div className='mx-auto min-h-screen font-sans bg-light' style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat' }}>
+    <div className='mx-auto min-h-screen font-sans bg-light' style={{ backgroundImage: `url(${wave})`, backgroundSize: 'auto', backgroundRepeat: 'repeat', backgroundPosition: 'center' }}>
       <Nav />
       <div className='container p-3 rounded-md mt-[7.2rem] flex justify-center'>
         <Search />
       </div>
 
       {/* Header Section */}
-      <div className='container mx-auto flex flex-col items-center mb-8 bg-white mt-2 shadow-md rounded-xl shadow-gray-400 p-5 ' style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat' }}>
+      <div className='container mx-auto flex flex-col items-center mb-8 bg-white mt-2 shadow-md rounded-xl shadow-gray-400 p-5 ' >
         <div className='relative flex items-center w-36 h-36 mb-4'>
           <Avatar className='w-full h-full object-cover rounded-full border-4 border-color1' 
             src={profilePic 
@@ -638,7 +638,7 @@ const UserProfile = ({ activities = [] }) => {
                 <div key={`approved-${application.application_id}`} className='mb-4 flex justify-center items-center flex-col'>
                   <h1 className='font-bold mb-2'>Switch to Business:</h1>
                   <button 
-                    className='text-gray-500 hover:bg-color2 hover:text-white flex items-center p-2 rounded-lg gap-1 border-2 border-color1 shadow-md transition duration-300 ease-in-out transform hover:scale-105'
+                    className='text-gray-500 hover:bg-color2 hover:text-white flex items-center p-2 rounded-md gap-1 border-1 border-color1 shadow-md transition duration-300 ease-in-out transform hover:scale-105'
                     onClick={() => handleBusinessClick(businessData.business_id)}
                     key={application.application_id}>
                     <Avatar src={ businessData.businessLogo ? `http://localhost:5000/${businessData.businessLogo}` : ''}/>
