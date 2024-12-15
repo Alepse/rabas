@@ -9,6 +9,12 @@ import MapPicker from '../../components/map-picker';
 
 const MySwal = withReactContent(Swal);
 
+const municipalities = [
+  "Barcelona", "Bulan", "Bulusan", "Casiguran", "Castilla", "Donsol",
+  "Gubat", "Irosin", "Juban", "Magallanes", "Matnog", "Pilar",
+  "Prieto Diaz", "Sta. Magdalena", "Sorsogon City"
+];
+
 const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userData }) => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -133,13 +139,13 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
       case 1:
         return (
           <>
-            <h3 className="text-xl font-semibold mb-4">Personal Information</h3>
+            <h3 className="text-xl font-bold mb-4">Personal Information</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Input
                 clearable
                 bordered
                 fullWidth
-                label="First Name"
+                label={<span className="font-bold">First Name</span>}
                 name="firstName"
                 placeholder="Enter First Name"
                 value={formData.firstName}
@@ -150,7 +156,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
                 clearable
                 bordered
                 fullWidth
-                label="Last Name"
+                label={<span className="font-bold">Last Name</span>}
                 name="lastName"
                 placeholder="Enter Last Name"
                 value={formData.lastName}
@@ -162,7 +168,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
               clearable
               bordered
               fullWidth
-              label="Business Name"
+              label={<span className="font-bold">Business Name</span>}
               name="businessName"
               placeholder="Enter Business Name"
               value={formData.businessName}
@@ -174,7 +180,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
               clearable
               bordered
               fullWidth
-              label="Business Territory"
+              label={<span className="font-bold">Business Territory (Province)</span>}
               name="businessTerritory"
               placeholder="Enter Business Territory"
               value={formData.businessTerritory}
@@ -186,7 +192,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
               clearable
               bordered
               fullWidth
-              label="Certificate No. / BNN"
+              label={<span className="font-bold">Certificate No. / BNN</span>}
               name="certificateNo"
               placeholder="Enter Certificate No. / BNN"
               value={formData.certificateNo}
@@ -194,26 +200,29 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
               className="mt-4"
               required
             />
-            <Input
-              clearable
-              bordered
-              fullWidth
-              label="Business Scope (City/Municipality)"
-              name="businessScope"
-              placeholder="Enter Business Scope"
+            <Select 
+              label={<span className="font-bold">Business Scope (City/Municipality)</span>}
+              placeholder="Select Business Scope"
               value={formData.businessScope}
-              onChange={handleInputChange}
-              className="mt-4"
+              onChange={(e) => setFormData({ ...formData, businessScope: e.target.value })}
+              className="mt-4 "
               required
-            />
+              style={{ maxHeight: '150px', overflowY: 'auto' }}
+            >
+              {municipalities.map((municipality) => (
+                <SelectItem  key={municipality} value={municipality}>
+                  {municipality}
+                </SelectItem>
+              ))}
+            </Select>
           </>
         );
       case 2:
         return (
           <>
-            <h3 className="text-xl font-semibold mb-4">Business Details</h3>
+            <h3 className="text-xl font-bold mb-4">Business Details</h3>
             <Select
-              label="Type of Business"
+              label={<span className="font-bold">Type of Business</span>}
               placeholder="Select business type"
               className="mt-4"
               onChange={(e) => handleBusinessTypeChange(e.target.value)}
@@ -227,9 +236,9 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
             </Select>
             {formData.businessType && (
               <CheckboxGroup
-                label={formData.businessType === "accommodations" ? "Property Type" : 
+                label={<span className="font-bold">{formData.businessType === "accommodations" ? "Property Type" : 
                        formData.businessType === "food" ? "Restaurant Type" :
-                       formData.businessType === "shops" ? "Shop Type" : "Category"}
+                       formData.businessType === "shops" ? "Shop Type" : "Category"}</span>}
                 value={formData.category}
                 onChange={handleCategoryChange}
                 className="mt-4"
@@ -249,7 +258,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
                   clearable
                   bordered
                   fullWidth
-                  label="Custom Category"
+                  label={<span className="font-bold">Custom Category</span>}
                   name="customCategory"
                   placeholder="Enter Custom Category"
                   value={formData.customCategory}
@@ -270,7 +279,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
       case 3:
         return (
           <div className="mt-4">
-            <h3 className="text-xl font-semibold mb-4">Business Location</h3>
+            <h3 className="text-xl font-bold mb-4">Business Location</h3>
             <MapPicker
               setLatitude={handleLatitudeChange}
               setLongitude={handleLongitudeChange}
@@ -279,7 +288,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
               clearable
               bordered
               fullWidth
-              label="Location"
+              label={<span className="font-bold">Location</span>}
               name="location"
               placeholder="Enter or select your business location"
               value={formData.location}
@@ -430,14 +439,20 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
         <FaTimes />  
       </Button>  
     </ModalHeader>  
-    <ModalBody className="p-4 overflow-y-auto max-h-[80vh]">  
+    <ModalBody className="p-4 overflow-y-auto max-h-[80vh] ">  
       <Progress value={(step / 4) * 100}  classNames={{ indicator: "bg-color2",}} />  
       {renderStep()}  
     </ModalBody>  
     <ModalFooter className="flex justify-between">  
-      <Button auto flat color="error" onClick={handleBack} disabled={step === 1}>  
-        Back  
-      </Button>  
+      {step === 1 ? (
+        <Button auto flat color="danger" onClick={handleCloseModal}>
+          Cancel
+        </Button>
+      ) : (
+        <Button auto color="primary" onClick={handleBack}>
+          Back
+        </Button>
+      )}
       <Button auto color="primary" onClick={handleNext}>  
         {step === 4 ? (  
           <>  

@@ -235,14 +235,14 @@ const Nav = () => {
 
   return (
     <div className={` bg-gradient-to-r from-color1 to-color2 flex justify-center fixed top-0 z-50 w-full shadow-lg`}>
-      <div className="flex justify-between items-center w-full container  mx-auto h-[6rem] p-6">
+      <div className="flex justify-between items-center w-full container  mx-auto h-[4rem] p-4">
         <a
           className='flex items-center hover:scale-105 duration-500'
           href='/'
           onClick={() => handleLinkClick('/')}
         >
-          <img className="lg:h-[4.3rem] max-h-[4.3rem] lg:w-[4.3rem] max-w-[4.3rem]" src={Logo} alt="Logo" />
-          <div className='text-white ml-2 text-xl font-mono '>RabaSorsogon</div>
+          <img className="lg:h-[3rem] max-h-[3rem] lg:w-[3rem] max-w-[3rem]" src={Logo} alt="Logo" />
+          <div className='text-white ml-2 text-lg font-mono '>RabaSorsogon</div>
         </a>
         
         <div className="flex items-center gap-3 xl:hidden">
@@ -301,13 +301,13 @@ const Nav = () => {
                 value={searchQuery}
                 onFocus={openSearchOverlay}
                 onChange={handleInputChange}
-                className="border border-gray-300 rounded-full p-2 pl-10 text-sm shadow-md focus:outline-none focus:ring-2 focus:ring-color1 transition-all duration-300"
+                className="border border-gray-300 rounded-full p-1 pl-8 text-sm shadow-md focus:outline-none focus:ring-2 focus:ring-color1 transition-all duration-300"
               />
-              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+              <FaSearch className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500" />
               {searchQuery && (
                 <FaTimes
                   onClick={clearSearchField}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer"
                 />
               )}
             </div>

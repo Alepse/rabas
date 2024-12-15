@@ -3,7 +3,7 @@ import Sorsogon from '../assets/terminal.webp'
 
 const heroTransportation = () => {
   return (
-    <div className="relative flex flex-col items-center justify-center mx-auto bg-cover  bg-center h-[300px] mt-24 " style={{  
+    <div className="relative flex flex-col items-center justify-center mx-auto bg-cover  bg-center h-[300px] mt-16" style={{  
         backgroundImage: `url(${Sorsogon})`,  
       }}>  
 

@@ -110,80 +110,93 @@ const MyBookingTab = ({ bookings, onCancelBooking }) => {
 
   return (
     <div className="p-6">
-      <h3 className="text-2xl font-bold ">My Bookings</h3>
+      <h3 className="text-4xl font-bold mb-4 ">My Bookings</h3>
+      <div className='bg-gray-300 w-full h-[1px] mb-8'></div>
       <Tabs aria-label="Booking Status" selectedKey={activeTab} onSelectionChange={setActiveTab} className='overflow-x-auto w-full'>
         <Tab key="active" title="Active">
           <div className="overflow-y-auto max-h-[450px] scrollbar-custom">
-            {filterBookings("active").map((booking) => (
-              <div key={booking.booking_id} className="bg-white shadow-lg p-4 rounded-lg mb-4">
-                <div className="p-3 bg-gray-50 rounded-lg text-sm text-black border border-gray-200">
-                  <h4 className="font-semibold mb-2">Booking Details:</h4>
-                  <ul className="space-y-1">
-                    <li><strong>Product:</strong> {booking.productName}</li>
-                    <li><strong>Booked Name:</strong> {booking.customerName}</li>
-                    <li><strong>Guests:</strong> {booking.numberOfGuests}</li>
-                    <li><strong>Email:</strong> {booking.email}</li>
-                    <li><strong>Phone:</strong> {booking.phone}</li>
-                    <li><strong>Date:</strong> {new Date(booking.dateIn).toLocaleDateString()}</li>
-                    <li><strong>Time:</strong> {new Date(booking.dateIn).toLocaleTimeString()}</li>
-                    <li><strong>Special Requests:</strong> {booking.specialRequests}</li>
-                    <li><strong>Amount:</strong> ₱{parseFloat(booking.priceDetails.discountedPrice).toLocaleString()}</li>
-                    <li><strong>Status:</strong> {booking.status}</li>
-                  </ul>
+            {filterBookings("active").length === 0 ? (
+              <p className='text-slate-500'>No active bookings at the moment.</p>
+            ) : (
+              filterBookings("active").map((booking) => (
+                <div key={booking.booking_id} className="bg-white shadow-lg p-4 rounded-lg mb-4">
+                  <div className="p-3 bg-gray-50 rounded-lg text-sm text-black border border-gray-200">
+                    <h4 className="font-semibold mb-2">Booking Details:</h4>
+                    <ul className="space-y-1">
+                      <li><strong>Product:</strong> {booking.productName}</li>
+                      <li><strong>Booked Name:</strong> {booking.customerName}</li>
+                      <li><strong>Guests:</strong> {booking.numberOfGuests}</li>
+                      <li><strong>Email:</strong> {booking.email}</li>
+                      <li><strong>Phone:</strong> {booking.phone}</li>
+                      <li><strong>Date:</strong> {new Date(booking.dateIn).toLocaleDateString()}</li>
+                      <li><strong>Time:</strong> {new Date(booking.dateIn).toLocaleTimeString()}</li>
+                      <li><strong>Special Requests:</strong> {booking.specialRequests}</li>
+                      <li><strong>Amount:</strong> ₱{parseFloat(booking.priceDetails.discountedPrice).toLocaleString()}</li>
+                      <li><strong>Status:</strong> {booking.status}</li>
+                    </ul>
+                  </div>
+                  {booking.status === 'pending' && (
+                    <Button 
+                      className="mt-2 bg-red-500 text-white hover:bg-red-600" 
+                      onClick={() => onCancelBooking(booking.booking_id)}
+                    >
+                      Cancel Booking
+                    </Button>
+                  )}
                 </div>
-                {booking.status === 'pending' && (
-                  <Button 
-                    className="mt-2 bg-red-500 text-white hover:bg-red-600" 
-                    onClick={() => onCancelBooking(booking.booking_id)}
-                  >
-                    Cancel Booking
-                  </Button>
-                )}
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </Tab>
         <Tab key="completed" title="Completed">
           <div className="overflow-y-auto max-h-[500px] scrollbar-custom">
-            {filterBookings("completed").map((booking) => (
-              <div key={booking.booking_id} className="bg-white shadow-lg p-4 rounded-lg ">
-                <div className="p-3 bg-gray-50 rounded-lg text-sm text-black border border-gray-200">
-                  <h4 className="font-semibold mb-2">Booking Details:</h4>
-                  <ul className="space-y-1">
-                    <li><strong>Product:</strong> {booking.productName}</li>
-                    <li><strong>Guests:</strong> {booking.numberOfGuests}</li>
-                    <li><strong>Email:</strong> {booking.email}</li>
-                    <li><strong>Phone:</strong> {booking.phone}</li>
-                    <li><strong>Date:</strong> {new Date(booking.dateIn).toLocaleDateString()}</li>
-                    <li><strong>Time:</strong> {new Date(booking.dateIn).toLocaleTimeString()}</li>
-                    <li><strong>Special Requests:</strong> {booking.specialRequests}</li>
-                    <li><strong>Amount:</strong> ₱{parseFloat(booking.priceDetails.discountedPrice).toLocaleString()}</li>
-                    <li><strong>Status:</strong> {booking.status}</li>
-                  </ul>
+            {filterBookings("completed").length === 0 ? (
+              <p className='text-slate-500'>No completed bookings at the moment.</p>
+            ) : (
+              filterBookings("completed").map((booking) => (
+                <div key={booking.booking_id} className="bg-white shadow-lg p-4 rounded-lg ">
+                  <div className="p-3 bg-gray-50 rounded-lg text-sm text-black border border-gray-200">
+                    <h4 className="font-semibold mb-2">Booking Details:</h4>
+                    <ul className="space-y-1">
+                      <li><strong>Product:</strong> {booking.productName}</li>
+                      <li><strong>Guests:</strong> {booking.numberOfGuests}</li>
+                      <li><strong>Email:</strong> {booking.email}</li>
+                      <li><strong>Phone:</strong> {booking.phone}</li>
+                      <li><strong>Date:</strong> {new Date(booking.dateIn).toLocaleDateString()}</li>
+                      <li><strong>Time:</strong> {new Date(booking.dateIn).toLocaleTimeString()}</li>
+                      <li><strong>Special Requests:</strong> {booking.specialRequests}</li>
+                      <li><strong>Amount:</strong> ₱{parseFloat(booking.priceDetails.discountedPrice).toLocaleString()}</li>
+                      <li><strong>Status:</strong> {booking.status}</li>
+                    </ul>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </Tab>
         <Tab key="cancelled" title="Cancelled">
           <div className="overflow-y-auto max-h-[500px] scrollbar-custom">
-            {filterBookings("cancelled").map((booking) => (
-              <div key={booking.booking_id} className="bg-white shadow-lg p-4 rounded-lg ">
-                <div className="p-3 bg-gray-50 rounded-lg text-sm text-black border border-gray-200">
-                  <h4 className="font-semibold mb-2">Booking Details:</h4>
-                  <ul className="space-y-1">
-                    <li><strong>Product:</strong> {booking.productName}</li>
-                    <li><strong>Guests:</strong> {booking.numberOfGuests}</li>
-                    <li><strong>Email:</strong> {booking.email}</li>
-                    <li><strong>Phone:</strong> {booking.phone}</li>
-                    <li><strong>Date:</strong> {new Date(booking.dateIn).toLocaleDateString()}</li>
-                    <li><strong>Time:</strong> {new Date(booking.dateIn).toLocaleTimeString()}</li>
-                    <li><strong>Special Requests:</strong> {booking.specialRequests}</li>
-                    <li><strong>Amount:</strong> ₱{parseFloat(booking.priceDetails.discountedPrice).toLocaleString()}</li>
-                  </ul>
+            {filterBookings("cancelled").length === 0 ? (
+              <p className='text-slate-500'>No cancelled bookings at the moment.</p>
+            ) : (
+              filterBookings("cancelled").map((booking) => (
+                <div key={booking.booking_id} className="bg-white shadow-lg p-4 rounded-lg ">
+                  <div className="p-3 bg-gray-50 rounded-lg text-sm text-black border border-gray-200">
+                    <h4 className="font-semibold mb-2">Booking Details:</h4>
+                    <ul className="space-y-1">
+                      <li><strong>Product:</strong> {booking.productName}</li>
+                      <li><strong>Guests:</strong> {booking.numberOfGuests}</li>
+                      <li><strong>Email:</strong> {booking.email}</li>
+                      <li><strong>Phone:</strong> {booking.phone}</li>
+                      <li><strong>Date:</strong> {new Date(booking.dateIn).toLocaleDateString()}</li>
+                      <li><strong>Time:</strong> {new Date(booking.dateIn).toLocaleTimeString()}</li>
+                      <li><strong>Special Requests:</strong> {booking.specialRequests}</li>
+                      <li><strong>Amount:</strong> ₱{parseFloat(booking.priceDetails.discountedPrice).toLocaleString()}</li>
+                    </ul>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </Tab>
       </Tabs>
@@ -233,40 +246,53 @@ const UserProfile = ({ activities = [] }) => {
   };
 
   const handleCancelBooking = async (bookingId) => {
-    try {
-      const response = await fetch(`http://localhost:5000/cancel-booking/${bookingId}`, {
-        method: 'PUT',
-        credentials: 'include'
-      });
-      
-      const data = await response.json();
-      
-      if (data.success) {
-        setBookings(prevBookings => 
-          prevBookings.map(booking => 
-            booking.booking_id === bookingId 
-              ? { ...booking, status: 'cancelled' } 
-              : booking
-          )
-        );
-        
-        Swal.fire({
-          title: 'Success!',
-          text: 'Booking cancelled successfully',
-          icon: 'success',
-          confirmButtonColor: '#0BDA51'
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: "Do you really want to cancel this booking?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#0BDA51',
+      cancelButtonColor: '#D33736',
+      confirmButtonText: 'Yes, cancel it!',
+      cancelButtonText: 'No, keep it'
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const response = await fetch(`http://localhost:5000/cancel-booking/${bookingId}`, {
+          method: 'PUT',
+          credentials: 'include'
         });
-      } else {
-        throw new Error(data.message);
+
+        const data = await response.json();
+
+        if (data.success) {
+          setBookings(prevBookings => 
+            prevBookings.map(booking => 
+              booking.booking_id === bookingId 
+                ? { ...booking, status: 'cancelled' } 
+                : booking
+            )
+          );
+
+          Swal.fire({
+            title: 'Cancelled!',
+            text: 'Your booking has been cancelled.',
+            icon: 'success',
+            confirmButtonColor: '#0BDA51'
+          });
+        } else {
+          throw new Error(data.message);
+        }
+      } catch (error) {
+        console.error('Error cancelling booking:', error);
+        Swal.fire({
+          title: 'Error!',
+          text: 'Failed to cancel booking',
+          icon: 'error',
+          confirmButtonColor: '#D33736'
+        });
       }
-    } catch (error) {
-      console.error('Error cancelling booking:', error);
-      Swal.fire({
-        title: 'Error!',
-        text: 'Failed to cancel booking',
-        icon: 'error',
-        confirmButtonColor: '#D33736'
-      });
     }
   };
 
@@ -649,6 +675,7 @@ const UserProfile = ({ activities = [] }) => {
             <Card className='p-4 shadow-lg'>
               <CardBody className='p-6'>
                 <h1 className='text-4xl font-bold mb-6'>User Profile</h1>
+                <div className='bg-gray-300 w-full h-[1px] mb-8'></div>
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
                   {/* Username field */}
                   <div>
