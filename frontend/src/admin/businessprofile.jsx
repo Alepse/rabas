@@ -66,6 +66,17 @@ const BusinessProfile = () => {
   const heroImagesInputRef = useRef(null);
   const [isLoggedIn, setIsLoggedIn] = useState(true);
 
+  // Default opening hours
+  const defaultOpeningHours = [
+    { day: "Monday", open: "08:00", close: "17:00" },
+    { day: "Tuesday", open: "08:00", close: "17:00" },
+    { day: "Wednesday", open: "08:00", close: "17:00" },
+    { day: "Thursday", open: "08:00", close: "18:00" },
+    { day: "Friday", open: "08:00", close: "17:00" },
+    { day: "Saturday", open: "Closed", close: "Closed" },
+    { day: "Sunday", open: "Closed", close: "Closed" }
+  ];
+
   // Function to check login status
   const checkLoginStatus = useCallback(async () => {
     try {
@@ -670,7 +681,13 @@ const BusinessProfile = () => {
 
   const handleEditHours = () => {
     setIsEditingHours(true);
-    setTempOpeningHours(businessData.openingHours.map(hours => ({ ...hours }))); // Create a copy of the hours
+    setTempOpeningHours(
+      (businessData.openingHours && businessData.openingHours.length > 0 ? businessData.openingHours : defaultOpeningHours).map(hours => ({
+        day: hours.day,
+        open: hours.open || "08:00", // Default open time
+        close: hours.close || "17:00" // Default close time
+      }))
+    );
   };
 
   const handleSaveHours = async () => {
@@ -876,6 +893,19 @@ const BusinessProfile = () => {
   const handleRemovePolicyItem = (policyIndex, itemIndex) => {
     dispatch(removePolicyItem({ policyIndex, itemIndex }));
   };
+
+  // Ensure tempOpeningHours is initialized with default values if null or empty
+  useEffect(() => {
+    if (!tempOpeningHours || tempOpeningHours.length === 0) {
+      setTempOpeningHours(
+        (businessData.openingHours && businessData.openingHours.length > 0 ? businessData.openingHours : defaultOpeningHours).map(hours => ({
+          day: hours.day,
+          open: hours.open || "08:00", // Default open time
+          close: hours.close || "17:00" // Default close time
+        }))
+      );
+    }
+  }, [businessData.openingHours]);
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen mx-auto bg-gray-100 font-sans">
