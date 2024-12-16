@@ -17,6 +17,8 @@ import {
   Textarea,
   Spinner,
   useDisclosure,
+  CheckboxGroup,
+  Checkbox,
 } from '@nextui-org/react';
 import { MdRateReview } from 'react-icons/md';
 import { AiFillStar } from 'react-icons/ai';
@@ -403,33 +405,23 @@ const Filters = ({ activeTab, setSelectedType, setRatingFilter, budgetRange, set
 
       {/* Ratings Filter */}
       <div className="font-bold text-lg text-gray-700 mb-4">Ratings</div>
-      <div className="space-y-2">
-        <label className="flex items-center">
-          <input
-            type="checkbox"
-            label="Ratings"
-            onChange={() => handleRatingClick('All')}
-            checked={ratingFilter.length === 0}
-            className="form-checkbox text-color2"
-          />
-          <span className="ml-2 text-sm">All Ratings</span>
-        </label>
+      <CheckboxGroup
+        value={ratingFilter}
+        onChange={setRatingFilter}
+        className="space-y-2"
+      >
+        <Checkbox value="All" isChecked={ratingFilter.length === 0}>
+          All Ratings
+        </Checkbox>
         {[5, 4, 3, 2, 1].map((star) => (
-          <label key={star} className="flex items-center">
-            <input
-              type="checkbox"
-              label="start"
-              onChange={() => handleRatingClick(star)}
-              checked={ratingFilter.includes(star)}
-              className="form-checkbox text-color2"
-            />
-            <span className="ml-2 text-sm flex items-center">
+          <Checkbox key={star} value={star}>
+            <span className="flex items-center">
               {'★'.repeat(star)}{'☆'.repeat(5 - star)}
               <span className="ml-1">{star} Star{star > 1 ? 's' : ''}</span>
             </span>
-          </label>
+          </Checkbox>
         ))}
-      </div>
+      </CheckboxGroup>
 
       <div className="font-bold text-lg text-gray-700 mb-4">Filter by Budget</div>
       <Slider
@@ -679,7 +671,7 @@ const BusinessAllproducts = () => {
   }
 
   return (
-    <div className="min-h-screen container mx-auto p-4 bg-white  rounded-md shadow-md mb-4">
+    <div className="max-h-screen container mx-auto p-4 bg-white  rounded-md shadow-md mb-4">
       <div className="text-3xl font-semibold mb-6 text-gray-800">What We Offer</div>
 
       <div className="flex flex-col lg:flex-row gap-2">
@@ -719,7 +711,7 @@ const BusinessAllproducts = () => {
           </Tabs>
 
           {/* Content */}
-          <div className="p-2 max-h-[800px] overflow-y-auto  scrollbar-custom">
+          <div className="p-2 max-h-[600px] overflow-y-auto  scrollbar-custom">
             {loading ? (
               <LoadingSpinner />
             ) : filteredData.length > 0 ? (

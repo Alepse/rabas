@@ -45,8 +45,8 @@ const destinations = [
 
 const DestinationSection = () => {
   return (
-    <section className='mt-12  mx-auto p-8 rounded-lg'  style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'repeat' }}>
-      <div className='flex flex-col container items-start'>
+    <section className='mt-12  mx-auto bg-transparent p-8 rounded-lg' style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'repeat' }}>
+      <div className='flex flex-col container justify-center items-center'>
           <h1 className='text-4xl font-bold text-gray-800 mb-2'>
             Discover the Wonders of Sorsogon
           </h1>

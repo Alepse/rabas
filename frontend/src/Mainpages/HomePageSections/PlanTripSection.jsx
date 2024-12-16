@@ -21,7 +21,7 @@ export default function PlanTripSection() {
   ]
 
   return (
-    <section className="mt-2 bg-white" style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat' }}>
+    <section className=" bg-white" style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat' }}>
       <div className="  mx-auto p-9 container"  >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
           <motion.div 
