@@ -43,7 +43,7 @@ const Home = () => {
   }
 
   return (  
-    <div className='mx-auto min-h-screen bg-light font-sans' style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>
+    <div className='mx-auto min-h-screen bg-light font-sans' style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'repeat' }}>
       <Nav />
       
       {/* Hero Section */}

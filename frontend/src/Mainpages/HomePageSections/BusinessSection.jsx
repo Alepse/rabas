@@ -10,7 +10,7 @@ const BusinessSection = () => {
   return (
    <div 
      className="mx-auto p-6 "
-     style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat' }}
+     style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat',   opacity: 20, }}
    >
    
       <div className="text-center mb-10">

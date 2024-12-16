@@ -259,7 +259,7 @@ const Trip = () => {
   return (
     <div className="mx-auto bg-gray-100 min-h-screen font-sans flex flex-col" style={{ backgroundImage: `url(${wave})`, backgroundSize: 'auto', backgroundRepeat: 'repeat', backgroundPosition: 'center' }}>
       <Nav />
-      <div className="mt-[7rem] flex justify-center w-full px-4">
+      <div className="mt-[3rem] flex justify-center w-full px-4">
         <Search />
       </div>
 

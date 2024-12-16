@@ -149,7 +149,7 @@ const Search = () => {
   };
 
   return (
-    <div className="flex flex-col items-center mt-6 p-6 w-full max-w-4xl mx-auto">
+    <div className="flex flex-col items-center mt-6 p-6 w-full max-w-4xl mx-auto ">
       <div>
         <h1 className='font-semibold text-2xl'>{getTitleForTab(activeTab)}</h1>
       </div>
@@ -160,7 +160,7 @@ const Search = () => {
           variant="underlined"
           classNames={{
           base: "w-full overflow-x-auto rounded shadow-md",
-          tabList: "gap-6 flex justify-center w-full p-4  container ",
+          tabList: "gap-6 flex justify-center w-full p-4 border-gray-200 container ",
           tab: "max-w-fit px-0 h-12 ",
           tabContent: " text-color1  ",
           cursor: "w-full bg-color1",
@@ -176,18 +176,18 @@ const Search = () => {
       </div>
 
       <div className="flex items-center w-full mb-4">
-        <FaSearch className="text-gray-500 mr-2" />
+        <FaSearch className="text-color1 mr-2" />
         <input
           type="text"
           placeholder={`Search for ${activeTab}`}
           value={searchQuery}
           onChange={handleInputChange}
-          className="flex-grow p-2 border-b border-gray-300 focus:outline-none"
+          className="flex-grow p-2 border border-gray-300 focus:outline-none rounded-xl"
         />
         {searchQuery && (
           <FaTimes
             onClick={clearSearchField}
-            className="text-gray-500 cursor-pointer ml-2"
+            className="text-color1 cursor-pointer ml-2"
           />
         )}
       </div>

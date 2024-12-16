@@ -45,7 +45,7 @@ const destinations = [
 
 const DestinationSection = () => {
   return (
-    <section className='mt-24  mx-auto p-8 rounded-lg'  style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>
+    <section className='mt-12  mx-auto p-8 rounded-lg'  style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'repeat' }}>
       <div className='flex flex-col container items-start'>
           <h1 className='text-4xl font-bold text-gray-800 mb-2'>
             Discover the Wonders of Sorsogon
@@ -84,7 +84,7 @@ const DestinationSection = () => {
       >
         {destinations.map((destination, index) => (
           <SwiperSlide key={index}>
-            <Link to={`/destinations?name=${destination.name}`}>
+            <Link to={`/destinations?name=${destination.name.replace(' ', '')}`}>
               <motion.div
                 className='relative overflow-hidden rounded-lg shadow-lg'
                 whileHover={{ scale: 1.05 }}
