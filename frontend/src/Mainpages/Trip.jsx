@@ -468,7 +468,7 @@ const Trip = () => {
               </Button>
               <div className='flex gap-3'>
                 {step > 1 && (
-                  <Button onClick={prevStep} className="bg-gray-300 hover:bg-gray-400 text-black rounded-lg py-2 px-4 transition-all">
+                  <Button onClick={prevStep} className="bg-primary hover:bg-primary-dark text-white rounded-lg py-2 px-4 transition-all">
                     Back
                   </Button>
                 )}

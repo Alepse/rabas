@@ -108,20 +108,7 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
   };
 
   const handleCancelEdit = () => {
-    Swal.fire({
-      title: 'Cancel changes?',
-      text: "Your changes will not be saved.",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#D33736',
-      cancelButtonColor: '#0BDA51',
-      confirmButtonText: 'Yes, cancel it!',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        setEditTripDetails(trip); // Revert changes
-        setIsEditing(false);
-      }
-    });
+    setEditItemIndex(null);
   };
 
   const handleItineraryChange = (newItinerary) => {
@@ -140,8 +127,6 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
 
   const handleEdit = (date, index) => {
     const item = itinerary[date][index];
-    setCurrentDate(date);
-    setSelectedItem(item);
     setEditItemIndex(index);
     setEditItemDetails(item);
   };
@@ -316,41 +301,74 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
             </AccordionItem>
             <AccordionItem title="Itinerary">
               <div className="p-4">
-                {Object.keys(itinerary || {}).map(date => (
-                  <div key={date} className="mb-6">
-                    <h4 className="font-semibold text-lg mb-2">{date}</h4>
-                    {itinerary[date].map((item, index) => (
-                      <div key={index} className="flex flex-col sm:flex-row items-start mb-6 bg-white p-4 rounded-lg shadow-lg w-full sm:w-3/4 lg:w-2/3 mx-auto">
-                        <div className="flex-shrink-0 w-12 text-center">
-                          <div className="bg-color1 text-white rounded-full w-10 h-10 flex items-center justify-center mb-2">
-                            {index + 1}
-                          </div>
-                          <div className="h-full border-l-2 border-gray-300"></div>
-                        </div>
-                        <div className="ml-0 sm:ml-6 w-full">
-                          <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
-                            <h3 className="font-semibold text-xl">{item.title}</h3>
-                            <span className="text-sm text-gray-500"> <span className='text-black font-medium'>Time of Visit:</span> {formatTime(item.time)}</span>
-                          </div>
-                          <img src={`http://localhost:5000/${item.imageUrl}` || 'https://via.placeholder.com/300'} alt={item.title} className="w-full h-56 object-cover rounded-md mb-4" />
-                          <p className="text-sm mb-2"><strong>Booked:</strong> {item.isBooked ? 'Yes' : 'No'}</p>
-                          <p className="text-sm mb-4"><strong>Notes:</strong> {item.notes}</p>
-                          {isEditing && (
-                            <div className="flex space-x-2">
-                              <Button size="sm" color="danger" onClick={() => handleDelete(date, index)}>Delete</Button>
-                              <Button size="sm" onClick={() => handleEdit(date, index)}>Edit</Button>
+                <Accordion selectionMode="multiple">
+                  {Object.keys(itinerary || {}).map(date => (
+                    <AccordionItem 
+                      className='max-h-[700px] h-full overflow-auto scrollbar-custom'
+                      key={date} 
+                      title={date}
+                    >
+                      <div className="mb-6">
+                        {itinerary[date].map((item, index) => (
+                          <div key={index} className="flex flex-col sm:flex-row items-start mb-6 bg-white p-4 rounded-lg shadow-lg w-full sm:w-3/4 lg:w-2/3 mx-auto">
+                            <div className="flex-shrink-0 w-12 text-center">
+                              <div className="bg-color1 text-white rounded-full w-10 h-10 flex items-center justify-center mb-2">
+                                {index + 1}
+                              </div>
+                              <div className="h-full border-l-2 border-gray-300"></div>
                             </div>
-                          )}
-                        </div>
+                            <div className="ml-0 sm:ml-6 w-full">
+                              {editItemIndex === index ? (
+                                <div className="space-y-4">
+                                  <input type="time" name="time" value={editItemDetails.time} onChange={handleEditInputChange} className="w-full p-2 border rounded-md" />
+                                  <Checkbox
+                                    isSelected={editItemDetails.isBooked}
+                                    onChange={() => setEditItemDetails(prevDetails => ({ ...prevDetails, isBooked: !prevDetails.isBooked }))}
+                                    color="primary"
+                                  >
+                                    Yes, I have booked this
+                                  </Checkbox>
+                                  <Textarea
+                                    name="notes"
+                                    value={editItemDetails.notes}
+                                    onChange={handleEditInputChange}
+                                    placeholder="Enter any notes here..."
+                                    fullWidth
+                                  />
+                                  <div className="flex space-x-2">
+                                    <Button size="sm" onClick={() => handleUpdate(date)} className="bg-green-500 text-white">Update</Button>
+                                    <Button size="sm" onClick={handleCancelEdit} className="bg-red-500 text-white">Cancel</Button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div>
+                                  <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
+                                    <h3 className="font-semibold text-xl">{item.title}</h3>
+                                    <span className="text-sm text-gray-500"> <span className='text-black font-medium'>Time of Visit:</span> {formatTime(item.time)}</span>
+                                  </div>
+                                  <img src={`http://localhost:5000/${item.imageUrl}` || 'https://via.placeholder.com/300'} alt={item.title} className="w-full h-56 object-cover rounded-md mb-4" />
+                                  <p className="text-sm mb-2"><strong>Booked:</strong> {item.isBooked ? 'Yes' : 'No'}</p>
+                                  <p className="text-sm mb-4"><strong>Notes:</strong> {item.notes}</p>
+                                  {isEditing && (
+                                    <div className="flex space-x-2">
+                                      <Button size="sm" color="danger" onClick={() => handleDelete(date, index)}>Delete</Button>
+                                      <Button size="sm" color='primary' onClick={() => handleEdit(date, index)}>Edit</Button>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                        {isEditing && (
+                          <Button className='border-1 m-2 border-color1 rounded-full text-lg p-3 hover:bg-color2 bg-white hover:text-white duration-300 min-w-11' onClick={() => handleAdd(date)}>
+                            <FaPlus/> Add
+                          </Button>
+                        )}
                       </div>
-                    ))}
-                    {isEditing && (
-                      <Button className='border-1 m-2 border-color1 rounded-full text-lg p-3 hover:bg-color2 bg-white hover:text-white duration-300 min-w-11' onClick={() => handleAdd(date)}>
-                        <FaPlus/> Add
-                      </Button>
-                    )}
-                  </div>
-                ))}
+                    </AccordionItem>
+                  ))}
+                </Accordion>
               </div>
             </AccordionItem>
           </Accordion>
