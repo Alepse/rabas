@@ -676,7 +676,6 @@ const SuperAdminVerification = () => {
         <SearchBar placeholder="Search pending applications..." onSearch={setSearchTermPending} />
         <VerificationTable 
           data={filteredDataPending} 
-          title="Pending Applications" 
           onUpdateStatus={updateStatus} 
           searchTerm={searchTermPending} 
         />
@@ -685,7 +684,6 @@ const SuperAdminVerification = () => {
         <SearchBar placeholder="Search approved applications..." onSearch={setSearchTermApproved} />
         <VerificationTable 
           data={filteredDataApproved} 
-          title="Approved Applications" 
           onUpdateStatus={updateStatus} 
           searchTerm={searchTermApproved} 
         />
@@ -694,7 +692,6 @@ const SuperAdminVerification = () => {
         <SearchBar placeholder="Search rejected applications..." onSearch={setSearchTermRejected} />
         <VerificationTable 
           data={filteredDataRejected} 
-          title="Rejected Applications" 
           onUpdateStatus={updateStatus} 
           searchTerm={searchTermRejected} 
         />
