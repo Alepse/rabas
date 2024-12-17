@@ -149,9 +149,9 @@ const Search = () => {
   };
 
   return (
-    <div className="flex flex-col items-center mt-6 p-6 w-full max-w-4xl mx-auto ">
+    <div className="flex flex-col  mt-8 items-center  p-6 w-full max-w-4xl mx-auto ">
       <div>
-        <h1 className='font-semibold text-2xl'>{getTitleForTab(activeTab)}</h1>
+        <h1 className='font-semibold text-2xl mt-9'>{getTitleForTab(activeTab)}</h1>
       </div>
       <div className="w-full mb-6 overflow-x-auto">
         <Tabs

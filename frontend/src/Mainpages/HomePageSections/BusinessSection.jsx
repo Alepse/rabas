@@ -10,15 +10,20 @@ const BusinessSection = () => {
   return (
    <div 
      className="mx-auto p-6 "
-     style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat',   opacity: 20, }}
+     style={{  
+      backgroundImage: `url(${wave})`,  
+      backgroundSize: '140% 100%', // adjust the size to make the background smaller  
+      backgroundRepeat: 'no-repeat', // prevents the image from repeating  
+      backgroundPosition: 'center', // centers the image in the container  
+    }} 
    >
    
-      <div className="text-center mb-10">
+      <div className="text-center mb-10 ">
         <h1 className="text-3xl md:text-5xl font-bold text-color1">
-          Explore Sorsogon
+        Sorsogon's Hidden Gems
         </h1>
         <p className="text-md md:text-lg text-gray-500 mt-3">
-          Discover the best places to visit, stay, and dine.
+        Your Guide to Unforgettable Visits, Comfy Stays, and Delicious Meals.
         </p>
       </div>
       
