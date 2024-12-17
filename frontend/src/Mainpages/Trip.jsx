@@ -257,16 +257,17 @@ const Trip = () => {
   };
 
   return (
-    <div className="mx-auto bg-gray-100 min-h-screen font-sans flex flex-col" style={{ backgroundImage: `url(${wave})`, backgroundSize: 'auto', backgroundRepeat: 'repeat', backgroundPosition: 'center' }}>
+    <div className="mx-auto  bg-gray-100 min-h-screen font-sans flex flex-col" style={{ backgroundImage: `url(${wave})`, backgroundSize: 'auto', backgroundRepeat: 'repeat', backgroundPosition: 'center' }}>
       <Nav />
       <div className="mt-[3rem] flex justify-center w-full px-4">
         <Search />
       </div>
-
-      <div className="container mx-auto flex justify-center bg-color1 p-4 mb-4 items-center shadow-lg md:rounded-xl shadow-color1 m-4">
+      <div className='p-6'>
+      <div className="container mx-auto flex justify-center bg-color1 p-4 mb-4 items-center shadow-lg rounded-xl shadow-color1 m-4">
         <h1 className="text-white text-center font-semibold text-2xl md:text-4xl hover:tracking-wider duration-500">
           Plan Your Trip In Sorsogon
         </h1>
+      </div>
       </div>
 
       <div className="container mx-auto p-4 md:p-9 bg-white max-h-screen mb-2 border rounded-lg shadow-md">
