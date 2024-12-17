@@ -59,7 +59,7 @@ const whatodoSection = () => {
       </div>
 
 
-      <div className="container mx-auto px-4 pt-12">
+      <div className="container mx-auto px-4 pt-5">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
