@@ -52,7 +52,7 @@ const renderSwiperActivitySection = (title, link, spots) => {
               <div className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between max-w-xs md:max-w-lg lg:max-w-sm mx-auto h-[400px] p-2 relative"
                    style={{ width: '300px', height: '400px' }}>
                 <img
-                  src={`http://localhost:5000/${spot.image}` || 'path/to/placeholder.jpg'}
+                  src={spot.image ? `http://localhost:5000/${spot.image}` : `http://localhost:5000/${spot.businessLogo}`}
                   alt={spot.name}
                   className="w-full h-48 object-cover rounded-t-lg"
                 />
@@ -142,7 +142,7 @@ const renderSwiperAccommodationSection = (title, link, spots) => {
               <div className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between max-w-xs md:max-w-lg lg:max-w-sm mx-auto h-[400px] p-2 relative"
                    style={{ width: '300px', height: '400px' }}>
                 <img
-                  src={`http://localhost:5000/${spot.image}` || 'path/to/placeholder.jpg'}
+                  src={spot.image ? `http://localhost:5000/${spot.image}` : `http://localhost:5000/${spot.businessLogo}`}
                   alt={spot.name}
                   className="w-full h-48 object-cover rounded-t-lg"
                 />
@@ -232,7 +232,7 @@ const renderSwiperEaterySection = (title, link, spots) => {
               <div className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between max-w-xs md:max-w-lg lg:max-w-sm mx-auto h-[400px] p-2 relative"
                    style={{ width: '300px', height: '400px' }}>
                 <img
-                  src={`http://localhost:5000/${spot.image}` || 'path/to/placeholder.jpg'}
+                  src={spot.image ? `http://localhost:5000/${spot.image}` : `http://localhost:5000/${spot.businessLogo}`}
                   alt={spot.name}
                   className="w-full h-48 object-cover rounded-t-lg"
                 />
@@ -323,7 +323,7 @@ const renderSwiperShopSection = (title, link, spots) => {
               <div className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between max-w-xs md:max-w-lg lg:max-w-sm mx-auto h-[400px] p-2 relative"
                    style={{ width: '300px', height: '400px' }}>
                 <img
-                  src={`http://localhost:5000/${spot.image}` || 'path/to/placeholder.jpg'}
+                  src={spot.image ? `http://localhost:5000/${spot.image}` : `http://localhost:5000/${spot.businessLogo}`}
                   alt={spot.name}
                   className="w-full h-48 object-cover rounded-t-lg"
                 />
@@ -377,7 +377,6 @@ const renderSwiperShopSection = (title, link, spots) => {
     </div>
   );
 };
-
 const Pilar = () => {
   const [businesses, setBusinesses] = useState([]);
   const [currentZoom, setCurrentZoom] = useState(10); // Initial zoom level
