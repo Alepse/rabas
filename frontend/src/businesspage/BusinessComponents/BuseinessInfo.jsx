@@ -7,7 +7,7 @@ import { Tabs, Tab, Card, CardBody, Textarea, Button, Avatar } from "@nextui-org
 import { businessIcons } from './businessIcons';
 import DOMPurify from 'dompurify';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
-import { FaFacebook, FaInstagram, FaPhone, FaWifi, FaCheckCircle, FaPlus, FaClipboardList } from 'react-icons/fa';
+import { FaFacebook, FaInstagram, FaPhone, FaWifi, FaCheckCircle, FaPlus, FaClipboardList, FaInfoCircle, FaConciergeBell, FaStar } from 'react-icons/fa';
 
 
 const StarRating = ({ rating, onRatingChange, size = "md" }) => {
@@ -148,12 +148,12 @@ const BusinessInfo = () => {
         variant="underlined"  
         classNames={{
           base: "w-full overflow-x-auto mb-4",
-          tabList: "gap-6 w-full p-4 container",
+          tabList: "gap-6 w-full p-2 container",
           tab: "max-w-fit px-0 h-12",
-          tabContent: "text-color1"
+          tabContent: "text-color1 flex items-center"
         }}
       >
-        <Tab key="about-location" title="About Us">
+        <Tab key="about-location" title={<><FaInfoCircle className="mr-2" />About Us</>}>
           <Card>
             <CardBody>
               <div className="flex flex-col lg:flex-row h-auto lg:h-[47em] overflow-y-auto scrollbar-custom gap-8">
@@ -256,31 +256,39 @@ const BusinessInfo = () => {
             </CardBody>
           </Card>
         </Tab>
-        <Tab key="facilities" title="Facilities & Amenities">
+        <Tab key="facilities" title={<><FaConciergeBell className="mr-2" />Facilities & Amenities</>}>
           <Card>
             <CardBody>
               <h2 className="text-2xl font-bold mb-4">Our Facilities & Amenities</h2>
               <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-            {businessData.facilities && businessData.facilities.length > 0 ? (
-              businessData.facilities.map((facility, index) => (
-                <div key={index} className="flex flex-col items-center w-full h-auto p-4 bg-white shadow-md rounded-lg">
-                  <div className="flex items-center gap-2 mb-2">
-                    {React.createElement(
-                      businessIcons.find(icon => icon.name === facility.icon)?.icon || FaCheckCircle,
-                      { size: 20 }
-                    )}
-                    <p className="font-medium text-md">{facility.name}</p>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="italic text-gray-500 p-4 bg-gray-100 rounded-md">No facilities available</div>
-            )}
-          </div>
+                {businessData.facilities && businessData.facilities.length > 0 ? (
+                  businessData.facilities.map((facility, index) => (
+                    <div key={index} className="flex flex-col items-start w-full h-auto p-4 bg-white shadow-md rounded-lg">
+                      <div className="mb-2">
+                        <p className="font-medium text-md">{facility.name}</p>
+                      </div>
+                      <ul className="pl-5 space-y-1">
+                        {facility.items && facility.items.length > 0 ? (
+                          facility.items.map((item, itemIndex) => (
+                            <li key={itemIndex} className="font-normal text-sm list-disc flex items-center gap-2">
+                              {item.icon && React.createElement(businessIcons.find(icon => icon.name === item.icon)?.icon, { size: 16 })}
+                              <span>{item.name}</span>
+                            </li>
+                          ))
+                        ) : (
+                          <li className="italic text-gray-500">No items available</li>
+                        )}
+                      </ul>
+                    </div>
+                  ))
+                ) : (
+                  <div className="italic text-gray-500 p-4 bg-gray-100 rounded-md">No facilities available</div>
+                )}
+              </div>
             </CardBody>
           </Card>
         </Tab>
-        <Tab key="reviews" title="Reviews">
+        <Tab key="reviews" title={<><FaStar className="mr-2" />Reviews</>}>
           <Card>
             <CardBody>
               <h2 className="text-2xl font-bold mb-6">Customer Reviews</h2>
@@ -326,31 +334,32 @@ const BusinessInfo = () => {
             </CardBody>
           </Card>
         </Tab>
-        <Tab key="policies" title="Policies">
+        <Tab key="policies" title={<><FaClipboardList className="mr-2" />Policies</>}>
           <Card>
             <CardBody>
               <h2 className="text-2xl font-bold mb-4">Our Policies</h2>
+              <p className="mb-4 text-gray-600">Please review our policies carefully to ensure a smooth experience.</p>
               <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {businessData.policies && businessData.policies.length > 0 ? (
-                businessData.policies.map((policy, index) => (
-                  <div key={index} className="flex flex-col items-start w-full h-auto p-4 bg-white shadow-md rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <FaClipboardList size={20} />
-                      <p className="font-semibold text-lg">{policy.title}</p>
+                {businessData.policies && businessData.policies.length > 0 ? (
+                  businessData.policies.map((policy, index) => (
+                    <div key={index} className="flex flex-col items-start w-full h-auto p-4 bg-white shadow-md rounded-lg">
+                      <div className="flex items-center gap-2 mb-2">
+                        <FaClipboardList size={20} />
+                        <p className="font-semibold text-lg">{policy.title}</p>
+                      </div>
+                      <ul className="pl-5 space-y-1">
+                        {policy.items.map((item, itemIndex) => (
+                          <li key={itemIndex} className="font-normal text-sm list-disc">
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
-                    <ul className="pl-5 space-y-1">
-                      {policy.items.map((item, itemIndex) => (
-                        <li key={itemIndex} className="font-normal text-sm list-disc">
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))
-              ) : (
-                <div className="italic text-gray-500 p-4 bg-gray-100 rounded-md">No policies available</div>
-              )}
-            </div>
+                  ))
+                ) : (
+                  <div className="italic text-gray-500 p-4 bg-gray-100 rounded-md">No policies available</div>
+                )}
+              </div>
             </CardBody>
           </Card>
         </Tab>

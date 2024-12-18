@@ -281,6 +281,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
                   icon={<FaPlus />}
                   onClick={addCustomCategory}
                   className="ml-2"
+                  color="primary"
                 >
                   Add
                 </Button>
@@ -440,20 +441,17 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
   aria-labelledby="modal-title"  
 >  
   <ModalContent className=" sm:max-w-md md:max-w-lg lg:max-w-2xl overflow-auto flex justify-center">  
-    <ModalHeader className="flex justify-between items-center">  
-      <h2 id="modal-title" className="text-2xl font-bold">  
+    <ModalHeader className="flex justify-between items-center bg-color1">  
+      <h2 id="modal-title" className="text-2xl text-white font-bold">  
         Apply for Business Account  
       </h2>  
-      <Button  
-        auto  
-        flat  
-        color="danger"  
-        onClick={handleCloseModal}  
-        className="absolute right-2 top-2"  
-        size="sm"  
-      >  
-        <FaTimes />  
-      </Button>  
+      <button 
+        aria-label="Close" 
+        className='text-white hover:text-gray-300 transition-colors duration-200 absolute right-2 top-2'
+        onClick={handleCloseModal}
+      >
+        <FaTimes />
+      </button>
     </ModalHeader>  
     <ModalBody className="p-4 overflow-y-auto max-h-[80vh] ">  
       <Progress value={(step / 4) * 100}  classNames={{ indicator: "bg-color2",}} />  

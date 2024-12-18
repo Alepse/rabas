@@ -21,7 +21,7 @@ import Prieto from '@/assets/prieto.jpg'
 import Santa from '@/assets/santa.jpg'
 import Sorso from '@/assets/sorsogon city.jpg'
 import { Link } from 'react-router-dom'
-import wave from '@/assets/wave2.webp'
+import wave from '@/assets/wave-haikei.png'
 
 
 const destinations = [
@@ -45,16 +45,22 @@ const destinations = [
 
 const DestinationSection = () => {
   return (
-    <section className='mt-24  mx-auto p-8 rounded-lg'  style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>
-      <div className='flex flex-col container items-start'>
-          <h1 className='text-4xl font-bold text-gray-800 mb-2'>
-            Discover the Wonders of Sorsogon
+    <section className='mt-12    mx-auto bg-transparent p-8 rounded-lg' style={{  
+      backgroundImage: `url(${wave})`,  
+      backgroundSize: '100% 100%', // adjust the size to make the background smaller  
+      backgroundRepeat: 'no-repeat', // prevents the image from repeating  
+      backgroundPosition: 'center', // centers the image in the container  
+    }}  >
+   
+      <div className='flex flex-col container '>
+          <h1 className='text-4xl z-20 font-bold text-gray-800 mb-2'>
+          Journey Through Sorsogon
           </h1>
           <div className='flex md:flex-row justify-between w-full items-center mb-4 flex-wrap'>
         <p className='text-lg text-gray-600 '>
-          Uncover breathtaking destinations, hidden gems, and iconic attractions in Sorsogon.
+        Find Breathtaking Destinations, Hidden Gems, and Attractions Worth Visiting.
         </p>
-        <Link className='rounded-full text-center bg-color1 text-white p-2 text-sm hover:bg-color2 duration-300 hover:translate-x-2 flex items-center hover:shadow-lg mt-4 ' to='/destinations' target='_blank'>
+        <Link className='rounded-full text-center bg-color1 ml-1 text-white p-2 text-sm hover:bg-color2 duration-300 hover:translate-x-2 flex items-center hover:shadow-lg mt-4 ' to='/destinations' target='_blank'>
             <button>View All ⇀</button>
           </Link>
       </div>
@@ -84,7 +90,7 @@ const DestinationSection = () => {
       >
         {destinations.map((destination, index) => (
           <SwiperSlide key={index}>
-            <Link to={`/destinations?name=${destination.name}`}>
+            <Link to={`/destinations?name=${destination.name.replace(' ', '')}`}>
               <motion.div
                 className='relative overflow-hidden rounded-lg shadow-lg'
                 whileHover={{ scale: 1.05 }}
@@ -109,8 +115,11 @@ const DestinationSection = () => {
               </motion.div>
             </Link>
           </SwiperSlide>
+          
         ))}
+       
       </Swiper>
+
     </section>
   )
 }

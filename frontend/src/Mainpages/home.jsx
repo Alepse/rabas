@@ -10,7 +10,8 @@ import PlanTripSection from './HomePageSections/PlanTripSection';
 import AboutSection from './HomePageSections/AboutSection';
 import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import wave from '@/assets/wave2.webp'
+import wave2 from '@/assets/wavy.png'
+import WhatodoSection from './HomePageSections/whatodoSection';
 
 const Home = () => {
   const [loading, setLoading] = useState(true);
@@ -43,23 +44,38 @@ const Home = () => {
   }
 
   return (  
-    <div className='mx-auto min-h-screen bg-light font-sans' style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>
+    <div className='mx-auto min-h-screen bg-white font-sans' >
       <Nav />
+
+      <whatodoSection/>
       
       {/* Hero Section */}
       <AnimatedSection>
         <Hero />
       </AnimatedSection>
       
-      {/* Search Section */}
+     <AnimatedSection>
+      <Search/>
+     </AnimatedSection>
+    
+      
       <AnimatedSection>
-        <Search />
+       <WhatodoSection/>
       </AnimatedSection>
 
       {/* Destination Section */}
       <AnimatedSection>
         <DestinationSection />
       </AnimatedSection>
+      
+      <AnimatedSection>
+      <div className=' h-[20rem]   w-full bg-color1/80 ' style={{  
+      backgroundImage: `url(${wave2})`,  
+      backgroundSize: '100% 100%', // adjust the size to make the background smaller  
+      backgroundRepeat: 'no-repeat', // prevents the image from repeating  
+      backgroundPosition: 'center', // centers the image in the container  
+    }} ></div>
+    </AnimatedSection>
 
       {/* Business Section */}
      

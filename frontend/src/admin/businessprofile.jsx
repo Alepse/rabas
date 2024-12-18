@@ -26,7 +26,10 @@ import {
   updateContactIcon,
   updateBusinessCard,
   updateHeroImageTitle,
-  removeHeroImage
+  removeHeroImage,
+  addFacilityItem,
+  updateFacilityItem,
+  removeFacilityItem,
 } from '../redux/businessSlice';
 
 const BusinessProfile = () => {
@@ -139,7 +142,8 @@ const BusinessProfile = () => {
         title: 'Error',
         text: 'Business name cannot be empty.',
         icon: 'error',
-        confirmButtonColor: '#0BDA51',
+        confirmButtonColor: '#32CD32',
+        cancelButtonColor: '#FF7F7F',
       });
       return;
     }
@@ -164,7 +168,8 @@ const BusinessProfile = () => {
           title: 'Success',
           text: 'Business name updated successfully!',
           icon: 'success',
-          confirmButtonColor: '#0BDA51',
+          confirmButtonColor: '#32CD32',
+          cancelButtonColor: '#FF7F7F',
         });
       } else {
         throw new Error(data.message);
@@ -175,7 +180,8 @@ const BusinessProfile = () => {
         title: 'Error',
         text: 'Failed to update business name.',
         icon: 'error',
-        confirmButtonColor: '#0BDA51',
+        confirmButtonColor: '#32CD32',
+        cancelButtonColor: '#FF7F7F',
       });
     }
   };
@@ -196,7 +202,8 @@ const BusinessProfile = () => {
         title: 'Error',
         text: 'Field cannot be empty.',
         icon: 'error',
-        confirmButtonColor: '#0BDA51',
+        confirmButtonColor: '#32CD32',
+        cancelButtonColor: '#FF7F7F',
       });
       return;
     }
@@ -221,7 +228,8 @@ const BusinessProfile = () => {
           title: 'Success',
           text: 'About Us updated successfully!',
           icon: 'success',
-          confirmButtonColor: '#0BDA51',
+          confirmButtonColor: '#32CD32',
+          cancelButtonColor: '#FF7F7F',
         });
       } else {
         throw new Error(data.message);
@@ -232,7 +240,8 @@ const BusinessProfile = () => {
         title: 'Error',
         text: 'Failed to update about us.',
         icon: 'error',
-        confirmButtonColor: '#0BDA51',
+        confirmButtonColor: '#32CD32',
+        cancelButtonColor: '#FF7F7F',
       });
     }
   };
@@ -258,7 +267,8 @@ const BusinessProfile = () => {
         title: 'Error',
         text: 'Please fill in all fields for the business card.',
         icon: 'error',
-        confirmButtonColor: '#0BDA51',
+        confirmButtonColor: '#32CD32',
+        cancelButtonColor: '#FF7F7F',
       });
       return;
     }
@@ -291,7 +301,8 @@ const BusinessProfile = () => {
             title: 'Success',
             text: 'Business card updated successfully!',
             icon: 'success',
-            confirmButtonColor: '#0BDA51',
+            confirmButtonColor: '#32CD32',
+            cancelButtonColor: '#FF7F7F',
           });
 
         }
@@ -320,7 +331,9 @@ const BusinessProfile = () => {
                  </div>`, // Center the image and text
           showCancelButton: true,
           confirmButtonText: 'Upload',
+          confirmButtonColor: '#32CD32',
           cancelButtonText: 'Cancel',
+          cancelButtonColor: '#FF7F7F',
         }).then((result) => {
           if (result.isConfirmed) {
             const formData = new FormData();
@@ -336,7 +349,12 @@ const BusinessProfile = () => {
                 if (data.success) {
                   fetchBusinessData(); // Fetch the updated business data
                   dispatch(updateBusinessData({ cardImage: data.updatedBusinessCard.cardImage })); // Update Redux state with the new card image
-                  Swal.fire('Uploaded!', 'Your image has been uploaded.', 'success'); // Success message
+                  Swal.fire({
+                    title: 'Uploaded!',
+                    text: '',
+                    icon: 'success',
+                    confirmButtonColor: '#90EE90', // Light green color
+                  }); // Success message
                 } else {
                   Swal.fire('Error!', data.message, 'error'); // Error message
                 }
@@ -357,8 +375,8 @@ const BusinessProfile = () => {
       text: 'This will remove the card image.',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#0BDA51',
-      cancelButtonColor: '#D33736',
+      confirmButtonColor: '#32CD32',
+      cancelButtonColor: '#FF7F7F',
       confirmButtonText: 'Yes, remove it!',
     }).then((result) => {
       if (result.isConfirmed) {
@@ -379,14 +397,16 @@ const BusinessProfile = () => {
               title: 'Removed!',
               text: 'The card image has been removed.',
               icon: 'success',
-              confirmButtonColor: '#0BDA51',
+              confirmButtonColor: '#32CD32',
+              cancelButtonColor: '#FF7F7F',
             });
           } else {
             MySwal.fire({
               title: 'Error!',
               text: data.message,
               icon: 'error',
-              confirmButtonColor: '#D33736',
+              confirmButtonColor: '#32CD32',
+              cancelButtonColor: '#FF7F7F',
             });
           }
         })
@@ -396,7 +416,8 @@ const BusinessProfile = () => {
             title: 'Error!',
             text: 'Failed to remove the card image.',
             icon: 'error',
-            confirmButtonColor: '#D33736',
+            confirmButtonColor: '#32CD32',
+            cancelButtonColor: '#FF7F7F',
           });
         });
       }
@@ -423,7 +444,9 @@ const BusinessProfile = () => {
                  </div>`, // Center the image and text
           showCancelButton: true,
           confirmButtonText: 'Upload',
+          confirmButtonColor: '#32CD32',
           cancelButtonText: 'Cancel',
+          cancelButtonColor: '#FF7F7F',
         }).then((result) => {
           if (result.isConfirmed) {
             const formData = new FormData();
@@ -439,7 +462,12 @@ const BusinessProfile = () => {
                 if (data.success) {
                   fetchBusinessData(); // Fetch the updated business data
                   dispatch(updateBusinessData({ businessLogo: data.updatedLogoPath })); // Update Redux state with the logo path
-                  Swal.fire('Uploaded!', '', 'success'); // Success message
+                  Swal.fire({
+                    title: 'Uploaded!',
+                    text: '',
+                    icon: 'success',
+                    confirmButtonColor: '#32CD32', // Light green color
+                  });
                 } else {
                   console.error('Error updating logo:', data.message);
                   Swal.fire('Error!', data.message, 'error'); // Error message
@@ -490,7 +518,8 @@ const BusinessProfile = () => {
             title: 'Success',
             text: 'Hero images updated successfully!',
             icon: 'success',
-            confirmButtonColor: '#0BDA51',
+            confirmButtonColor: '#32CD32',
+            cancelButtonColor: '#FF7F7F',
           });
         } else {
           console.error('Error updating hero images:', data.message);
@@ -498,7 +527,8 @@ const BusinessProfile = () => {
             title: 'Error',
             text: 'Failed to update hero images.',
             icon: 'error',
-            confirmButtonColor: '#D33736',
+            confirmButtonColor: '#32CD32',
+            cancelButtonColor: '#FF7F7F',
           });
         }
       })
@@ -508,7 +538,8 @@ const BusinessProfile = () => {
           title: 'Error',
           text: 'An error occurred while uploading hero images.',
           icon: 'error',
-          confirmButtonColor: '#D33736',
+          confirmButtonColor: '#32CD32',
+          cancelButtonColor: '#FF7F7F',
         });
       });
   };
@@ -522,8 +553,8 @@ const BusinessProfile = () => {
       text: 'This will remove the hero image.',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#0BDA51',
-      cancelButtonColor: '#D33736',
+      confirmButtonColor: '#32CD32',
+      cancelButtonColor: '#FF7F7F',
       confirmButtonText: 'Yes, remove it!',
     }).then((result) => {
       if (result.isConfirmed) {
@@ -545,7 +576,8 @@ const BusinessProfile = () => {
                 title: 'Removed!',
                 text: 'The image has been removed successfully.',
                 icon: 'success',
-                confirmButtonColor: '#0BDA51',
+                confirmButtonColor: '#32CD32',
+                cancelButtonColor: '#FF7F7F',
               });
             } else {
               console.error('Error removing image:', data.message);
@@ -553,7 +585,8 @@ const BusinessProfile = () => {
                 title: 'Error',
                 text: 'Failed to remove the image.',
                 icon: 'error',
-                confirmButtonColor: '#D33736',
+                confirmButtonColor: '#32CD32',
+                cancelButtonColor: '#FF7F7F',
               });
             }
           })
@@ -563,7 +596,8 @@ const BusinessProfile = () => {
               title: 'Error',
               text: 'An error occurred while removing the image.',
               icon: 'error',
-              confirmButtonColor: '#D33736',
+              confirmButtonColor: '#32CD32',
+              cancelButtonColor: '#FF7F7F',
             });
           });
       }
@@ -599,7 +633,8 @@ const BusinessProfile = () => {
           title: 'Success',
           text: 'Image title updated successfully!',
           icon: 'success',
-          confirmButtonColor: '#0BDA51',
+          confirmButtonColor: '#32CD32',
+          cancelButtonColor: '#FF7F7F',
         });
       } else {
         throw new Error(data.message);
@@ -610,7 +645,8 @@ const BusinessProfile = () => {
         title: 'Error',
         text: 'Failed to update image title.',
         icon: 'error',
-        confirmButtonColor: '#0BDA51',
+        confirmButtonColor: '#32CD32',
+        cancelButtonColor: '#FF7F7F',
       });
     }
   };
@@ -640,7 +676,8 @@ const BusinessProfile = () => {
           title: 'Success',
           text: 'Contact information updated successfully!',
           icon: 'success',
-          confirmButtonColor: '#0BDA51',
+          confirmButtonColor: '#32CD32',
+          cancelButtonColor: '#FF7F7F',
         });
       } else {
         throw new Error(data.message);
@@ -651,7 +688,8 @@ const BusinessProfile = () => {
         title: 'Error',
         text: 'Failed to update contact information.',
         icon: 'error',
-        confirmButtonColor: '#0BDA51',
+        confirmButtonColor: '#32CD32',
+        cancelButtonColor: '#FF7F7F',
       });
     }
   };
@@ -663,8 +701,8 @@ const BusinessProfile = () => {
       text: 'This will remove the contact info.',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#0BDA51',
-      cancelButtonColor: '#D33736',
+      confirmButtonColor: '#32CD32',
+      cancelButtonColor: '#FF7F7F',
       confirmButtonText: 'Yes, remove it!',
     }).then((result) => {
       if (result.isConfirmed) {
@@ -673,7 +711,8 @@ const BusinessProfile = () => {
           title: 'Removed!',
           text: 'The contact info has been removed.',
           icon: 'success',
-          confirmButtonColor: '#0BDA51',
+          confirmButtonColor: '#32CD32',
+          cancelButtonColor: '#FF7F7F',
         });
       }
     });
@@ -715,6 +754,7 @@ const BusinessProfile = () => {
           title: 'Success!',
           text: 'Opening hours saved successfully.',
           confirmButtonText: 'Okay',
+          confirmButtonColor: '#32CD32',
         });
 
         // Exit editing mode
@@ -727,6 +767,7 @@ const BusinessProfile = () => {
           title: 'Error!',
           text: data.message || 'Failed to save opening hours.',
           confirmButtonText: 'Okay',
+          confirmButtonColor: '#32CD32',
         });
       }
     } catch (error) {
@@ -737,6 +778,7 @@ const BusinessProfile = () => {
         title: 'Error!',
         text: 'An error occurred while saving opening hours.',
         confirmButtonText: 'Okay',
+        confirmButtonColor: '#32CD32',
       });
     }
   };
@@ -769,7 +811,8 @@ const BusinessProfile = () => {
           title: 'Success',
           text: 'Facilities updated successfully!',
           icon: 'success',
-          confirmButtonColor: '#0BDA51',
+          confirmButtonColor: '#32CD32',
+          cancelButtonColor: '#FF7F7F',
         });
       } else {
         throw new Error(data.message);
@@ -780,7 +823,8 @@ const BusinessProfile = () => {
         title: 'Error',
         text: 'Failed to update facilities.',
         icon: 'error',
-        confirmButtonColor: '#0BDA51',
+        confirmButtonColor: '#32CD32',
+        cancelButtonColor: '#FF7F7F',
       });
     }
   };
@@ -792,8 +836,8 @@ const BusinessProfile = () => {
       text: 'This will remove the facility.',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#0BDA51',
-      cancelButtonColor: '#D33736',
+      confirmButtonColor: '#32CD32',
+      cancelButtonColor: '#FF7F7F',
       confirmButtonText: 'Yes, remove it!',
     }).then((result) => {
       if (result.isConfirmed) {
@@ -802,7 +846,8 @@ const BusinessProfile = () => {
           title: 'Removed!',
           text: 'The facility has been removed.',
           icon: 'success',
-          confirmButtonColor: '#0BDA51',
+          confirmButtonColor: '#32CD32',
+          cancelButtonColor: '#FF7F7F',
         });
       }
     });
@@ -826,7 +871,8 @@ const BusinessProfile = () => {
           title: 'Success',
           text: 'Policies updated successfully!',
           icon: 'success',
-          confirmButtonColor: '#0BDA51',
+          confirmButtonColor: '#32CD32',
+          cancelButtonColor: '#FF7F7F',
         });
       } else {
         throw new Error(data.message);
@@ -837,7 +883,8 @@ const BusinessProfile = () => {
         title: 'Error',
         text: 'Failed to update policies.',
         icon: 'error',
-        confirmButtonColor: '#0BDA51',
+        confirmButtonColor: '#32CD32',
+        cancelButtonColor: '#FF7F7F',
       });
     }
   };
@@ -867,8 +914,8 @@ const BusinessProfile = () => {
       text: 'Do you want to save the business profile?',
       icon: 'question',
       showCancelButton: true,
-      confirmButtonColor: '#0BDA51',
-      cancelButtonColor: '#D33736',
+      confirmButtonColor: '#32CD32',
+      cancelButtonColor: '#FF7F7F',
       confirmButtonText: 'Yes, save it!',
     }).then((result) => {
       if (result.isConfirmed) {
@@ -878,7 +925,8 @@ const BusinessProfile = () => {
           title: 'Saved!',
           text: 'Your business profile has been saved.',
           icon: 'success',
-          confirmButtonColor: '#0BDA51',
+          confirmButtonColor: '#32CD32',
+          cancelButtonColor: '#FF7F7F',
         });
       }
     });
@@ -1339,35 +1387,52 @@ const BusinessProfile = () => {
 
           <Tab key="facilities" title="Facilities & Amenities">
             <Card>
-              <CardBody className='h-[300px] overflow-x-auto scrollbar-hide'>
+              <CardBody className='max-h-[300px] overflow-y-auto scrollbar-custom'>
                 <h2 className="text-lg lg:text-xl font-semibold mb-4 text-gray-700">Facilities & Amenities</h2>
                 <div className='flex justify-start flex-wrap gap-3'>
-                  {businessData.facilities && Array.isArray(businessData.facilities) && businessData.facilities && businessData.facilities.map((facility, index) => (
-                    <div key={index} className='flex lg:flex-row items-center gap-2 mb-2'>
-                      <Button onClick={() => openIconModal(`facility-${index}`)} className="min-w-[40px] h-[40px] p-0">
-                        {facility.icon ? React.createElement(businessIcons.find(icon => icon.name === facility.icon)?.icon, { size: 20 }) : <FaPlus size={20} />}
-                      </Button>
-                      <Input
-                        type="text"
-                        value={facility.name}
-                        onChange={(e) => dispatch(updateFacility({ index, field: 'name', value: e.target.value }))}
-                        placeholder="Facility name"
-                        className='w-[15rem]'
-                      />
-                      <Button onClick={() => handleRemoveFacility(index)} className="bg-red-500 text-white p-2">
-                        <FaTrash size={16} />
-                      </Button>
+                  {businessData.facilities && Array.isArray(businessData.facilities) && businessData.facilities.map((facility, facilityIndex) => (
+                    <div key={facilityIndex} className='mb-4'>
+                      <div className='flex lg:flex-row items-center gap-2 mb-2'>
+                        <Input
+                          type="text"
+                          value={facility.name}
+                          onChange={(e) => dispatch(updateFacility({ index: facilityIndex, field: 'name', value: e.target.value }))}
+                          placeholder="Facility name"
+                          className='w-[15rem]'
+                        />
+                        <Button onClick={() => handleRemoveFacility(facilityIndex)} className="bg-red-500 text-white p-2">
+                          <FaTrash size={16} />
+                        </Button>
+                      </div>
+                      {facility.items.map((item, itemIndex) => (
+                        <div key={itemIndex} className='flex flex-col lg:flex-row items-center gap-2 mb-2'>
+                          <Button onClick={() => openIconModal(`facility-item-${facilityIndex}-${itemIndex}`)} className="min-w-[40px] h-[40px] p-0">
+                            {item.icon ? React.createElement(businessIcons.find(icon => icon.name === item.icon)?.icon, { size: 20 }) : <FaPlus size={20} />}
+                          </Button>
+                          <Input
+                            type="text"
+                            value={item.name}
+                            onChange={(e) => dispatch(updateFacilityItem({ facilityIndex, itemIndex, field: 'name', value: e.target.value }))}
+                            placeholder="Facility item"
+                            className='flex-grow'
+                          />
+                          <Button onClick={() => dispatch(removeFacilityItem({ facilityIndex, itemIndex }))} className="bg-red-500 text-white p-2">
+                            <FaTrash size={16} />
+                          </Button>
+                        </div>
+                      ))}
+                      <Button onClick={() => dispatch(addFacilityItem({ facilityIndex }))} className="mr-2">Add Item</Button>
                     </div>
                   ))}
                 </div>
               </CardBody>
             </Card>
             <div className='flex gap-2'>
-            <Button onClick={() => dispatch(addFacility())} className="mt-2 bg-color1 text-white hover:bg-color2 transition">Add Facility</Button>
-            <Button onClick={() => handleSaveFacilities()} className="mt-2 bg-color1 text-white hover:bg-color2 transition">
-              Save
-            </Button>
-            </div>
+              <Button onClick={() => dispatch(addFacility())} className="mt-2 bg-color1 text-white hover:bg-color2 transition">Add Facility</Button>
+              <Button onClick={() => handleSaveFacilities()} className="mt-2 bg-color1 text-white hover:bg-color2 transition">
+                Save
+              </Button>
+            </div>   
           </Tab>
 
           <Tab key="policies" title="Policies">
@@ -1397,7 +1462,7 @@ const BusinessProfile = () => {
                         </Button>
                       </div>
                     ))}
-                    <Button onClick={() => dispatch(addPolicyItem({ policyIndex }))} className="mr-2">Add Item</Button>
+                    <Button color='primary' onClick={() => dispatch(addPolicyItem({ policyIndex }))} className="mr-2">Add Item</Button>
                     <Button onClick={() => handleRemovePolicy(policyIndex)} className="bg-red-500 text-white">Remove Policy</Button>
                   </div>
                 ))}
@@ -1406,6 +1471,7 @@ const BusinessProfile = () => {
                   Save
                 </Button>
               </CardBody>
+              
             </Card>
           </Tab>
 

@@ -46,7 +46,7 @@ const businessSlice = createSlice({
       if (!state.facilities) {
         state.facilities = [];
       }
-      state.facilities.push({ icon: null, name: '', description: '' });
+      state.facilities.push({ icon: null, name: '', items: [{ name: '', icon: null }] });
     },
     updateFacility: (state, action) => {
       const { index, field, value } = action.payload || {};
@@ -71,6 +71,35 @@ const businessSlice = createSlice({
         return;
       }
       state.facilities[index].icon = icon;
+    },
+    updateFacilityItem: (state, action) => {
+      const { facilityIndex, itemIndex, field, value } = action.payload || {};
+      if (facilityIndex === undefined || itemIndex === undefined || !field || value === undefined) {
+        console.error('Invalid payload for updateFacilityItem:', action.payload);
+        return;
+      }
+      state.facilities[facilityIndex].items[itemIndex][field] = value;
+    },
+    addFacilityItem: (state, action) => {
+      const { facilityIndex } = action.payload || {};
+      if (facilityIndex === undefined) {
+        console.error('Invalid payload for addFacilityItem:', action.payload);
+        return;
+      }
+      state.facilities[facilityIndex].items.push({ name: '', icon: null });
+    },
+    removeFacilityItem: (state, action) => {
+      const { facilityIndex, itemIndex } = action.payload || {};
+      if (
+        facilityIndex === undefined || 
+        itemIndex === undefined || 
+        !state.facilities[facilityIndex] || 
+        !state.facilities[facilityIndex].items[itemIndex]
+      ) {
+        console.error('Invalid payload or indices for removeFacilityItem:', action.payload);
+        return;
+      }
+      state.facilities[facilityIndex].items.splice(itemIndex, 1);
     },
 
     // Policies-related reducers
@@ -259,6 +288,9 @@ export const {
   addHeroImage,
   updateHeroImageTitle,
   removeHeroImage,
+  addFacilityItem,
+  updateFacilityItem,
+  removeFacilityItem,
 } = businessSlice.actions;
 
 export default businessSlice.reducer;

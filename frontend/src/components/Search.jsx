@@ -149,9 +149,9 @@ const Search = () => {
   };
 
   return (
-    <div className="flex flex-col items-center mt-6 p-6 w-full max-w-4xl mx-auto">
+    <div className="flex flex-col  mt-8 items-center  p-6 w-full max-w-4xl mx-auto ">
       <div>
-        <h1 className='font-semibold text-2xl'>{getTitleForTab(activeTab)}</h1>
+        <h1 className='font-semibold text-2xl mt-9'>{getTitleForTab(activeTab)}</h1>
       </div>
       <div className="w-full mb-6 overflow-x-auto">
         <Tabs
@@ -159,13 +159,13 @@ const Search = () => {
           onSelectionChange={handleTabChange}
           variant="underlined"
           classNames={{
-          base: "w-full overflow-x-auto rounded shadow-md",
-          tabList: "gap-6 flex justify-center w-full p-4  container ",
-          tab: "max-w-fit px-0 h-12 ",
-          tabContent: " text-color1  ",
-          cursor: "w-full bg-color1",
-        
-        }}
+            base: "w-full overflow-x-auto rounded-full",
+            tabList: "gap-6 w-full p-4 flex md:justify-center",
+            tab: "max-w-fit px-0 h-12",
+            tabContent: "text-color1",
+            cursor: "w-full bg-color1",
+          }}
+          defaultValue="all"
         >
           <Tab key="all" title={<span className="flex items-center"><FaSearch className="mr-2" />Search All</span>} />
           <Tab key="activities" title={<span className="flex items-center"><FaHiking className="mr-2" />Activities</span>} />
@@ -176,18 +176,18 @@ const Search = () => {
       </div>
 
       <div className="flex items-center w-full mb-4">
-        <FaSearch className="text-gray-500 mr-2" />
+        <FaSearch className="text-color1 mr-2" />
         <input
           type="text"
           placeholder={`Search for ${activeTab}`}
           value={searchQuery}
           onChange={handleInputChange}
-          className="flex-grow p-2 border-b border-gray-300 focus:outline-none"
+          className="flex-grow p-2 border border-gray-300 focus:outline-none rounded-xl"
         />
         {searchQuery && (
           <FaTimes
             onClick={clearSearchField}
-            className="text-gray-500 cursor-pointer ml-2"
+            className="text-color1 cursor-pointer ml-2"
           />
         )}
       </div>
