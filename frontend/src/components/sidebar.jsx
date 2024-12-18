@@ -8,11 +8,24 @@ import { Button } from '@nextui-org/react';
 import { FaBars, FaTimes, FaCalendar } from 'react-icons/fa';
 import { CgLogOut } from "react-icons/cg";
 import { TbWorld } from "react-icons/tb";
+import CryptoJS from 'crypto-js';
+
+// Function to encrypt the business_id
+const encryptId = (id) => {
+  const secretKey = import.meta.env.VITE_SECRET_KEY;
+  if (!secretKey) {
+    console.error('Secret key is not defined');
+    return null;
+  }
+  const ciphertext = CryptoJS.AES.encrypt(id.toString(), secretKey).toString();
+  return encodeURIComponent(ciphertext);
+};
 
 const Sidebar = () => {
   const [activeNav, setActiveNav] = useState('Dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false); // For mobile toggle
   const location = useLocation();
+  const [businessID, setBusinessID] = useState(null);
 
   const navItems = [
     { icon: <MdDashboard className="text-2xl" />, label: 'Dashboard', path: '/businessdashboardadmin' },
@@ -28,6 +41,26 @@ const Sidebar = () => {
       setActiveNav(currentItem.label);
     }
   }, [location]);
+
+  // Fetching business data from the backend and updating Redux
+  const fetchBusinessData = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/get-businessData', {
+        method: 'GET',
+        credentials: 'include',
+      });
+      const data = await response.json();
+      if (data.success && data.businessData.length > 0) {
+        setBusinessID(data.businessData[0].business_id);
+      }
+    } catch (error) {
+      console.error('Error fetching business data:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchBusinessData(); // Fetch business data on component mount
+  }, []);
 
   return (
     <div className=''>
@@ -78,20 +111,19 @@ const Sidebar = () => {
             </ul>
           </nav>
         </div>
-             {/* Buttons */}
-             <div className="flex flex-col gap-2 mt-9 items-center ">
-             <Link to='/business' target='_blank'>
-          <Button className="bg-color3 text-black font-medium w-full flex items-center justify-center gap-2">
-            <TbWorld /> Go to Business Page
-          </Button>
+        {/* Buttons */}
+        <div className="flex flex-col gap-2 mt-9 items-center ">
+          <Link to={businessID ? `/business/${encryptId(businessID)}` : '#'}>
+            <Button className="bg-color3 text-black font-medium w-full flex items-center justify-center gap-2" disabled={!businessID}>
+              <TbWorld /> Go to Business Page
+            </Button>
           </Link>
           <Link to='/userprofile'>
-          <Button className="bg-red-500 text-white font-medium w-full flex items-center justify-center gap-2">
-            <CgLogOut /> Logout
-          </Button>
+            <Button className="bg-red-500 text-white font-medium w-full flex items-center justify-center gap-2">
+              <CgLogOut /> Logout
+            </Button>
           </Link>
         </div>
-      
       </div>
 
       {/* Overlay for mobile when sidebar is open */}
