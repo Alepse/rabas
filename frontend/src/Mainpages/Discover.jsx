@@ -694,7 +694,7 @@ const Discover = () => {
                     variants={cardVariants}
                   >
                     <img
-                      src={`http://localhost:5000/${item.businessLogo}`}
+                      src={item.cardImage ? `http://localhost:5000/${item.cardImage}` : `http://localhost:5000/${item.businessLogo}`}
                       alt={item.businessName}
                       className="w-full h-48 object-cover rounded-t-lg"
                     />

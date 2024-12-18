@@ -3496,6 +3496,12 @@ app.get('/getAllBusinesses', async (req, res) => {
         NULL, 
         JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.description'))
       ) AS description,
+      IF(
+        JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.cardImage')) IS NULL OR 
+        JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.cardImage')) = '', 
+        NULL, 
+        JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.cardImage'))
+      ) AS cardImage,
       b.aboutUs,
       MIN(CAST(p.price AS DECIMAL)) AS lowest_price,
       MAX(CAST(p.price AS DECIMAL)) AS highest_price,
@@ -3594,7 +3600,7 @@ app.get('/getBusinessesByLocation/:location', async (req, res) => {
       b.business_id, 
       b.businessName AS name, 
       b.businessType, 
-      b.businessLogo AS image, 
+      b.businessLogo AS businessLogo, 
       b.location AS destination, 
       b.contactInfo, 
       b.openingHours, 
@@ -3607,6 +3613,12 @@ app.get('/getBusinessesByLocation/:location', async (req, res) => {
         NULL, 
         JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.description'))
       ) AS description,
+       IF(
+        JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.cardImage')) IS NULL OR 
+        JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.cardImage')) = '', 
+        NULL, 
+        JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.cardImage'))
+      ) AS image,
       b.aboutUs, 
       MIN(CAST(p.price AS DECIMAL)) AS lowest_price,
       MAX(CAST(p.price AS DECIMAL)) AS highest_price,
