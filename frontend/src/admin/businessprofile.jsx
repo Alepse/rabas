@@ -262,7 +262,7 @@ const BusinessProfile = () => {
   // Handle updating the business card
   const handleUpdate = () => {
 
-    if (!cardImage || !description || !location || !priceRange) {
+    if (!cardImage || !description || !location) {
       MySwal.fire({
         title: 'Error',
         text: 'Please fill in all fields for the business card.',
@@ -276,7 +276,6 @@ const BusinessProfile = () => {
     const formData = new FormData();
     formData.append('description', description);
     formData.append('location', location);
-    formData.append('priceRange', priceRange);
 
     // Make an API call to update the business details
     fetch(`http://localhost:5000/updateBusinessDetails/${businessData.business_id}`, {
@@ -287,7 +286,6 @@ const BusinessProfile = () => {
       body: JSON.stringify({
         description,
         location,
-        priceRange,
       }),
     })
       .then(response => response.json())
@@ -295,7 +293,7 @@ const BusinessProfile = () => {
         if (data.success) {
           // Assuming there's a function to fetch and update the business data in state
           fetchBusinessData(); // Update local state with new business details
-          dispatch(updateBusinessCard({ description, location, priceRange })); // Update Redux state with the new details
+          dispatch(updateBusinessCard({ description, location })); // Update Redux state with the new details
 
           MySwal.fire({
             title: 'Success',
@@ -946,7 +944,10 @@ const BusinessProfile = () => {
   useEffect(() => {
     if (!tempOpeningHours || tempOpeningHours.length === 0) {
       setTempOpeningHours(
-        (businessData.openingHours && businessData.openingHours.length > 0 ? businessData.openingHours : defaultOpeningHours).map(hours => ({
+        (Array.isArray(businessData.openingHours) && businessData.openingHours.length > 0 
+          ? businessData.openingHours 
+          : defaultOpeningHours
+        ).map(hours => ({
           day: hours.day,
           open: hours.open || "08:00", // Default open time
           close: hours.close || "17:00" // Default close time
@@ -1101,16 +1102,6 @@ const BusinessProfile = () => {
                         className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-color1"
                       />
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Budget Range</label>
-                      <input
-                        type="text"
-                        value={priceRange || ''}
-                        onChange={(e) => setPriceRange(e.target.value)}
-                        placeholder="Enter budget range"
-                        className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-color1"
-                      />
-                    </div>
                     <button
                       onClick={handleUpdate}
                       className="mt-4 w-full bg-color1 text-white p-2 rounded-md hover:bg-color2 transition"
@@ -1136,7 +1127,6 @@ const BusinessProfile = () => {
                     <p><strong>Business Name:</strong> {businessData.businessName}</p>
                     <p><strong>Description:</strong> {description}</p>
                     <p><strong>Location:</strong> {location}</p>
-                    <p><strong>Price Range:</strong> {priceRange}</p>
                   </div>
                 </div>
               </CardBody>
@@ -1404,7 +1394,7 @@ const BusinessProfile = () => {
                           <FaTrash size={16} />
                         </Button>
                       </div>
-                      {facility.items.map((item, itemIndex) => (
+                      {facility.items && Array.isArray(facility.items) && facility.items.map((item, itemIndex) => (
                         <div key={itemIndex} className='flex flex-col lg:flex-row items-center gap-2 mb-2'>
                           <Button onClick={() => openIconModal(`facility-item-${facilityIndex}-${itemIndex}`)} className="min-w-[40px] h-[40px] p-0">
                             {item.icon ? React.createElement(businessIcons.find(icon => icon.name === item.icon)?.icon, { size: 20 }) : <FaPlus size={20} />}

@@ -1326,9 +1326,9 @@ app.put('/updateBusinessCardImage/:id', upload.single('businessCardImage'), asyn
 // Endpoint for updating business details
 app.put('/updateBusinessDetails/:id', async (req, res) => {
   const businessId = req.params.id;
-  const { description, location, priceRange } = req.body;
+  const { description, location } = req.body;
 
-  if (!description || !location || !priceRange) {
+  if (!description || !location) {
     return res.status(400).json({ success: false, message: 'All fields are required' });
   }
 
@@ -1349,7 +1349,6 @@ app.put('/updateBusinessDetails/:id', async (req, res) => {
     // Update the businessCard object with the new details
     businessCard.description = description;
     businessCard.location = location;
-    businessCard.priceRange = priceRange;
 
     // Update the database with the modified businessCard JSON
     await pool.query(
@@ -1360,7 +1359,7 @@ app.put('/updateBusinessDetails/:id', async (req, res) => {
     return res.json({
       success: true,
       message: 'Business details updated successfully',
-      updatedDetails: { description, location, priceRange },
+      updatedDetails: { description, location },
     });
   } catch (err) {
     console.error('Database query error:', err);
