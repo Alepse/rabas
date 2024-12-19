@@ -3706,6 +3706,7 @@ app.get('/getBusinessesByBusinessType/:businessType', async (req, res) => {
       b.facilities, 
       b.policies, 
       b.pin_location,
+      b.dateOrigin,
       IF(
         JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.description')) IS NULL OR 
         JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.description')) = '', 
@@ -3745,6 +3746,7 @@ app.get('/getBusinessesByBusinessType/:businessType', async (req, res) => {
     GROUP BY b.business_id, b.businessName, b.businessType, b.businessLogo, 
       b.location, b.contactInfo, b.openingHours, b.facilities, 
       b.policies, b.aboutUs
+    ORDER BY b.dateOrigin DESC;
   `;
 
   try {

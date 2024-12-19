@@ -143,7 +143,7 @@ const ActivitiesTab = () => {
       <div className="p-4 md:p-6">
         <div className='flex flex-col md:flex-row justify-between items-center'>
           <h1 className='text-xl md:text-2xl font-bold mb-4 md:mb-6 text-center lg:text-start text-white'>
-            Top Activity Offers
+            Upgrade Your Weekend: Explore Our Newest Activities!
           </h1>
         </div>
         <Swiper
