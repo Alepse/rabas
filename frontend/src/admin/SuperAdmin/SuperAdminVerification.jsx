@@ -460,10 +460,10 @@ const SuperAdminVerification = () => {
   };
 
   // Derived counts
-  const appliedAttractions = verificationData.filter(item => item.businessType === ('attractions' || 'activity')).length;
-  const appliedAccommodations = verificationData.filter(item => item.businessType === 'accommodations').length;
+  const appliedAttractions = verificationData.filter(item => item.businessType === ('attraction' || 'activity')).length;
+  const appliedAccommodations = verificationData.filter(item => item.businessType === 'accommodation').length;
   const appliedFoods = verificationData.filter(item => item.businessType === 'food').length;
-  const appliedShops = verificationData.filter(item => item.businessType === 'shops').length;
+  const appliedShops = verificationData.filter(item => item.businessType === 'shop').length;
   const totalPending = verificationData.filter(item => item.status === 0).length;
 
   // Filter function
