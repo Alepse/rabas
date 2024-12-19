@@ -3196,7 +3196,7 @@ app.put('/updateStatus-businessApplications/:id', async (req, res) => {
   }
 
   try {
-    // Start with updating the status
+    // Update the status
     const [updateResults] = await pool.query(
       'UPDATE business_applications SET status = ? WHERE application_id = ?',
       [status, id]
@@ -3206,19 +3206,49 @@ app.put('/updateStatus-businessApplications/:id', async (req, res) => {
       return res.status(404).json({ success: false, message: 'Business application not found' });
     }
 
-    // If status is 1 (Approved), copy data to businesses table
-    if (status === 1) {
-      const [applicationResults] = await pool.query(
-        'SELECT * FROM business_applications WHERE application_id = ?',
-        [id]
-      );
+    // Fetch updated application data with email using LEFT JOIN
+    const [applicationResults] = await pool.query(
+      `
+      SELECT 
+        ba.*, 
+        u.email AS email 
+      FROM 
+        business_applications AS ba 
+      LEFT JOIN 
+        users AS u 
+      ON 
+        ba.user_id = u.user_id 
+      WHERE 
+        ba.application_id = ?
+      `,
+      [id]
+    );
 
-      if (applicationResults.length === 0) {
-        return res.status(404).json({ success: false, message: 'Business application not found' });
+    if (applicationResults.length === 0) {
+      return res.status(404).json({ success: false, message: 'Business application not found' });
+    }
+
+    const applicationData = applicationResults[0]; // Extract application data
+
+    // Configure email transporter
+    const transporter = nodemailer.createTransport({
+      service: 'Gmail',
+      auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_PASS
       }
+    });
 
-      // Extract data from business application
-      const applicationData = applicationResults[0];
+    if (status === 1) { // Approval logic
+      // Send approval email
+      await transporter.sendMail({
+        from: process.env.GMAIL_USER,
+        to: applicationData.email,
+        subject: 'Business Application Approved',
+        text: `Dear ${applicationData.businessName},\n\nYour business application has been approved! Welcome aboard.\n\nBest regards,\nRabaSorsogon`
+      });
+
+      // Prepare data for insertion
       const {
         user_id,
         application_id,
@@ -3231,7 +3261,6 @@ app.put('/updateStatus-businessApplications/:id', async (req, res) => {
         pin_location,
       } = applicationData;
 
-      // Prepare to insert into businesses table
       const insertQuery = `
         INSERT INTO businesses 
         (user_id, application_id, businessName, certNumber, businessType, category, location, completeAddress, pin_location, businessLogo, businessCard, heroImages, aboutUs, facilities, policies, contactInfo, openingHours) 
@@ -3263,7 +3292,15 @@ app.put('/updateStatus-businessApplications/:id', async (req, res) => {
         success: true,
         message: 'Business application approved and data copied to businesses table successfully',
       });
-    } else {
+    } else { // Decline logic
+      // Send decline email
+      await transporter.sendMail({
+        from: process.env.GMAIL_USER,
+        to: applicationData.email,
+        subject: 'Business Application Declined',
+        text: `Dear ${applicationData.businessName},\n\nWe regret to inform you that your business application has been declined. Please contact us for more information.\n\nBest regards,\nRabaSorsogon`
+      });
+
       return res.json({
         success: true,
         message: 'Business application status updated successfully',
@@ -3479,7 +3516,7 @@ app.get('/getAllBusinesses', async (req, res) => {
       b.business_id,
       b.user_id,
       b.businessName,
-      b.businessType,
+      b.businessType,businessApplications
       b.category,
       b.businessLogo,
       b.location AS destination,
