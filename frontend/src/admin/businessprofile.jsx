@@ -1245,10 +1245,7 @@ const BusinessProfile = () => {
 
                 <h3 className="text-md lg:text-lg font-semibold mt-4 mb-2 flex items-center justify-between">
                   <span>Contact Information</span>
-                  <AiOutlineCheck
-                    onClick={handleSaveContact}
-                    className="cursor-pointer text-green-600 mr-2 text-2xl"
-                  />
+                 
                 </h3>
                 {businessData.contactInfo && Array.isArray(businessData.contactInfo) && businessData.contactInfo.map((info) => (
                   <div key={info.id} className='flex flex-col lg:flex-row items-center gap-2 mb-2'>
@@ -1278,6 +1275,10 @@ const BusinessProfile = () => {
                 <Button onClick={() => dispatch(addContactInfo())} className="mt-2 bg-color1 text-white hover:bg-color2 transition">
                   Add Contact Info
                 </Button>
+                <Button className="mt-2 bg-color1 text-white hover:bg-color2 transition" onClick={handleSaveContact}>
+                    Save
+                  </Button>
+
 
                 <h3 className="text-md lg:text-lg font-semibold mt-4 mb-2 flex items-center justify-between">
                   <span>Opening Hours</span>
@@ -1411,7 +1412,7 @@ const BusinessProfile = () => {
                           </Button>
                         </div>
                       ))}
-                      <Button onClick={() => dispatch(addFacilityItem({ facilityIndex }))} className="mr-2">Add Item</Button>
+                      <Button color='primary' onClick={() => dispatch(addFacilityItem({ facilityIndex }))} className="mr-2">Add Item</Button>
                     </div>
                   ))}
                 </div>

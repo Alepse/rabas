@@ -113,7 +113,7 @@ const Sidebar = () => {
         </div>
         {/* Buttons */}
         <div className="flex flex-col gap-2 mt-9 items-center ">
-          <Link to={businessID ? `/business/${encryptId(businessID)}` : '#'}>
+          <Link to={businessID ? `/business/${encryptId(businessID)}` : '#'} target='_blank'>
             <Button className="bg-color3 text-black font-medium w-full flex items-center justify-center gap-2" disabled={!businessID}>
               <TbWorld /> Go to Business Page
             </Button>
