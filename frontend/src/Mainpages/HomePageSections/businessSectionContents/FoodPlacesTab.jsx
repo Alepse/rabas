@@ -61,7 +61,7 @@ const FoodPlacesTab = () => {
   return (
     <div className='lg:container'>
       <FoodPlaceSwiper title="Culinary Delights: Must-Try Food Spots" link="/foodplaces" foodPlaces={culinaryDelights} />
-      <FoodPlaceSwiper title="Taste-Tested: Liked Eateries" link="/foodplaces" foodPlaces={tasteTested} />
+      <FoodPlaceSwiper title="Taste-Tested: Most Liked Eateries" link="/foodplaces" foodPlaces={tasteTested} />
       <FoodPlaceSwiper title="Savor the Savings: Top Food Offers" isLast foodPlaces={foodPlaces} />
     </div>
   );

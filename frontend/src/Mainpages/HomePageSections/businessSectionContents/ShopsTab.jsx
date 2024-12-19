@@ -61,7 +61,7 @@ const ShopsTab = () => {
   return (
     <div className='lg:container'>
       <ShopSwiper title="Must-Visit: Recommended Stores" link="/shops" shops={mustVisit} />
-      <ShopSwiper title="Shopper's Picks: Liked Shops" link="/shops" shops={shoppersPicks} />
+      <ShopSwiper title="Shopper's Picks: Most Liked Shops" link="/shops" shops={shoppersPicks} />
       <ShopSwiper title="Retail Therapy: Top Shopping Offers" isLast shops={shops} />
     </div>
   );
