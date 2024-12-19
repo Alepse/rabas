@@ -46,7 +46,7 @@ const businessSlice = createSlice({
       if (!state.facilities) {
         state.facilities = [];
       }
-      state.facilities.push({ icon: null, name: '', items: [{ name: '', icon: null }] });
+      state.facilities.push({ id: Date.now(), icon: null, name: '', items: [{ name: '', icon: null }] });
     },
     updateFacility: (state, action) => {
       const { index, field, value } = action.payload || {};
@@ -79,6 +79,14 @@ const businessSlice = createSlice({
         return;
       }
       state.facilities[facilityIndex].items[itemIndex][field] = value;
+    },
+    updateFacilityItemIcon: (state, action) => {
+      const { facilityIndex, itemIndex, icon } = action.payload || {};
+      if (facilityIndex === undefined || itemIndex === undefined || !icon) {
+        console.error('Invalid payload for updateFacilityItemIcon:', action.payload);
+        return;
+      }
+      state.facilities[facilityIndex].items[itemIndex].icon = icon;
     },
     addFacilityItem: (state, action) => {
       const { facilityIndex } = action.payload || {};
@@ -291,6 +299,7 @@ export const {
   addFacilityItem,
   updateFacilityItem,
   removeFacilityItem,
+  updateFacilityItemIcon,
 } = businessSlice.actions;
 
 export default businessSlice.reducer;

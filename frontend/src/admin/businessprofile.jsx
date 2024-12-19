@@ -14,6 +14,7 @@ import {
   updateFacility,
   removeFacility,
   updateFacilityIcon,
+  updateFacilityItemIcon,
   addPolicy,
   updatePolicy,
   removePolicy,
@@ -898,9 +899,10 @@ const BusinessProfile = () => {
     if (currentEditingField.startsWith('contact-')) {
       const id = parseInt(currentEditingField.split('-')[1]);
       dispatch(updateContactIcon({ id, icon: iconName }));
-    } else if (currentEditingField.startsWith('facility-')) {
-      const index = parseInt(currentEditingField.split('-')[1]);
-      dispatch(updateFacilityIcon({ index, icon: iconName }));
+    } else if (currentEditingField.startsWith('facilityItem-')) {
+      const [facilityIndex, itemIndex] = currentEditingField.split('-').slice(1).map(Number); // Updated to parse both indices
+      console.log(currentEditingField);
+      dispatch(updateFacilityItemIcon({ facilityIndex, itemIndex, icon: iconName })); // Pass both indices
     }
     setIsIconModalOpen(false);
   };
@@ -1397,7 +1399,7 @@ const BusinessProfile = () => {
                       </div>
                       {facility.items && Array.isArray(facility.items) && facility.items.map((item, itemIndex) => (
                         <div key={itemIndex} className='flex flex-col lg:flex-row items-center gap-2 mb-2'>
-                          <Button onClick={() => openIconModal(`facility-item-${facilityIndex}-${itemIndex}`)} className="min-w-[40px] h-[40px] p-0">
+                          <Button onClick={() => openIconModal(`facilityItem-${facilityIndex}-${itemIndex}`)} className="min-w-[40px] h-[40px] p-0">
                             {item.icon ? React.createElement(businessIcons.find(icon => icon.name === item.icon)?.icon, { size: 20 }) : <FaPlus size={20} />}
                           </Button>
                           <Input
