@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -7,39 +7,57 @@ import { Link } from 'react-router-dom';
 import { Button } from '@nextui-org/react';
 import { GiPositionMarker } from 'react-icons/gi';
 import img from '@/assets/shop.webp';
+import { AiOutlineLike } from "react-icons/ai";
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 
-const accommodationDetails = [
-  {
-    image: img,
-    tags: ['Luxury', 'Comfort'],
-    rating: 5,
-    name: 'Luxury Resort',
-    destination: 'Sorsogon',
-    budget: 5000,
-    discount: 15,
-  },
-  {
-    image: img,
-    tags: ['Budget', 'Convenience'],
-    rating: 4,
-    name: 'Budget Inn',
-    destination: 'Sorsogon',
-    budget: 1500,
-    discount: 0,
-  },
-  {
-    image: img,
-    tags: ['Family', 'Spacious'],
-    rating: 4,
-    name: 'Family Suite',
-    destination: 'Sorsogon',
-    budget: 3000,
-    discount: 10,
-  },
-];
+const formatNumber = (num) => {
+  if (num >= 1_000_000) {
+    return (num / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'm';
+  }
+  if (num >= 1_000) {
+    return (num / 1_000).toFixed(1).replace(/\.0$/, '') + 'k';
+  }
+  return num;
+};
 
-const AccommodationSwiper = ({ title, link, isLast }) => (
+const AccommodationsTab = () => {
+  const [accommodations, setAccommodations] = useState([]);
+
+  useEffect(() => {
+    const fetchAccommodations = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/getBusinessesByBusinessType/accommodation');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log('Fetched data:', data);
+        setAccommodations(data);
+      } catch (error) {
+        console.error('Error fetching accommodations:', error);
+      }
+    };
+
+    fetchAccommodations();
+  }, []);
+
+  // Sort accommodations for "Design Meets Comfort" by ratings (descending)
+  const designMeetsComfort = [...accommodations].sort((a, b) => b.rating - a.rating);
+
+  // Sort accommodations for "Traveler's Choice" by number of likes (descending)
+  const travelersChoice = [...accommodations].sort((a, b) => b.likes - a.likes);
+
+  return (
+    <div className='lg:container'>
+      <AccommodationSwiper title="Design Meets Comfort: Accommodation Recommendations" link="/accommodations" accommodations={designMeetsComfort} />
+      <AccommodationSwiper title="Traveler's Choice: Most Liked Stays" link="/accommodations" accommodations={travelersChoice} />
+      <AccommodationSwiper title="Top Accommodation Offers" isLast accommodations={accommodations} />
+    </div>
+  );
+};
+
+const AccommodationSwiper = ({ title, link, isLast, accommodations }) => (
+
   <div className="p-4 md:p-6">
     <div className='flex flex-col md:flex-row justify-between items-center'>
       <h1 className={`text-xl md:text-2xl font-bold mb-4 md:mb-6 text-center lg:text-start ${isLast ? 'text-light' : ''}`}>
@@ -67,7 +85,7 @@ const AccommodationSwiper = ({ title, link, isLast }) => (
       }}
       className='max-w-full p-4 md:p-6'
     >
-      {accommodationDetails.map((accommodation, index) => (
+      {accommodations.map((accommodation, index) => (
         <SwiperSlide key={index} className='flex justify-center'>
           <div className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between max-w-xs md:max-w-lg lg:max-w-sm mx-auto h-[400px] p-2 relative"
                style={{ width: '300px', height: '400px' }}>
@@ -76,23 +94,44 @@ const AccommodationSwiper = ({ title, link, isLast }) => (
                 {accommodation.discount}% OFF
               </div>
             )}
-            <img
-              src={accommodation.image || 'path/to/placeholder.jpg'}
-              alt={accommodation.name}
-              className="w-full h-56 md:h-64 object-cover rounded-t-lg"
-            />
+            {accommodation.image ? (
+              <img
+                src={`http://localhost:5000/${accommodation.image}`}
+                alt={accommodation.name}
+                className="w-full h-56 md:h-64 object-cover rounded-t-lg"
+              />
+            ) : (
+              <div className="w-full h-56 md:h-64 flex items-center justify-center bg-gray-200 rounded-t-lg">
+                <span>No Image</span>
+              </div>
+            )}
             <div className="flex-grow flex flex-col justify-between mt-4">
               <div>
                 <div className="flex justify-between items-center mb-3">
                   <div className="flex items-center gap-1">
-                    <span className="text-[12px]">{accommodation.rating}</span>
-                    <span className="text-yellow-500">
-                      {'★'.repeat(accommodation.rating)}
-                      {'☆'.repeat(5 - accommodation.rating)}
-                    </span>
+                    {accommodation.rating ? (
+                      <>
+                        <span className="text-[12px]">{parseFloat(accommodation.rating).toFixed(1)}</span>
+                        <span className="text-yellow-500">
+                          {'★'.repeat(accommodation.rating)}
+                          {'☆'.repeat(5 - accommodation.rating)}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="ml-1 text-sm">No ratings</span>
+                    )}
                   </div>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-800 truncate mb-2">{accommodation.name}</h3>
+                <div className="flex items-center gap-2 mb-2">
+                  <h3 className="text-lg font-semibold text-gray-800 truncate">
+                    {accommodation.name}
+                  </h3>
+                  {accommodation.likes > 0 && (
+                    <span className="text-xs text-gray-500 flex items-center gap-1">
+                      <AiOutlineLike /> {formatNumber(accommodation.likes)}
+                    </span>
+                  )}
+                </div>
                 <div className="text-xs text-gray-500 mb-4 flex items-center">
                   <GiPositionMarker className="mr-1" />
                   {accommodation.destination}
@@ -100,15 +139,21 @@ const AccommodationSwiper = ({ title, link, isLast }) => (
               </div>
               <div className="mt-auto">
                 <p className="text-md font-semibold text-black mb-4">
-                  {accommodation.discount ? (
+                  {accommodation.lowest_price === null && accommodation.highest_price === null ? (
+                    <span className="text-gray-500">Not Available</span>
+                  ) : accommodation.discount ? (
                     <>
-                      <span className="line-through text-gray-500">₱{accommodation.budget}</span>
+                      <span className="line-through text-gray-500">
+                        ₱{accommodation.lowest_price} - ₱{accommodation.highest_price}
+                      </span>
                       <span className="text-red-500 text-xl font-bold ml-2">
-                        ₱{accommodation.budget - (accommodation.budget * accommodation.discount) / 100}
+                        ₱{accommodation.lowest_price - (accommodation.highest_price * accommodation.discount) / 100}
                       </span>
                     </>
                   ) : (
-                    `₱${accommodation.budget}`
+                    <>
+                      <span>₱{accommodation.lowest_price} - ₱{accommodation.highest_price}</span>
+                    </>
                   )}
                 </p>
                 <Link to="/business" target="_blank">
@@ -128,14 +173,6 @@ const AccommodationSwiper = ({ title, link, isLast }) => (
           <FaArrowRight />
         </div>
     </Swiper>
-  </div>
-);
-
-const AccommodationsTab = () => (
-  <div className='lg:container'>
-    <AccommodationSwiper title="Design Meets Comfort: Accommodation Recommendations" link="/accommodations" />
-    <AccommodationSwiper title="Traveler's Choice: Liked Stays" link="/accommodations" />
-    <AccommodationSwiper title="Top Accommodation Offers" isLast />
   </div>
 );
 

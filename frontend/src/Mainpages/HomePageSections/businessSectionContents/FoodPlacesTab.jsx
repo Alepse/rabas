@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -6,40 +6,56 @@ import { Navigation } from 'swiper/modules';
 import { Link } from 'react-router-dom';
 import { Button } from '@nextui-org/react';
 import { GiPositionMarker } from 'react-icons/gi';
+import { AiOutlineLike } from 'react-icons/ai';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
-import img from '@/assets/shop.webp';
 
-const foodPlaceDetails = [
-  {
-    image: img,
-    tags: ['Local', 'Authentic'],
-    rating: 5,
-    name: 'Local Diner',
-    destination: 'Sorsogon',
-    budget: 500,
-    discount: 0,
-  },
-  {
-    image: img,
-    tags: ['Fine Dining', 'Gourmet'],
-    rating: 4,
-    name: 'Gourmet Restaurant',
-    destination: 'Sorsogon',
-    budget: 2000,
-    discount: 10,
-  },
-  {
-    image: img,
-    tags: ['Casual', 'Family'],
-    rating: 4,
-    name: 'Family Eatery',
-    destination: 'Sorsogon',
-    budget: 800,
-    discount: 5,
-  },
-];
+const formatNumber = (num) => {
+  if (num >= 1_000_000) {
+    return (num / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'm';
+  }
+  if (num >= 1_000) {
+    return (num / 1_000).toFixed(1).replace(/\.0$/, '') + 'k';
+  }
+  return num;
+};
 
-const FoodPlaceSwiper = ({ title, link, isLast }) => (
+const FoodPlacesTab = () => {
+  const [foodPlaces, setFoodPlaces] = useState([]);
+
+  useEffect(() => {
+    const fetchFoodPlaces = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/getBusinessesByBusinessType/restaurant');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log('Fetched data:', data);
+        setFoodPlaces(data);
+      } catch (error) {
+        console.error('Error fetching food places:', error);
+      }
+    };
+
+    fetchFoodPlaces();
+  }, []);
+
+  // Sort food places for "Culinary Delights" by ratings (descending)
+  const culinaryDelights = [...foodPlaces].sort((a, b) => b.rating - a.rating);
+
+  // Sort food places for "Taste-Tested" by number of likes (descending)
+  const tasteTested = [...foodPlaces].sort((a, b) => b.likes - a.likes);
+
+  return (
+    <div className='lg:container'>
+      <FoodPlaceSwiper title="Culinary Delights: Must-Try Food Spots" link="/foodplaces" foodPlaces={culinaryDelights} />
+      <FoodPlaceSwiper title="Taste-Tested: Liked Eateries" link="/foodplaces" foodPlaces={tasteTested} />
+      <FoodPlaceSwiper title="Savor the Savings: Top Food Offers" isLast foodPlaces={foodPlaces} />
+    </div>
+  );
+};
+
+const FoodPlaceSwiper = ({ title, link, isLast, foodPlaces }) => (
   <div className="p-4 md:p-6">
     <div className='flex flex-col md:flex-row justify-between items-center'>
       <h1 className={`text-xl md:text-2xl font-bold mb-4 md:mb-6 text-center lg:text-start ${isLast ? 'text-light' : ''}`}>
@@ -67,7 +83,7 @@ const FoodPlaceSwiper = ({ title, link, isLast }) => (
       }}
       className='max-w-full p-4 md:p-6'
     >
-      {foodPlaceDetails.map((foodPlace, index) => (
+      {foodPlaces.map((foodPlace, index) => (
         <SwiperSlide key={index} className='flex justify-center'>
           <div className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between max-w-xs md:max-w-lg lg:max-w-sm mx-auto h-[400px] p-2 relative"
                style={{ width: '300px', height: '400px' }}>
@@ -76,23 +92,44 @@ const FoodPlaceSwiper = ({ title, link, isLast }) => (
                 {foodPlace.discount}% OFF
               </div>
             )}
-            <img
-              src={foodPlace.image || 'path/to/placeholder.jpg'}
-              alt={foodPlace.name}
-              className="w-full h-56 md:h-64 object-cover rounded-t-lg"
-            />
+            {foodPlace.image ? (
+              <img
+                src={`http://localhost:5000/${foodPlace.image}`}
+                alt={foodPlace.name}
+                className="w-full h-56 md:h-64 object-cover rounded-t-lg"
+              />
+            ) : (
+              <div className="w-full h-56 md:h-64 flex items-center justify-center bg-gray-200 rounded-t-lg">
+                <span>No Image</span>
+              </div>
+            )}
             <div className="flex-grow flex flex-col justify-between mt-4">
               <div>
                 <div className="flex justify-between items-center mb-3">
                   <div className="flex items-center gap-1">
-                    <span className="text-[12px]">{foodPlace.rating}</span>
-                    <span className="text-yellow-500">
-                      {'★'.repeat(foodPlace.rating)}
-                      {'☆'.repeat(5 - foodPlace.rating)}
-                    </span>
+                    {foodPlace.rating ? (
+                      <>
+                        <span className="text-[12px]">{parseFloat(foodPlace.rating).toFixed(1)}</span>
+                        <span className="text-yellow-500">
+                          {'★'.repeat(foodPlace.rating)}
+                          {'☆'.repeat(5 - foodPlace.rating)}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="ml-1 text-sm">No ratings</span>
+                    )}
                   </div>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-800 truncate mb-2">{foodPlace.name}</h3>
+                <div className="flex items-center gap-2 mb-2">
+                  <h3 className="text-lg font-semibold text-gray-800 truncate">
+                    {foodPlace.name}
+                  </h3>
+                  {foodPlace.likes > 0 && (
+                    <span className="text-xs text-gray-500 flex items-center gap-1">
+                      <AiOutlineLike /> {formatNumber(foodPlace.likes)}
+                    </span>
+                  )}
+                </div>
                 <div className="text-xs text-gray-500 mb-4 flex items-center">
                   <GiPositionMarker className="mr-1" />
                   {foodPlace.destination}
@@ -100,15 +137,21 @@ const FoodPlaceSwiper = ({ title, link, isLast }) => (
               </div>
               <div className="mt-auto">
                 <p className="text-md font-semibold text-black mb-4">
-                  {foodPlace.discount ? (
+                  {foodPlace.lowest_price === null && foodPlace.highest_price === null ? (
+                    <span className="text-gray-500">Not Available</span>
+                  ) : foodPlace.discount ? (
                     <>
-                      <span className="line-through text-gray-500">₱{foodPlace.budget}</span>
+                      <span className="line-through text-gray-500">
+                        ₱{foodPlace.lowest_price} - ₱{foodPlace.highest_price}
+                      </span>
                       <span className="text-red-500 text-xl font-bold ml-2">
-                        ₱{foodPlace.budget - (foodPlace.budget * foodPlace.discount) / 100}
+                        ₱{foodPlace.lowest_price - (foodPlace.highest_price * foodPlace.discount) / 100}
                       </span>
                     </>
                   ) : (
-                    `₱${foodPlace.budget}`
+                    <>
+                      <span>₱{foodPlace.lowest_price} - ₱{foodPlace.highest_price}</span>
+                    </>
                   )}
                 </p>
                 <Link to="/business" target="_blank">
@@ -122,20 +165,12 @@ const FoodPlaceSwiper = ({ title, link, isLast }) => (
         </SwiperSlide>
       ))}
       <div className="custom-prev absolute left-2 top-[25%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300">
-          <FaArrowLeft />
-        </div>
-        <div className="custom-next absolute right-2 top-[25%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300">
-          <FaArrowRight />
-        </div>
+        <FaArrowLeft />
+      </div>
+      <div className="custom-next absolute right-2 top-[25%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300">
+        <FaArrowRight />
+      </div>
     </Swiper>
-  </div>
-);
-
-const FoodPlacesTab = () => (
-  <div className='lg:container'>
-    <FoodPlaceSwiper title="Culinary Delights: Must-Try Food Spots" link="/foodplaces" />
-    <FoodPlaceSwiper title="Taste-Tested: Liked Eateries" link="/foodplaces" />
-    <FoodPlaceSwiper title="Savor the Savings: Top Food Offers" isLast />
   </div>
 );
 

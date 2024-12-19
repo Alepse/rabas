@@ -3689,6 +3689,73 @@ app.get('/getBusinessesByLocation/:location', async (req, res) => {
   }
 });
 
+// Endpoint to fetch businesses based on business location
+app.get('/getBusinessesByBusinessType/:businessType', async (req, res) => {
+  // Normalize the input by removing spaces and converting to lowercase
+  const businessType = req.params.businessType.replace(/\s+/g, '').toLowerCase();
+
+  const sql = `
+    SELECT 
+      b.business_id, 
+      b.businessName AS name, 
+      b.businessType, 
+      b.businessLogo AS businessLogo, 
+      b.location AS destination, 
+      b.contactInfo, 
+      b.openingHours, 
+      b.facilities, 
+      b.policies, 
+      b.pin_location,
+      IF(
+        JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.description')) IS NULL OR 
+        JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.description')) = '', 
+        NULL, 
+        JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.description'))
+      ) AS description,
+      IF(
+        JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.cardImage')) IS NULL OR 
+        JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.cardImage')) = '', 
+        NULL, 
+        JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.cardImage'))
+      ) AS image,
+      IF(
+        JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.location')) IS NULL OR 
+        JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.location')) = '', 
+        NULL, 
+        JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.location'))
+      ) AS completeAddress,
+      b.aboutUs, 
+      MIN(CAST(p.price AS DECIMAL)) AS lowest_price,
+      MAX(CAST(p.price AS DECIMAL)) AS highest_price,
+      (
+        SELECT COUNT(*) 
+        FROM liked_pages l 
+        WHERE l.business_id = b.business_id
+      ) AS likes,
+      AVG(r.ratings) AS rating,
+      (
+        SELECT COUNT(*) 
+        FROM business_ratings br 
+        WHERE br.business_id = b.business_id
+      ) AS rateCount
+    FROM businesses b
+    LEFT JOIN products p ON b.business_id = p.business_id
+    LEFT JOIN business_ratings r ON b.business_id = r.business_id
+    WHERE REPLACE(LOWER(b.businessType), ' ', '') = ?
+    GROUP BY b.business_id, b.businessName, b.businessType, b.businessLogo, 
+      b.location, b.contactInfo, b.openingHours, b.facilities, 
+      b.policies, b.aboutUs
+  `;
+
+  try {
+    const [results] = await pool.query(sql, [businessType]);
+    res.json(results);
+  } catch (err) {
+    console.error('Error fetching businesses by businessType:', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
 // Endpoint for reviews and ratings
 app.get('/getAllReviewsAndRatings', async (req, res) => {
   const sql = `
