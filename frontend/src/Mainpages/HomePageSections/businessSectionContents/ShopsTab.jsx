@@ -134,7 +134,16 @@ const ShopSwiper = ({ title, link, isLast, shops }) => (
                     )}
                   </div>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-800 truncate mb-2">{shop.name}</h3>
+                <div className="flex items-center gap-2 mb-2">
+                  <h3 className="text-lg font-semibold text-gray-800 truncate">
+                    {shop.name}
+                  </h3>
+                  {shop.likes > 0 && (
+                    <span className="text-xs text-gray-500 flex items-center gap-1">
+                      <AiOutlineLike /> {formatNumber(shop.likes)}
+                    </span>
+                  )}
+                </div>
                 <div className="text-xs text-gray-500 mb-4 flex items-center">
                   <GiPositionMarker className="mr-1" />
                   {shop.destination}
