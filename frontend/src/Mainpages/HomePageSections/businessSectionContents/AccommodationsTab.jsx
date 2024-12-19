@@ -69,7 +69,6 @@ const AccommodationsTab = () => {
 };
 
 const AccommodationSwiper = ({ title, link, isLast, accommodations }) => (
-
   <div className="p-4 md:p-6">
     <div className='flex flex-col md:flex-row justify-between items-center'>
       <h1 className={`text-xl md:text-2xl font-bold mb-4 md:mb-6 text-center lg:text-start ${isLast ? 'text-light' : ''}`}>
@@ -99,25 +98,27 @@ const AccommodationSwiper = ({ title, link, isLast, accommodations }) => (
     >
       {accommodations.map((accommodation, index) => (
         <SwiperSlide key={index} className='flex justify-center'>
-          <div className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between max-w-xs md:max-w-lg lg:max-w-sm mx-auto h-[400px] p-2 relative"
-               style={{ width: '300px', height: '400px' }}>
+          <div className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between mx-auto h-full p-2 relative"
+               style={{ width: '100%', maxWidth: '300px', height: '400px' }}>
             {accommodation.discount > 0 && (
               <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold py-1 px-2 rounded">
                 {accommodation.discount}% OFF
               </div>
             )}
-            {accommodation.image ? (
-              <img
-                src={`http://localhost:5000/${accommodation.image}`}
-                alt={accommodation.name}
-                className="w-full h-56 md:h-64 object-cover rounded-t-lg"
-              />
-            ) : (
-              <div className="w-full h-56 md:h-64 flex items-center justify-center bg-gray-200 rounded-t-lg">
-                <span>No Image</span>
-              </div>
-            )}
-            <div className="flex-grow flex flex-col justify-between mt-4">
+            <div className="w-full h-56 md:h-64 bg-gray-200 rounded-t-lg overflow-hidden">
+              {accommodation.image ? (
+                <img
+                  src={`http://localhost:5000/${accommodation.image}`}
+                  alt={accommodation.name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <span>No Image</span>
+                </div>
+              )}
+            </div>
+            <div className="flex-grow flex flex-col justify-between mt-4 px-2">
               <div>
                 <div className="flex justify-between items-center mb-3">
                   <div className="flex items-center gap-1">
@@ -179,11 +180,11 @@ const AccommodationSwiper = ({ title, link, isLast, accommodations }) => (
         </SwiperSlide>
       ))}
       <div className="custom-prev absolute left-2 top-[25%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300">
-          <FaArrowLeft />
-        </div>
-        <div className="custom-next absolute right-2 top-[25%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300">
-          <FaArrowRight />
-        </div>
+        <FaArrowLeft />
+      </div>
+      <div className="custom-next absolute right-2 top-[25%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300">
+        <FaArrowRight />
+      </div>
     </Swiper>
   </div>
 );

@@ -97,25 +97,27 @@ const ShopSwiper = ({ title, link, isLast, shops }) => (
     >
       {shops.map((shop, index) => (
         <SwiperSlide key={index} className='flex justify-center'>
-          <div className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between max-w-xs md:max-w-lg lg:max-w-sm mx-auto h-[400px] p-2 relative"
-               style={{ width: '300px', height: '400px' }}>
+          <div className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between mx-auto h-full p-2 relative"
+               style={{ width: '100%', maxWidth: '300px', height: '400px' }}>
             {shop.discount > 0 && (
               <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold py-1 px-2 rounded">
                 {shop.discount}% OFF
               </div>
             )}
-            {shop.image ? (
-              <img
-                src={`http://localhost:5000/${shop.image}`}
-                alt={shop.name}
-                className="w-full h-56 md:h-64 object-cover rounded-t-lg"
-              />
-            ) : (
-              <div className="w-full h-56 md:h-64 flex items-center justify-center bg-gray-200 rounded-t-lg">
-                <span>No Image</span>
-              </div>
-            )}
-            <div className="flex-grow flex flex-col justify-between mt-4">
+            <div className="w-full h-56 md:h-64 bg-gray-200 rounded-t-lg overflow-hidden">
+              {shop.image ? (
+                <img
+                  src={`http://localhost:5000/${shop.image}`}
+                  alt={shop.name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <span>No Image</span>
+                </div>
+              )}
+            </div>
+            <div className="flex-grow flex flex-col justify-between mt-4 px-2">
               <div>
                 <div className="flex justify-between items-center mb-3">
                   <div className="flex items-center gap-1">
