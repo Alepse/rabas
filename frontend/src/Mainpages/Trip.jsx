@@ -58,6 +58,9 @@ const Trip = () => {
   const [loading, setLoading] = useState(true);
   const [showButton, setShowButton] = useState(false); // State to show/hide button
   const [trips, setTrips] = useState([]); // Initialize with an empty array
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [selectedTrip, setSelectedTrip] = useState(null);
+  const [itinerary, setItinerary] = useState({});
 
   useEffect(() => {
     // Fetch trips from the endpoint
@@ -85,9 +88,7 @@ const Trip = () => {
     start: today(getLocalTimeZone()),
     end: today(getLocalTimeZone()).add({ weeks: 1 }),
   });
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-  const [selectedTrip, setSelectedTrip] = useState(null);
-  const [itinerary, setItinerary] = useState({});
+  
 
   useEffect(() => {
 
@@ -179,9 +180,14 @@ const Trip = () => {
           showSuccessAlert('Trip added successfully', 'Your trip has been added to your trips list.');
 
           // Clear the form
+          setStep(1);
+          setProgress(10);
           setTripName('');
-          setValue({ start: today(getLocalTimeZone()), end: today(getLocalTimeZone()).add({ weeks: 1 }) });
+          setIsDetailsOpen(false);
+          setSelectedTrip(null);
           setItinerary({});
+          setValue({ start: today(getLocalTimeZone()), end: today(getLocalTimeZone()).add({ weeks: 1 }) });
+          
         })
         .catch(error => {
           // Show message if error

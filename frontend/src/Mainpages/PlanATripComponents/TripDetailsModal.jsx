@@ -22,11 +22,11 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
 
   const [isEditing, setIsEditing] = useState(false);
   const [editTripDetails, setEditTripDetails] = useState(trip);
+  const [originalTripDetails, setOriginalTripDetails] = useState(trip);
+  const [originalItinerary, setOriginalItinerary] = useState(itinerary); // Store original itinerary
 
   const [currentLocation, setCurrentLocation] = useState(null);
   const [destination, setDestination] = useState(null);
-
-  const [isEditingItinerary, setIsEditingItinerary] = useState(false);
 
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [currentDate, setCurrentDate] = useState(null);
@@ -37,8 +37,11 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
   const [currentZoom, setCurrentZoom] = useState(10);
 
   const handleEditToggle = () => {
+    if (!isEditing) {
+      setOriginalTripDetails(editTripDetails);
+      setOriginalItinerary(itinerary); // Store original itinerary when editing starts
+    }
     setIsEditing(!isEditing);
-    setIsEditingItinerary(!isEditing);
   };
 
   const handleInputChange = (e) => {
@@ -47,7 +50,6 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
       ...prevDetails,
       [name]: value,
     }));
-    console.log('Edit Trip Details:', editTripDetails);
   };
 
   const handleSave = () => {
@@ -65,14 +67,14 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
           const date = new Date(dateString);
           return date.toISOString().split('T')[0]; // 'YYYY-MM-DD'
         };
-  
+
         const updatedTrip = {
           ...trip,
           ...editTripDetails,
           startDate: formatDate(editTripDetails.startDate),
           endDate: formatDate(editTripDetails.endDate),
         };
-  
+
         axios.put(`http://localhost:5000/update-trip/${trip.tripId}`, updatedTrip, { withCredentials: true })
         .then(response => {
           const data = response.data; // Directly access response.data
@@ -108,15 +110,9 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
   };
 
   const handleCancelEdit = () => {
-    setEditItemIndex(null);
-  };
-
-  const handleItineraryChange = (newItinerary) => {
-    // Update the trip details with the new itinerary
-    setEditTripDetails((prevDetails) => ({
-      ...prevDetails,
-      itinerary: newItinerary,
-    }));
+    setEditTripDetails(originalTripDetails);
+    setOriginalItinerary(itinerary); // Restore original itinerary
+    setIsEditing(false);
   };
 
   const handleAdd = (date) => {
@@ -188,8 +184,6 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
     }));
   };
 
-  // console.log('Itinerary Items:', trip.itinerary);
-
   return (
     <Modal isOpen={isOpen} onClose={onClose} isDismissable={false} hideCloseButton className="rounded-lg shadow-lg mx-auto p-3 max-h-screen max-w-[1200px]">
       <ModalContent>
@@ -213,7 +207,7 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
                       label="Start Date"
                       name="startDate"
                       type="date"
-                      value={editTripDetails.startDate}
+                      value={editTripDetails.startDate ? editTripDetails.startDate.split('T')[0] : ''}
                       onChange={handleInputChange}
                       fullWidth
                     />
@@ -221,16 +215,16 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
                       label="End Date"
                       name="endDate"
                       type="date"
-                      value={editTripDetails.endDate}
+                      value={editTripDetails.endDate ? editTripDetails.endDate.split('T')[0] : ''}
                       onChange={handleInputChange}
                       fullWidth
                     />
                   </>
                 ) : (
                   <>
-                     <div className='flex gap-2'>
-                    <h3 className="font-semibold">Trip Name:</h3>
-                    <p>{trip.tripName}</p>
+                    <div className='flex gap-2'>
+                      <h3 className="font-semibold">Trip Name:</h3>
+                      <p>{trip.tripName}</p>
                     </div>
                     <h3 className="font-semibold mt-2">Trip Dates:</h3>
                     <p>Start: {trip.startDate}</p>

@@ -427,7 +427,14 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                     isBooked: isBookingConfirmed,
                     notes: notes || 'No additional notes',
                 });
+
                 setIsSideUIVisible(false);
+                setItineraryTime('');
+                setCheckInTime('');
+                setCheckOutTime('');
+                setIsBookingConfirmed(false);
+                setNotes('');
+
                 Swal.fire({
                     title: 'Added!',
                     icon: 'success',
