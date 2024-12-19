@@ -63,7 +63,7 @@ const AccommodationsTab = () => {
     <div className='lg:container'>
       <AccommodationSwiper title="Design Meets Comfort: Accommodation Recommendations" link="/accommodations" accommodations={designMeetsComfort} />
       <AccommodationSwiper title="Traveler's Choice: Most Liked Stays" link="/accommodations" accommodations={travelersChoice} />
-      <AccommodationSwiper title="Top Accommodation Offers" isLast accommodations={accommodations} />
+      <AccommodationSwiper title="Experience Comfort: Recent Additions to Our Accommodations" isLast accommodations={accommodations} />
     </div>
   );
 };
