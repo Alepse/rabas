@@ -9,6 +9,7 @@ import { GiPositionMarker } from 'react-icons/gi';
 import img from '@/assets/shop.webp';
 import { AiOutlineLike } from "react-icons/ai";
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
+import CryptoJS from 'crypto-js';
 
 const formatNumber = (num) => {
   if (num >= 1_000_000) {
@@ -18,6 +19,17 @@ const formatNumber = (num) => {
     return (num / 1_000).toFixed(1).replace(/\.0$/, '') + 'k';
   }
   return num;
+};
+
+// Function to encrypt the business_id
+const encryptId = (id) => {
+  const secretKey = import.meta.env.VITE_SECRET_KEY;
+  if (!secretKey) {
+    console.error('Secret key is not defined');
+    return null;
+  }
+  const ciphertext = CryptoJS.AES.encrypt(id.toString(), secretKey).toString();
+  return encodeURIComponent(ciphertext);
 };
 
 const AccommodationsTab = () => {
@@ -156,7 +168,7 @@ const AccommodationSwiper = ({ title, link, isLast, accommodations }) => (
                     </>
                   )}
                 </p>
-                <Link to="/business" target="_blank">
+                <Link to={`/business/${encryptId(accommodation.business_id)}`}>
                   <Button className="w-full bg-color1 text-white text-sm font-medium px-5 py-2 rounded hover:bg-color2">
                    Explore More
                   </Button>
