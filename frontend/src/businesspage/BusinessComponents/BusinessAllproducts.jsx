@@ -671,7 +671,7 @@ const BusinessAllproducts = () => {
   }
 
   return (
-    <div className="max-h-screen container mx-auto p-4 bg-white  rounded-md shadow-md mb-4">
+    <div className="min-h-screen container mx-auto p-4 bg-white  rounded-md shadow-md mb-4">
       <div className="text-3xl font-semibold mb-6 text-gray-800">What We Offer</div>
 
       <div className="flex flex-col lg:flex-row gap-2">
@@ -688,7 +688,7 @@ const BusinessAllproducts = () => {
         </div>
 
         {/* Main Content Area */}
-        <div className="flex flex-col w-full bg-white  p-5 rounded-lg shadow-md">
+        <div className="flex max-h-screen flex-col w-full bg-white   p-5 rounded-lg shadow-md">
           {/* Tabs */}
           <Tabs
             aria-label="Business Offerings"
@@ -697,7 +697,7 @@ const BusinessAllproducts = () => {
             onSelectionChange={(key) => setActiveTab(key)}
             selectedKey={activeTab}
             classNames={{
-          base: "w-full overflow-x-auto mb-4",
+          base: "w-full mb-4",
           tabList: "gap-6 w-full p-4 container",
           tab: "max-w-fit px-0 h-12",
           tabContent: "text-color1"
@@ -711,7 +711,7 @@ const BusinessAllproducts = () => {
           </Tabs>
 
           {/* Content */}
-          <div className="p-2 max-h-[600px] overflow-y-auto  scrollbar-custom">
+          <div className="p-2 max-h-screen overflow-y-auto  scrollbar-custom">
             {loading ? (
               <LoadingSpinner />
             ) : filteredData.length > 0 ? (
