@@ -301,9 +301,9 @@ const BusinessPage = () => {
         <AnimatedSection>
           <div className='flex flex-wrap items-center gap-4 py-4'>
             <img 
-              className='w-16 h-16 sm:w-24 sm:h-24 rounded-full object-cover' 
-              src={`http://localhost:5000/${businessData.businessLogo}`} 
-              alt="Business Logo" 
+              className='w-16 h-16 sm:w-24 sm:h-24 rounded-full object-cover shadow-gray-400 p-5' 
+              src={businessData.businessLogo ? `http://localhost:5000/${businessData.businessLogo}` : `https://ui-avatars.com/api/?name=${businessData?.businessName?.charAt(0).toUpperCase()}`} 
+              alt={businessData.businessName}
             />
             <h1 className='text-xl sm:text-2xl font-medium mr-16'>{businessData.businessName}</h1>
             <div className='flex flex-wrap items-center gap-3'>
