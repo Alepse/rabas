@@ -3508,7 +3508,7 @@ app.get('/usersInChat/:userId', async (req, res) => {
 // ************ Displaying data for the pages *****************
 // ************************************************************
 // ************************************************************
-
+// ayuson mo ung amenities mamaya
 // Endpoint to display all the business with its price ranges based on the business products
 app.get('/getAllBusinesses', async (req, res) => {
   const sql = `
@@ -3524,7 +3524,6 @@ app.get('/getAllBusinesses', async (req, res) => {
       b.pin_location,
       b.contactInfo,
       b.openingHours,
-      b.facilities,
       b.policies,
       IF(
         JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.description')) IS NULL OR 
@@ -3548,7 +3547,7 @@ app.get('/getAllBusinesses', async (req, res) => {
       MIN(CAST(p.price AS DECIMAL)) AS lowest_price,
       MAX(CAST(p.price AS DECIMAL)) AS highest_price,
       AVG(r.ratings) AS rating,
-      JSON_ARRAYAGG(JSON_UNQUOTE(JSON_EXTRACT(b.facilities, '$[*].name'))) AS raw_amenities
+      JSON_UNQUOTE(JSON_EXTRACT(b.facilities, '$[*].items')) AS raw_amenities
     FROM 
       businesses b
     LEFT JOIN 
@@ -3566,21 +3565,28 @@ app.get('/getAllBusinesses', async (req, res) => {
     // Use pooled connection to query the database
     const [results] = await pool.query(sql);
 
-    // Post-process the results to clean up the unique_amenities
+    // Post-process the results to clean up the unique amenities
     const cleanedResults = results.map(business => {
       const uniqueAmenitiesSet = new Set();
 
-      // Parse each raw_amenity entry and add unique items to the set
-      business.raw_amenities.forEach(amenity => {
-        if (amenity) {
-          try {
-            const amenitiesArray = JSON.parse(amenity);
-            amenitiesArray.forEach(item => uniqueAmenitiesSet.add(item));
-          } catch (e) {
-            console.error('Error parsing amenity:', e);
-          }
+      // Parse each facility entry and add unique items to the set
+      if (business.raw_amenities) {
+        try {
+          const amenitiesArray = JSON.parse(business.raw_amenities);
+          amenitiesArray.forEach(amenityGroup => {
+            amenityGroup.forEach(amenity => {
+              uniqueAmenitiesSet.add(amenity.name); // Add facility name
+              if (amenity.items) {
+                amenity.items.forEach(item => {
+                  uniqueAmenitiesSet.add(item.name); // Add item name
+                });
+              }
+            });
+          });
+        } catch (e) {
+          console.error('Error parsing amenities:', e);
         }
-      });
+      }
 
       return {
         ...business,
