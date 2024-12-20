@@ -3828,7 +3828,11 @@ app.use((req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+
+// Listen on all interfaces (0.0.0.0) to make it accessible externally
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server started on port ${PORT}`);
+});
 
 // Refactored generateUniqueUsername function using connection pool
 async function generateUniqueUsername(baseName) {
