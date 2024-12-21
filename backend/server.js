@@ -96,19 +96,6 @@ app.use((err, req, res, next) => {
   res.status(500).json({ success: false, message: 'Internal server error' });
 });
 
-// Function to get the base URL based on the environment
-const getBaseURL = () => {
-  switch (process.env.NODE_ENV) {
-    case 'production':
-      return process.env.BASE_URL_PRODUCTION;
-    case 'staging':
-      return process.env.BASE_URL_STAGING;
-    case 'development':
-    default:
-      return process.env.BASE_URL_LOCAL;
-  }
-};
-
 // User Login Endpoint
 app.post('/login', async (req, res) => {
   const { identifier, password } = req.body; // Use 'identifier' to accept either username or email
@@ -191,7 +178,7 @@ app.post('/forgot-password', async (req, res) => {
       subject: 'Password Reset',
       text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n
              Please click on the following link, or paste this into your browser to complete the process:\n\n
-             ${getBaseURL()}/reset-password/${token}\n\n
+             http://localhost:5000/reset-password/${token}\n\n
              If you did not request this, please ignore this email and your password will remain unchanged.\n`
     };
 
@@ -244,7 +231,7 @@ app.get('/reset-password/:token', (req, res) => {
   const { token } = req.params;
 
   // Redirect to the React frontend with the token as a query parameter
-  res.redirect(`${getBaseURL()}/resetpassword?token=${token}`);
+  res.redirect(`http://localhost:5173/resetpassword?token=${token}`);
 });
 
 // Handle the password reset form submission
@@ -657,6 +644,19 @@ app.post('/signup', async (req, res) => {
 // Passport setup
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Function to get the base URL based on the environment
+const getBaseURL = () => {
+  switch (process.env.NODE_ENV) {
+    case 'production':
+      return process.env.BASE_URL_PRODUCTION;
+    case 'staging':
+      return process.env.BASE_URL_STAGING;
+    case 'development':
+    default:
+      return process.env.BASE_URL_LOCAL;
+  }
+};
 
 // Function to get the callback URL
 const getCallbackURL = () => {
