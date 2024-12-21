@@ -19,7 +19,7 @@ const LoginSignup = () => {
   const [email, setEmail] = useState(''); // Add state to manage email for forgot password
 
   useEffect(() => {
-    document.title = 'Login/Signup - Spa-ntaneous';
+    document.title = 'Login/Signup';
 
     // Check login status when the component mounts
     const checkLoginStatus = async () => {
