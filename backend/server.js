@@ -87,7 +87,7 @@ app.use(
     saveUninitialized: false,
     cookie: {
       maxAge: 24 * 60 * 60 * 1000, // 1 day
-      secure: false, // Set to true if using HTTPS
+      secure: true, // Set to true if using HTTPS
       httpOnly: true, // Prevents client-side access to the cookie
       sameSite: 'none', // Required for cross-origin cookies
     },
