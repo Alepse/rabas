@@ -645,10 +645,22 @@ app.use(passport.initialize());
 // Remove this line if you are managing sessions manually
 app.use(passport.session());
 
+const getCallbackURL = () => {
+  switch (process.env.NODE_ENV) {
+    case 'production':
+      return `${process.env.BASE_URL_PRODUCTION}/auth/google/callback`;
+    case 'staging':
+      return `${process.env.BASE_URL_STAGING}/auth/google/callback`;
+    case 'development':
+    default:
+      return `${process.env.BASE_URL_LOCAL}/auth/google/callback`;
+  }
+};
+
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: 'http://localhost:5000/auth/google/callback'
+  callbackURL: getCallbackURL() // Use the dynamic callback URL
 },
 async (accessToken, refreshToken, profile, done) => {
   try {
