@@ -643,21 +643,27 @@ app.post('/signup', async (req, res) => {
 
 // Passport setup
 app.use(passport.initialize());
-// Remove this line if you are managing sessions manually
 app.use(passport.session());
 
-const getCallbackURL = () => {
+// Function to get the base URL based on the environment
+const getBaseURL = () => {
   switch (process.env.NODE_ENV) {
     case 'production':
-      return `${process.env.BASE_URL_PRODUCTION}/auth/google/callback`;
+      return process.env.BASE_URL_PRODUCTION;
     case 'staging':
-      return `${process.env.BASE_URL_STAGING}/auth/google/callback`;
+      return process.env.BASE_URL_STAGING;
     case 'development':
     default:
-      return `${process.env.BASE_URL_LOCAL}/auth/google/callback`;
+      return process.env.BASE_URL_LOCAL;
   }
 };
 
+// Function to get the callback URL
+const getCallbackURL = () => {
+  return `${getBaseURL()}/auth/google/callback`;
+};
+
+// Configure Google Strategy for Passport
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
@@ -703,14 +709,14 @@ async (accessToken, refreshToken, profile, done) => {
   }
 }));
 
+// Serialize user to the session
 passport.serializeUser((user, done) => {
-  // Serialize the user by user ID
   done(null, user.user_id); // Ensure a valid identifier is used
 });
 
+// Deserialize user from the session
 passport.deserializeUser(async (id, done) => {
   try {
-    // Use the connection pool to fetch the user
     const [results] = await pool.query('SELECT * FROM users WHERE user_id = ?', [id]);
 
     if (results.length === 0) {
@@ -718,20 +724,19 @@ passport.deserializeUser(async (id, done) => {
       return done(new Error('User not found'));
     }
 
-    // Pass the user data to the next middleware
-    done(null, results[0]);
+    done(null, results[0]); // Pass the user data to the next middleware
   } catch (err) {
     console.error('Error deserializing user:', err);
     done(err);
   }
 });
 
-// Routes
+// Routes for Google authentication
 app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 app.get(
   '/auth/google/callback',
-  passport.authenticate('google', { failureRedirect: 'http://localhost:5173' }),
+  passport.authenticate('google', { failureRedirect: getBaseURL() }), // Use the base URL for failure
   (req, res) => {
     if (!req.user || !req.user.user_id) {
       console.error('User object is invalid:', req.user);
@@ -751,16 +756,17 @@ app.get(
         return res.status(500).json({ success: false, message: 'Failed to save session' });
       }
 
-      // Redirect to the client
-      res.redirect('http://localhost:5173');
+      // Redirect to the base URL
+      res.redirect(getBaseURL());
     });
   }
 );
 
+// Root route to check session
 app.get('/', (req, res) => {
   // Redirect if no user session
   if (!req.session.user) {
-    return res.redirect('http://localhost:5173');
+    return res.redirect(getBaseURL()); // Use the base URL for redirection
   }
 
   // Respond with session user details
