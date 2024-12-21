@@ -213,6 +213,10 @@ const BusinessPage = () => {
       showErrorAlert('An error occurred while fetching the likes count.');
     }
   };
+
+  useEffect(() => {
+    fetchLikeCounts(decryptId(encryptedBusinessId));
+  }, [likesCount]);
   
   const likeBusiness = async (businessId) => {
     try {
