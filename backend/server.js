@@ -255,12 +255,34 @@ app.post('/reset-password/:token', async (req, res) => {
 });
 
 // Endpoint for checking login status
-app.get('/check-login', (req, res) => {
+app.get('/check-login', async (req, res) => {
   console.log('Current session:', req.session); // Log the session object
-  if (req.session.user) {
-    return res.status(200).json({ isLoggedIn: true, user: req.session.user });
-  } else {
-    return res.status(200).json({ isLoggedIn: false });
+  try {
+    // Query the sessions table to retrieve session data using the session ID
+    const [results] = await pool.query(
+      'SELECT data FROM sessions WHERE session_id = ?',
+      [req.sessionID]
+    );
+
+    if (results.length === 0) {
+      // Session not found
+      return res.status(200).json({ isLoggedIn: false });
+    }
+
+    // Parse the session data from the database
+    const session = JSON.parse(results[0].data);
+
+    // Check if the session has user data
+    if (session && session.user) {
+      // User is logged in
+      return res.status(200).json({ isLoggedIn: true, user: session.user });
+    } else {
+      // No user data in session
+      return res.status(200).json({ isLoggedIn: false });
+    }
+  } catch (err) {
+    console.error('Error fetching session data from database:', err);
+    return res.status(500).json({ isLoggedIn: false, error: 'Internal server error' });
   }
 });
 
