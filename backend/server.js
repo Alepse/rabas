@@ -20,6 +20,7 @@ const app = express();
 // Enable CORS with credentials
 const allowedOrigins = [
   "http://localhost:5173",
+  "http://ubuntu-24.localhost:5173",
   "http://192.168.254.145:5173",
   "http://rabasorsogon.com",
   "https://rabasorsogon.com", 
