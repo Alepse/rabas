@@ -18,9 +18,21 @@ const cookieParser = require('cookie-parser'); // Import cookie-parser
 const app = express();
 
 // Enable CORS with credentials
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://192.168.254.145:5173",
+  "http://147.93.19.247:5173",
+];
+
 app.use(
   cors({
-    origin: process.env.ORIGIN_CORS_ORIGIN,
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true); // Allow the origin
+      } else {
+        callback(new Error("Not allowed by CORS")); // Reject the origin
+      }
+    },
     credentials: true,
   })
 );
