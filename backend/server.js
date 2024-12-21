@@ -645,6 +645,18 @@ app.post('/signup', async (req, res) => {
 app.use(passport.initialize());
 app.use(passport.session());
 
+const getRedirectionURL = () => {
+  switch (process.env.NODE_ENV) {
+    case 'production':
+      return process.env.REDIRECTION_URL_PRODUCTION;
+    case 'staging':
+      return process.env.REDIRECTION_URL_STAGING;
+    case 'development':
+    default:
+      return process.env.REDIRECTION_URL_LOCAL;
+  }
+};
+
 // Function to get the base URL based on the environment
 const getBaseURL = () => {
   switch (process.env.NODE_ENV) {
@@ -660,7 +672,7 @@ const getBaseURL = () => {
 
 // Function to get the callback URL
 const getCallbackURL = () => {
-  return `${getBaseURL()}/auth/google/callback`;
+  return `${getRedirectionURL()}/auth/google/callback`;
 };
 
 // Configure Google Strategy for Passport
