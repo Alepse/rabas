@@ -11,6 +11,9 @@ import { AiOutlineLike } from "react-icons/ai";
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import CryptoJS from 'crypto-js';
 
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
+
 const formatNumber = (num) => {
   if (num >= 1_000_000) {
     return (num / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'm';
@@ -38,7 +41,7 @@ const AccommodationsTab = () => {
   useEffect(() => {
     const fetchAccommodations = async () => {
       try {
-        const response = await fetch('http://localhost:5000/getBusinessesByBusinessType/accommodation');
+        const response = await fetch(`${BASE_URL}/getBusinessesByBusinessType/accommodation`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -108,7 +111,7 @@ const AccommodationSwiper = ({ title, link, isLast, accommodations }) => (
             <div className="w-full h-56 md:h-64 bg-gray-200 rounded-t-lg overflow-hidden">
               {accommodation.image ? (
                 <img
-                  src={`http://localhost:5000/${accommodation.image}`}
+                  src={`${BASE_URL}/${accommodation.image}`}
                   alt={accommodation.name}
                   className="w-full h-full object-cover"
                 />

@@ -5,6 +5,8 @@ import Swal from 'sweetalert2';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import axios from 'axios';
 import Logo2 from '../../assets/rabas.png';
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 const ResetPW = () => {
   const [newPassword, setNewPassword] = useState('');
@@ -59,7 +61,7 @@ const ResetPW = () => {
     }
 
     try {
-      const response = await axios.post(`http://localhost:5000/reset-password/${token}`, {
+      const response = await axios.post(`${BASE_URL}/reset-password/${token}`, {
         newPassword,
       });
 

@@ -10,6 +10,8 @@ import { Link } from 'react-router-dom';
 import Search from '@/components/Search';
 import wave from '@/assets/wave2.webp'
 import CryptoJS from 'crypto-js';
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 // Custom hook to detect if the screen is large
 const useIsLargeScreen = () => {
@@ -42,7 +44,7 @@ const Foods = () => {
   useEffect(() => {
     const fetchFoods = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/getAllBusinesses?businessType=restaurant`);
+        const response = await fetch(`${BASE_URL}/getAllBusinesses?businessType=restaurant`);
         const data = await response.json();
         if (data.success) {
           const foods = data.businesses.filter(business => business.businessType === 'restaurant');
@@ -315,7 +317,7 @@ const Foods = () => {
                     variants={cardVariants}
                   >
                     <img
-                      src={`http://localhost:5000/${food.businessLogo}`}
+                      src={`${BASE_URL}/${food.businessLogo}`}
                       alt={food.busineName}
                       className='w-full h-48 object-cover rounded-t-lg'
                     />

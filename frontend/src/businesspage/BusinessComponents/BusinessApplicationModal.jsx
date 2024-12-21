@@ -6,6 +6,8 @@ import { FaCheck, FaPlus, FaTimes } from "react-icons/fa";
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import MapPicker from '../../components/map-picker';
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 const MySwal = withReactContent(Swal);
 
@@ -349,7 +351,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
         setStep(4);
       } else if (step === 4) {
         try {
-          const response = await fetch('http://localhost:5000/submitBusinessApplication', {
+          const response = await fetch(`${BASE_URL}/submitBusinessApplication`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

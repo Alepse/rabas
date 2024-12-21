@@ -32,6 +32,8 @@ import {
   updateFacilityItem,
   removeFacilityItem,
 } from '../redux/businessSlice';
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 const BusinessProfile = () => {
   const dispatch = useDispatch();
@@ -84,7 +86,7 @@ const BusinessProfile = () => {
   // Function to check login status
   const checkLoginStatus = useCallback(async () => {
     try {
-      const response = await fetch('http://localhost:5000/check-login', {
+      const response = await fetch(`${BASE_URL}/check-login`, {
         method: 'GET',
         credentials: 'include' // Include cookies
       });
@@ -110,7 +112,7 @@ const BusinessProfile = () => {
   // Fetching business data from the backend and updating Redux
   const fetchBusinessData = async () => {
     try {
-      const response = await fetch('http://localhost:5000/get-businessData', {
+      const response = await fetch(`${BASE_URL}/get-businessData`, {
         method: 'GET',
         credentials: 'include',
       });
@@ -151,7 +153,7 @@ const BusinessProfile = () => {
 
     try {
       // Send PUT request to update business name
-      const response = await fetch(`http://localhost:5000/updateBusinessName/${businessData.business_id}`, {
+      const response = await fetch(`${BASE_URL}/updateBusinessName/${businessData.business_id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -211,7 +213,7 @@ const BusinessProfile = () => {
 
     try {
       // Send PUT request to update business name
-      const response = await fetch(`http://localhost:5000/updateBusinessAboutUs/${businessData.business_id}`, {
+      const response = await fetch(`${BASE_URL}/updateBusinessAboutUs/${businessData.business_id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -279,7 +281,7 @@ const BusinessProfile = () => {
     formData.append('location', location);
 
     // Make an API call to update the business details
-    fetch(`http://localhost:5000/updateBusinessDetails/${businessData.business_id}`, {
+    fetch(`${BASE_URL}/updateBusinessDetails/${businessData.business_id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -339,7 +341,7 @@ const BusinessProfile = () => {
             formData.append('businessCardImage', file); // Append the file to FormData
 
             // Make an API call to upload the logo
-            fetch(`http://localhost:5000/updateBusinessCardImage/${businessId}`, {
+            fetch(`${BASE_URL}/updateBusinessCardImage/${businessId}`, {
               method: 'PUT',
               body: formData,
             })
@@ -380,7 +382,7 @@ const BusinessProfile = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         // Make API call to delete the card image on the server
-        fetch(`http://localhost:5000/businessCardImage/${businessData.business_id}`, {
+        fetch(`${BASE_URL}/businessCardImage/${businessData.business_id}`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
@@ -452,7 +454,7 @@ const BusinessProfile = () => {
             formData.append('businessLogo', file); // Append the logo file
 
             // Make an API call to upload the logo
-            fetch(`http://localhost:5000/updateBusinessLogo/${businessId}`, {
+            fetch(`${BASE_URL}/updateBusinessLogo/${businessId}`, {
               method: 'PUT',
               body: formData,
             })
@@ -501,7 +503,7 @@ const BusinessProfile = () => {
     });
 
     // Make API call to upload the hero images
-    fetch(`http://localhost:5000/updateBusinessCover/${businessData.business_id}`, {
+    fetch(`${BASE_URL}/updateBusinessCover/${businessData.business_id}`, {
       method: 'PUT',
       body: formData,
     })
@@ -558,7 +560,7 @@ const BusinessProfile = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         // Make DELETE request to remove the image from the backend
-        fetch(`http://localhost:5000/businessCoverPhoto/${businessData.business_id}`, {
+        fetch(`${BASE_URL}/businessCoverPhoto/${businessData.business_id}`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
@@ -611,7 +613,7 @@ const BusinessProfile = () => {
   // Save edited title for a hero image
   const handleSaveImageTitle = async (imageId) => {
     try {
-      const response = await fetch(`http://localhost:5000/updateBusinessCoverImagesTitle/${businessData.business_id}`, {
+      const response = await fetch(`${BASE_URL}/updateBusinessCoverImagesTitle/${businessData.business_id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -660,7 +662,7 @@ const BusinessProfile = () => {
   const handleSaveContact = async () => {
     try {
       // Send PUT request to update contact info in the backend
-      const response = await fetch(`http://localhost:5000/updateBusinessContactInfo/${businessData.business_id}`, {
+      const response = await fetch(`${BASE_URL}/updateBusinessContactInfo/${businessData.business_id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -730,7 +732,7 @@ const BusinessProfile = () => {
 
   const handleSaveHours = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/update-opening-hours/${businessData.business_id}`, {
+      const response = await fetch(`${BASE_URL}/update-opening-hours/${businessData.business_id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -795,7 +797,7 @@ const BusinessProfile = () => {
 
   const handleSaveFacilities = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/updateBusinessFacilities/${businessData.business_id}`, {
+      const response = await fetch(`${BASE_URL}/updateBusinessFacilities/${businessData.business_id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -855,7 +857,7 @@ const BusinessProfile = () => {
   // Function to handle saving policies
   const handleSavePolicies = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/updateBusinessPolicies/${businessData.business_id}`, {
+      const response = await fetch(`${BASE_URL}/updateBusinessPolicies/${businessData.business_id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -985,7 +987,7 @@ const BusinessProfile = () => {
                     {businessData.businessLogo ? (
                       <img
                         src={businessData.businessLogo.startsWith('uploads')
-                          ? `http://localhost:5000/${businessData.businessLogo}`
+                          ? `${BASE_URL}/${businessData.businessLogo}`
                           : businessData.businessLogo
                         }
                         alt="Business Logo"
@@ -1053,7 +1055,7 @@ const BusinessProfile = () => {
                       {cardImage ? (
                         <div className="relative w-full h-48 mb-3">
                           <img
-                            src={`http://localhost:5000/${cardImage}`
+                            src={`${BASE_URL}/${cardImage}`
                             }
                             alt="Card Preview"
                             className="w-full h-full object-cover rounded-md shadow-md"
@@ -1119,7 +1121,7 @@ const BusinessProfile = () => {
                     {cardImage && (
                       <img
                         src={cardImage.startsWith('uploads')
-                          ? `http://localhost:5000/${cardImage}`
+                          ? `${BASE_URL}/${cardImage}`
                           : cardImage
                         }
                         alt="Business Card"
@@ -1144,7 +1146,7 @@ const BusinessProfile = () => {
                   {businessData.heroImages && Array.isArray(businessData.heroImages) && businessData.heroImages.map((image) => (
                     <div key={image.id} className="relative">
                       <img
-                        src={`http://localhost:5000/${image.path}`}  // Apply the base URL to the image
+                        src={`${BASE_URL}/${image.path}`}  // Apply the base URL to the image
                         alt={`Cover Photo ${image.title}`}
                         className="w-full h-40 object-cover rounded-lg"
                       />

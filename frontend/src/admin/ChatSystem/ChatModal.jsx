@@ -12,6 +12,8 @@ import axios from "axios";
 import Swal from 'sweetalert2';
 import { useSelector, useDispatch } from 'react-redux';
 import { markBookingAsActive } from '@/redux/bookingSlice';
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 // SweetAlert functions
 const showSuccessAlert = (message) => {
@@ -350,11 +352,11 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
   }, [isOpen, selectedUserId, users]);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/check-login', { withCredentials: true })
+    axios.get(`${BASE_URL}/check-login`, { withCredentials: true })
       .then(response => {
         if (response.data.isLoggedIn) {  // Check if the user is logged in
           // If logged in, fetch user data
-          axios.get('http://localhost:5000/get-userData', { withCredentials: true })
+          axios.get(`${BASE_URL}/get-userData`, { withCredentials: true })
             .then(userResponse => {
               const userId = userResponse.data.userData.user_id;
               setUser_id(userId);
@@ -380,7 +382,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
       if (user_id) {
         try {
           // console.log('userId', user_id);
-          const { data } = await axios.get(`http://localhost:5000/businessMessages/${user_id}`);
+          const { data } = await axios.get(`${BASE_URL}/businessMessages/${user_id}`);
           // console.log('data', data);
           const fetchedMessages = data.reduce((acc, { userId, messages }) => {
             acc[userId] = messages;
@@ -403,7 +405,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
       try {
         // Create an array of API requests
         const userRequests = userIds.map(id =>
-          axios.get(`http://localhost:5000/usersInChat/${id}`)
+          axios.get(`${BASE_URL}/usersInChat/${id}`)
         );
 
         // Resolve all requests concurrently
@@ -468,7 +470,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
         // Handle regular server image paths
         const downloadUrl = imagePath.startsWith('http')
           ? imagePath
-          : `http://localhost:5000/${imagePath.replace(/\\/g, '/')}`;
+          : `${BASE_URL}/${imagePath.replace(/\\/g, '/')}`;
         
         // Fetch the image as a blob from the server
         const response = await fetch(downloadUrl);
@@ -530,7 +532,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
       }
   
       try {
-        const response = await fetch('http://localhost:5000/sendMessage', {
+        const response = await fetch(`${BASE_URL}/sendMessage`, {
           method: 'POST',
           body: formData,
         });
@@ -625,7 +627,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
   
     try {
       // Update booking status
-      const updateResponse = await fetch(`http://localhost:5000/update-booking-status/${bookingDetails?.formDetails?.booking_id}`, {
+      const updateResponse = await fetch(`${BASE_URL}/update-booking-status/${bookingDetails?.formDetails?.booking_id}`, {
         method: 'PUT',
         credentials: 'include',
         headers: {
@@ -642,7 +644,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
       dispatch(markBookingAsActive(bookingDetails?.formDetails?.booking_id));
   
       // Send message after successful booking status update
-      const messageResponse = await fetch('http://localhost:5000/sendMessage', {
+      const messageResponse = await fetch(`${BASE_URL}/sendMessage`, {
         method: 'POST',
         body: formData,
       });
@@ -696,7 +698,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
             <Avatar 
               radius="md" 
               src={user.image_path 
-                ? `http://localhost:5000/${user.image_path}` 
+                ? `${BASE_URL}/${user.image_path}` 
                 : user.image 
                   ? user.image 
                   : `https://ui-avatars.com/api/?name=${user.name}`} 
@@ -719,7 +721,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
       const imageUrl = message.image
         ? message.image.startsWith('blob:')
           ? message.image
-          : `http://localhost:5000/${message.image.replace(/\\/g, '/')}`
+          : `${BASE_URL}/${message.image.replace(/\\/g, '/')}`
         : null;
   
       const messageTime = new Date(message.time);
@@ -825,7 +827,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
                 <div className="flex items-center space-x-3 p-3 bg-color1 text-white rounded-t-lg">
                   <img
                     src={activeChatUser.image_path 
-                      ? `http://localhost:5000/${activeChatUser.image_path}` 
+                      ? `${BASE_URL}/${activeChatUser.image_path}` 
                       : activeChatUser.image 
                         ? activeChatUser.image 
                         : `https://ui-avatars.com/api/?name=${activeChatUser.name}`} 

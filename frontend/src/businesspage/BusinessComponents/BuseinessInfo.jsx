@@ -8,7 +8,8 @@ import { businessIcons } from './businessIcons';
 import DOMPurify from 'dompurify';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
 import { FaFacebook, FaInstagram, FaPhone, FaWifi, FaCheckCircle, FaPlus, FaClipboardList, FaInfoCircle, FaConciergeBell, FaStar } from 'react-icons/fa';
-
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 const StarRating = ({ rating, onRatingChange, size = "md" }) => {
   const [hoverRating, setHoverRating] = useState(0);
@@ -78,7 +79,7 @@ const BusinessInfo = () => {
       try {
         setLoading(true);
         const decryptedBusinessId = decryptId(encryptedBusinessId);
-        const response = await axios.get(`http://localhost:5000/getAllBusinesses`);
+        const response = await axios.get(`${BASE_URL}/getAllBusinesses`);
         const business = response.data.businesses.find(b => b.business_id === parseInt(decryptedBusinessId));
         setBusinessData(business);
         // console.log('Encrypted ID:', encryptedBusinessId);
@@ -231,7 +232,7 @@ const BusinessInfo = () => {
                             <div class="custom-popup flex items-center whitespace-nowrap font-bold text-color1 " style="font-size: ${fontSize};">
                               ${showLogo ? `<div class="pin-container">
                                 <div class="pin-head">
-                                  <img src="http://localhost:5000/${businessLogo}" alt="${businessName}" class="pin-logo" />
+                                  <img src="${BASE_URL}/${businessLogo}" alt="${businessName}" class="pin-logo" />
                                 </div>
                                 <div class="pin-point"></div>
                               </div><span>${businessName}</span>` : `<div class="business-name">${businessName}</div>`}

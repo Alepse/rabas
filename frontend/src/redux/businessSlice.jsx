@@ -1,11 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 // Async thunk to fetch initial business data
 export const fetchBusinessData = createAsyncThunk(
   'business/fetchBusinessData',
   async () => {
-    const response = await axios.get('http://localhost:5000/get-businessData', {
+    const response = await axios.get(`${BASE_URL}/get-businessData`, {
       withCredentials: true, // Ensure cookies are sent with the request if needed
     });
     return response.data.businessData[0]; // Return the first business object

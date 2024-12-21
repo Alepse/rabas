@@ -13,6 +13,7 @@ const crypto = require('crypto'); // Built-in Node.js module
 const { v4: uuidv4 } = require('uuid');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const cookieParser = require('cookie-parser'); // Import cookie-parser
 
 const app = express();
 
@@ -26,6 +27,7 @@ app.use(
 
 app.use(express.json()); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
+app.use(cookieParser()); // Use cookie-parser middleware
 
 // Create a connection pool
 const pool = mysql.createPool({
@@ -741,41 +743,13 @@ app.get('/', (req, res) => {
 
 // Endpoint for user logout
 app.post('/logout', (req, res) => {
-  // Check if user session exists
-  if (req.session.user) {
-    // Remove user data from the session
-    delete req.session.user;
-  }
-
-  // Check if all session roles are cleared
-  if (!req.session.admin && !req.session.user && !req.session.employee) {
-    // Use connection pool for session destruction in the database
-    const sessionID = req.sessionID;
-
-    sessionStore.destroy(sessionID, (err) => {
-      if (err) {
-        console.error('Error destroying session in database:', err);
-        return res.status(500).json({ success: false, message: 'Internal server error' });
-      }
-
-      // Clear session cookie
-      res.clearCookie('connect.sid');
-
-      // Destroy the session on the server
-      req.session.destroy((err) => {
-        if (err) {
-          console.error('Error destroying session:', err);
-          return res.status(500).json({ success: false, message: 'Internal server error' });
-        }
-
-        // Respond after successful session destruction
-        return res.json({ success: true, message: 'All roles logged out, session destroyed' });
-      });
-    });
-  } else {
-    // If any session role exists, respond with success
-    return res.json({ success: true, message: 'Logout successful' });
-  }
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).json({ success: false, message: 'Could not log out' });
+    }
+    res.clearCookie('connect.sid'); // Clear the cookie
+    res.json({ success: true, message: 'Logout successful' });
+  });
 });
 
 // Admin Login Endpoint

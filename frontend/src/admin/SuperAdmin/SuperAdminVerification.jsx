@@ -4,6 +4,8 @@ import Swal from 'sweetalert2';
 import { FaEye, FaCheck, FaTimes } from 'react-icons/fa';
 import SuperAdminSidebar from './superadmincomponents/superadminsidebar';
 import SearchBar from './superadmincomponents/SearchBar'; // Import the SearchBar component
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 const SummaryCard = ({ title, count, color }) => (
   <div className={`${color} text-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow`}>
@@ -67,7 +69,7 @@ const VerificationTable = ({ data, title, onUpdateStatus, searchTerm }) => {
 
   const updateStatus = async (item, newStatus) => {
     try {
-      const response = await fetch(`http://localhost:5000/updateStatus-businessApplications/${item.application_id}`, {
+      const response = await fetch(`${BASE_URL}/updateStatus-businessApplications/${item.application_id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -340,7 +342,7 @@ const SuperAdminVerification = () => {
     // Simulate data fetching
   const fetchData = async () => {
     try {
-      const response = await fetch('http://localhost:5000/superAdmin-businessApplications', {
+      const response = await fetch(`${BASE_URL}/superAdmin-businessApplications`, {
         method: 'GET',
         credentials: 'include'
       });
@@ -372,7 +374,7 @@ const SuperAdminVerification = () => {
 
   const submitUpdateStatus = async (item, newStatus) => {
     try {
-      const response = await fetch(`http://localhost:5000/updateStatus-businessApplications/${item.application_id}`, {
+      const response = await fetch(`${BASE_URL}/updateStatus-businessApplications/${item.application_id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

@@ -30,6 +30,8 @@ import { useParams } from 'react-router-dom';
 import CryptoJS from 'crypto-js';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 // SweetAlert functions
 const showSuccessAlert = (message) => {
@@ -64,7 +66,7 @@ const ReviewModal = ({ isOpen, onClose, product, isLoggedIn }) => {
   const [reviews, setReviews] = useState([]);
 
   const fetchUserData = () => {
-    axios.get('http://localhost:5000/get-userData', { withCredentials: true })
+    axios.get(`${BASE_URL}/get-userData`, { withCredentials: true })
       .then(({ data }) => {
         setUserData(data.userData);
       })
@@ -82,7 +84,7 @@ const ReviewModal = ({ isOpen, onClose, product, isLoggedIn }) => {
   useEffect(() => {
     const fetchReviewsAndRatings = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/getAllReviewsAndRatings`);
+        const response = await axios.get(`${BASE_URL}/getAllReviewsAndRatings`);
         
         if (response.data.success) {
           const reviews = response.data.reviewsAndRatings.filter(review => review.product_id === parseInt(product.product_id));
@@ -104,7 +106,7 @@ const ReviewModal = ({ isOpen, onClose, product, isLoggedIn }) => {
   const handleReviewSubmit = async () => {
     if (newReview && newRating > 0) {
       try {
-        const response = await fetch(`http://localhost:5000/addReviewsAndRatings`, {
+        const response = await fetch(`${BASE_URL}/addReviewsAndRatings`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -253,7 +255,7 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn }) => {
             <img
               src={
                 product.images.length > 0 && product.images[0].path
-                  ? `http://localhost:5000/${product.images[0].path}`
+                  ? `${BASE_URL}/${product.images[0].path}`
                   : product.fileUrl || ''
               }
               alt={product.images.length > 0 ? product.images[0].title : product.name}
@@ -483,7 +485,7 @@ const BusinessAllproducts = () => {
   // Function to check login status
   const checkLoginStatus = useCallback(async () => {
     try {
-      const response = await fetch('http://localhost:5000/check-login', {
+      const response = await fetch(`${BASE_URL}/check-login`, {
         method: 'GET',
         credentials: 'include' // Include cookies
       });
@@ -507,7 +509,7 @@ const BusinessAllproducts = () => {
     const fetchCategoryData = async (category) => {
       try {
         const decryptedBusinessId = decryptId(encryptedBusinessId);
-        const response = await fetch(`http://localhost:5000/getAllBusinessProduct?category=${category}`);
+        const response = await fetch(`${BASE_URL}/getAllBusinessProduct?category=${category}`);
         const contentType = response.headers.get("content-type");
 
         if (contentType && contentType.includes("application/json")) {
@@ -626,7 +628,7 @@ const BusinessAllproducts = () => {
 
   const handleThumbnailClick = (index) => {
     if (selectedProduct && selectedProduct.images && selectedProduct.images[index]) {
-      setPreviewImage(`http://localhost:5000/${selectedProduct.images[index].path}`);
+      setPreviewImage(`${BASE_URL}/${selectedProduct.images[index].path}`);
       setPreviewIndex(index);
       setIsPreviewOpen(true);
     }
@@ -636,7 +638,7 @@ const BusinessAllproducts = () => {
     if (selectedProduct && previewIndex > 0) {
       const newIndex = previewIndex - 1;
       setPreviewIndex(newIndex);
-      setPreviewImage(`http://localhost:5000/${selectedProduct.images[newIndex].path}`);
+      setPreviewImage(`${BASE_URL}/${selectedProduct.images[newIndex].path}`);
     }
   };
 
@@ -644,7 +646,7 @@ const BusinessAllproducts = () => {
     if (selectedProduct && selectedProduct.images && previewIndex < selectedProduct.images.length - 1) {
       const newIndex = previewIndex + 1;
       setPreviewIndex(newIndex);
-      setPreviewImage(`http://localhost:5000/${selectedProduct.images[newIndex].path}`);
+      setPreviewImage(`${BASE_URL}/${selectedProduct.images[newIndex].path}`);
     }
   };
 
@@ -755,7 +757,7 @@ const BusinessAllproducts = () => {
                         onClick={() => handleThumbnailClick(index)}
                       >
                         <img
-                          src={`http://localhost:5000/${image.path}`}
+                          src={`${BASE_URL}/${image.path}`}
                           alt={image.title || `Gallery image ${index + 1}`}
                           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                         />

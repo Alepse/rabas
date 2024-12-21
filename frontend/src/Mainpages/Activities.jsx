@@ -10,13 +10,13 @@ import { GiPositionMarker } from "react-icons/gi";
 import { Link } from 'react-router-dom';
 import Search from '@/components/Search';
 import wave from '@/assets/wave2.webp'
-
 import CryptoJS from 'crypto-js';
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 // Custom hook to detect if the screen is large
 const useIsLargeScreen = () => {
   const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1024);
-
 
   useEffect(() => {
     const handleResize = () => {
@@ -32,7 +32,7 @@ const useIsLargeScreen = () => {
 
 const Activities = () => {
   // State Variables
-  const [activityDetails, setActivityDetails] = useState([0]);
+  const [activityDetails, setActivityDetails] = useState([]);
   const [selectedActivities, setSelectedActivities] = useState([]);
   const [selectedAmenities, setSelectedAmenities] = useState([]);
   const [selectedRatings, setSelectedRatings] = useState([]);
@@ -41,19 +41,16 @@ const Activities = () => {
   const [budgetRange, setBudgetRange] = useState([0, 10000]);
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
-  
   const [showButton, setShowButton] = useState(false); // State to show/hide button
 
   useEffect(() => {
     const fetchActivities = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/getAllBusinesses?businessType=attraction`);
+        const response = await fetch(`${BASE_URL}/getAllBusinesses?businessType=attraction`);
         const data = await response.json();
         if (data.success) {
-          // Filter businesses to only include those with businessType 'attraction'
           const attractions = data.businesses.filter(business => business.businessType === 'attraction');
           setActivityDetails(attractions);
-          // console.log('Attraction Details:', attractions);
         } else {
           console.error('Failed to fetch activities:', data.message);
         }
@@ -140,66 +137,6 @@ const Activities = () => {
     const ciphertext = CryptoJS.AES.encrypt(id.toString(), secretKey).toString();
     return encodeURIComponent(ciphertext);
   };
-
-  // Activity Details
-  // const activityDetails = [
-  //   {
-  //     name: 'Beautiful Beach',
-  //     description: 'Relax and enjoy the scenic beach view.',
-  //     image: pic1,
-  //     tags: ['Swimming', 'Surfing'],
-  //     amenities: ['Parking', 'Restrooms'],
-  //     rating: 5,
-  //     destination: 'Donsol',
-  //     budget: '500-2000',
-  //     category: 'Relaxation',
-  //   },
-  //   {
-  //     name: 'Mountain Adventure',
-  //     description: 'Hike through the mountains and enjoy nature.',
-  //     image: pic1,
-  //     tags: ['Hiking', 'Camping'],
-  //     amenities: ['Guides', 'Parking'],
-  //     rating: 4,
-  //     destination: 'Bulusan',
-  //     budget: '250-3000',
-     
-  //   },
-  //   {
-  //     name: 'Cultural Tour',
-  //     description: 'Discover the local history and culture.',
-  //     image: pic1,
-  //     tags: ['Tour', 'History'],
-  //     amenities: ['Guides'],
-  //     rating: 4,
-  //     destination: 'Sorsogon City',
-  //     budget: '30-1500',
-    
-  //   },
-  //   {
-  //     name: 'Snorkeling Expedition',
-  //     description: 'Explore underwater life.',
-  //     image: pic1,
-  //     tags: ['Swimming', 'Snorkeling'],
-  //     amenities: ['Guides', 'Restrooms'],
-  //     rating: 5,
-  //     destination: 'Matnog',
-  //     budget: '500-3500',
-    
-  //   },
-  //   {
-  //     name: 'Camping Retreat',
-  //     description: 'Spend the night under the stars.',
-  //     image: pic1,
-  //     tags: ['Camping'],
-  //     amenities: ['Parking', 'Restrooms'],
-  //     rating: 4,
-  //     destination: 'Bulan',
-  //     budget: '40-800',
-      
-  //   },
-  //   // Add more mock activities here...
-  // ];
 
   // Define the activity types based on the tags used in your activity data
   const activityTypes = [ 'Adventure', 'Swimming', 'Surfing', 'Hiking', 'Camping', 'Tour', 'History', 'Snorkeling'];
@@ -398,7 +335,7 @@ const Activities = () => {
                     variants={cardVariants}
                   >
                     <img
-                      src={`http://localhost:5000/${activity.businessLogo}`}
+                      src={`${BASE_URL}/${activity.businessLogo}`}
                       alt={activity.businessName}
                       className='w-full h-48 object-cover rounded-t-lg'
                     />

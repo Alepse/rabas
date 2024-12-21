@@ -4,6 +4,8 @@ import { FaEye, FaEyeSlash, FaGoogle, FaEnvelope, FaArrowLeft } from 'react-icon
 import Logo2 from '../assets/rabas.png';
 import Swal from 'sweetalert2'; // Change import to sweetalert2
 import { Link } from 'react-router-dom';
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 const LoginSignup = () => {
   const [view, setView] = useState("initial"); // initial, email, signup, forgotPassword
@@ -22,7 +24,7 @@ const LoginSignup = () => {
     // Check login status when the component mounts
     const checkLoginStatus = async () => {
       try {
-        const response = await fetch('http://localhost:5000/check-login', {
+        const response = await fetch(`${BASE_URL}/check-login`, {
           method: 'GET',
           credentials: 'include', // Include credentials
         });
@@ -39,7 +41,7 @@ const LoginSignup = () => {
   const handleLogin = async (event) => {
     event.preventDefault();
     try {
-      const response = await fetch('http://localhost:5000/login', {
+      const response = await fetch(`${BASE_URL}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -101,7 +103,7 @@ const LoginSignup = () => {
   const handleSignup = async (event) => {
     event.preventDefault();
     try {
-      const response = await fetch('http://localhost:5000/signup', {
+      const response = await fetch(`${BASE_URL}/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -138,13 +140,13 @@ const LoginSignup = () => {
   }
 
   const handleGoogleLogin = () => {
-    window.location.href = 'http://localhost:5000/auth/google';
+    window.location.href = `${BASE_URL}/auth/google`;
   };
 
   const handleForgotPassword = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:5000/forgot-password', {
+      const response = await fetch(`${BASE_URL}/forgot-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

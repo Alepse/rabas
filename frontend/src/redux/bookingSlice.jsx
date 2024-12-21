@@ -1,4 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 const initialState = {
   pendingBookings: [],
@@ -16,7 +18,7 @@ export const fetchBookings = createAsyncThunk(
   'bookings/fetchBookings',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch('http://localhost:5000/business-bookings', {
+      const response = await fetch(`${BASE_URL}/business-bookings`, {
         credentials: 'include'
       });
       const data = await response.json();

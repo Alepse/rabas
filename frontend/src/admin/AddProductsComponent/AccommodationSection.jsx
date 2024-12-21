@@ -7,6 +7,8 @@ import { addProduct, handleUpdateAccommodation, deleteAccommodations, fetchBusin
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { FaSearch, FaChevronLeft, FaChevronRight, FaImage } from 'react-icons/fa';
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 const AccommodationSection = () => {
   // State Management
@@ -133,7 +135,7 @@ const AccommodationSection = () => {
     if (selectedAccommodations.length > 0) {
       try {
         // Create a request to delete selected accommodations
-        const response = await fetch('http://localhost:5000/delete-product', {
+        const response = await fetch(`${BASE_URL}/delete-product`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
@@ -194,7 +196,7 @@ const AccommodationSection = () => {
           imageFormData.append('productImage', file.file);
           imageFormData.append('title', file.title || '');
           try {
-            const response = await fetch('http://localhost:5000/upload-image-product', {
+            const response = await fetch(`${BASE_URL}/upload-image-product`, {
               method: 'PUT',
               body: imageFormData,
             });
@@ -268,7 +270,7 @@ const AccommodationSection = () => {
       if (isEditing) {
         try {
           const response = await fetch(
-            `http://localhost:5000/get-product-images/${editingAccommodationId}`
+            `${BASE_URL}/get-product-images/${editingAccommodationId}`
           );
           const data = await response.json();
           existingImages = data.images || [];
@@ -474,7 +476,7 @@ const AccommodationSection = () => {
                   // Render a single image without the slider
                   <div className="relative">
                     <img
-                      src={`http://localhost:5000/${accommodation.images[0].path}`} // Base URL to the image
+                      src={`${BASE_URL}/${accommodation.images[0].path}`} // Base URL to the image
                       alt={`Accommodation ${accommodation.accommodationName} Image`}
                       className="w-full h-32 object-cover rounded-lg mt-2"
                       onError={(e) => {
@@ -490,7 +492,7 @@ const AccommodationSection = () => {
                     {accommodation.images.map((image) => (
                       <div key={`${image.id}`} className="relative">
                         <img
-                          src={`http://localhost:5000/${image.path}`}  // Apply the base URL to the image
+                          src={`${BASE_URL}/${image.path}`}  // Apply the base URL to the image
                           alt={`Accommodation ${accommodation.accommodationName} Image ${image.id}`}
                           className="w-full h-32 object-cover rounded-lg mt-2"
                           onError={(e) => {
@@ -728,7 +730,7 @@ const AccommodationSection = () => {
                           <img
                             src={
                               image.path
-                                ? `http://localhost:5000/${image.path}`
+                                ? `${BASE_URL}/${image.path}`
                                 : image.fileUrl || ''
                             }
                             alt={`Uploaded ${index + 1}`}

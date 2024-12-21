@@ -40,6 +40,8 @@ const Nav = () => {
   const [isSearchOverlayOpen, setIsSearchOverlayOpen] = useState(false);
   const [activeLink, setActiveLink] = useState('');
   const location = useLocation();
+  // Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
   const sampleData = {
     activities: [
@@ -154,7 +156,7 @@ const Nav = () => {
 
   const handleLogout = (e) => {
     e.preventDefault();
-    axios.post('http://localhost:5000/logout', {}, { withCredentials: true })
+    axios.post(`${BASE_URL}/logout`, {}, { withCredentials: true })
       .then(response => {
         if (response.status === 200) {
           console.log('Logout successful');
@@ -169,7 +171,7 @@ const Nav = () => {
   };
 
   const checkLoginStatus = () => {
-    axios.get('http://localhost:5000/check-login', { withCredentials: true })
+    axios.get(`${BASE_URL}/check-login`, { withCredentials: true })
       .then(response => {
         if (response.status === 200) {
           setIsLoggedIn(response.data.isLoggedIn);
@@ -183,7 +185,7 @@ const Nav = () => {
   };
 
   const fetchUserData = () => {
-    axios.get('http://localhost:5000/get-userData', { withCredentials: true })
+    axios.get(`${BASE_URL}/get-userData`, { withCredentials: true })
       .then(response => {
         setUserData(response.data.userData);
       })
@@ -253,7 +255,7 @@ const Nav = () => {
                   <Avatar
                     className='text-lg bg-color1 text-white  duration-300'
                     src={userData?.image_path
-                      ? `http://localhost:5000/${userData.image_path}`
+                      ? `${BASE_URL}/${userData.image_path}`
                       : userData?.google_id
                         ? userData.image
                         : `https://ui-avatars.com/api/?name=${firstLetter}`
@@ -408,7 +410,7 @@ const Nav = () => {
                   <Avatar
                     className='text-lg bg-color1 text-light hover:bg-color2/80 transition-colors duration-300'
                     src={userData?.image_path
-                      ? `http://localhost:5000/${userData.image_path}`
+                      ? `${BASE_URL}/${userData.image_path}`
                       : userData?.google_id
                         ? userData.image
                         : `https://ui-avatars.com/api/?name=${firstLetter}`

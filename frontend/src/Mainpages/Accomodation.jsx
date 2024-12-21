@@ -11,6 +11,9 @@ import Search from '@/components/Search';
 import { Link } from 'react-router-dom';
 import wave from '@/assets/wave2.webp'
 import CryptoJS from 'crypto-js';
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
+
 // Custom hook to detect if the screen is large
 const useIsLargeScreen = () => {
   const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1024);
@@ -42,7 +45,7 @@ const Accommodations = () => {
   useEffect(() => {
     const fetchAccommodations = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/getAllBusinesses?businessType=accommodation`);
+        const response = await fetch(`${BASE_URL}/getAllBusinesses?businessType=accommodation`);
         const data = await response.json();
         if (data.success) {
           const accommodations = data.businesses.filter(business => business.businessType === 'accommodation');
@@ -316,7 +319,7 @@ const Accommodations = () => {
                     variants={cardVariants}
                   >
                     <img
-                      src={`http://localhost:5000/${accommodation.businessLogo}`}
+                      src={`${BASE_URL}/${accommodation.businessLogo}`}
                       alt={accommodation.businessName}
                       className='w-full h-48 object-cover rounded-t-lg'
                     />

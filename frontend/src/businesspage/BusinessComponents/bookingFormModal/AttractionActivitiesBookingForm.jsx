@@ -13,6 +13,8 @@ import {
 import Swal from 'sweetalert2';
 import { today, isWeekend, getLocalTimeZone } from '@internationalized/date';
 import { useLocale } from '@react-aria/i18n';
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 const formatDate = (date) => {
   if (!date) return '';
@@ -49,7 +51,7 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
   // Fetching user data
   const fetchUserData = async () => {
     try {
-      const response = await fetch('http://localhost:5000/get-userData', {
+      const response = await fetch(`${BASE_URL}/get-userData`, {
         method: 'GET',
         credentials: 'include' // Include cookies
       });
@@ -163,7 +165,7 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
         discountedPrice: Number(formData.discountedPrice)
       });
 
-      const response = await fetch(`http://localhost:5000/book-activity`, {
+      const response = await fetch(`${BASE_URL}/book-activity`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -206,7 +208,7 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
       };
 
       // Send the message
-      const messageResponse = await fetch(`http://localhost:5000/sendMessage`, {
+      const messageResponse = await fetch(`${BASE_URL}/sendMessage`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

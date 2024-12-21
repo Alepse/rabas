@@ -4,6 +4,9 @@ import { Tabs, Tab, Card, CardBody } from '@nextui-org/react';
 import SearchBar from './superadmincomponents/SearchBar'; // Import the SearchBar component
 import Swal from 'sweetalert2';
 
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
+
 // Remove the Highlight import and add this custom component
 const Highlight = ({ content, match }) => {
   if (!match || !match.trim() || !content) return <span>{content}</span>;
@@ -58,7 +61,7 @@ const SuperAdminUsers = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch('http://147.93.19.247:5000/superAdmin-fetchAllUsers', {
+      const response = await fetch(`${BASE_URL}/superAdmin-fetchAllUsers`, { // Use the BASE_URL variable
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -96,7 +99,7 @@ const SuperAdminUsers = () => {
     // If user confirms, proceed with deletion
     if (result.isConfirmed) {
       try {
-        const response = await fetch(`http://localhost:5000/superAdmin-deleteUser/${userId}`, {
+        const response = await fetch(`${BASE_URL}/superAdmin-deleteUser/${userId}`, { // Use the BASE_URL variable
           method: 'DELETE',
           credentials: 'include',
           headers: {

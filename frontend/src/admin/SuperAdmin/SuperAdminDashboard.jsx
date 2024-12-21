@@ -3,6 +3,8 @@ import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import SuperAdminSidebar from './superadmincomponents/superadminsidebar';
 import { useAsyncList } from '@react-stately/data';
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 // Register chart components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -96,7 +98,7 @@ const SuperAdminDashboard = () => {
   useEffect(() => {
     const fetchBusinessOwners = async () => {
       try {
-        const response = await fetch('http://localhost:5000/superAdmin-fetchAllBusinessOwners', {
+        const response = await fetch(`${BASE_URL}/superAdmin-fetchAllBusinessOwners`, {
           credentials: 'include'
         });
 
@@ -126,7 +128,7 @@ const SuperAdminDashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:5000/superAdmin-fetchAllData', {
+        const response = await fetch(`${BASE_URL}/superAdmin-fetchAllData`, {
           credentials: 'include'
         });
 

@@ -15,7 +15,8 @@ import { CheckboxGroup, Checkbox } from "@nextui-org/checkbox";
 import SuperAdminSidebar from './superadmincomponents/superadminsidebar';
 import SearchBar from './superadmincomponents/SearchBar'; // Import the SearchBar component
 import { Bar } from 'react-chartjs-2';
-
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 // Sample Business Listings Data
 const businessListings = {
@@ -250,7 +251,7 @@ const SuperAdminProducts = () => {
 
   const fetchBusinessProducts = async () => {
     try {
-      const response = await fetch('http://localhost:5000/superAdmin-fetchAllBusinessProducts', {
+      const response = await fetch(`${BASE_URL}/superAdmin-fetchAllBusinessProducts`, {
         credentials: 'include'
       });
 
@@ -283,7 +284,7 @@ const SuperAdminProducts = () => {
             title: product.name || 'Untitled Product',
             description: product.description || 'No description available',
             price: parseFloat(product.price) || 0,
-            imageUrl: images && images.length > 0 ?  `http://localhost:5000/${images[0].path}` : 'https://via.placeholder.com/200',
+            imageUrl: images && images.length > 0 ?  `${BASE_URL}/${images[0].path}` : 'https://via.placeholder.com/200',
             rating: product.rating || 0,
             type: product.type || 'Uncategorized',
             businessName: product.businessName || 'Unknown Business',
@@ -339,7 +340,7 @@ const SuperAdminProducts = () => {
 
   const fetchBusinessListings = async () => {
     try {
-      const response = await fetch('http://localhost:5000/superAdmin-fetchAllBusinessListings', {
+      const response = await fetch(`${BASE_URL}/superAdmin-fetchAllBusinessListings`, {
         credentials: 'include'
       });
 
@@ -363,7 +364,7 @@ const SuperAdminProducts = () => {
           const enhancedBusiness = {
             title: business.businessName,
             description: business.aboutUs || 'No description available',
-            imageUrl: business.businessLogo ? `http://localhost:5000/${business.businessLogo}` : 'https://via.placeholder.com/200',
+            imageUrl: business.businessLogo ? `${BASE_URL}/${business.businessLogo}` : 'https://via.placeholder.com/200',
             type: business.businessType,
             businessInfo: {
               category: business.category || [],
@@ -638,7 +639,7 @@ const SuperAdminProducts = () => {
                   {business.heroImages.map((img, idx) => (
                     <img
                       key={idx}
-                      src={`http://localhost:5000/${img.path}`}
+                      src={`${BASE_URL}/${img.path}`}
                       alt={`Hero ${idx + 1}`}
                       className="w-20 h-20 object-cover rounded"
                     />

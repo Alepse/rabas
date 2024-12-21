@@ -17,6 +17,8 @@ import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { FiSend } from 'react-icons/fi';
 import Swal from 'sweetalert2';
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 const showSuccessAlert = (message) => {
   Swal.fire({
@@ -66,7 +68,7 @@ const BusinessPage = () => {
   // Function to check login status
   const checkLoginStatus = useCallback(async () => {
     try {
-      const response = await fetch('http://localhost:5000/check-login', {
+      const response = await fetch(`${BASE_URL}/check-login`, {
         method: 'GET',
         credentials: 'include' // Include cookies
       });
@@ -86,7 +88,7 @@ const BusinessPage = () => {
   }, []);
 
   const fetchUserData = () => {
-    axios.get('http://localhost:5000/get-userData', { withCredentials: true })
+    axios.get(`${BASE_URL}/get-userData`, { withCredentials: true })
       .then(({ data }) => {
         setUserData(data.userData);
       })
@@ -112,7 +114,7 @@ const BusinessPage = () => {
     const fetchBusinessData = async () => {
       try {
         const decryptedBusinessId = decryptId(encryptedBusinessId);
-        const response = await axios.get(`http://localhost:5000/getAllBusinesses`);
+        const response = await axios.get(`${BASE_URL}/getAllBusinesses`);
         const business = response.data.businesses.find(b => b.business_id === parseInt(decryptedBusinessId));
         setBusinessData(business);
         // console.log('Encrypted ID:', encryptedBusinessId);
@@ -173,7 +175,7 @@ const BusinessPage = () => {
     formData.append('text', message);
 
     try {
-      const response = await axios.post('http://localhost:5000/sendMessage', formData);
+      const response = await axios.post(`${BASE_URL}/sendMessage`, formData);
       console.log(response);
       showSuccessAlert('Message send successfully.');
     } catch (error) {
@@ -184,7 +186,7 @@ const BusinessPage = () => {
 
   const fetchLikedBusinesses = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/liked-businesses', { withCredentials: true });
+      const response = await axios.get(`${BASE_URL}/liked-businesses`, { withCredentials: true });
       const likedBusinesses = response.data.likedBusinesses;
       setIsLiked(likedBusinesses.some(b => b.business_id === businessData.business_id));
     } catch (error) {
@@ -201,7 +203,7 @@ const BusinessPage = () => {
 
   const fetchLikeCounts = async (businessId) => {
     try {
-      const response = await axios.get(`http://localhost:5000/getLikesCount/${businessId}`, { withCredentials: true });
+      const response = await axios.get(`${BASE_URL}/getLikesCount/${businessId}`, { withCredentials: true });
       if (response.data.success) {
         const likes = response.data.businessLikes.likes; // Extract the likes count
         setLikesCount(likes); // Update the state with the likes count
@@ -220,7 +222,7 @@ const BusinessPage = () => {
   
   const likeBusiness = async (businessId) => {
     try {
-      const response = await axios.post('http://localhost:5000/like-business', { businessId }, { withCredentials: true });
+      const response = await axios.post(`${BASE_URL}/like-business`, { businessId }, { withCredentials: true });
       if (response.data.success) {
         setIsLiked(true);
         fetchLikeCounts(businessId); // Pass businessId here
@@ -235,7 +237,7 @@ const BusinessPage = () => {
   
   const unlikeBusiness = async (businessId) => {
     try {
-      const response = await axios.delete(`http://localhost:5000/unlike-business/${businessId}`, { withCredentials: true });
+      const response = await axios.delete(`${BASE_URL}/unlike-business/${businessId}`, { withCredentials: true });
       if (response.data.success) {
         setIsLiked(false);
         fetchLikeCounts(businessId); // Pass businessId here
@@ -306,7 +308,7 @@ const BusinessPage = () => {
           <div className='flex flex-wrap items-center gap-4 py-4'>
             <img 
               className='w-16 h-16 sm:w-24 sm:h-24 rounded-full object-cover shadow-gray-400 p-5' 
-              src={businessData.businessLogo ? `http://localhost:5000/${businessData.businessLogo}` : `https://ui-avatars.com/api/?name=${businessData?.businessName?.charAt(0).toUpperCase()}`} 
+              src={businessData.businessLogo ? `${BASE_URL}/${businessData.businessLogo}` : `https://ui-avatars.com/api/?name=${businessData?.businessName?.charAt(0).toUpperCase()}`} 
               alt={businessData.businessName}
             />
             <h1 className='text-xl sm:text-2xl font-medium mr-16'>{businessData.businessName}</h1>

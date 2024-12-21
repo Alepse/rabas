@@ -15,6 +15,8 @@ import wave from '@/assets/wave2.webp';
 import CryptoJS from 'crypto-js';
 import axios from 'axios';
 import { FaCamera } from 'react-icons/fa';
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 // Function to encrypt the business_id
 const encryptId = (id) => {
@@ -35,7 +37,7 @@ const renderLikedPages = (likedPages, handleUnlikePage) => {
     likedPages.map((item, index) => (
       <div key={item.id || index} className='bg-white max-w-[800px] w-full rounded-lg shadow-lg hover:shadow-slate-500 duration-300 mb-4'>
         <img
-          src={`http://localhost:5000/${item.image}`}
+          src={`${BASE_URL}/${item.image}`}
           alt={item.name}
           className='w-full h-48 object-cover rounded-t-lg'
         />
@@ -259,7 +261,7 @@ const UserProfile = ({ activities = [] }) => {
 
     if (result.isConfirmed) {
       try {
-        const response = await fetch(`http://localhost:5000/cancel-booking/${bookingId}`, {
+        const response = await fetch(`${BASE_URL}/cancel-booking/${bookingId}`, {
           method: 'PUT',
           credentials: 'include'
         });
@@ -298,7 +300,7 @@ const UserProfile = ({ activities = [] }) => {
 
   const checkLoginStatus = useCallback(async () => {
     try {
-      const response = await fetch('http://localhost:5000/check-login', {
+      const response = await fetch(`${BASE_URL}/check-login`, {
         method: 'GET',
         credentials: 'include'
       });
@@ -319,7 +321,7 @@ const UserProfile = ({ activities = [] }) => {
   
   const fetchUserData = async () => {
     try {
-      const response = await fetch('http://localhost:5000/get-userData', {
+      const response = await fetch(`${BASE_URL}/get-userData`, {
         method: 'GET',
         credentials: 'include'
       });
@@ -336,7 +338,7 @@ const UserProfile = ({ activities = [] }) => {
 
   const fetchLikedPages = async () => {
     try {
-      const response = await fetch('http://localhost:5000/liked-pages', {
+      const response = await fetch(`${BASE_URL}/liked-pages`, {
         method: 'GET',
         credentials: 'include',
       });
@@ -349,7 +351,7 @@ const UserProfile = ({ activities = [] }) => {
 
   const fetchBusinessApplications = async () => {
     try {
-      const response = await fetch('http://localhost:5000/businesses-application', {
+      const response = await fetch(`${BASE_URL}/businesses-application`, {
         method: 'GET',
         credentials: 'include',
       });
@@ -362,7 +364,7 @@ const UserProfile = ({ activities = [] }) => {
         
         if (approvedApplication) {
           try {
-            const response = await fetch('http://localhost:5000/get-businessData', {
+            const response = await fetch(`${BASE_URL}/get-businessData`, {
               method: 'GET',
               credentials: 'include',
             });
@@ -424,7 +426,7 @@ const UserProfile = ({ activities = [] }) => {
       const formData = new FormData();
       formData.append('profilePic', file);
   
-      const response = await axios.put(`http://localhost:5000/updateUserProfile/${userData.user_id}`, formData, {
+      const response = await axios.put(`${BASE_URL}/updateUserProfile/${userData.user_id}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         },
@@ -465,7 +467,7 @@ const UserProfile = ({ activities = [] }) => {
       formData.append('phoneNumber', phoneNumber);
       formData.append('address', address);
 
-      const response = await fetch(`http://localhost:5000/updateUserProfile/${userData.user_id}`, {
+      const response = await fetch(`${BASE_URL}/updateUserProfile/${userData.user_id}`, {
         method: 'PUT',
         body: formData,
       });
@@ -512,7 +514,7 @@ const UserProfile = ({ activities = [] }) => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await axios.delete(`http://localhost:5000/unlike-business/${businessId}`, { withCredentials: true });
+          const response = await axios.delete(`${BASE_URL}/unlike-business/${businessId}`, { withCredentials: true });
           if (response.data.success) {
             setLikedPages((prevLikedPages) => {
               // Filter out the page with the specified businessId
@@ -549,7 +551,7 @@ const UserProfile = ({ activities = [] }) => {
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const response = await fetch('http://localhost:5000/bookings', {
+        const response = await fetch(`${BASE_URL}/bookings`, {
           credentials: 'include'
         });
         const data = await response.json();
@@ -569,7 +571,7 @@ const UserProfile = ({ activities = [] }) => {
 
   const handleBusinessClick = async (businessId) => {
     try {
-      const response = await fetch('http://localhost:5000/set-business-id', {
+      const response = await fetch(`${BASE_URL}/set-business-id`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -609,7 +611,7 @@ const UserProfile = ({ activities = [] }) => {
             src={profilePic 
               ? profilePic 
               : (userData?.image_path 
-                ? `http://localhost:5000/${userData.image_path}`
+                ? `${BASE_URL}/${userData.image_path}`
                 : userData?.google_id
                   ? userData.image
                   : `https://ui-avatars.com/api/?name=${username?.charAt(0).toUpperCase()}`)}  
@@ -641,7 +643,7 @@ const UserProfile = ({ activities = [] }) => {
                     className='text-gray-500 hover:bg-color2 hover:text-white flex items-center p-2 rounded-md gap-1 border-1 border-color1 shadow-md transition duration-300 ease-in-out transform hover:scale-105'
                     onClick={() => handleBusinessClick(businessData.business_id)}
                     key={application.application_id}>
-                    <Avatar src={ businessData.businessLogo ? `http://localhost:5000/${businessData.businessLogo}` : ''}/>
+                    <Avatar src={ businessData.businessLogo ? `${BASE_URL}/${businessData.businessLogo}` : ''}/>
                     <p>{businessData.businessName}</p>
                   </button>
                 </div>

@@ -24,6 +24,8 @@ import { today, getLocalTimeZone } from '@internationalized/date';
 import { MdPeople, MdEmail, MdPhone, MdDateRange, MdHotel, MdRestaurant, MdDirectionsRun, MdCheck, MdDone, MdClose } from 'react-icons/md';
 import Swal from 'sweetalert2';
 import axios from 'axios';
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 // Add the formatDate helper function at the top of your file
 const formatDate = (date) => {
@@ -299,7 +301,7 @@ const BookingForm = ({ isOpen, onClose, title, products, onSubmit, type }) => {
           throw new Error('Invalid booking type');
       }
 
-      const response = await fetch(`http://localhost:5000${endpoint}`, {
+      const response = await fetch(`${BASE_URL}${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -573,7 +575,7 @@ const BusinessBooking = () => {
   // Function to check login status
   const checkLoginStatus = useCallback(async () => {
     try {
-      const response = await fetch('http://localhost:5000/check-login', {
+      const response = await fetch(`${BASE_URL}/check-login`, {
         method: 'GET',
         credentials: 'include' // Include cookies
       });
@@ -704,10 +706,10 @@ const BusinessBooking = () => {
       setIsLoading(true);
   
       // Fetch user data to get the user_id
-      const userResponse = await axios.get('http://localhost:5000/get-userData', { withCredentials: true });
+      const userResponse = await axios.get(`${BASE_URL}/get-userData`, { withCredentials: true });
       const userId = userResponse.data.userData.user_id;
   
-      const response = await fetch(`http://localhost:5000/update-booking-status/${bookingId}`, {
+      const response = await fetch(`${BASE_URL}/update-booking-status/${bookingId}`, {
         method: 'PUT',
         credentials: 'include',
         headers: {
@@ -736,7 +738,7 @@ const BusinessBooking = () => {
         form_details: JSON.stringify({ bookingId }) // Include any additional details if necessary
       };
   
-      const messageResponse = await fetch('http://localhost:5000/sendMessage', {
+      const messageResponse = await fetch(`${BASE_URL}/sendMessage`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -762,7 +764,7 @@ const BusinessBooking = () => {
   const handleMarkAsCompleted = async (bookingId) => {
     try {
       setIsLoading(true);
-      const response = await fetch(`http://localhost:5000/update-booking-status/${bookingId}`, {
+      const response = await fetch(`${BASE_URL}/update-booking-status/${bookingId}`, {
         method: 'PUT',
         credentials: 'include',
         headers: {
@@ -795,11 +797,11 @@ const BusinessBooking = () => {
   useEffect(() => {
     const fetchProducts = () => {
       // Fetch user_id from the endpoint
-      axios.get('http://localhost:5000/get-userData', { withCredentials: true })
+      axios.get(`${BASE_URL}/get-userData`, { withCredentials: true })
         .then(response => {
           const userId = response.data.userData.user_id;
 
-          axios.get('http://localhost:5000/getAllBusinessProduct')
+          axios.get(`${BASE_URL}/getAllBusinessProduct`)
             .then(({ data }) => {
               if (data.success) {
                 const products = data.businessProducts;
@@ -1144,7 +1146,7 @@ const WalkInTypeSection = ({ type, customers, searchQuery }) => {
   const handleMarkAsComplete = async (customerId) => {
     try {
       // setIsLoading(true);
-      const response = await fetch(`http://localhost:5000/update-booking-status/${customerId}`, {
+      const response = await fetch(`${BASE_URL}/update-booking-status/${customerId}`, {
         method: 'PUT',
         credentials: 'include',
         headers: {

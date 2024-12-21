@@ -11,6 +11,8 @@ import AttractionActivitiesBookingForm from './bookingFormModal/AttractionActivi
 import { useParams } from 'react-router-dom';
 import CryptoJS from 'crypto-js';
 import Swal from 'sweetalert2';
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 // SweetAlert functions
 const showSuccessAlert = (message) => {
@@ -43,7 +45,7 @@ const BusinessSection = () => {
    // Function to check login status
   const checkLoginStatus = useCallback(async () => {
     try {
-      const response = await fetch('http://localhost:5000/check-login', {
+      const response = await fetch(`${BASE_URL}/check-login`, {
         method: 'GET',
         credentials: 'include' // Include cookies
       });
@@ -101,7 +103,7 @@ const BusinessSection = () => {
     const fetchCategoryData = async (category) => {
       try {
         const decryptedBusinessId = decryptId(encryptedBusinessId);
-        const response = await fetch(`http://localhost:5000/getAllBusinessProduct?category=${category}`);
+        const response = await fetch(`${BASE_URL}/getAllBusinessProduct?category=${category}`);
         const contentType = response.headers.get("content-type");
 
         if (contentType && contentType.includes("application/json")) {
@@ -176,7 +178,7 @@ const BusinessSection = () => {
               <SwiperSlide key={`${deal.id}-${index}`} className='flex justify-center'>
                 <div className='shadow-lg rounded-lg overflow-hidden bg-white relative max-w-sm mx-1 transform transition-transform duration-300 hover:scale-105 hover:shadow-xl' style={{ height: '450px', width: '300px' }}>
                   {deal.images && deal.images.length > 0 && (
-                    <img src={`http://localhost:5000/${deal.images[0].path}`} alt={deal.name} className='w-full h-48 object-cover' />
+                    <img src={`${BASE_URL}/${deal.images[0].path}`} alt={deal.name} className='w-full h-48 object-cover' />
                   )}
                   <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
                     {deal.discount}% OFF

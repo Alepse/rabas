@@ -4,6 +4,8 @@ import { FaPlus } from 'react-icons/fa';
 import AddItemModal from './AddItemModal';
 import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 const SchedulesPlan = ({ startDate, endDate, onItineraryChange }) => {
     // console.log('SchedulesPlan Dates:', startDate, endDate);
@@ -263,7 +265,7 @@ const SchedulesPlan = ({ startDate, endDate, onItineraryChange }) => {
                                                     <h3 className="font-semibold text-xl">{item.title}</h3>
                                                     <span className="text-sm text-gray-500"> <span className='text-black font-medium'>Time of Visit:</span> {formatTime(item.time)}</span>
                                                 </div>
-                                                <img src={`http://localhost:5000/${item.imageUrl}` || 'https://via.placeholder.com/300'} alt={item.title} className="w-full h-56 object-cover rounded-md mb-4" />                                    
+                                                <img src={`${BASE_URL}/${item.imageUrl}` || 'https://via.placeholder.com/300'} alt={item.title} className="w-full h-56 object-cover rounded-md mb-4" />                                    
                                                 <p className="text-sm mb-2"><strong>Booked:</strong> {item.isBooked ? 'Yes' : 'No'}</p>
                                                 <p className="text-sm mb-4"><strong>Notes:</strong> {item.notes}</p>
                                                 <div className='w-full mb-2'>

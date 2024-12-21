@@ -6,6 +6,8 @@ import { Link } from 'react-router-dom';
 import { FaSearch, FaPlus, FaTimes } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 import CryptoJS from 'crypto-js';
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 // Function to encrypt the business_id
 const encryptId = (id) => {
@@ -67,7 +69,7 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
   useEffect(() => {
     const fetchBusinesses = async (businessType) => {
       try {
-        const response = await fetch(`http://localhost:5000/getAllBusinesses?businessType=${businessType}`);
+        const response = await fetch(`${BASE_URL}/getAllBusinesses?businessType=${businessType}`);
         const contentType = response.headers.get("content-type");
 
         if (contentType && contentType.includes("application/json")) {
@@ -606,7 +608,7 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                                                 <FaPlus />
                                             </button>
                                             <img
-                                                src={`http://localhost:5000/${item.businessLogo}`}
+                                                src={`${BASE_URL}/${item.businessLogo}`}
                                                 alt={item.businessName}
                                                 className="w-full h-48 object-cover rounded-t-lg"
                                             />
@@ -719,7 +721,7 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                                 <Button auto color='danger' flat onClick={() => setIsSideUIVisible(false)}>Close</Button>
                             </div>
                             <div className="mb-4">
-                                <img src={`http://localhost:5000/${selectedItem.businessLogo}`} alt={selectedItem.businessName} className="w-full h-48 object-cover rounded-md" />
+                                <img src={`${BASE_URL}/${selectedItem.businessLogo}`} alt={selectedItem.businessName} className="w-full h-48 object-cover rounded-md" />
                             </div>
                             <h3 className="text-lg font-bold">{selectedItem.title}</h3>
                             <p className="text-sm text-gray-500 mb-2">{selectedItem.destination}</p>

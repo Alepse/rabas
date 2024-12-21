@@ -5,6 +5,8 @@ import ActivityDeals from '@/admin/AddDealsComponent/ActivityDeals';
 import AccommodationDeals from '@/admin/AddDealsComponent/AccomodationDeals';
 import RestaurantDeals from '@/admin/AddDealsComponent/RestaurantDeals';
 import ShopDeals from '@/admin/AddDealsComponent/ShopDeals';
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 const BusinessDeals = () => {
   const [showActivities, setShowActivities] = useState(false);
@@ -16,7 +18,7 @@ const BusinessDeals = () => {
   // Function to check login status
   const checkLoginStatus = useCallback(async () => {
     try {
-      const response = await fetch('http://localhost:5000/check-login', {
+      const response = await fetch(`${BASE_URL}/check-login`, {
         method: 'GET',
         credentials: 'include' // Include cookies
       });

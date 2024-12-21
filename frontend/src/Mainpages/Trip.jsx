@@ -26,6 +26,9 @@ import Swal from 'sweetalert2';
 import TripDetailsModal from './PlanATripComponents/TripDetailsModal';
 import wave from '@/assets/wave2.webp'
 import axios from 'axios';
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
+
 const MotionBox = motion.div;
 
 // Function to show success alerts
@@ -64,7 +67,7 @@ const Trip = () => {
 
   useEffect(() => {
     // Fetch trips from the endpoint
-    axios.get('http://localhost:5000/trips', { withCredentials: true })
+    axios.get(`${BASE_URL}/trips`, { withCredentials: true })
       .then(response => {
         // console.log('response', response);
         setTrips(response.data.trips); // Set the fetched trips to state
@@ -149,7 +152,7 @@ const Trip = () => {
 
   const submitTrip = () => {
     // Fetch user_id from the endpoint
-    axios.get('http://localhost:5000/get-userData', { withCredentials: true })
+    axios.get(`${BASE_URL}/get-userData`, { withCredentials: true })
       .then(response => {
         // console.log('response', response);
         const userId = response.data.userData.user_id;
@@ -167,7 +170,7 @@ const Trip = () => {
           userId, // Include user_id in the newTrip object
         };
       
-        axios.post('http://localhost:5000/add-trip', newTrip)
+        axios.post(`${BASE_URL}/add-trip`, newTrip)
         .then(response => {
           const { tripId } = response.data; // Extract tripId from the response
           const tripWithId = { ...newTrip, tripId }; // Add tripId to the newTrip object
@@ -212,7 +215,7 @@ const Trip = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         // console.log('tripId', tripId);
-        axios.delete(`http://localhost:5000/delete-trip/${tripId}`, { withCredentials: true })
+        axios.delete(`${BASE_URL}/delete-trip/${tripId}`, { withCredentials: true })
           .then(() => {
             setTrips(trips.filter((_, i) => i !== index));
             Swal.fire({
@@ -289,7 +292,7 @@ const Trip = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {trips.map((trip, index) => (
                 <div key={index} className="flex flex-col md:flex-row border rounded-lg shadow-md overflow-hidden">
-                  <img src={`http://localhost:5000/${trip.imageUrl}`} alt="Trip" className="w-full md:w-1/3 object-cover" />
+                  <img src={`${BASE_URL}/${trip.imageUrl}`} alt="Trip" className="w-full md:w-1/3 object-cover" />
                   <div className="p-4 flex flex-col justify-between w-full md:w-2/3">
                     <div>
                       <h2 className="text-xl font-semibold">{trip.tripName}</h2>
@@ -453,7 +456,7 @@ const Trip = () => {
                                     <h3 className="font-semibold text-xl">{item.title}</h3>
                                     <span className="text-sm text-gray-500"> <span className='text-black font-medium'>Time of Visit:</span> {formatTime(item.time)}</span>
                                   </div>
-                                  <img src={`http://localhost:5000/${item.imageUrl}` || 'https://via.placeholder.com/300'} alt={item.title} className="w-full h-56 object-cover rounded-md mb-4" />
+                                  <img src={`${BASE_URL}/${item.imageUrl}` || 'https://via.placeholder.com/300'} alt={item.title} className="w-full h-56 object-cover rounded-md mb-4" />
                                   <p className="text-sm mb-2"><strong>Booked:</strong> {item.isBooked ? 'Yes' : 'No'}</p>
                                   <p className="text-sm mb-4"><strong>Notes:</strong> {item.notes}</p>
                                 </div>

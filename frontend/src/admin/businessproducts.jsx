@@ -5,6 +5,8 @@ import ActivitySections from './AddProductsComponent/ActivitySections';
 import AccommodationSection from './AddProductsComponent/AccommodationSection';
 import RestaurantServicesSection from './AddProductsComponent/RestaurantServicesSection';
 import ShopSections from './AddProductsComponent/ShopSections';
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 const BusinessProducts = () => {
   const [showActivities, setShowActivities] = useState(false);
@@ -16,7 +18,7 @@ const BusinessProducts = () => {
   // Function to check login status
   const checkLoginStatus = useCallback(async () => {
     try {
-      const response = await fetch('http://localhost:5000/check-login', {
+      const response = await fetch(`${BASE_URL}/check-login`, {
         method: 'GET',
         credentials: 'include' // Include cookies
       });

@@ -13,6 +13,8 @@ import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import wave from '@/assets/wave2.webp'
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 
 import CryptoJS from 'crypto-js';
@@ -74,7 +76,7 @@ const Discover = () => {
   useEffect(() => {
     const fetchBusinesses = async (businessType) => {
       try {
-        const response = await fetch(`http://localhost:5000/getAllBusinesses?businessType=${businessType}`);
+        const response = await fetch(`${BASE_URL}/getAllBusinesses?businessType=${businessType}`);
         const contentType = response.headers.get("content-type");
 
         if (contentType && contentType.includes("application/json")) {
@@ -587,7 +589,7 @@ const Discover = () => {
                     variants={cardVariants}
                   >
                     <img
-                      src={item.cardImage ? `http://localhost:5000/${item.cardImage}` : `http://localhost:5000/${item.businessLogo}`}
+                      src={item.cardImage ? `${BASE_URL}/${item.cardImage}` : `${BASE_URL}/${item.businessLogo}`}
                       alt={item.businessName}
                       className="w-full h-48 object-cover rounded-t-lg"
                     />
@@ -669,7 +671,7 @@ const Discover = () => {
                       <div class="custom-popup flex items-center whitespace-nowrap font-bold text-color1" style="font-size: ${fontSize};">
                         ${showLogo ? `<div class="pin-container">
                           <div class="pin-head">
-                            <img src="http://localhost:5000/${business.businessLogo}" alt="${business.businessName}" class="pin-logo" />
+                            <img src="${BASE_URL}/${business.businessLogo}" alt="${business.businessName}" class="pin-logo" />
                           </div>
                           <div class="pin-point"></div>
                         </div><span>${locationName}</span>` : `<div class="business-name">${locationName}</div>`}

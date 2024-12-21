@@ -11,6 +11,8 @@ import {
   RangeCalendar
 } from '@nextui-org/react';
 import Swal from 'sweetalert2';
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
   const [userId, setUserId] = useState(null);
@@ -39,7 +41,7 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
   // Fetching user data
   const fetchUserData = async () => {
     try {
-      const response = await fetch('http://localhost:5000/get-userData', {
+      const response = await fetch(`${BASE_URL}/get-userData`, {
         method: 'GET',
         credentials: 'include' // Include cookies
       });
@@ -101,7 +103,7 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
       return;
     }
     try {
-      const response = await fetch(`http://localhost:5000/book-accommodation`, {
+      const response = await fetch(`${BASE_URL}/book-accommodation`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -137,7 +139,7 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
       };
 
       // Send the message
-      const messageResponse = await fetch(`http://localhost:5000/sendMessage`, {
+      const messageResponse = await fetch(`${BASE_URL}/sendMessage`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

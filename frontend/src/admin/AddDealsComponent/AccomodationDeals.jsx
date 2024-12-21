@@ -7,6 +7,8 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDi
 import { addAccommodationDeals, updateAccommodationDeals, deleteDeal, fetchDeals } from '@/redux/accommodationDealsSlice';
 import { fetchBusinessProducts } from '@/redux/accomodationSlice';
 import axios from 'axios';
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 const AccomodationDeals = () => {
   const dispatch = useDispatch();
@@ -209,7 +211,7 @@ const AccomodationDeals = () => {
       cancelButtonColor: '#D33736',
     }).then((result) => {
       if (result.isConfirmed) {
-        axios.delete(`http://localhost:5000/delete-deals/${dealId}`, {
+        axios.delete(`${BASE_URL}/delete-deals/${dealId}`, {
           withCredentials: true,
         })
         .then(() => {

@@ -9,6 +9,8 @@ import { FaBars, FaTimes, FaCalendar } from 'react-icons/fa';
 import { CgLogOut } from "react-icons/cg";
 import { TbWorld } from "react-icons/tb";
 import CryptoJS from 'crypto-js';
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 // Function to encrypt the business_id
 const encryptId = (id) => {
@@ -45,7 +47,7 @@ const Sidebar = () => {
   // Fetching business data from the backend and updating Redux
   const fetchBusinessData = async () => {
     try {
-      const response = await fetch('http://localhost:5000/get-businessData', {
+      const response = await fetch(`${BASE_URL}/get-businessData`, {
         method: 'GET',
         credentials: 'include',
       });

@@ -9,6 +9,8 @@ import { GiPositionMarker } from 'react-icons/gi';
 import { AiOutlineLike } from 'react-icons/ai';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import CryptoJS from 'crypto-js';
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 const formatNumber = (num) => {
   if (num >= 1_000_000) {
@@ -37,7 +39,7 @@ const ShopsTab = () => {
   useEffect(() => {
     const fetchShops = async () => {
       try {
-        const response = await fetch('http://localhost:5000/getBusinessesByBusinessType/shop');
+        const response = await fetch(`${BASE_URL}/getBusinessesByBusinessType/shop`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -107,7 +109,7 @@ const ShopSwiper = ({ title, link, isLast, shops }) => (
             <div className="w-full h-56 md:h-64 bg-gray-200 rounded-t-lg overflow-hidden">
               {shop.image ? (
                 <img
-                  src={`http://localhost:5000/${shop.image}`}
+                  src={`${BASE_URL}/${shop.image}`}
                   alt={shop.name}
                   className="w-full h-full object-cover"
                 />

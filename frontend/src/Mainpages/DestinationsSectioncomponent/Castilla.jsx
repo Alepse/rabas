@@ -16,6 +16,8 @@ import img from '@/assets/shop.webp'; // Sample image
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa'
 import axios from 'axios';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 const renderSwiperActivitySection = (title, link, spots) => {
   const activitySpots = spots.filter(spot => spot.businessType === 'attraction');
@@ -52,7 +54,7 @@ const renderSwiperActivitySection = (title, link, spots) => {
               <div className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between max-w-xs md:max-w-lg lg:max-w-sm mx-auto h-[400px] p-2 relative"
                    style={{ width: '300px', height: '400px' }}>
                 <img
-                  src={spot.image ? `http://localhost:5000/${spot.image}` : `http://localhost:5000/${spot.businessLogo}`}
+                  src={spot.image ? `${BASE_URL}/${spot.image}` : `${BASE_URL}/${spot.businessLogo}`}
                   alt={spot.name}
                   className="w-full h-48 object-cover rounded-t-lg"
                 />
@@ -142,7 +144,7 @@ const renderSwiperAccommodationSection = (title, link, spots) => {
               <div className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between max-w-xs md:max-w-lg lg:max-w-sm mx-auto h-[400px] p-2 relative"
                    style={{ width: '300px', height: '400px' }}>
                 <img
-                  src={spot.image ? `http://localhost:5000/${spot.image}` : `http://localhost:5000/${spot.businessLogo}`}
+                  src={spot.image ? `${BASE_URL}/${spot.image}` : `${BASE_URL}/${spot.businessLogo}`}
                   alt={spot.name}
                   className="w-full h-48 object-cover rounded-t-lg"
                 />
@@ -232,7 +234,7 @@ const renderSwiperEaterySection = (title, link, spots) => {
               <div className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between max-w-xs md:max-w-lg lg:max-w-sm mx-auto h-[400px] p-2 relative"
                    style={{ width: '300px', height: '400px' }}>
                 <img
-                  src={spot.image ? `http://localhost:5000/${spot.image}` : `http://localhost:5000/${spot.businessLogo}`}
+                  src={spot.image ? `${BASE_URL}/${spot.image}` : `${BASE_URL}/${spot.businessLogo}`}
                   alt={spot.name}
                   className="w-full h-48 object-cover rounded-t-lg"
                 />
@@ -323,7 +325,7 @@ const renderSwiperShopSection = (title, link, spots) => {
               <div className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between max-w-xs md:max-w-lg lg:max-w-sm mx-auto h-[400px] p-2 relative"
                    style={{ width: '300px', height: '400px' }}>
                 <img
-                  src={spot.image ? `http://localhost:5000/${spot.image}` : `http://localhost:5000/${spot.businessLogo}`}
+                  src={spot.image ? `${BASE_URL}/${spot.image}` : `${BASE_URL}/${spot.businessLogo}`}
                   alt={spot.name}
                   className="w-full h-48 object-cover rounded-t-lg"
                 />
@@ -385,7 +387,7 @@ const Castilla = () => {
   useEffect(() => {
     const fetchBusinesses = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/getBusinessesByLocation/Castilla');
+        const response = await axios.get(`${BASE_URL}/getBusinessesByLocation/Castilla`);
         // console.log(response.data);
         setBusinesses(Array.isArray(response.data) ? response.data : []);
       } catch (error) {
@@ -465,7 +467,7 @@ const Castilla = () => {
                       <div class="custom-popup flex items-center whitespace-nowrap font-bold text-color1" style="font-size: ${fontSize};">
                         ${showLogo ? `<div class="pin-container">
                           <div class="pin-head">
-                            <img src="http://localhost:5000/${business.image}" alt="${business.name}" class="pin-logo" />
+                            <img src="${BASE_URL}/${business.image}" alt="${business.name}" class="pin-logo" />
                           </div>
                           <div class="pin-point"></div>
                         </div><span>${locationName}</span>` : `<div class="business-name">${locationName}</div>`}

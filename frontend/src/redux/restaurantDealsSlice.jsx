@@ -1,12 +1,14 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 // Async thunk to fetch deals (restaurant)
 export const fetchDeals = createAsyncThunk(
   'restaurantDeals/fetchRestaurantDeals',
   async () => {
     try {
-      const response = await axios.get('http://localhost:5000/getDeals', {
+      const response = await axios.get(`${BASE_URL}/getDeals`, {
         params: { category: 'restaurant' },
         withCredentials: true,
       });
@@ -26,7 +28,7 @@ export const addRestaurantDeals = createAsyncThunk(
       // Log the data being sent for verification
       // console.log('Sending deal data:', dealData);
 
-      const response = await axios.post('http://localhost:5000/add-deals', dealData, {
+      const response = await axios.post(`${BASE_URL}/add-deals`, dealData, {
         withCredentials: true,
       });
 
@@ -56,7 +58,7 @@ export const updateRestaurantDeals = createAsyncThunk(
   'restaurantActivity/updatedRestaurantDeals', 
   async (dealData, { dispatch }) => {
     try {
-      const response = await axios.put('http://localhost:5000/update-deal', dealData, {
+      const response = await axios.put(`${BASE_URL}/update-deal`, dealData, {
         withCredentials: true,
       });
 

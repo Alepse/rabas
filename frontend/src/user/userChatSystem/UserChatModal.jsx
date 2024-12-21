@@ -5,7 +5,8 @@ import { FiSend, FiImage, FiDownload } from "react-icons/fi";
 import { toast } from 'react-toastify';
 import { MdDateRange, MdPeople, MdEmail, MdPhone, MdClose } from "react-icons/md";
 import axios from 'axios';
-
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 // Component for rendering booking details
 const BookingDetailsCard = ({ message, isSender }) => {
@@ -143,11 +144,11 @@ const UserChatModal = ({ isOpen, onClose }) => {
   const [businesses, setBusinesses] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/check-login', { withCredentials: true })
+    axios.get(`${BASE_URL}/check-login`, { withCredentials: true })
       .then(response => {
         if (response.data.isLoggedIn) {  // Check if the user is logged in
           // If logged in, fetch user data
-          axios.get('http://localhost:5000/get-userData', { withCredentials: true })
+          axios.get(`${BASE_URL}/get-userData`, { withCredentials: true })
             .then(userResponse => {
               const userId = userResponse.data.userData.user_id;
               setUser_id(userId);
@@ -174,7 +175,7 @@ const UserChatModal = ({ isOpen, onClose }) => {
       const fetchMessages = async () => {
         try {
           // console.log('userId', user_id);
-          const { data } = await axios.get(`http://localhost:5000/userMessages/${user_id}`);
+          const { data } = await axios.get(`${BASE_URL}/userMessages/${user_id}`);
           // console.log('data', data);
           const fetchedMessages = data.reduce((acc, { businessId, messages }) => {
             acc[businessId] = messages;
@@ -195,7 +196,7 @@ const UserChatModal = ({ isOpen, onClose }) => {
       const fetchBusinesses = async (businessIds) => {
         try {
           const businessRequests = businessIds.map(id =>
-            axios.get(`http://localhost:5000/businessesInChat/${id}`)
+            axios.get(`${BASE_URL}/businessesInChat/${id}`)
           );
           const responses = await Promise.all(businessRequests);
           const businessesData = responses.map(response => response.data);
@@ -258,7 +259,7 @@ const UserChatModal = ({ isOpen, onClose }) => {
       }
   
       try {
-        const response = await fetch('http://localhost:5000/sendMessage', {
+        const response = await fetch(`${BASE_URL}/sendMessage`, {
           method: 'POST',
           body: formData,
         });
@@ -322,7 +323,7 @@ const UserChatModal = ({ isOpen, onClose }) => {
         // Handle regular server image paths
         const downloadUrl = imagePath.startsWith('http')
           ? imagePath
-          : `http://localhost:5000/${imagePath.replace(/\\/g, '/')}`;
+          : `${BASE_URL}/${imagePath.replace(/\\/g, '/')}`;
         
         // Fetch the image as a blob from the server
         const response = await fetch(downloadUrl);
@@ -390,7 +391,7 @@ const renderMessages = (messages) => {
     const imageUrl = message.image
       ? message.image.startsWith('blob:')
         ? message.image
-        : `http://localhost:5000/${message.image.replace(/\\/g, '/')}`
+        : `${BASE_URL}/${message.image.replace(/\\/g, '/')}`
       : null;
 
     const messageTime = new Date(message.time);
@@ -470,7 +471,7 @@ const renderMessages = (messages) => {
         onClick={() => handleBusinessClick(business.user_id)}>
         <div className="relative flex items-center gap-3">
           <div className="relative">
-            <Avatar radius="md" src={`http://localhost:5000/${business.avatarUrl}`} alt={business.name} />
+            <Avatar radius="md" src={`${BASE_URL}/${business.avatarUrl}`} alt={business.name} />
             <UnreadBadge count={unreadMessages[business.id] || 0} />  {/* Handle missing counts */}
           </div>
           <span className="text-black">{business.name}</span>
@@ -514,7 +515,7 @@ const renderMessages = (messages) => {
                 <div className="flex items-center space-x-3 p-3 bg-color1 text-white rounded-t-lg">
                   <img
                     src={activeChatUser.avatarUrl 
-                      ? `http://localhost:5000/${activeChatUser.avatarUrl}` 
+                      ? `${BASE_URL}/${activeChatUser.avatarUrl}` 
                       : activeChatUser.image 
                         ? activeChatUser.image 
                         : `https://ui-avatars.com/api/?name=${activeChatUser.name}`} 

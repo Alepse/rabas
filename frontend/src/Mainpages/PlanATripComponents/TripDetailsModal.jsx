@@ -8,6 +8,8 @@ import { FaPlus } from 'react-icons/fa';
 import AddItemModal from './AddItemModal';
 import axios from 'axios';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 const formatTime = (time) => {
   if (!time || time.trim() === '') return 'None';
@@ -75,7 +77,7 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
           endDate: formatDate(editTripDetails.endDate),
         };
 
-        axios.put(`http://localhost:5000/update-trip/${trip.tripId}`, updatedTrip, { withCredentials: true })
+        axios.put(`${BASE_URL}/update-trip/${trip.tripId}`, updatedTrip, { withCredentials: true })
         .then(response => {
           const data = response.data; // Directly access response.data
           if (data.success) {
@@ -259,7 +261,7 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
                               ${showLogo ? `
                                 <div class="pin-container">
                                   <div class="pin-head">
-                                    <img src="http://localhost:5000/${imageUrl}" alt="${title}" class="pin-logo" />
+                                    <img src="${BASE_URL}/${imageUrl}" alt="${title}" class="pin-logo" />
                                   </div>
                                   <div class="pin-point"></div>
                                 </div><span>${locationName}</span>
@@ -340,7 +342,7 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
                                     <h3 className="font-semibold text-xl">{item.title}</h3>
                                     <span className="text-sm text-gray-500"> <span className='text-black font-medium'>Time of Visit:</span> {formatTime(item.time)}</span>
                                   </div>
-                                  <img src={`http://localhost:5000/${item.imageUrl}` || 'https://via.placeholder.com/300'} alt={item.title} className="w-full h-56 object-cover rounded-md mb-4" />
+                                  <img src={`${BASE_URL}/${item.imageUrl}` || 'https://via.placeholder.com/300'} alt={item.title} className="w-full h-56 object-cover rounded-md mb-4" />
                                   <p className="text-sm mb-2"><strong>Booked:</strong> {item.isBooked ? 'Yes' : 'No'}</p>
                                   <p className="text-sm mb-4"><strong>Notes:</strong> {item.notes}</p>
                                   {isEditing && (

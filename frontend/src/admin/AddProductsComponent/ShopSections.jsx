@@ -7,6 +7,8 @@ import { addProduct, handleUpdateShopProduct, deleteShopProducts, fetchBusinessP
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { FaSearch, FaChevronLeft, FaChevronRight, FaImage } from 'react-icons/fa';
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 const ShopSections = () => {
   // State Management
@@ -85,7 +87,7 @@ const ShopSections = () => {
     if (selectedShopProducts.length > 0) {
       try {
         // Create a request to delete selected products
-        const response = await fetch('http://localhost:5000/delete-product', {
+        const response = await fetch(`${BASE_URL}/delete-product`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
@@ -144,7 +146,7 @@ const ShopSections = () => {
           imageFormData.append('productImage', file.file);
           imageFormData.append('title', file.title || '');
           try {
-            const response = await fetch('http://localhost:5000/upload-image-product', {
+            const response = await fetch(`${BASE_URL}/upload-image-product`, {
               method: 'PUT',
               body: imageFormData,
             });
@@ -197,7 +199,7 @@ const ShopSections = () => {
       if (isEditing) {
         try {
           const response = await fetch(
-            `http://localhost:5000/get-product-images/${editingProductId}`
+            `${BASE_URL}/get-product-images/${editingProductId}`
           );
           const data = await response.json();
           existingImages = data.images || [];
@@ -372,7 +374,7 @@ const ShopSections = () => {
                   // Render a single image without the slider
                   <div className="relative">
                     <img
-                      src={`http://localhost:5000/${product.images[0].path}`} // Base URL to the image
+                      src={`${BASE_URL}/${product.images[0].path}`} // Base URL to the image
                       alt={`Product ${product.productName} Image`}
                       className="w-full h-32 object-cover rounded-lg mt-2"
                       onError={(e) => {
@@ -388,7 +390,7 @@ const ShopSections = () => {
                     {product.images.map((image) => (
                       <div key={`${image.id}`} className="relative">
                         <img
-                          src={`http://localhost:5000/${image.path}`}  // Apply the base URL to the image
+                          src={`${BASE_URL}/${image.path}`}  // Apply the base URL to the image
                           alt={`Product ${product.productName} Image ${image.id}`}
                           className="w-full h-32 object-cover rounded-lg mt-2"
                           onError={(e) => {
@@ -533,7 +535,7 @@ const ShopSections = () => {
                           <img
                             src={
                               image.path
-                                ? `http://localhost:5000/${image.path}`
+                                ? `${BASE_URL}/${image.path}`
                                 : image.fileUrl || ''
                             }
                             alt={`Uploaded ${index + 1}`}
