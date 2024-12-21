@@ -58,7 +58,7 @@ const SuperAdminUsers = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch('http://localhost:5000/superAdmin-fetchAllUsers', {
+      const response = await fetch('http://147.93.19.247:5000/superAdmin-fetchAllUsers', {
         method: 'GET',
         credentials: 'include',
         headers: {
