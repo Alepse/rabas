@@ -21,7 +21,7 @@ const app = express();
 const allowedOrigins = [
   "http://localhost:5173",
   "http://192.168.254.145:5173",
-  "http://srv674238.hstgr.cloud:5173",
+  "http://rabasorsogon.com:5173",
   "http://147.93.19.247:5173",
 ];
 
