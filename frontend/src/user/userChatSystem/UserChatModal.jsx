@@ -298,6 +298,10 @@ const UserChatModal = ({ isOpen, onClose }) => {
         [selectedBusiness]: [...currentMessages, newMessage],
       });
 
+      setMessageInput('');
+      setImage(null);
+      setImagePreview(null);
+
       try {
         const response = await fetch(`${BASE_URL}/sendMessage`, {
           method: 'POST',
@@ -317,9 +321,7 @@ const UserChatModal = ({ isOpen, onClose }) => {
               msg.id === newMessage.id ? { ...msg, id: result.messageId, isSending: false } : msg
             ),
           }));
-          setMessageInput('');
-          setImage(null);
-          setImagePreview(null);
+          
           toast.success('Message sent!');
         } else {
           throw new Error('Failed to send message');

@@ -577,6 +577,10 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
         [selectedUser]: [...currentMessages, newMessage],
       });
 
+      setMessageInput('');
+      setImage(null);
+      setImagePreview(null);
+
       // Set loading state
       setIsLoading(true); // Assuming you have a state variable for loading
 
@@ -599,9 +603,6 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
               msg.id === newMessage.id ? { ...msg, id: result.messageId, isSending: false } : msg
             ),
           }));
-          setMessageInput('');
-          setImage(null);
-          setImagePreview(null);
           toast.success('Message sent!');
         } else {
           throw new Error('Failed to send message');
