@@ -87,14 +87,12 @@ app.use(
     saveUninitialized: true,
     cookie: {
       httpOnly: true,
-      secure: false,  // Set to true if using HTTPS
-      sameSite: 'lax',  // For cross-site cookies
+      secure: true,  // Set to true for HTTPS
+    sameSite: 'None',  // Necessary for cross-origin cookiess
       maxAge: 24 * 60 * 60 * 1000,  // 1 day
     },
   })
 );
-
-
 
 // Routes and API Endpoints
 app.get('/', (req, res) => {
