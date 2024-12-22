@@ -81,14 +81,15 @@ sessionStore.on('error', (error) => {
 // Configure session middleware
 app.use(
   session({
-    secret: 'whats-on-your-mind',
+    secret: 'whats-on-your-mind', // Change this to a secure secret in production
     store: sessionStore,
     resave: false,
     saveUninitialized: false,
     cookie: {
       maxAge: 24 * 60 * 60 * 1000, // 1 day
-      secure: true, // Set to true if using HTTPS
-      httpOnly: true, // Prevents client-side access to the cookie
+      secure: process.env.NODE_ENV === 'production', // Secure cookies in production with HTTPS
+      httpOnly: true, // Prevent client-side access to the cookie
+      sameSite: 'lax', // Adjust sameSite setting as per your application
     },
   })
 );
