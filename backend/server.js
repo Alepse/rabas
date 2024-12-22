@@ -22,24 +22,32 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://ubuntu-24.localhost:5173",
   "http://192.168.254.145:5173",
-  "http://rabasorsogon.com",
   "https://rabasorsogon.com", 
   "https://www.rabasorsogon.com",
   "http://147.93.19.247:5173",
 ];
 
+// Enable CORS with credentials
 app.use(
   cors({
     origin: (origin, callback) => {
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true); // Allow the origin
       } else {
-        callback(new Error("Not allowed by CORS")); // Reject the origin
+        callback(new Error("Not allowed by CORS"));
       }
     },
-    credentials: true,
+    credentials: true, // Allow credentials
   })
 );
+
+const corsOptions = {
+  origin: 'https://rabasorsogon.com', // Your frontend domain
+  credentials: true,  // Allow credentials (cookies)
+};
+
+app.use(cors(corsOptions));
+
 
 app.use(express.json()); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
@@ -82,21 +90,32 @@ sessionStore.on('error', (error) => {
 app.use(
   session({
     secret: 'whats-on-your-mind',
-    store: sessionStore,
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     cookie: {
-      maxAge: 24 * 60 * 60 * 1000, // 1 day
-      secure: true, // Set to true if using HTTPS
-      httpOnly: true, // Prevents client-side access to the cookie
+      httpOnly: true,
+      secure: false,  // Set to true for HTTPS
+      sameSite: 'lax',  // Necessary for cross-origin cookiess
+      maxAge: 24 * 60 * 60 * 1000,  // 1 day
     },
   })
 );
+
+// Routes and API Endpoints
+app.get('/', (req, res) => {
+  req.session.viewCount = (req.session.viewCount || 0) + 1;
+  res.json({ message: `You've visited this page ${req.session.viewCount} times` });
+});
 
 // Error handling middleware for Express
 app.use((err, req, res, next) => {
   console.error('Error:', err);
   res.status(500).json({ success: false, message: 'Internal server error' });
+});
+
+app.use((req, res, next) => {
+  console.log("Session cookie:", req.cookies['connect.sid']); // Log session cookie
+  next();
 });
 
 // User Login Endpoint
