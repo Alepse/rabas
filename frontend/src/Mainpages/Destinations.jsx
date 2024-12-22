@@ -39,6 +39,7 @@ import StaMagdalena from './DestinationsSectioncomponent/StaMagdalena';
 import Sorsogon from './DestinationsSectioncomponent/Sorsogon';
 import EmergencyHotlines from '../Mainpages/DestinationsSectioncomponent/EmergencyHotlines';
 import wave from '@/assets/wave2.webp'
+import { Skeleton } from '@nextui-org/react';
 
 
 const destinationComponents = {
@@ -136,35 +137,43 @@ const Destinations = () => {
 
         {/* Municipalities grid */}
         <div className='bg-transparent text-sm grid grid-cols-1 sm:grid-cols-2 font-font1 md:grid-cols-4 lg:grid-cols-5 gap-4'>
-          {[
-            { name: 'Bulusan', img: bulusan },
-            { name: 'Bulan', img: bulan },
-            { name: 'Barcelona', img: barcelona },
-            { name: 'Casiguran', img: casiguran },
-            { name: 'Castilla', img: castilla },
-            { name: 'Donsol', img: donsol },
-            { name: 'Gubat', img: gubat },
-            { name: 'Irosin', img: irosin },
-            { name: 'Juban', img: juban },
-            { name: 'Magallanes', img: magallanes },
-            { name: 'Matnog', img: matnog },
-            { name: 'Pilar', img: pilar },
-            { name: 'PrietoDiaz', img: prieto },
-            { name: 'StaMagdalena', img: santa },
-            { name: 'Sorsogon', img: Sorso },
-          ].map(({ name, img }) => (
-            <AnimatedSection key={name}>
-              <div
-                className="relative h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer"
-                onClick={() => handleDestinationClick(name)}
-              >
-                <img className="h-full w-full object-cover rounded-sm shadow-md" src={img} alt={name} />
-                <div className="absolute bottom-0 left-0 right-0 bg-dark/60 text-white rounded-lg p-1 text-md text-center w-full">
-                  {name}
+          {loading ? (
+            Array.from({ length: 15 }).map((_, index) => (
+              <AnimatedSection key={index}>
+                <Skeleton className='h-[200px] w-full rounded-sm' />
+              </AnimatedSection>
+            ))
+          ) : (
+            [
+              { name: 'Bulusan', img: bulusan },
+              { name: 'Bulan', img: bulan },
+              { name: 'Barcelona', img: barcelona },
+              { name: 'Casiguran', img: casiguran },
+              { name: 'Castilla', img: castilla },
+              { name: 'Donsol', img: donsol },
+              { name: 'Gubat', img: gubat },
+              { name: 'Irosin', img: irosin },
+              { name: 'Juban', img: juban },
+              { name: 'Magallanes', img: magallanes },
+              { name: 'Matnog', img: matnog },
+              { name: 'Pilar', img: pilar },
+              { name: 'PrietoDiaz', img: prieto },
+              { name: 'StaMagdalena', img: santa },
+              { name: 'Sorsogon', img: Sorso },
+            ].map(({ name, img }) => (
+              <AnimatedSection key={name}>
+                <div
+                  className="relative h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer"
+                  onClick={() => handleDestinationClick(name)}
+                >
+                  <img className="h-full w-full object-cover rounded-sm shadow-md" src={img} alt={name} />
+                  <div className="absolute bottom-0 left-0 right-0 bg-dark/60 text-white rounded-lg p-1 text-md text-center w-full">
+                    {name}
+                  </div>
                 </div>
-              </div>
-            </AnimatedSection>
-          ))}
+              </AnimatedSection>
+            ))
+          )}
         </div>
      
 

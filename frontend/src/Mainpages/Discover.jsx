@@ -18,6 +18,7 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 
 import CryptoJS from 'crypto-js';
+import { Skeleton } from "@nextui-org/skeleton";
 
 // Animation Variants
 const containerVariants = {
@@ -541,109 +542,121 @@ const Discover = () => {
               initial="hidden"
               animate="visible"
             >
-              {Object.keys(mockData).map((category) => {
-                // console.log('Category:', category);
-                // console.log('Active Tab:', activeTab);
-                // console.log('mockData:', mockData[category]);
+              {loading ? (
+                // Render skeletons while loading
+                Array.from({ length: 6 }).map((_, index) => (
+                  <div key={index} className="bg-white rounded-lg shadow-lg p-2">
+                    <Skeleton className="w-full h-48 rounded-t-lg" />
+                    <div className="p-4">
+                      <Skeleton className="h-6 mb-2" />
+                      <Skeleton className="h-4 mb-2" />
+                      <Skeleton className="h-4 mb-2" />
+                      <Skeleton className="h-4" />
+                    </div>
+                  </div>
+                ))
+              ) : (
+                // Render actual content once loaded
+                Object.keys(mockData).map((category) => {
+                  if (activeTab !== 'all' && activeTab !== category) return null;
 
-                if (activeTab !== 'all' && activeTab !== category) return null;
+                  const filters = {
+                    selectedType: activeTab === 'restaurant' ? foodFilters.selectedType :
+                                  activeTab === 'shop' ? shopFilters.selectedType :
+                                  activeTab === 'activities' ? activitiesFilters.selectedType :
+                                  activeTab === 'accommodations' ? accommodationsFilters.selectedType :
+                                  allFilters.selectedType,
+                    selectedCategory: activeTab === 'shop' ? shopFilters.selectedCategory : [],
+                    selectedAmenities: activeTab === 'restaurant' ? foodFilters.selectedAmenities :
+                                       activeTab === 'shop' ? shopFilters.selectedAmenities :
+                                       activeTab === 'activities' ? activitiesFilters.selectedAmenities :
+                                       activeTab === 'accommodations' ? accommodationsFilters.selectedAmenities :
+                                       allFilters.selectedAmenities,
+                    selectedRatings: activeTab === 'restaurant' ? foodFilters.selectedRatings :
+                                     activeTab === 'shop' ? shopFilters.selectedRatings :
+                                     activeTab === 'activities' ? activitiesFilters.selectedRatings :
+                                     activeTab === 'accommodations' ? accommodationsFilters.selectedRatings :
+                                     allFilters.selectedRatings,
+                    selectedDestination: activeTab === 'restaurant' ? foodFilters.selectedDestination :
+                                         activeTab === 'shop' ? shopFilters.selectedDestination :
+                                         activeTab === 'activities' ? activitiesFilters.selectedDestination :
+                                         activeTab === 'accommodations' ? accommodationsFilters.selectedDestination :
+                                         allFilters.selectedDestination,
+                    priceRange: activeTab === 'restaurant' ? foodFilters.priceRange :
+                                activeTab === 'shop' ? shopFilters.priceRange :
+                                activeTab === 'activities' ? activitiesFilters.priceRange :
+                                activeTab === 'accommodations' ? accommodationsFilters.priceRange :
+                                allFilters.priceRange,
+                    selectedCuisine: activeTab === 'restaurant' ? foodFilters.selectedCuisine : [],
+                  };
 
-                const filters = {
-                  selectedType: activeTab === 'restaurant' ? foodFilters.selectedType :
-                                activeTab === 'shop' ? shopFilters.selectedType :
-                                activeTab === 'activities' ? activitiesFilters.selectedType :
-                                activeTab === 'accommodations' ? accommodationsFilters.selectedType :
-                                allFilters.selectedType,
-                  selectedCategory: activeTab === 'shop' ? shopFilters.selectedCategory : [],
-                  selectedAmenities: activeTab === 'restaurant' ? foodFilters.selectedAmenities :
-                                     activeTab === 'shop' ? shopFilters.selectedAmenities :
-                                     activeTab === 'activities' ? activitiesFilters.selectedAmenities :
-                                     activeTab === 'accommodations' ? accommodationsFilters.selectedAmenities :
-                                     allFilters.selectedAmenities,
-                  selectedRatings: activeTab === 'restaurant' ? foodFilters.selectedRatings :
-                                   activeTab === 'shop' ? shopFilters.selectedRatings :
-                                   activeTab === 'activities' ? activitiesFilters.selectedRatings :
-                                   activeTab === 'accommodations' ? accommodationsFilters.selectedRatings :
-                                   allFilters.selectedRatings,
-                  selectedDestination: activeTab === 'restaurant' ? foodFilters.selectedDestination :
-                                       activeTab === 'shop' ? shopFilters.selectedDestination :
-                                       activeTab === 'activities' ? activitiesFilters.selectedDestination :
-                                       activeTab === 'accommodations' ? accommodationsFilters.selectedDestination :
-                                       allFilters.selectedDestination,
-                  priceRange: activeTab === 'restaurant' ? foodFilters.priceRange :
-                              activeTab === 'shop' ? shopFilters.priceRange :
-                              activeTab === 'activities' ? activitiesFilters.priceRange :
-                              activeTab === 'accommodations' ? accommodationsFilters.priceRange :
-                              allFilters.priceRange,
-                  selectedCuisine: activeTab === 'restaurant' ? foodFilters.selectedCuisine : [],
-                };
+                  const filteredItems = filterData(mockData[category], filters);
 
-                const filteredItems = filterData(mockData[category], filters);
-
-                // console.log('filteredItems:', filteredItems);
-
-                return filteredItems.map((item, index) => (
-                  <motion.div
-                    key={index}
-                    className="bg-white rounded-lg shadow-lg p-2 hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between"
-                    variants={cardVariants}
-                  >
-                    <img
-                      src={item.cardImage ? `${BASE_URL}/${item.cardImage}` : `${BASE_URL}/${item.businessLogo}`}
-                      alt={item.businessName}
-                      className="w-full h-48 object-cover rounded-t-lg"
-                    />
-                    <div className="p-4 flex-grow">
-                      <div className="flex justify-between  items-center mb-2">
-                        {renderTags(item.category, filters.selectedType)}
-                        <div className="flex items-center gap-1">
-                          {item.rating ? (
-                            <>
-                              <span className="text-[12px]">{parseFloat(item.rating).toFixed(1)}</span>
-                              <span className="text-yellow-500">
-                                {'★'.repeat(Math.floor(item.rating))}
-                                {'☆'.repeat(5 - Math.floor(item.rating))}
-                              </span>
-                            </>
+                  return filteredItems.map((item, index) => (
+                    <motion.div
+                      key={index}
+                      className="bg-white rounded-lg shadow-lg p-2 hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between"
+                      variants={cardVariants}
+                    >
+                      <img
+                        src={item.cardImage ? `${BASE_URL}/${item.cardImage}` : `${BASE_URL}/${item.businessLogo}`}
+                        alt={item.businessName}
+                        className="w-full h-48 object-cover rounded-t-lg"
+                      />
+                      <div className="p-4 flex-grow">
+                        <div className="flex justify-between  items-center mb-2">
+                          {renderTags(item.category, filters.selectedType)}
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-800">
+                          {item.businessName}
+                        </h3>
+                        <div className="text-xs text-gray-500 mb-2 flex items-center">
+                          <GiPositionMarker className="mr-1" />
+                          {item.destination}
+                        </div>
+                        <div className="flex mb-2 max-w-[500px] max-h-[5rem] overflow-y-auto scrollbar-custom flex-col">
+                          {item.description ? (
+                            <p className="text-sm text-gray-600 mb-2">
+                              {item.description}
+                            </p>
                           ) : (
-                            <span className="text-gray-500 text-[12px]">No ratings</span>
+                            <p className="text-sm text-gray-400 italic mb-2">
+                              No description
+                            </p>
                           )}
                         </div>
-                      </div>
-                      <h3 className="text-lg font-semibold text-gray-800">
-                        {item.businessName}
-                      </h3>
-                      <div className="text-xs text-gray-500 mb-2 flex items-center">
-                        <GiPositionMarker className="mr-1" />
-                        {item.destination}
-                      </div>
-                      <div className="flex mb-2 max-w-[500px] max-h-[5rem] overflow-y-auto scrollbar-custom flex-col">
-                        {item.description ? (
-                          <p className="text-sm text-gray-600 mb-2">
-                            {item.description}
+                        <div className="flex justify-between items-center mb-2">
+                          <div className="flex items-center gap-1">
+                            {item.rating ? (
+                              <>
+                                <span className="text-[12px]">{parseFloat(item.rating).toFixed(1)}</span>
+                                <span className="text-yellow-500">
+                                  {'★'.repeat(Math.floor(item.rating))}
+                                  {'☆'.repeat(5 - Math.floor(item.rating))}
+                                </span>
+                              </>
+                            ) : (
+                              <span className="text-gray-500 text-[12px]">No ratings</span>
+                            )}
+                          </div>
+                          <p className="text-md font-semibold text-black">
+                            {item.lowest_price && item.highest_price ? (
+                              `₱${item.lowest_price} - ₱${item.highest_price}`
+                            ) : (
+                              <span className="text-gray-400 italic">Price Range Not available</span>
+                            )}
                           </p>
-                        ) : (
-                          <p className="text-sm text-gray-400 italic mb-2">
-                            No description
-                          </p>
-                        )}
+                        </div>
                       </div>
-                      <p className="text-md font-semibold text-black mb-2">
-                        {item.lowest_price && item.highest_price ? (
-                          `₱${item.lowest_price} - ₱${item.highest_price}`
-                        ) : (
-                          <span className="text-gray-400 italic">Price Range Not available</span>
-                        )}
-                      </p>
-                    </div>
-                    <Link to={`/business/${encryptId(item.business_id)}`}>
-                      <Button className="w-full bg-color1 text-color3 rounded-md hover:bg-color2">
-                        Explore More
-                      </Button>
-                    </Link>
-                  </motion.div>
-                ));
-              })}
+                      <Link to={`/business/${encryptId(item.business_id)}`}>
+                        <Button className="w-full bg-color1 text-color3 rounded-md hover:bg-color2">
+                          Explore More
+                        </Button>
+                      </Link>
+                    </motion.div>
+                  ));
+                })
+              )}
             </motion.div>
           </div>
         </div>

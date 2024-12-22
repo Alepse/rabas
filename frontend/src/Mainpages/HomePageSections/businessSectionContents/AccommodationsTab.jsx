@@ -10,6 +10,7 @@ import img from '@/assets/shop.webp';
 import { AiOutlineLike } from "react-icons/ai";
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import CryptoJS from 'crypto-js';
+import { Skeleton } from "@nextui-org/skeleton";
 
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
@@ -37,6 +38,7 @@ const encryptId = (id) => {
 
 const AccommodationsTab = () => {
   const [accommodations, setAccommodations] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchAccommodations = async () => {
@@ -46,10 +48,11 @@ const AccommodationsTab = () => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        console.log('Fetched data:', data);
         setAccommodations(data);
       } catch (error) {
         console.error('Error fetching accommodations:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -64,14 +67,14 @@ const AccommodationsTab = () => {
 
   return (
     <div className='lg:container'>
-      <AccommodationSwiper title="Design Meets Comfort: Accommodation Recommendations" link="/accommodations" accommodations={designMeetsComfort} />
-      <AccommodationSwiper title="Traveler's Choice: Most Liked Stays" link="/accommodations" accommodations={travelersChoice} />
-      <AccommodationSwiper title="Experience Comfort: Recent Additions to Our Accommodations" isLast accommodations={accommodations} />
+      <AccommodationSwiper title="Design Meets Comfort: Accommodation Recommendations" link="/accommodations" accommodations={designMeetsComfort} loading={loading} />
+      <AccommodationSwiper title="Traveler's Choice: Most Liked Stays" link="/accommodations" accommodations={travelersChoice} loading={loading} />
+      <AccommodationSwiper title="Experience Comfort: Recent Additions to Our Accommodations" isLast accommodations={accommodations} loading={loading} />
     </div>
   );
 };
 
-const AccommodationSwiper = ({ title, link, isLast, accommodations }) => (
+const AccommodationSwiper = ({ title, link, isLast, accommodations, loading }) => (
   <div className="p-4 md:p-6">
     <div className='flex flex-col md:flex-row justify-between items-center'>
       <h1 className={`text-xl md:text-2xl font-bold mb-4 md:mb-6 text-center lg:text-start ${isLast ? 'text-light' : ''}`}>
@@ -99,89 +102,97 @@ const AccommodationSwiper = ({ title, link, isLast, accommodations }) => (
       }}
       className='max-w-full p-4 md:p-6'
     >
-      {accommodations.map((accommodation, index) => (
-        <SwiperSlide key={index} className='flex justify-center'>
-          <div className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between mx-auto h-full p-2 relative"
-               style={{ width: '100%', maxWidth: '300px', height: '400px' }}>
-            {accommodation.discount > 0 && (
-              <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold py-1 px-2 rounded">
-                {accommodation.discount}% OFF
-              </div>
-            )}
-            <div className="w-full h-56 md:h-64 bg-gray-200 rounded-t-lg overflow-hidden">
-              {accommodation.image ? (
-                <img
-                  src={`${BASE_URL}/${accommodation.image}`}
-                  alt={accommodation.name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <span>No Image</span>
+      {loading ? (
+        Array.from({ length: accommodations.length || 4 }).map((_, index) => (
+          <SwiperSlide key={index} className='flex justify-center'>
+            <Skeleton className="w-full h-[400px] rounded-lg" />
+          </SwiperSlide>
+        ))
+      ) : (
+        accommodations.map((accommodation, index) => (
+          <SwiperSlide key={index} className='flex justify-center'>
+            <div className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between mx-auto h-full p-2 relative"
+                 style={{ width: '100%', maxWidth: '300px', height: '400px' }}>
+              {accommodation.discount > 0 && (
+                <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold py-1 px-2 rounded">
+                  {accommodation.discount}% OFF
                 </div>
               )}
-            </div>
-            <div className="flex-grow flex flex-col justify-between mt-4 px-2">
-              <div>
-                <div className="flex justify-between items-center mb-3">
-                  <div className="flex items-center gap-1">
-                    {accommodation.rating ? (
+              <div className="w-full h-56 md:h-64 bg-gray-200 rounded-t-lg overflow-hidden">
+                {accommodation.image ? (
+                  <img
+                    src={`${BASE_URL}/${accommodation.image}`}
+                    alt={accommodation.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <span>No Image</span>
+                  </div>
+                )}
+              </div>
+              <div className="flex-grow flex flex-col justify-between mt-4 px-2">
+                <div>
+                  <div className="flex justify-between items-center mb-3">
+                    <div className="flex items-center gap-1">
+                      {accommodation.rating ? (
+                        <>
+                          <span className="text-[12px]">{parseFloat(accommodation.rating).toFixed(1)}</span>
+                          <span className="text-yellow-500">
+                            {'★'.repeat(accommodation.rating)}
+                            {'☆'.repeat(5 - accommodation.rating)}
+                          </span>
+                        </>
+                      ) : (
+                        <span className="ml-1 text-sm">No ratings</span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className="text-lg font-semibold text-gray-800 truncate">
+                      {accommodation.name}
+                    </h3>
+                    {accommodation.likes > 0 && (
+                      <span className="text-xs text-gray-500 flex items-center gap-1">
+                        <AiOutlineLike /> {formatNumber(accommodation.likes)}
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-xs text-gray-500 mb-4 flex items-center">
+                    <GiPositionMarker className="mr-1" />
+                    {accommodation.destination}
+                  </div>
+                </div>
+                <div className="mt-auto">
+                  <p className="text-md font-semibold text-black mb-4">
+                    {accommodation.lowest_price === null && accommodation.highest_price === null ? (
+                      <span className="text-gray-500">Not Available</span>
+                    ) : accommodation.discount ? (
                       <>
-                        <span className="text-[12px]">{parseFloat(accommodation.rating).toFixed(1)}</span>
-                        <span className="text-yellow-500">
-                          {'★'.repeat(accommodation.rating)}
-                          {'☆'.repeat(5 - accommodation.rating)}
+                        <span className="line-through text-gray-500">
+                          ₱{accommodation.lowest_price} - ₱{accommodation.highest_price}
+                        </span>
+                        <span className="text-red-500 text-xl font-bold ml-2">
+                          ₱{accommodation.lowest_price - (accommodation.highest_price * accommodation.discount) / 100}
                         </span>
                       </>
                     ) : (
-                      <span className="ml-1 text-sm">No ratings</span>
+                      <>
+                        <span>₱{accommodation.lowest_price} - ₱{accommodation.highest_price}</span>
+                      </>
                     )}
-                  </div>
+                  </p>
+                  <Link to={`/business/${encryptId(accommodation.business_id)}`}>
+                    <Button className="w-full bg-color1 text-white text-sm font-medium px-5 py-2 rounded hover:bg-color2">
+                     Explore More
+                    </Button>
+                  </Link>
                 </div>
-                <div className="flex items-center gap-2 mb-2">
-                  <h3 className="text-lg font-semibold text-gray-800 truncate">
-                    {accommodation.name}
-                  </h3>
-                  {accommodation.likes > 0 && (
-                    <span className="text-xs text-gray-500 flex items-center gap-1">
-                      <AiOutlineLike /> {formatNumber(accommodation.likes)}
-                    </span>
-                  )}
-                </div>
-                <div className="text-xs text-gray-500 mb-4 flex items-center">
-                  <GiPositionMarker className="mr-1" />
-                  {accommodation.destination}
-                </div>
-              </div>
-              <div className="mt-auto">
-                <p className="text-md font-semibold text-black mb-4">
-                  {accommodation.lowest_price === null && accommodation.highest_price === null ? (
-                    <span className="text-gray-500">Not Available</span>
-                  ) : accommodation.discount ? (
-                    <>
-                      <span className="line-through text-gray-500">
-                        ₱{accommodation.lowest_price} - ₱{accommodation.highest_price}
-                      </span>
-                      <span className="text-red-500 text-xl font-bold ml-2">
-                        ₱{accommodation.lowest_price - (accommodation.highest_price * accommodation.discount) / 100}
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <span>₱{accommodation.lowest_price} - ₱{accommodation.highest_price}</span>
-                    </>
-                  )}
-                </p>
-                <Link to={`/business/${encryptId(accommodation.business_id)}`}>
-                  <Button className="w-full bg-color1 text-white text-sm font-medium px-5 py-2 rounded hover:bg-color2">
-                   Explore More
-                  </Button>
-                </Link>
               </div>
             </div>
-          </div>
-        </SwiperSlide>
-      ))}
+          </SwiperSlide>
+        ))
+      )}
       <div className="custom-prev absolute left-2 top-[25%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300">
         <FaArrowLeft />
       </div>

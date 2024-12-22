@@ -9,6 +9,7 @@ import { GiPositionMarker } from 'react-icons/gi';
 import { AiOutlineLike } from 'react-icons/ai';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import CryptoJS from 'crypto-js';
+import { Skeleton } from "@nextui-org/skeleton";
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
@@ -35,6 +36,7 @@ const encryptId = (id) => {
 
 const ShopsTab = () => {
   const [shops, setShops] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchShops = async () => {
@@ -44,10 +46,11 @@ const ShopsTab = () => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        console.log('Fetched data:', data);
         setShops(data);
       } catch (error) {
         console.error('Error fetching shops:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -62,14 +65,14 @@ const ShopsTab = () => {
 
   return (
     <div className='lg:container'>
-      <ShopSwiper title="Must-Visit: Recommended Stores" link="/shops" shops={mustVisit} />
-      <ShopSwiper title="Shopper's Picks: Most Liked Shops" link="/shops" shops={shoppersPicks} />
-      <ShopSwiper title="Shop Local: Explore the Latest Additions to Our Shops!" isLast shops={shops} />
+      <ShopSwiper title="Must-Visit: Recommended Stores" link="/shops" shops={mustVisit} loading={loading} />
+      <ShopSwiper title="Shopper's Picks: Most Liked Shops" link="/shops" shops={shoppersPicks} loading={loading} />
+      <ShopSwiper title="Shop Local: Explore the Latest Additions to Our Shops!" isLast shops={shops} loading={loading} />
     </div>
   );
 };
 
-const ShopSwiper = ({ title, link, isLast, shops }) => (
+const ShopSwiper = ({ title, link, isLast, shops, loading }) => (
   <div className="p-4 md:p-6">
     <div className='flex flex-col md:flex-row justify-between items-center'>
       <h1 className={`text-xl md:text-2xl font-bold mb-4 md:mb-6 text-center lg:text-start ${isLast ? 'text-light' : ''}`}>
@@ -97,89 +100,97 @@ const ShopSwiper = ({ title, link, isLast, shops }) => (
       }}
       className='max-w-full p-4 md:p-6'
     >
-      {shops.map((shop, index) => (
-        <SwiperSlide key={index} className='flex justify-center'>
-          <div className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between mx-auto h-full p-2 relative"
-               style={{ width: '100%', maxWidth: '300px', height: '400px' }}>
-            {shop.discount > 0 && (
-              <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold py-1 px-2 rounded">
-                {shop.discount}% OFF
-              </div>
-            )}
-            <div className="w-full h-56 md:h-64 bg-gray-200 rounded-t-lg overflow-hidden">
-              {shop.image ? (
-                <img
-                  src={`${BASE_URL}/${shop.image}`}
-                  alt={shop.name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <span>No Image</span>
+      {loading ? (
+        Array.from({ length: shops.length || 4 }).map((_, index) => (
+          <SwiperSlide key={index} className='flex justify-center'>
+            <Skeleton className="w-full h-[400px] rounded-lg" />
+          </SwiperSlide>
+        ))
+      ) : (
+        shops.map((shop, index) => (
+          <SwiperSlide key={index} className='flex justify-center'>
+            <div className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between mx-auto h-full p-2 relative"
+                 style={{ width: '100%', maxWidth: '300px', height: '400px' }}>
+              {shop.discount > 0 && (
+                <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold py-1 px-2 rounded">
+                  {shop.discount}% OFF
                 </div>
               )}
-            </div>
-            <div className="flex-grow flex flex-col justify-between mt-4 px-2">
-              <div>
-                <div className="flex justify-between items-center mb-3">
-                  <div className="flex items-center gap-1">
-                    {shop.rating ? (
+              <div className="w-full h-56 md:h-64 bg-gray-200 rounded-t-lg overflow-hidden">
+                {shop.image ? (
+                  <img
+                    src={`${BASE_URL}/${shop.image}`}
+                    alt={shop.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <span>No Image</span>
+                  </div>
+                )}
+              </div>
+              <div className="flex-grow flex flex-col justify-between mt-4 px-2">
+                <div>
+                  <div className="flex justify-between items-center mb-3">
+                    <div className="flex items-center gap-1">
+                      {shop.rating ? (
+                        <>
+                          <span className="text-[12px]">{parseFloat(shop.rating).toFixed(1)}</span>
+                          <span className="text-yellow-500">
+                            {'★'.repeat(shop.rating)}
+                            {'☆'.repeat(5 - shop.rating)}
+                          </span>
+                        </>
+                      ) : (
+                        <span className="ml-1 text-sm">No ratings</span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className="text-lg font-semibold text-gray-800 truncate">
+                      {shop.name}
+                    </h3>
+                    {shop.likes > 0 && (
+                      <span className="text-xs text-gray-500 flex items-center gap-1">
+                        <AiOutlineLike /> {formatNumber(shop.likes)}
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-xs text-gray-500 mb-4 flex items-center">
+                    <GiPositionMarker className="mr-1" />
+                    {shop.destination}
+                  </div>
+                </div>
+                <div className="mt-auto">
+                  <p className="text-md font-semibold text-black mb-4">
+                    {shop.lowest_price === null && shop.highest_price === null ? (
+                      <span className="text-gray-500">Not Available</span>
+                    ) : shop.discount ? (
                       <>
-                        <span className="text-[12px]">{parseFloat(shop.rating).toFixed(1)}</span>
-                        <span className="text-yellow-500">
-                          {'★'.repeat(shop.rating)}
-                          {'☆'.repeat(5 - shop.rating)}
+                        <span className="line-through text-gray-500">
+                          ₱{shop.lowest_price} - ₱{shop.highest_price}
+                        </span>
+                        <span className="text-red-500 text-xl font-bold ml-2">
+                          ₱{shop.lowest_price - (shop.highest_price * shop.discount) / 100}
                         </span>
                       </>
                     ) : (
-                      <span className="ml-1 text-sm">No ratings</span>
+                      <>
+                        <span>₱{shop.lowest_price} - ₱{shop.highest_price}</span>
+                      </>
                     )}
-                  </div>
+                  </p>
+                  <Link to={`/business/${encryptId(shop.business_id)}`}>
+                    <Button className="w-full bg-color1 text-white text-sm font-medium px-5 py-2 rounded hover:bg-color2">
+                      Explore More
+                    </Button>
+                  </Link>
                 </div>
-                <div className="flex items-center gap-2 mb-2">
-                  <h3 className="text-lg font-semibold text-gray-800 truncate">
-                    {shop.name}
-                  </h3>
-                  {shop.likes > 0 && (
-                    <span className="text-xs text-gray-500 flex items-center gap-1">
-                      <AiOutlineLike /> {formatNumber(shop.likes)}
-                    </span>
-                  )}
-                </div>
-                <div className="text-xs text-gray-500 mb-4 flex items-center">
-                  <GiPositionMarker className="mr-1" />
-                  {shop.destination}
-                </div>
-              </div>
-              <div className="mt-auto">
-                <p className="text-md font-semibold text-black mb-4">
-                  {shop.lowest_price === null && shop.highest_price === null ? (
-                    <span className="text-gray-500">Not Available</span>
-                  ) : shop.discount ? (
-                    <>
-                      <span className="line-through text-gray-500">
-                        ₱{shop.lowest_price} - ₱{shop.highest_price}
-                      </span>
-                      <span className="text-red-500 text-xl font-bold ml-2">
-                        ₱{shop.lowest_price - (shop.highest_price * shop.discount) / 100}
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <span>₱{shop.lowest_price} - ₱{shop.highest_price}</span>
-                    </>
-                  )}
-                </p>
-                <Link to={`/business/${encryptId(shop.business_id)}`}>
-                  <Button className="w-full bg-color1 text-white text-sm font-medium px-5 py-2 rounded hover:bg-color2">
-                    Explore More
-                  </Button>
-                </Link>
               </div>
             </div>
-          </div>
-        </SwiperSlide>
-      ))}
+          </SwiperSlide>
+        ))
+      )}
       <div className="custom-prev absolute left-2 top-[25%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300">
         <FaArrowLeft />
       </div>
