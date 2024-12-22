@@ -82,13 +82,13 @@ sessionStore.on('error', (error) => {
 // Configure session middleware
 app.use(
   session({
-    secret: 'your_secret_key',
+    secret: 'whats-on-your-mind',
     resave: false,
     saveUninitialized: true,
     cookie: {
-      httpOnly: true,
+      httpOnly: false,
       secure: false,  // Set to true if using HTTPS
-      sameSite: 'none',  // For cross-site cookies
+      // sameSite: 'none',  // For cross-site cookies
       maxAge: 24 * 60 * 60 * 1000,  // 1 day
     },
   })
