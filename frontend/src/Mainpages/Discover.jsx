@@ -598,11 +598,17 @@ const Discover = () => {
                       className="bg-white rounded-lg shadow-lg p-2 hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between"
                       variants={cardVariants}
                     >
-                      <img
-                        src={item.cardImage ? `${BASE_URL}/${item.cardImage}` : `${BASE_URL}/${item.businessLogo}`}
-                        alt={item.businessName}
-                        className="w-full h-48 object-cover rounded-t-lg"
-                      />
+                      {item.cardImage ? (
+                        <img
+                          src={item.cardImage ? `${BASE_URL}/${item.cardImage}` : `${BASE_URL}/${item.businessLogo}`}
+                          alt={item.businessName}
+                          className="w-full h-48 object-cover rounded-t-lg"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <span>No Image</span>
+                        </div>
+                      )}                      
                       <div className="p-4 flex-grow">
                         <div className="flex justify-between  items-center mb-2">
                           {renderTags(item.category, filters.selectedType)}
