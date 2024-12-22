@@ -212,7 +212,29 @@ const UserChatModal = ({ isOpen, onClose }) => {
     }
   }, [user_id]);  // Dependency array ensures it re-runs only when user_id changes
   
-  
+  useEffect(() => {
+    // Polling function to fetch new messages
+    const fetchNewMessages = async () => {
+      try {
+        // console.log('userId', user_id);
+        const { data } = await axios.get(`${BASE_URL}/userMessages/${user_id}`);
+        // console.log('data', data);
+        const fetchedMessages = data.reduce((acc, { businessId, messages }) => {
+          acc[businessId] = messages;
+          return acc;
+        }, {});
+        setMessages(fetchedMessages);
+      } catch (error) {
+        console.error('Error fetching messages:', error.response ? error.response.data.message : 'An unknown error occurred');
+        toast.error('Failed to load messages');
+      };
+    };
+
+    // Set an interval to fetch new messages every 5 seconds
+    const intervalId = setInterval(fetchNewMessages, 5000);
+
+    return () => clearInterval(intervalId); // Cleanup on unmount
+  }, [user_id]); // Run when user_id or selectedBusiness changes
 
   // Scroll chat to the bottom when new messages arrive
   useEffect(() => {

@@ -423,6 +423,33 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
     fetchMessages();
   }, [user_id]);
 
+  useEffect(() => {
+    // Polling function to fetch new messages
+    const fetchNewMessages = async () => {
+      try {
+        // console.log('userId', user_id);
+        const { data } = await axios.get(`${BASE_URL}/businessMessages/${user_id}`);
+        // console.log('data', data);
+        const fetchedMessages = data.reduce((acc, { userId, messages }) => {
+          acc[userId] = messages;
+          return acc;
+        }, {});
+        setMessages(fetchedMessages);
+        // console.log('fetchedMessages', fetchedMessages);
+        // Extract unique user IDs and fetch users based on them
+        const uniqueUserIds = [...new Set(data.map(({ userId }) => userId))];
+      } catch (error) {
+        console.error('Error fetching messages:', error.response ? error.response.data.message : 'An unknown error occurred');
+        toast.error('Failed to load messages');
+      }
+    }
+
+    // Set an interval to fetch new messages every 5 seconds
+    const intervalId = setInterval(fetchNewMessages, 5000);
+
+    return () => clearInterval(intervalId); // Cleanup on unmount
+  }, [user_id]); // Run when user_id or selectedBusiness changes
+
   // Scroll chat to the bottom when new messages arrive
   useEffect(() => {
     // Delay the scroll to ensure the DOM updates
