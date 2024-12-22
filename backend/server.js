@@ -41,6 +41,13 @@ app.use(
   })
 );
 
+const corsOptions = {
+  origin: 'https://rabasorsogon.com', // Your frontend domain
+  credentials: true,  // Allow credentials (cookies)
+};
+
+app.use(cors(corsOptions));
+
 
 app.use(express.json()); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
