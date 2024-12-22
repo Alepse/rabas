@@ -6,6 +6,7 @@ import Surf from '@/assets/surfing.jpg'
 import Room from '@/assets/room.webp'
 import Food from '@/assets/Food.jpg'
 import Shop from '@/assets/Souvenirs.jpg'
+import { Skeleton } from "@nextui-org/skeleton";
 
 const categories = [
   {
@@ -46,6 +47,14 @@ const links = [
 ];
 
 const whatodoSection = () => {
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    // Simulate a loading delay
+    const timer = setTimeout(() => setLoading(false), 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <section className="py-24 mt-24 bg-white relative ">
       {/* Top Wave */}
@@ -84,29 +93,35 @@ const whatodoSection = () => {
                     transition={{ duration: 0.3 }}
                     className="relative overflow-hidden rounded-2xl aspect-[3/4] group"
                   >
-                    <div
-                      className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
-                      style={{ backgroundImage: `url(${category.image})` }}
-                    />
-                    <div className={`absolute inset-0 bg-gradient-to-t ${category.gradient}`} />
-                    <div className="absolute inset-0 p-6 flex flex-col justify-end">
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                        className="text-center"
-                      >
-                        <div className="mb-4 flex justify-center">
-                          <category.icon className="w-8 h-8 text-white" />
+                    {loading ? (
+                      <Skeleton className="w-full h-full" />
+                    ) : (
+                      <>
+                        <div
+                          className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
+                          style={{ backgroundImage: `url(${category.image})` }}
+                        />
+                        <div className={`absolute inset-0 bg-gradient-to-t ${category.gradient}`} />
+                        <div className="absolute inset-0 p-6 flex flex-col justify-end">
+                          <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.1 }}
+                            className="text-center"
+                          >
+                            <div className="mb-4 flex justify-center">
+                              <category.icon className="w-8 h-8 text-white" />
+                            </div>
+                            <h3 className="text-2xl font-bold text-white mb-2">
+                              {category.title}
+                            </h3>
+                            <p className="text-white/90 text-sm">
+                              {category.description}
+                            </p>
+                          </motion.div>
                         </div>
-                        <h3 className="text-2xl font-bold text-white mb-2">
-                          {category.title}
-                        </h3>
-                        <p className="text-white/90 text-sm">
-                          {category.description}
-                        </p>
-                      </motion.div>
-                    </div>
+                      </>
+                    )}
                   </motion.div>
                 </a>
               </CarouselItem>

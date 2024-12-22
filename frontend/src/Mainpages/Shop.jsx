@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 import Search from '@/components/Search';
 import wave from '@/assets/wave2.webp'
 import CryptoJS from 'crypto-js';
+import { Skeleton } from "@nextui-org/skeleton";
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
@@ -284,79 +285,85 @@ const Shop = () => {
               initial="hidden"
               animate="visible"
             >
-              {filteredShops.length > 0 ? (
-                filteredShops.map((shop, index) => (
-                  <motion.div
-                    key={index}
-                    className='bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300'
-                    variants={cardVariants}
-                  >
-                    <img
-                      src={`${BASE_URL}/${shop.businessLogo}`}
-                      alt={shop.businessName}
-                      className='w-full h-48 object-cover rounded-t-lg'
-                    />
-                    <div className='p-4'>
-                      <div className='flex items-center justify-between gap-2'>
-                      {/* tags */}
-                      <div className='flex flex-wrap gap-2 mb-2'>
-                        {shop.category.map((cat, index) => (
-                          <span 
-                            key={index} 
-                            className={`text-xs px-2 py-1 rounded-full ${selectedCategories.map(c => c.toLowerCase()).includes(cat.toLowerCase()) ? 'bg-color2 text-white' : 'bg-gray-200 text-gray-700'}`}
-                          >
-                            {cat}
-                          </span>
-                        ))}
-                      </div>
-                       
-                        <div className='flex items-center gap-2'>
-                          <div className='flex items-center gap-1 '>
-                            {shop.rating ? (
-                              <>
-                                <span className='text-black text-[12px] '>{shop.rating}</span> 
-                                <span className='text-yellow-500'>
-                                  {'★'.repeat(Math.floor(shop.rating))}
-                                  {'☆'.repeat(5 - Math.floor(shop.rating))}
-                                </span>
-                              </>
-                            ) : (
-                              <span className="text-gray-500 text-[12px]">No ratings</span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      <h3 className='font-semibold text-lg text-color1'>{shop.businessName}</h3>
-                      <div className='text-xs text-gray-500 mb-2 flex items-center'>
-                        <GiPositionMarker/> {shop.destination}
-                      </div>
-                      
-                      <div className='flex mb-2 max-w-[500px] max-h-[5rem] overflow-y-auto scrollbar-custom flex-col'>      
-                        {shop.description ? (
-                          <p className='text-sm text-gray-600 mb-2'>{shop.description}</p>
-                        ) : (
-                          <p className='text-sm text-gray-400 italic mb-2'>No description</p>
-                        )}
-                      </div>
-                      <p className='font-semibold text-md mb-2'>
-                        {shop.lowest_price && shop.highest_price ? (
-                          `₱${shop.lowest_price} - ₱${shop.highest_price}`
-                        ) : (
-                          <span className="text-gray-400 italic">Price Range Not available</span>
-                        )}
-                      </p>
-                      <Link to={`/business/${encryptId(shop.business_id)}`} target='_blank'>
-                        <Button 
-                          className='w-full bg-color1 text-color3 hover:bg-color2'
-                        >
-                          Explore More
-                        </Button>
-                      </Link>
-                    </div>
-                  </motion.div>
+              {loading ? (
+                Array.from({ length: 4 }).map((_, index) => (
+                  <Skeleton key={index} className='w-full h-48 rounded-lg' />
                 ))
               ) : (
-                <p className='col-span-full text-center text-gray-500'>No shops match your selected filters.</p>
+                filteredShops.length > 0 ? (
+                  filteredShops.map((shop, index) => (
+                    <motion.div
+                      key={index}
+                      className='bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300'
+                      variants={cardVariants}
+                    >
+                      <img
+                        src={`${BASE_URL}/${shop.businessLogo}`}
+                        alt={shop.businessName}
+                        className='w-full h-48 object-cover rounded-t-lg'
+                      />
+                      <div className='p-4'>
+                        <div className='flex items-center justify-between gap-2'>
+                        {/* tags */}
+                        <div className='flex flex-wrap gap-2 mb-2'>
+                          {shop.category.map((cat, index) => (
+                            <span 
+                              key={index} 
+                              className={`text-xs px-2 py-1 rounded-full ${selectedCategories.map(c => c.toLowerCase()).includes(cat.toLowerCase()) ? 'bg-color2 text-white' : 'bg-gray-200 text-gray-700'}`}
+                            >
+                              {cat}
+                            </span>
+                          ))}
+                        </div>
+                         
+                          <div className='flex items-center gap-2'>
+                            <div className='flex items-center gap-1 '>
+                              {shop.rating ? (
+                                <>
+                                  <span className='text-black text-[12px] '>{shop.rating}</span> 
+                                  <span className='text-yellow-500'>
+                                    {'★'.repeat(Math.floor(shop.rating))}
+                                    {'☆'.repeat(5 - Math.floor(shop.rating))}
+                                  </span>
+                                </>
+                              ) : (
+                                <span className="text-gray-500 text-[12px]">No ratings</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        <h3 className='font-semibold text-lg text-color1'>{shop.businessName}</h3>
+                        <div className='text-xs text-gray-500 mb-2 flex items-center'>
+                          <GiPositionMarker/> {shop.destination}
+                        </div>
+                        
+                        <div className='flex mb-2 max-w-[500px] max-h-[5rem] overflow-y-auto scrollbar-custom flex-col'>      
+                          {shop.description ? (
+                            <p className='text-sm text-gray-600 mb-2'>{shop.description}</p>
+                          ) : (
+                            <p className='text-sm text-gray-400 italic mb-2'>No description</p>
+                          )}
+                        </div>
+                        <p className='font-semibold text-md mb-2'>
+                          {shop.lowest_price && shop.highest_price ? (
+                            `₱${shop.lowest_price} - ₱${shop.highest_price}`
+                          ) : (
+                            <span className="text-gray-400 italic">Price Range Not available</span>
+                          )}
+                        </p>
+                        <Link to={`/business/${encryptId(shop.business_id)}`} target='_blank'>
+                          <Button 
+                            className='w-full bg-color1 text-color3 hover:bg-color2'
+                          >
+                            Explore More
+                          </Button>
+                        </Link>
+                      </div>
+                    </motion.div>
+                  ))
+                ) : (
+                  <p className='col-span-full text-center text-gray-500'>No shops match your selected filters.</p>
+                )
               )}
             </motion.div>
           </div>

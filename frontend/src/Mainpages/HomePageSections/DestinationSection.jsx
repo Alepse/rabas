@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/css'
 import 'swiper/css/pagination'
@@ -22,6 +22,7 @@ import Santa from '@/assets/santa.jpg'
 import Sorso from '@/assets/sorsogon city.jpg'
 import { Link } from 'react-router-dom'
 import wave from '@/assets/wave-haikei.png'
+import { Skeleton } from "@nextui-org/skeleton";
 
 
 const destinations = [
@@ -44,6 +45,13 @@ const destinations = [
   
 
 const DestinationSection = () => {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadTimer = setTimeout(() => setLoading(false), 1000);
+    return () => clearTimeout(loadTimer);
+  }, []);
+
   return (
     <section className='mt-12    mx-auto bg-transparent p-8 rounded-lg' style={{  
       backgroundImage: `url(${wave})`,  
@@ -88,35 +96,42 @@ const DestinationSection = () => {
         navigation
         className='mb-5 container'
       >
-        {destinations.map((destination, index) => (
-          <SwiperSlide key={index}>
-            <Link to={`/destinations?name=${destination.name.replace(' ', '')}`}>
-              <motion.div
-                className='relative overflow-hidden rounded-lg shadow-lg'
-                whileHover={{ scale: 1.05 }}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                <motion.img
-                  src={destination.image}
-                  alt={destination.name}
-                  className='w-full h-64 bg-black object-cover'
-                  whileHover={{ scale: 1.1 }}
-                />
+        {loading ? (
+          Array.from({ length: destinations.length || 4 }).map((_, index) => (
+            <SwiperSlide key={index}>
+              <Skeleton className='w-full h-64 rounded-lg' />
+            </SwiperSlide>
+          ))
+        ) : (
+          destinations.map((destination, index) => (
+            <SwiperSlide key={index}>
+              <Link to={`/destinations?name=${destination.name.replace(' ', '')}`}>
                 <motion.div
-                  className='absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 p-4 text-white'
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.3 }}
+                  className='relative overflow-hidden rounded-lg shadow-lg'
+                  whileHover={{ scale: 1.05 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
                 >
-                  <h3 className='text-lg font-semibold'>{destination.name}</h3>
+                  <motion.img
+                    src={destination.image}
+                    alt={destination.name}
+                    className='w-full h-64 bg-black object-cover'
+                    whileHover={{ scale: 1.1 }}
+                  />
+                  <motion.div
+                    className='absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 p-4 text-white'
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                  >
+                    <h3 className='text-lg font-semibold'>{destination.name}</h3>
+                  </motion.div>
                 </motion.div>
-              </motion.div>
-            </Link>
-          </SwiperSlide>
-          
-        ))}
+              </Link>
+            </SwiperSlide>
+          ))
+        )}
        
       </Swiper>
 

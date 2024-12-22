@@ -9,6 +9,7 @@ import { GiPositionMarker } from 'react-icons/gi';
 import { AiOutlineLike } from "react-icons/ai";
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import CryptoJS from 'crypto-js';
+import { Skeleton } from "@nextui-org/skeleton";
 
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
@@ -36,19 +37,21 @@ const encryptId = (id) => {
 
 const ActivitiesTab = () => {
   const [activities, setActivities] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchActivities = async () => {
       try {
-        const response = await fetch(`${BASE_URL}/getBusinessesByBusinessType/attraction`); // Update URL if needed
+        const response = await fetch(`${BASE_URL}/getBusinessesByBusinessType/attraction`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        console.log('Fetched activities:', data);
         setActivities(data);
       } catch (error) {
         console.error('Error fetching activities:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -63,203 +66,139 @@ const ActivitiesTab = () => {
 
   return (
     <div className='lg:container'>
-      <div className="p-4 md:p-6">
-        <div className='flex flex-col md:flex-row justify-between items-center'>
-          <h1 className='text-xl md:text-2xl font-bold mb-4 md:mb-6 text-center lg:text-start'>
-            Adventure Awaits: Top Activity Spots
-          </h1>
-          <Link to='/activities' target='_blank' className='mb-4 md:mb-0'>
-            <h1 className='text-md font-semibold text-color1 hover:tracking-wide duration-300 hover:underline cursor-pointer'>
-              See More ⥬
-            </h1>
-          </Link>
-        </div>
-        <Swiper
-          modules={[Navigation]}
-          navigation={{ nextEl: '.custom-next', prevEl: '.custom-prev' }}
-          spaceBetween={20}
-          slidesPerView={1}
-          breakpoints={{
-            320: { slidesPerView: 1 },
-            480: { slidesPerView: 1.5 },
-            640: { slidesPerView: 2 },
-            768: { slidesPerView: 3 },
-            1024: { slidesPerView: 4 },
-            1440: { slidesPerView: 4 },
-          }}
-          className='max-w-full p-4 md:p-6 overflow-hidden'
-        >
-          {adventureAwaits.map((activity, index) => (
-            <SwiperSlide key={index} className='flex justify-center'>
-              <ActivityCard activity={activity} />
-            </SwiperSlide>
-          ))}
-          <div className="custom-prev absolute left-2 top-[25%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300">
-            <FaArrowLeft />
-          </div>
-          <div className="custom-next absolute right-2 top-[25%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300">
-            <FaArrowRight />
-          </div>
-        </Swiper>
-      </div>
-
-      <div className="p-4 md:p-6">
-        <div className='flex flex-col md:flex-row justify-between items-center'>
-          <h1 className='text-xl md:text-2xl font-bold mb-4 md:mb-6 text-center lg:text-start'>
-            Things To Do: Most Liked Activities
-          </h1>
-          <Link to='/activities' target='_blank' className='mb-4 md:mb-0'>
-            <h1 className='text-md font-semibold text-color1 hover:tracking-wide duration-300 hover:underline cursor-pointer'>
-              See More ⥬
-            </h1>
-          </Link>
-        </div>
-        <Swiper
-          modules={[Navigation]}
-          navigation={{ nextEl: '.custom-next', prevEl: '.custom-prev' }}
-          spaceBetween={20}
-          slidesPerView={1}
-          breakpoints={{
-            320: { slidesPerView: 1 },
-            480: { slidesPerView: 1.5 },
-            640: { slidesPerView: 2 },
-            768: { slidesPerView: 3 },
-            1024: { slidesPerView: 4 },
-            1440: { slidesPerView: 4 },
-          }}
-          className='max-w-full p-4 md:p-6 overflow-hidden'
-        >
-          {thingsToDo.map((activity, index) => (
-            <SwiperSlide key={index} className='flex justify-center'>
-              <ActivityCard activity={activity} />
-            </SwiperSlide>
-          ))}
-          <div className="custom-prev absolute left-2 top-[25%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300">
-            <FaArrowLeft />
-          </div>
-          <div className="custom-next absolute right-2 top-[25%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300">
-            <FaArrowRight />
-          </div>
-        </Swiper>
-      </div>
-
-      <div className="p-4 md:p-6">
-        <div className='flex flex-col md:flex-row justify-between items-center'>
-          <h1 className='text-xl md:text-2xl font-bold mb-4 md:mb-6 text-center lg:text-start text-white'>
-            Upgrade Your Weekend: Explore Our Newest Activities!
-          </h1>
-        </div>
-        <Swiper
-          modules={[Navigation]}
-          navigation={{ nextEl: '.custom-next', prevEl: '.custom-prev' }}
-          spaceBetween={20}
-          slidesPerView={1}
-          breakpoints={{
-            320: { slidesPerView: 1 },
-            480: { slidesPerView: 1.5 },
-            640: { slidesPerView: 2 },
-            768: { slidesPerView: 3 },
-            1024: { slidesPerView: 4 },
-            1440: { slidesPerView: 4 },
-          }}
-          className='max-w-full p-4 md:p-6 overflow-hidden'
-        >
-          {activities.map((activity, index) => (
-            <SwiperSlide key={index} className='flex justify-center'>
-              <ActivityCard activity={activity} />
-            </SwiperSlide>
-          ))}
-          <div className="custom-prev absolute left-2 top-[25%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300">
-            <FaArrowLeft />
-          </div>
-          <div className="custom-next absolute right-2 top-[25%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300">
-            <FaArrowRight />
-          </div>
-        </Swiper>
-      </div>
+      <ActivitySwiper title="Adventure Awaits: Top Activity Spots" link="/activities" activities={adventureAwaits} loading={loading} />
+      <ActivitySwiper title="Things To Do: Most Liked Activities" link="/activities" activities={thingsToDo} loading={loading} />
+      <ActivitySwiper title="Explore New Adventures: Latest Activities" isLast activities={activities} loading={loading} />
     </div>
   );
 };
 
-const ActivityCard = ({ activity }) => (
-  <div className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between mx-auto h-full p-2 relative"
-       style={{ width: '100%', maxWidth: '300px', height: '400px' }}>
-    {activity.discount > 0 && (
-      <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold py-1 px-2 rounded">
-        {activity.discount}% OFF
-      </div>
-    )}
-    <div className="w-full h-56 md:h-64 bg-gray-200 rounded-t-lg overflow-hidden">
-      {activity.image ? (
-        <img
-          src={`${BASE_URL}/${activity.image}`}
-          alt={activity.name}
-          className="w-full h-full object-cover"
-        />
-      ) : (
-        <div className="w-full h-full flex items-center justify-center">
-          <span>No Image</span>
-        </div>
+const ActivitySwiper = ({ title, link, isLast, activities, loading }) => (
+  <div className="p-4 md:p-6">
+    <div className='flex flex-col md:flex-row justify-between items-center'>
+      <h1 className={`text-xl md:text-2xl font-bold mb-4 md:mb-6 text-center lg:text-start ${isLast ? 'text-light' : ''}`}>
+        {title}
+      </h1>
+      {link && (
+        <Link to={link} target='_blank' className='mb-4 md:mb-0'>
+          <h1 className='text-md font-semibold text-color1 hover:tracking-wide duration-300 hover:underline cursor-pointer'>
+            See More ⥬
+          </h1>
+        </Link>
       )}
     </div>
-    <div className="flex-grow flex flex-col justify-between mt-4 px-2">
-      <div>
-        <div className="flex justify-between items-center mb-3">
-          <div className="flex items-center gap-1">
-            {activity.rating ? (
-              <>
-                <span className="text-[12px]">{parseFloat(activity.rating).toFixed(1)}</span>
-                <span className="text-yellow-500">
-                  {'★'.repeat(activity.rating)}
-                  {'☆'.repeat(5 - activity.rating)}
-                </span>
-              </>
-            ) : (
-              <span className="ml-1 text-sm">No ratings</span>
-            )}
-          </div>
-        </div>
-        <div className="flex items-center gap-2 mb-2">
-          <h3 className="text-lg font-semibold text-gray-800 truncate">
-            {activity.name}
-          </h3>
-          {activity.likes > 0 && (
-            <span className="text-xs text-gray-500 flex items-center gap-1">
-              <AiOutlineLike /> {formatNumber(activity.likes)}
-            </span>
-          )}
-        </div>
-        <div className="text-xs text-gray-500 mb-4 flex items-center">
-          <GiPositionMarker className="mr-1" />
-          {activity.destination}
-        </div>
+    <Swiper
+      modules={[Navigation]}
+      navigation={{ nextEl: '.custom-next', prevEl: '.custom-prev' }}
+      spaceBetween={20}
+      slidesPerView={1}
+      breakpoints={{
+        320: { slidesPerView: 1 },
+        640: { slidesPerView: 1 },
+        768: { slidesPerView: 2 },
+        1024: { slidesPerView: 3 },
+        1440: { slidesPerView: 4 },
+      }}
+      className='max-w-full p-4 md:p-6'
+    >
+      {loading ? (
+        Array.from({ length: activities.length || 4 }).map((_, index) => (
+          <SwiperSlide key={index} className='flex justify-center'>
+            <Skeleton className="w-full h-[400px] rounded-lg" />
+          </SwiperSlide>
+        ))
+      ) : (
+        activities.map((activity, index) => (
+          <SwiperSlide key={index} className='flex justify-center'>
+            <div className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between mx-auto h-full p-2 relative"
+                 style={{ width: '100%', maxWidth: '300px', height: '400px' }}>
+              {activity.discount > 0 && (
+                <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold py-1 px-2 rounded">
+                  {activity.discount}% OFF
+                </div>
+              )}
+              <div className="w-full h-56 md:h-64 bg-gray-200 rounded-t-lg overflow-hidden">
+                {activity.image ? (
+                  <img
+                    src={`${BASE_URL}/${activity.image}`}
+                    alt={activity.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <span>No Image</span>
+                  </div>
+                )}
+              </div>
+              <div className="flex-grow flex flex-col justify-between mt-4 px-2">
+                <div>
+                  <div className="flex justify-between items-center mb-3">
+                    <div className="flex items-center gap-1">
+                      {activity.rating ? (
+                        <>
+                          <span className="text-[12px]">{parseFloat(activity.rating).toFixed(1)}</span>
+                          <span className="text-yellow-500">
+                            {'★'.repeat(activity.rating)}
+                            {'☆'.repeat(5 - activity.rating)}
+                          </span>
+                        </>
+                      ) : (
+                        <span className="ml-1 text-sm">No ratings</span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className="text-lg font-semibold text-gray-800 truncate">
+                      {activity.name}
+                    </h3>
+                    {activity.likes > 0 && (
+                      <span className="text-xs text-gray-500 flex items-center gap-1">
+                        <AiOutlineLike /> {formatNumber(activity.likes)}
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-xs text-gray-500 mb-4 flex items-center">
+                    <GiPositionMarker className="mr-1" />
+                    {activity.destination}
+                  </div>
+                </div>
+                <div className="mt-auto">
+                  <p className="text-md font-semibold text-black mb-4">
+                    {activity.lowest_price === null && activity.highest_price === null ? (
+                      <span className="text-gray-500">Not Available</span>
+                    ) : activity.discount ? (
+                      <>
+                        <span className="line-through text-gray-500">
+                          ₱{activity.lowest_price} - ₱{activity.highest_price}
+                        </span>
+                        <span className="text-red-500 text-xl font-bold ml-2">
+                          ₱{activity.lowest_price - (activity.highest_price * activity.discount) / 100}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <span>₱{activity.lowest_price} - ₱{activity.highest_price}</span>
+                      </>
+                    )}
+                  </p>
+                  <Link to={`/business/${encryptId(activity.business_id)}`}>
+                    <Button className="w-full bg-color1 text-white text-sm font-medium px-5 py-2 rounded hover:bg-color2">
+                     Explore More
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </SwiperSlide>
+        ))
+      )}
+      <div className="custom-prev absolute left-2 top-[25%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300">
+        <FaArrowLeft />
       </div>
-      <div className="mt-auto">
-        <p className="text-md font-semibold text-black mb-4">
-          {activity.lowest_price === null && activity.highest_price === null ? (
-            <span className="text-gray-500">Not Available</span>
-          ) : activity.discount ? (
-            <>
-              <span className="line-through text-gray-500">
-                ₱{activity.lowest_price} - ₱{activity.highest_price}
-              </span>
-              <span className="text-red-500 text-xl font-bold ml-2">
-                ₱{activity.lowest_price - (activity.highest_price * activity.discount) / 100}
-              </span>
-            </>
-          ) : (
-            <>
-              <span>₱{activity.lowest_price} - ₱{activity.highest_price}</span>
-            </>
-          )}
-        </p>
-        <Link to={`/business/${encryptId(activity.business_id)}`}>
-          <Button className="w-full bg-color1 text-white text-sm font-medium px-5 py-2 rounded hover:bg-color2">
-           Explore More
-          </Button>
-        </Link>
+      <div className="custom-next absolute right-2 top-[25%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300">
+        <FaArrowRight />
       </div>
-    </div>
+    </Swiper>
   </div>
 );
 

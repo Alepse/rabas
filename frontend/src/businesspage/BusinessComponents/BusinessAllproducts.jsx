@@ -19,6 +19,7 @@ import {
   useDisclosure,
   CheckboxGroup,
   Checkbox,
+  Skeleton,
 } from '@nextui-org/react';
 import { MdRateReview } from 'react-icons/md';
 import { AiFillStar } from 'react-icons/ai';
@@ -673,7 +674,7 @@ const BusinessAllproducts = () => {
   }
 
   return (
-    <div className="min-h-screen container mx-auto p-4 bg-white  rounded-md shadow-md mb-4">
+    <div className="min-h-screen container mx-auto p-4 bg-white rounded-md shadow-md mb-4">
       <div className="text-3xl font-semibold mb-6 text-gray-800">What We Offer</div>
 
       <div className="flex flex-col lg:flex-row gap-2">
@@ -690,7 +691,7 @@ const BusinessAllproducts = () => {
         </div>
 
         {/* Main Content Area */}
-        <div className="flex max-h-screen flex-col w-full bg-white   p-5 rounded-lg shadow-md">
+        <div className="flex max-h-screen flex-col w-full bg-white p-5 rounded-lg shadow-md">
           {/* Tabs */}
           <Tabs
             aria-label="Business Offerings"
@@ -699,11 +700,11 @@ const BusinessAllproducts = () => {
             onSelectionChange={(key) => setActiveTab(key)}
             selectedKey={activeTab}
             classNames={{
-          base: "w-full mb-4",
-          tabList: "gap-6 w-full p-4 container",
-          tab: "max-w-fit px-0 h-12",
-          tabContent: "text-color1"
-        }}
+              base: "w-full mb-4",
+              tabList: "gap-6 w-full p-4 container",
+              tab: "max-w-fit px-0 h-12",
+              tabContent: "text-color1"
+            }}
           >
             <Tab key="all" title="All Products" />
             <Tab key="activities" title="Activities" />
@@ -713,9 +714,20 @@ const BusinessAllproducts = () => {
           </Tabs>
 
           {/* Content */}
-          <div className="p-2 max-h-screen overflow-y-auto  scrollbar-custom">
+          <div className="p-2 max-h-screen overflow-y-auto scrollbar-custom">
             {loading ? (
-              <LoadingSpinner />
+              // Render skeletons while loading
+              Array.from({ length: 6 }).map((_, index) => (
+                <div key={index} className="bg-white rounded-lg shadow-lg p-2 mb-4">
+                  <Skeleton className="w-full h-48 rounded-t-lg" />
+                  <div className="p-4">
+                    <Skeleton className="h-6 mb-2" />
+                    <Skeleton className="h-4 mb-2" />
+                    <Skeleton className="h-4 mb-2" />
+                    <Skeleton className="h-4" />
+                  </div>
+                </div>
+              ))
             ) : filteredData.length > 0 ? (
               filteredData.map((product) => (
                 <ProductCard 
@@ -747,8 +759,6 @@ const BusinessAllproducts = () => {
               <ModalHeader className="flex flex-col gap-1">Image Gallery</ModalHeader>
               <ModalBody>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 cursor-pointer">
-                  {console.log('Modal Selected Product:', selectedProduct)}
-                  {console.log('Modal Images:', selectedProduct?.images)}
                   {selectedProduct && selectedProduct.images && selectedProduct.images.length > 0 ? (
                     selectedProduct.images.map((image, index) => (
                       <div
@@ -770,72 +780,71 @@ const BusinessAllproducts = () => {
                     </div>
                   )}
                 </div>
-              
               </ModalBody>
               <ModalFooter>
                 <Button onPress={onClose} color='danger'>Close</Button>
               </ModalFooter>
 
-               {/* Single Image Preview Modal */}
-                <Modal 
-                  isOpen={isPreviewOpen} 
-                  onOpenChange={setIsPreviewOpen}
-                  hideCloseButton
-                  size="full"
-                  className='z-50 bg-black bg-opacity-75'
-                >
-                  <ModalContent className="relative w-full h-full flex justify-center items-center">
-                    <ModalBody className="relative w-full h-full flex justify-center items-center bg-transparent p-4">
-                      <div className="relative max-w-[90vw] max-h-[85vh] flex justify-center items-center">
-                        <img
-                          src={previewImage}
-                          alt="Preview"
-                          className="max-w-full max-h-[85vh] w-auto h-auto object-contain rounded-md"
-                          style={{
-                            minWidth: '300px',  // Minimum width for very small images
-                            minHeight: '200px', // Minimum height for very small images
-                          }}
-                        />
+              {/* Single Image Preview Modal */}
+              <Modal 
+                isOpen={isPreviewOpen} 
+                onOpenChange={setIsPreviewOpen}
+                hideCloseButton
+                size="full"
+                className='z-50 bg-black bg-opacity-75'
+              >
+                <ModalContent className="relative w-full h-full flex justify-center items-center">
+                  <ModalBody className="relative w-full h-full flex justify-center items-center bg-transparent p-4">
+                    <div className="relative max-w-[90vw] max-h-[85vh] flex justify-center items-center">
+                      <img
+                        src={previewImage}
+                        alt="Preview"
+                        className="max-w-full max-h-[85vh] w-auto h-auto object-contain rounded-md"
+                        style={{
+                          minWidth: '300px',  // Minimum width for very small images
+                          minHeight: '200px', // Minimum height for very small images
+                        }}
+                      />
+                    </div>
+                    {previewIndex !== null && selectedProduct?.images[previewIndex] && (
+                      <div className="absolute bottom-4 left-0 right-0 text-center text-white text-xl font-semibold py-2 bg-black bg-opacity-50">
+                        {selectedProduct.images[previewIndex].title || `Image ${previewIndex + 1}`}
                       </div>
-                      {previewIndex !== null && selectedProduct?.images[previewIndex] && (
-                        <div className="absolute bottom-4 left-0 right-0 text-center text-white text-xl font-semibold py-2 bg-black bg-opacity-50">
-                          {selectedProduct.images[previewIndex].title || `Image ${previewIndex + 1}`}
-                        </div>
-                      )}
-                      {previewIndex > 0 && (
-                        <button
-                          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-gray-800 bg-opacity-70 hover:bg-opacity-90 rounded-full p-3 transition-all duration-300"
-                          onClick={goToPrevImage}
-                          aria-label="Previous image"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6 text-white">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                          </svg>
-                        </button>
-                      )}
-                      {selectedProduct?.images && previewIndex < selectedProduct.images.length - 1 && (
-                        <button
-                          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-gray-800 bg-opacity-70 hover:bg-opacity-90 rounded-full p-3 transition-all duration-300"
-                          onClick={goToNextImage}
-                          aria-label="Next image"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6 text-white">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
-                        </button>
-                      )}
+                    )}
+                    {previewIndex > 0 && (
                       <button
-                        className="absolute top-4 right-4 bg-red-500 bg-opacity-70 hover:bg-opacity-90 rounded-full p-2 transition-all duration-300"
-                        onClick={closePreview}
-                        aria-label="Close preview"
+                        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-gray-800 bg-opacity-70 hover:bg-opacity-90 rounded-full p-3 transition-all duration-300"
+                        onClick={goToPrevImage}
+                        aria-label="Previous image"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6 text-white">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                         </svg>
                       </button>
-                    </ModalBody>
-                  </ModalContent>
-                </Modal>
+                    )}
+                    {selectedProduct?.images && previewIndex < selectedProduct.images.length - 1 && (
+                      <button
+                        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-gray-800 bg-opacity-70 hover:bg-opacity-90 rounded-full p-3 transition-all duration-300"
+                        onClick={goToNextImage}
+                        aria-label="Next image"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6 text-white">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </button>
+                    )}
+                    <button
+                      className="absolute top-4 right-4 bg-red-500 bg-opacity-70 hover:bg-opacity-90 rounded-full p-2 transition-all duration-300"
+                      onClick={closePreview}
+                      aria-label="Close preview"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6 text-white">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </ModalBody>
+                </ModalContent>
+              </Modal>
             </>
           )}
         </ModalContent>
