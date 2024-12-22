@@ -95,7 +95,7 @@ app.use(
     cookie: {
       httpOnly: true,
       secure: true,  // Set to true for HTTPS
-      sameSite: 'Strict',  // Necessary for cross-origin cookiess
+      sameSite: 'lax',  // Necessary for cross-origin cookiess
       maxAge: 24 * 60 * 60 * 1000,  // 1 day
     },
   })
