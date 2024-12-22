@@ -34,12 +34,13 @@ app.use(
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true); // Allow the origin
       } else {
-        callback(new Error("Not allowed by CORS")); // Reject the origin
+        callback(new Error("Not allowed by CORS"));
       }
     },
-    credentials: true,
+    credentials: true, // Allow credentials
   })
 );
+
 
 app.use(express.json()); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
@@ -104,6 +105,11 @@ app.get('/', (req, res) => {
 app.use((err, req, res, next) => {
   console.error('Error:', err);
   res.status(500).json({ success: false, message: 'Internal server error' });
+});
+
+app.use((req, res, next) => {
+  console.log("Session cookie:", req.cookies['connect.sid']); // Log session cookie
+  next();
 });
 
 // User Login Endpoint
