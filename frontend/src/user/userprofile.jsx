@@ -14,7 +14,7 @@ import { motion } from 'framer-motion';
 import wave from '@/assets/wave2.webp';
 import CryptoJS from 'crypto-js';
 import axios from 'axios';
-import { FaCamera } from 'react-icons/fa';
+import { FaCamera, FaBusinessTime } from 'react-icons/fa';
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
@@ -641,10 +641,21 @@ const UserProfile = ({ activities = [] }) => {
                   <h1 className='font-bold mb-2'>Switch to Business:</h1>
                   <button 
                     className='text-gray-500 hover:bg-color2 hover:text-white flex items-center p-2 rounded-md gap-1 border-1 border-color1 shadow-md transition duration-300 ease-in-out transform hover:scale-105'
-                    onClick={() => handleBusinessClick(businessData.business_id)}
-                    key={application.application_id}>
-                    <Avatar src={ businessData.businessLogo ? `${BASE_URL}/${businessData.businessLogo}` : ''}/>
-                    <p>{businessData.businessName}</p>
+                    onClick={() => handleBusinessClick(businessData?.business_id)} // Use optional chaining
+                    key={application.application_id}
+                  >
+                    {/* Check if businessData is available before accessing its properties */}
+                    {businessData && businessData.businessLogo ? (
+                      <Avatar 
+                        src={`${BASE_URL}/${businessData.businessLogo}`} 
+                        alt={businessData.businessName} // Alt text for accessibility
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center w-10 h-10 bg-gray-200 rounded-full"> {/* Optional styling for the icon container */}
+                        <FaBusinessTime className="text-gray-500" size={24} /> {/* Display the icon */}
+                      </div>
+                    )}
+                    <p>{businessData ? businessData.businessName : 'Loading...'}</p> {/* Show loading text if businessData is not available */}
                   </button>
                 </div>
               );
