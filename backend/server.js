@@ -71,7 +71,7 @@ const pool = mysql.createPool({
 const sessionStore = new MySQLStore({}, pool); // Pass the pool directly
 
 // Log session store configuration
-console.log('Session store initialized');
+// console.log('Session store initialized');
 
 // Error handling for session store initialization
 sessionStore.on('error', (error) => {
@@ -108,7 +108,7 @@ app.use((err, req, res, next) => {
 });
 
 app.use((req, res, next) => {
-  console.log("Session cookie:", req.cookies['connect.sid']); // Log session cookie
+  // console.log("Session cookie:", req.cookies['connect.sid']); // Log session cookie
   next();
 });
 
@@ -155,7 +155,7 @@ app.post('/login', async (req, res) => {
 
 // Endpoint for checking login status
 app.get('/check-login', async (req, res) => {
-  console.log('Current session:', req.session); // Log the session object
+  // console.log('Current session:', req.session); // Log the session object
   try {
     // Query the sessions table to retrieve session data using the session ID
     const [results] = await pool.query(
