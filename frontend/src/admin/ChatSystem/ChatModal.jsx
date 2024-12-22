@@ -788,7 +788,6 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
           )}
           <div className={`flex ${isSenderYou ? 'justify-end' : 'justify-start'} mb-4`}>
             <div className={`p-4 rounded-lg max-w-[70%] ${isSenderYou ? 'bg-gray-200 text-black' : 'bg-color1 text-white'} shadow-md`}>
-              {message.isSending && <span className="text-sm text-gray-500">Sending...</span>} {/* Loading indicator */}
               {message.formType ? (
                 <BookingDetailsCard
                   message={message}
@@ -834,6 +833,10 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
                 </>
               )}
             </div>
+            
+          </div>
+          <div className='flex justify-end'>
+            {message.isSending && <span className="text-sm text-gray-500">Sending</span>} 
           </div>
         </div>
       );
