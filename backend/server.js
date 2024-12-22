@@ -23,6 +23,7 @@ const allowedOrigins = [
   "http://ubuntu-24.localhost:5173",
   "http://192.168.254.145:5173",
   "https://rabasorsogon.com", 
+  "https://www.rabasorsogon.com",
   "http://147.93.19.247:5173",
 ];
 
@@ -36,9 +37,7 @@ app.use(
         callback(new Error("Not allowed by CORS"));
       }
     },
-    credentials: true, // Allow cookies and credentials
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    credentials: true, 
   })
 );
 
@@ -88,7 +87,7 @@ app.use(
     cookie: {
       httpOnly: true,          // For security: Prevents client-side JS access to cookies
       secure: process.env.NODE_ENV === 'production',  // Set to true when in production (HTTPS)
-      sameSite: 'None',        // Required for cross-origin cookies (ensure cookies work between frontend and backend)
+      sameSite: 'lax',        // Required for cross-origin cookies (ensure cookies work between frontend and backend)
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     },
     store: sessionStore,  // Use MySQL session store
