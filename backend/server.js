@@ -23,6 +23,7 @@ const allowedOrigins = [
   "http://ubuntu-24.localhost:5173",
   "http://192.168.254.145:5173",
   "http://rabasorsogon.com", 
+  "https://rabasorsogon.com", 
   "http://www.rabasorsogon.com",
   "http://147.93.19.247:5173",
 ];
