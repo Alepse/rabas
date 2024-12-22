@@ -325,6 +325,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
   const [imagePreview, setImagePreview] = useState(null);
   const [users, setUsers] = useState([]);
   const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -550,55 +551,72 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
       formData.append('receiver_id', selectedUser);
       formData.append('receiver_account', 'user');
       formData.append('text', messageInput);
-      // formData.append('form_details', ''); // Add any additional form details if needed
-      // formData.append('additionalInfo', ''); // Add any additional info if needed
-      // formData.append('messageNote', ''); // Add any message note if needed
-  
+
       if (image) {
         formData.append('photo', image); // Append the image file
       }
-  
+
+      // Create a new message object
+      const newMessage = {
+        id: Date.now(), // Temporary ID until we get the response
+        sender: 'You',
+        senderId: user_id,
+        senderAccount: 'business',
+        receiverId: selectedUser,
+        receiverAccount: 'user',
+        text: messageInput,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        image: imagePreview,
+        isSending: true, // Indicate that the message is being sent
+      };
+
+      // Update messages state immediately
+      const currentMessages = messages[selectedUser] || [];
+      setMessages({
+        ...messages,
+        [selectedUser]: [...currentMessages, newMessage],
+      });
+
+      // Set loading state
+      setIsLoading(true); // Assuming you have a state variable for loading
+
       try {
         const response = await fetch(`${BASE_URL}/sendMessage`, {
           method: 'POST',
           body: formData,
         });
-  
+
         if (!response.ok) {
           throw new Error('Failed to send message');
         }
-  
+
         const result = await response.json();
         if (result.success) {
-          const currentMessages = messages[selectedUser] || [];
-          const newMessage = {
-            id: result.messageId, // Use the messageId returned from the server
-            sender: 'You',
-            senderId: user_id,
-            senderAccount: 'business',
-            receiverId: selectedUser,
-            receiverAccount: 'user',
-            text: messageInput,
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            image: imagePreview
-          };
-
-          // console.log('new message', newMessage);
-  
-          setMessages({
-            ...messages,
-            [selectedUser]: [...currentMessages, newMessage]
-          });
+          // Update the message with the actual ID from the server
+          setMessages(prevMessages => ({
+            ...prevMessages,
+            [selectedUser]: prevMessages[selectedUser].map(msg =>
+              msg.id === newMessage.id ? { ...msg, id: result.messageId, isSending: false } : msg
+            ),
+          }));
           setMessageInput('');
           setImage(null);
           setImagePreview(null);
           toast.success('Message sent!');
         } else {
-          toast.error('Failed to send message');
+          throw new Error('Failed to send message');
         }
       } catch (error) {
         console.error('Error:', error);
+        // Optionally, you can revert the message state if sending fails
+        setMessages(prevMessages => ({
+          ...prevMessages,
+          [selectedUser]: prevMessages[selectedUser].filter(msg => msg.id !== newMessage.id),
+        }));
         toast.error('An error occurred while sending the message');
+      } finally {
+        // Reset loading state
+        setIsLoading(false);
       }
     }
   };
@@ -768,6 +786,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
           )}
           <div className={`flex ${isSenderYou ? 'justify-end' : 'justify-start'} mb-4`}>
             <div className={`p-4 rounded-lg max-w-[70%] ${isSenderYou ? 'bg-gray-200 text-black' : 'bg-color1 text-white'} shadow-md`}>
+              {message.isSending && <span className="text-sm text-gray-500">Sending...</span>} {/* Loading indicator */}
               {message.formType ? (
                 <BookingDetailsCard
                   message={message}
