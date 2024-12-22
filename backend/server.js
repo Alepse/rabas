@@ -153,136 +153,6 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Endpoint for forgot password
-app.post('/forgot-password', async (req, res) => {
-  const { email } = req.body;
-
-  if (!email) {
-    return res.status(400).json({ success: false, message: 'Email is required' });
-  }
-
-  try {
-    // Generate a secure token
-    const token = crypto.randomBytes(20).toString('hex');
-
-    // Set token expiration time (e.g., 1 hour)
-    const tokenExpiration = Date.now() + 3600000;
-
-    // Store the token and expiration in the database for the user
-    const [results] = await pool.query(
-      'UPDATE users SET reset_password_token = ?, reset_password_expires = ? WHERE email = ?',
-      [token, tokenExpiration, email]
-    );
-
-    if (results.affectedRows === 0) {
-      console.log('Email not found:', email); // Log the email not found
-      return res.status(404).json({ success: false, message: 'Email not found' });
-    }
-
-    // Send email with the token
-    const transporter = nodemailer.createTransport({
-      service: 'Gmail',
-      auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_PASS
-      }
-    });
-
-    const mailOptions = {
-      to: email,
-      from: process.env.GMAIL_USER,
-      subject: 'Password Reset',
-      text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n
-             Please click on the following link, or paste this into your browser to complete the process:\n\n
-             http://localhost:5000/reset-password/${token}\n\n
-             If you did not request this, please ignore this email and your password will remain unchanged.\n`
-    };
-
-    // Send the email and respond
-    transporter.sendMail(mailOptions, (err) => {
-      if (err) {
-        console.error('Error sending email:', err);
-        return res.status(500).json({ success: false, message: 'Failed to send email' });
-      }
-      res.json({ success: true, message: 'Password reset email sent' });
-    });
-  } catch (err) {
-    console.error('Database query error:', err);
-    return res.status(500).json({ success: false, message: 'Internal server error' });
-  }
-});
-
-// Endpoint to handle password reset
-app.post('/reset-password/:token', async (req, res) => {
-  const { token } = req.params;
-  const { newPassword } = req.body;
-
-  if (!newPassword) {
-    return res.status(400).json({ success: false, message: 'New password is required' });
-  }
-
-  try {
-    // Hash the new password
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-    // Update the user's password in the database
-    const [results] = await pool.query(
-      'UPDATE users SET password = ?, reset_password_token = NULL, reset_password_expires = NULL WHERE reset_password_token = ?',
-      [hashedPassword, token]
-    );
-
-    if (results.affectedRows === 0) {
-      return res.status(404).json({ success: false, message: 'Invalid or expired token' });
-    }
-
-    res.json({ success: true, message: 'Password has been reset' });
-  } catch (err) {
-    console.error('Error during password reset:', err);
-    return res.status(500).json({ success: false, message: 'Internal server error' });
-  }
-});
-
-// Redirect to the React frontend for password reset
-app.get('/reset-password/:token', (req, res) => {
-  const { token } = req.params;
-
-  // Redirect to the React frontend with the token as a query parameter
-  res.redirect(`http://localhost:5173/resetpassword?token=${token}`);
-});
-
-// Handle the password reset form submission
-app.post('/reset-password/:token', async (req, res) => {
-  const { token } = req.params;
-  const { newPassword } = req.body;
-
-  // Log the new password to ensure it's defined
-  console.log('New password:', newPassword);
-
-  if (!newPassword) {
-    return res.status(400).json({ success: false, message: 'New password is required' });
-  }
-
-  try {
-    // Hash the new password
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-    // Update the user's password in the database
-    const [results] = await pool.query(
-      'UPDATE users SET password = ?, reset_password_token = NULL, reset_password_expires = NULL WHERE reset_password_token = ?',
-      [hashedPassword, token]
-    );
-
-    if (results.affectedRows === 0) {
-      return res.status(404).json({ success: false, message: 'Invalid or expired token' });
-    }
-
-    res.json({ success: true, message: 'Password has been reset' });
-  } catch (err) {
-    console.error('Error during password reset:', err);
-    return res.status(500).json({ success: false, message: 'Internal server error' });
-  }
-});
-
 // Endpoint for checking login status
 app.get('/check-login', async (req, res) => {
   console.log('Current session:', req.session); // Log the session object
@@ -799,6 +669,137 @@ app.get('/', (req, res) => {
 
   // Respond with session user details
   res.json({ name: req.session.user.name });
+});
+
+
+// Endpoint for forgot password
+app.post('/forgot-password', async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ success: false, message: 'Email is required' });
+  }
+
+  try {
+    // Generate a secure token
+    const token = crypto.randomBytes(20).toString('hex');
+
+    // Set token expiration time (e.g., 1 hour)
+    const tokenExpiration = Date.now() + 3600000;
+
+    // Store the token and expiration in the database for the user
+    const [results] = await pool.query(
+      'UPDATE users SET reset_password_token = ?, reset_password_expires = ? WHERE email = ?',
+      [token, tokenExpiration, email]
+    );
+
+    if (results.affectedRows === 0) {
+      console.log('Email not found:', email); // Log the email not found
+      return res.status(404).json({ success: false, message: 'Email not found' });
+    }
+
+    // Send email with the token
+    const transporter = nodemailer.createTransport({
+      service: 'Gmail',
+      auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_PASS
+      }
+    });
+
+    const mailOptions = {
+      to: email,
+      from: process.env.GMAIL_USER,
+      subject: 'Password Reset',
+      text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n
+             Please click on the following link, or paste this into your browser to complete the process:\n\n
+             ${getRedirectionURL()}/reset-password/${token}\n\n
+             If you did not request this, please ignore this email and your password will remain unchanged.\n`
+    };
+
+    // Send the email and respond
+    transporter.sendMail(mailOptions, (err) => {
+      if (err) {
+        console.error('Error sending email:', err);
+        return res.status(500).json({ success: false, message: 'Failed to send email' });
+      }
+      res.json({ success: true, message: 'Password reset email sent' });
+    });
+  } catch (err) {
+    console.error('Database query error:', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+// Endpoint to handle password reset
+app.post('/reset-password/:token', async (req, res) => {
+  const { token } = req.params;
+  const { newPassword } = req.body;
+
+  if (!newPassword) {
+    return res.status(400).json({ success: false, message: 'New password is required' });
+  }
+
+  try {
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update the user's password in the database
+    const [results] = await pool.query(
+      'UPDATE users SET password = ?, reset_password_token = NULL, reset_password_expires = NULL WHERE reset_password_token = ?',
+      [hashedPassword, token]
+    );
+
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: 'Invalid or expired token' });
+    }
+
+    res.json({ success: true, message: 'Password has been reset' });
+  } catch (err) {
+    console.error('Error during password reset:', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+// Redirect to the React frontend for password reset
+app.get('/reset-password/:token', (req, res) => {
+  const { token } = req.params;
+
+  // Redirect to the React frontend with the token as a query parameter
+  res.redirect(`${getBaseURL()}/resetpassword?token=${token}`);
+});
+
+// Handle the password reset form submission
+app.post('/reset-password/:token', async (req, res) => {
+  const { token } = req.params;
+  const { newPassword } = req.body;
+
+  // Log the new password to ensure it's defined
+  console.log('New password:', newPassword);
+
+  if (!newPassword) {
+    return res.status(400).json({ success: false, message: 'New password is required' });
+  }
+
+  try {
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update the user's password in the database
+    const [results] = await pool.query(
+      'UPDATE users SET password = ?, reset_password_token = NULL, reset_password_expires = NULL WHERE reset_password_token = ?',
+      [hashedPassword, token]
+    );
+
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: 'Invalid or expired token' });
+    }
+
+    res.json({ success: true, message: 'Password has been reset' });
+  } catch (err) {
+    console.error('Error during password reset:', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
 });
 
 // Endpoint for user logout
