@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Nav from '@/components/nav';
 import Search from '@/components/Search';
 import Footer from '@/components/Footer';
@@ -64,22 +64,61 @@ const Trip = () => {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedTrip, setSelectedTrip] = useState(null);
   const [itinerary, setItinerary] = useState({});
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // State to track login status
+
+  const checkLoginStatus = useCallback(async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/check-login`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setIsLoggedIn(data.isLoggedIn);
+
+        if (!data.isLoggedIn) {
+          // Show alert before redirecting
+          Swal.fire({
+            icon: 'warning',
+            title: 'Not Logged In',
+            text: 'You need to log in to access this page.',
+            confirmButtonText: 'OK'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              window.location.href = '/'; // Redirect to home if not logged in after pressing OK
+            }
+          });
+        }
+      } else {
+        setIsLoggedIn(false);
+      }
+    } catch (error) {
+      console.error('Error checking login status:', error);
+    }
+  }, []);
 
   useEffect(() => {
-    // Fetch trips from the endpoint
-    axios.get(`${BASE_URL}/trips`, { withCredentials: true })
-      .then(response => {
-        // console.log('response', response);
-        setTrips(response.data.trips); // Set the fetched trips to state
-        // console.log('trips', trips);
-      })
-      .catch(error => {
-        console.error('Error fetching trips:', error);
-        showErrorAlert('Error fetching trips:', error.response ? error.response.data.message : 'An unknown error occurred');
-      });
-  }, []); 
+    checkLoginStatus(); // Check login status on component mount
+  }, [checkLoginStatus]);
 
-    // Title Tab
+  useEffect(() => {
+    if (isLoggedIn) {
+      // Fetch trips only if the user is logged in
+      axios.get(`${BASE_URL}/trips`, { withCredentials: true })
+        .then(response => {
+          setTrips(response.data.trips); // Set the fetched trips to state
+        })
+        .catch(error => {
+          console.error('Error fetching trips:', error);
+          showErrorAlert('Error fetching trips:', error.response ? error.response.data.message : 'An unknown error occurred');
+        })
+        .finally(() => {
+          setLoading(false); // Set loading to false after fetching
+        });
+    }
+  }, [isLoggedIn]); // Fetch trips when isLoggedIn changes
+
+  // Title Tab
   useEffect(() => {
     document.title = 'RabaSorsogon | Trip';
   });
