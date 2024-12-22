@@ -22,7 +22,6 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://ubuntu-24.localhost:5173",
   "http://192.168.254.145:5173",
-  "http://rabasorsogon.com",
   "https://rabasorsogon.com", 
   "https://www.rabasorsogon.com",
   "http://147.93.19.247:5173",
@@ -87,9 +86,9 @@ app.use(
     saveUninitialized: true,
     cookie: {
       maxAge: 24 * 60 * 60 * 1000, // 1 day
-      secure: false, // Temporarily set to false for testing
-      httpOnly: false,
-      // sameSite: 'none', // Required for cross-origin cookies
+      secure: true, // Temporarily set to false for testing
+      httpOnly: true,
+      sameSite: 'none', // Required for cross-origin cookies
     },
   })
 );
