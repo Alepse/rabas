@@ -94,7 +94,7 @@ app.use(
     saveUninitialized: true,
     cookie: {
       httpOnly: true,
-      secure: true,  // Set to true for HTTPS
+      secure: false,  // Set to true for HTTPS
       sameSite: 'lax',  // Necessary for cross-origin cookiess
       maxAge: 24 * 60 * 60 * 1000,  // 1 day
     },
