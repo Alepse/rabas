@@ -27,7 +27,7 @@ const allowedOrigins = [
   "http://147.93.19.247:5173",
 ];
 
-// Enable CORS with credentials
+// Configure CORS with allowed origins and credentials
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -37,17 +37,11 @@ app.use(
         callback(new Error("Not allowed by CORS"));
       }
     },
-    credentials: true, // Allow credentials
+    credentials: true, // Allow cookies and credentials
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   })
 );
-
-const corsOptions = {
-  origin: 'https://rabasorsogon.com', // Your frontend domain
-  credentials: true,  // Allow credentials (cookies)
-};
-
-app.use(cors(corsOptions));
-
 
 app.use(express.json()); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
@@ -93,13 +87,15 @@ app.use(
     resave: false,
     saveUninitialized: true,
     cookie: {
-      httpOnly: true,
-      secure: false,  // Set to true for HTTPS
-      sameSite: 'lax',  // Necessary for cross-origin cookiess
-      maxAge: 24 * 60 * 60 * 1000,  // 1 day
+      httpOnly: true,          // For security: Prevents client-side JS access to cookies
+      secure: process.env.NODE_ENV === 'production',  // Set to true when in production (HTTPS)
+      sameSite: 'None',        // Required for cross-origin cookies (ensure cookies work between frontend and backend)
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
     },
+    store: sessionStore,  // Use MySQL session store
   })
 );
+
 
 // Routes and API Endpoints
 app.get('/', (req, res) => {
