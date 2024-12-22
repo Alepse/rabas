@@ -28,6 +28,7 @@ const allowedOrigins = [
   "http://147.93.19.247:5173",
 ];
 
+// Enable CORS with credentials
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -87,12 +88,18 @@ app.use(
     saveUninitialized: false,
     cookie: {
       maxAge: 24 * 60 * 60 * 1000, // 1 day
-      secure: process.env.NODE_ENV === 'production', // Secure cookies in production with HTTPS
+      secure: process.env.NODE_ENV === 'production', // Requires HTTPS for cookies
       httpOnly: true, // Prevent client-side access to the cookie
-      sameSite: 'lax', // Adjust sameSite setting as per your application
+      sameSite: 'none', // Required for cross-origin cookies
     },
   })
 );
+
+// Routes and API Endpoints
+app.get('/', (req, res) => {
+  req.session.viewCount = (req.session.viewCount || 0) + 1;
+  res.json({ message: `You've visited this page ${req.session.viewCount} times` });
+});
 
 // Error handling middleware for Express
 app.use((err, req, res, next) => {
