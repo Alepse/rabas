@@ -603,7 +603,7 @@ const Discover = () => {
                           <img
                             src={item.cardImage ? `${BASE_URL}/${item.cardImage}` : `${BASE_URL}/${item.businessLogo}`}
                             alt={item.businessName}
-                            className="w-full h-48 object-cover rounded-t-lg"
+                            className="w-full h-full object-cover"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">

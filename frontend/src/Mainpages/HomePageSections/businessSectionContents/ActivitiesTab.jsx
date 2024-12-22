@@ -122,7 +122,7 @@ const ActivitySwiper = ({ title, link, isLast, activities, loading }) => (
                   <img
                     src={`${BASE_URL}/${activity.image}`}
                     alt={activity.name}
-                    className="w-full h-48 object-cover rounded-t-lg"
+                    className="w-full h-full object-cover"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
