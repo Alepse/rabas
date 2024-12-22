@@ -625,6 +625,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
   // Handle key press in the input field
   const handleKeyPress = (event) => {
     if (event.key === 'Enter') {
+      event.preventDefault(); // Prevent the default behavior of adding a newline
       handleSendMessage();
     }
   };
