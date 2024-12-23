@@ -91,8 +91,8 @@ const AccommodationSwiper = ({ title, link, isLast, accommodations, loading }) =
     <Swiper
       modules={[Navigation]}
       navigation={{ nextEl: '.custom-next', prevEl: '.custom-prev' }}
-      spaceBetween={24}
-      slidesPerView={3}
+      spaceBetween={20}
+      slidesPerView={1}
       breakpoints={{
         320: { slidesPerView: 1 },
         640: { slidesPerView: 1 },
