@@ -108,6 +108,8 @@ const Discover = () => {
         }
       } catch (error) {
         console.error(`Error fetching ${businessType}:`, error);
+      } finally {
+        setLoading(false); // Set loading to false after data is set
       }
     };
 
@@ -126,7 +128,6 @@ const Discover = () => {
       ...mockData.shop,
     ]);
     document.title = 'RabaSorsogon | Discover';
-    setLoading(false); // Set loading to false after data is set
   }, [mockData.activities, mockData.accommodations, mockData.restaurant, mockData.shop]);
 
   const initialState = {
@@ -452,9 +453,9 @@ const Discover = () => {
     );
   };
 
-  if (loading) {
-    return <Spinner className='flex justify-center items-center h-screen' size='lg' label="Loading..." color="primary" />;
-  }
+  // if (loading) {
+  //   return <Spinner className='flex justify-center items-center h-screen' size='lg' label="Loading..." color="primary" />;
+  // }
 
   return (
     <div className="mx-auto bg-light min-h-screen font-sans" style={{ backgroundImage: `url(${wave})`, backgroundSize: 'auto', backgroundRepeat: 'repeat', backgroundPosition: 'center' }}>
