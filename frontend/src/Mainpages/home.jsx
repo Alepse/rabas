@@ -79,10 +79,9 @@ const Home = () => {
 
       {/* Business Section */}
      
-      
-        <AnimatedSection>
-          <BusinessSection />
-        </AnimatedSection>
+      <AnimatedSection>
+        <BusinessSection />
+      </AnimatedSection>
   
       {/* Plan Trip Section */}
       <AnimatedSection>

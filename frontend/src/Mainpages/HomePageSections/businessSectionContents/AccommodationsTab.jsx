@@ -104,8 +104,14 @@ const AccommodationSwiper = ({ title, link, isLast, accommodations, loading }) =
     >
       {loading ? (
         Array.from({ length: accommodations.length || 4 }).map((_, index) => (
-          <SwiperSlide key={index} className='flex justify-center'>
-            <Skeleton className="w-full h-[400px] rounded-lg" />
+          <SwiperSlide key={index} className="bg-white rounded-lg shadow-lg p-2 max-w-[300px] w-full h-[400px] rounded-lg">
+            <Skeleton className="w-full h-56 md:h-64 bg-gray-200 rounded-t-lg overflow-hidden" />
+            <div className="p-4">
+              <Skeleton className="h-6 mb-2" />
+              <Skeleton className="h-4 mb-2" />
+              <Skeleton className="h-4 mb-2" />
+              <Skeleton className="h-4" />
+            </div>
           </SwiperSlide>
         ))
       ) : (
