@@ -259,3 +259,30 @@
   margin-top: -5px; 
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Shadow to match head */
 }
+
+.scroll-button {
+  
+  transition: opacity 0.3s ease;
+  animation: slide-up 0.3s ease forwards; /* Apply slide-up animation */
+}
+
+.scroll-button.hidden {
+  opacity: 0; /* Fully transparent when hidden */
+  transform: translateY(0); 
+}
+
+.scroll-button.visible {
+  opacity: 1; /* Fully opaque when visible */
+  transform: translateY(-40px); 
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0; /* Start fully transparent */
+    transform: translateY(0);
+  }
+  to {
+    opacity: 1; /* End fully opaque */
+    transform: translateY(-40px);
+  }
+}

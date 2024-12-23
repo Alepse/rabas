@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ModalContent, ModalHeader, ModalBody, ModalFooter, Modal } from "@nextui-org/modal";
 import { Button, Avatar, Textarea } from '@nextui-org/react';
-import { FiSend, FiDownload, FiImage } from "react-icons/fi";
+import { FiSend, FiDownload, FiImage, FiArrowDown } from "react-icons/fi";
 import { RangeCalendar, TimeInput } from "@nextui-org/react";
 import { Time } from "@internationalized/date";
 import { today, isWeekend, getLocalTimeZone } from "@internationalized/date";
@@ -326,6 +326,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
   const [users, setUsers] = useState([]);
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
+  const [showScrollToBottom, setShowScrollToBottom] = useState(true); // State for arrow visibility
 
   useEffect(() => {
     if (isOpen && selectedUserId) {
@@ -439,7 +440,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
         }, {});
         // Check if there are new messages
         if (JSON.stringify(fetchedMessages) !== JSON.stringify(messages)) {
-          console.log("not equal");
+          // console.log("not equal");
           scrollToBottom();
 
           setMessages(fetchedMessages);
@@ -499,6 +500,38 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
 
     return () => clearTimeout(scrollTimeout); // Cleanup timeout on unmount
   };
+
+  // Function to handle scrolling to the bottom
+  const handleScrollToBottom = () => {
+    sudoToBottom();
+  };
+
+  // Check scroll position to show/hide the arrow
+  const handleScroll = () => {
+    const chatContainer = messageEndRef.current?.parentNode; 
+    if (chatContainer) {
+      const isAtBottom = chatContainer.scrollHeight - chatContainer.scrollTop <= chatContainer.clientHeight + 1;
+      const threshold = 1000; // Adjust this value to set how far from the bottom the button should appear
+
+      // Show arrow if not at the bottom and the scroll position is greater than the threshold
+      setShowScrollToBottom(!isAtBottom && (chatContainer.scrollHeight - chatContainer.scrollTop > threshold));
+    }
+  };
+
+  useEffect(() => {
+    // Attach scroll event listener
+    const chatContainer = messageEndRef.current?.parentNode; 
+    if (chatContainer) {
+      chatContainer.addEventListener('scroll', handleScroll);
+    }
+
+    // Cleanup event listener on unmount
+    return () => {
+      if (chatContainer) {
+        chatContainer.removeEventListener('scroll', handleScroll);
+      }
+    };
+  });
 
   // Handle image selection
   const handleImageChange = (event) => {
@@ -903,7 +936,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
           </div>
 
           {/* Main chat area */}
-          <div className="flex flex-col justify-between w-full lg:w-3/4 h-full bg-white rounded-md p-4">
+          <div className="flex flex-col justify-between w-full lg:w-3/4 h-full bg-white rounded-md p-4 relative">
             {selectedUser ? (
               <>
                 <div className="flex items-center space-x-3 p-3 bg-color1 text-white rounded-t-lg">
@@ -928,8 +961,17 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
                   <div ref={messageEndRef}></div>
                 </div>
 
+                {/* Scroll to bottom arrow */}
+                {showScrollToBottom && (
+                    <div className={`absolute bottom-24 left-1/2 transform -translate-x-1/2 z-10 scroll-button ${showScrollToBottom ? 'visible animate' : 'hidden'}`}>
+                      <button onClick={handleScrollToBottom} className="bg-gray-200 p-2 rounded-full shadow-md">
+                        <FiArrowDown size={24} className="text-black" />
+                      </button>
+                    </div>
+                  )}
+
                 {/* Input to send messages */}
-                <div className="flex items-center space-x-2 mt-4">
+                <div className="flex items-center space-x-2 mt-4 justify-between">
                   <Textarea
                     value={messageInput}
                     onChange={(e) => setMessageInput(e.target.value)}
