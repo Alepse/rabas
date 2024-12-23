@@ -277,7 +277,7 @@ const UserChatModal = ({ isOpen, onClose }) => {
     }
   };
 
-  const toBottomOnSend = () => {
+  const sudoToBottom = () => {
     const scrollTimeout = setTimeout(() => {
       messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }, 100); // Adjust the delay as needed
@@ -339,7 +339,7 @@ const UserChatModal = ({ isOpen, onClose }) => {
       setMessageInput('');
       setImage(null);
       setImagePreview(null);
-      toBottomOnSend();
+      sudoToBottom();
       try {
         const response = await fetch(`${BASE_URL}/sendMessage`, {
           method: 'POST',
@@ -448,7 +448,7 @@ const UserChatModal = ({ isOpen, onClose }) => {
       ...unreadMessages,
       [businessId]: 0,
     });
-    toBottomOnSend();
+    sudoToBottom();
   };
   
   // Function to get business by ID

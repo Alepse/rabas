@@ -491,7 +491,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
     }
   };
 
-  const toBottomOnSend = () => {
+  const sudoToBottom = () => {
     const scrollTimeout = setTimeout(() => {
       messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }, 100); // Adjust the delay as needed
@@ -612,7 +612,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
 
       // Set loading state
       setIsLoading(true); // Assuming you have a state variable for loading
-      toBottomOnSend();
+      sudoToBottom();
       try {
         const response = await fetch(`${BASE_URL}/sendMessage`, {
           method: 'POST',
@@ -683,7 +683,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
       ...unreadMessages,
       [userId]: 0,
     });
-    toBottomOnSend();
+    sudoToBottom();
   };  
 
   // Handle accepting a booking
