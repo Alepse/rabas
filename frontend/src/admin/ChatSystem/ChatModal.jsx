@@ -436,7 +436,13 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
           acc[userId] = messages;
           return acc;
         }, {});
-        setMessages(fetchedMessages);
+        // Check if there are new messages
+        if (JSON.stringify(fetchedMessages) !== JSON.stringify(messages)) {
+          console.log("not equal");
+          scrollToBottom();
+
+          setMessages(fetchedMessages);
+        }
         // console.log('fetchedMessages', fetchedMessages);
         // Extract unique user IDs and fetch users based on them
         const uniqueUserIds = [...new Set(data.map(({ userId }) => userId))];
@@ -467,19 +473,31 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
     // Set an interval to fetch new messages every 5 seconds
     const intervalId = setInterval(fetchNewMessages, 5000);
     return () => clearInterval(intervalId); // Cleanup on unmount
-  }, [user_id]); // Run when user_id or selectedBusiness changes
+  }, [messages]); // Run when user_id or selectedBusiness changes
 
   // Scroll chat to the bottom when new messages arrive
-  useEffect(() => {
-    // Delay the scroll to ensure the DOM updates
-    const scrollTimeout = setTimeout(() => {
-      if (messageEndRef.current) {
-        messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
+  const scrollToBottom = () => {
+    const chatContainer = messageEndRef.current?.parentNode; // Get the parent node of the ref
+    if (chatContainer) {
+      const isAtBottom = chatContainer.scrollHeight - chatContainer.scrollTop <= chatContainer.clientHeight + 1; // Check if at the bottom
+      if (isAtBottom) {
+        // Delay the scroll to ensure the DOM updates
+        const scrollTimeout = setTimeout(() => {
+          messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }, 100); // Adjust the delay as needed
+
+        return () => clearTimeout(scrollTimeout); // Cleanup timeout on unmount
       }
+    }
+  };
+
+  const toBottomOnSend = () => {
+    const scrollTimeout = setTimeout(() => {
+      messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }, 100); // Adjust the delay as needed
-  
+
     return () => clearTimeout(scrollTimeout); // Cleanup timeout on unmount
-  }, [messages, selectedUser]);
+  };
 
   // Handle image selection
   const handleImageChange = (event) => {
@@ -538,13 +556,6 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
     }
   };
 
-  // Scroll chat to the bottom when new messages arrive
-  useEffect(() => {
-    if (messageEndRef.current) {
-      messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages]);
-
   // Opens the availability modal with booking-specific details
   const handleCheckAvailability = (booking) => {
     setCurrentBookingDetails(booking);
@@ -601,7 +612,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
 
       // Set loading state
       setIsLoading(true); // Assuming you have a state variable for loading
-
+      toBottomOnSend();
       try {
         const response = await fetch(`${BASE_URL}/sendMessage`, {
           method: 'POST',
@@ -672,6 +683,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
       ...unreadMessages,
       [userId]: 0,
     });
+    toBottomOnSend();
   };  
 
   // Handle accepting a booking

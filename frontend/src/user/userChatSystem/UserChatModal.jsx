@@ -224,8 +224,6 @@ const UserChatModal = ({ isOpen, onClose }) => {
           acc[businessId] = messages;
           return acc;
         }, {});
-        console.log("fetch new messages: ", fetchedMessages);
-        console.log("previous messages: ", messages);
          // Check if there are new messages
          if (JSON.stringify(fetchedMessages) !== JSON.stringify(messages)) {
           console.log("not equal");
@@ -277,6 +275,14 @@ const UserChatModal = ({ isOpen, onClose }) => {
         return () => clearTimeout(scrollTimeout); // Cleanup timeout on unmount
       }
     }
+  };
+
+  const toBottomOnSend = () => {
+    const scrollTimeout = setTimeout(() => {
+      messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }, 100); // Adjust the delay as needed
+
+    return () => clearTimeout(scrollTimeout); // Cleanup timeout on unmount
   };
 
   // Handle image selection
@@ -333,7 +339,7 @@ const UserChatModal = ({ isOpen, onClose }) => {
       setMessageInput('');
       setImage(null);
       setImagePreview(null);
-
+      toBottomOnSend();
       try {
         const response = await fetch(`${BASE_URL}/sendMessage`, {
           method: 'POST',
@@ -442,7 +448,7 @@ const UserChatModal = ({ isOpen, onClose }) => {
       ...unreadMessages,
       [businessId]: 0,
     });
-    scrollToBottom();
+    toBottomOnSend();
   };
   
   // Function to get business by ID
