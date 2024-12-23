@@ -16,6 +16,7 @@ import img from '@/assets/shop.webp'; // Sample image
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa'
 import axios from 'axios';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
+import { Skeleton } from "@nextui-org/skeleton";
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
@@ -23,7 +24,7 @@ const renderSwiperActivitySection = (title, link, spots) => {
   const activitySpots = spots.filter(spot => spot.businessType === 'attraction');
 
   return (
-    <div>
+    <div className="p-4 md:p-6">
       <div className='flex flex-col md:flex-row justify-between items-center mt-5'>
         <h1 className='text-xl md:text-2xl font-bold p-2 text-center lg:text-start'>
           {title}
@@ -51,14 +52,22 @@ const renderSwiperActivitySection = (title, link, spots) => {
         >
           {activitySpots.map((spot, index) => (
             <SwiperSlide key={index} className='flex justify-center'>
-              <div className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between max-w-xs md:max-w-lg lg:max-w-sm mx-auto h-[400px] p-2 relative"
-                   style={{ width: '300px', height: '400px' }}>
-                <img
-                  src={spot.image ? `${BASE_URL}/${spot.image}` : `${BASE_URL}/${spot.businessLogo}`}
-                  alt={spot.name}
-                  className="w-full h-48 object-cover rounded-t-lg"
-                />
-                <div className="flex-grow flex flex-col justify-between mt-4">
+              <div className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between mx-auto h-full p-2 relative"
+                 style={{ width: '100%', maxWidth: '300px', height: '400px' }}>
+                <div className="w-full h-56 md:h-64 bg-gray-200 rounded-t-lg overflow-hidden">
+                  {spot.image ? (
+                    <img
+                      src={spot.image ? `${BASE_URL}/${spot.image}` : `${BASE_URL}/${spot.businessLogo}`}
+                      alt={spot.name}
+                      className="w-full h-48 object-cover rounded-t-lg"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span>No Image</span>
+                    </div>
+                  )}
+                </div>
+                <div className="flex-grow flex flex-col justify-between mt-4 px-2">
                   <div>
                     <div className="flex justify-between items-center mb-3">
                       <div className="flex items-center gap-1">
@@ -113,7 +122,7 @@ const renderSwiperAccommodationSection = (title, link, spots) => {
   const accommodationSpots = spots.filter(spot => spot.businessType === 'accommodation');
 
   return (
-    <div>
+    <div className="p-4 md:p-6">
       <div className='flex flex-col md:flex-row justify-between items-center mt-5'>
         <h1 className='text-xl md:text-2xl font-bold p-2 text-center lg:text-start'>
           {title}
@@ -141,13 +150,21 @@ const renderSwiperAccommodationSection = (title, link, spots) => {
         >
           {accommodationSpots.map((spot, index) => (
             <SwiperSlide key={index} className='flex justify-center'>
-              <div className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between max-w-xs md:max-w-lg lg:max-w-sm mx-auto h-[400px] p-2 relative"
-                   style={{ width: '300px', height: '400px' }}>
-                <img
-                  src={spot.image ? `${BASE_URL}/${spot.image}` : `${BASE_URL}/${spot.businessLogo}`}
-                  alt={spot.name}
-                  className="w-full h-48 object-cover rounded-t-lg"
-                />
+              <div className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between mx-auto h-full p-2 relative"
+                style={{ width: '100%', maxWidth: '300px', height: '400px' }}>
+                <div className="w-full h-56 md:h-64 bg-gray-200 rounded-t-lg overflow-hidden">
+                  {spot.image ? (
+                    <img
+                      src={spot.image ? `${BASE_URL}/${spot.image}` : `${BASE_URL}/${spot.businessLogo}`}
+                      alt={spot.name}
+                      className="w-full h-48 object-cover rounded-t-lg"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span>No Image</span>
+                    </div>
+                  )}
+                </div>
                 <div className="flex-grow flex flex-col justify-between mt-4">
                   <div>
                     <div className="flex justify-between items-center mb-3">
@@ -203,7 +220,7 @@ const renderSwiperEaterySection = (title, link, spots) => {
   const eaterySpots = spots.filter(spot => spot.businessType === 'restaurant');
 
   return (
-    <div>
+    <div className="p-4 md:p-6">
       <div className='flex flex-col md:flex-row justify-between items-center mt-5'>
         <h1 className='text-xl md:text-2xl font-bold p-2 text-center lg:text-start'>
           {title}
@@ -231,13 +248,21 @@ const renderSwiperEaterySection = (title, link, spots) => {
         >
           {eaterySpots.map((spot, index) => (
             <SwiperSlide key={index} className='flex justify-center'>
-              <div className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between max-w-xs md:max-w-lg lg:max-w-sm mx-auto h-[400px] p-2 relative"
-                   style={{ width: '300px', height: '400px' }}>
-                <img
-                  src={spot.image ? `${BASE_URL}/${spot.image}` : `${BASE_URL}/${spot.businessLogo}`}
-                  alt={spot.name}
-                  className="w-full h-48 object-cover rounded-t-lg"
-                />
+              <div className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between mx-auto h-full p-2 relative"
+                style={{ width: '100%', maxWidth: '300px', height: '400px' }}>
+                <div className="w-full h-56 md:h-64 bg-gray-200 rounded-t-lg overflow-hidden">
+                  {spot.image ? (
+                    <img
+                      src={spot.image ? `${BASE_URL}/${spot.image}` : `${BASE_URL}/${spot.businessLogo}`}
+                      alt={spot.name}
+                      className="w-full h-48 object-cover rounded-t-lg"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span>No Image</span>
+                    </div>
+                  )}
+                </div>
                 <div className="flex-grow flex flex-col justify-between mt-4">
                   <div>
                     <div className="flex justify-between items-center mb-3">
@@ -294,7 +319,7 @@ const renderSwiperShopSection = (title, link, spots) => {
   const shopSpots = spots.filter(spot => spot.businessType === 'shop');
 
   return (
-    <div>
+    <div className="p-4 md:p-6">
       <div className='flex flex-col md:flex-row justify-between items-center mt-5'>
         <h1 className='text-xl md:text-2xl font-bold p-2 text-center lg:text-start'>
           {title}
@@ -322,13 +347,21 @@ const renderSwiperShopSection = (title, link, spots) => {
         >
           {shopSpots.map((spot, index) => (
             <SwiperSlide key={index} className='flex justify-center'>
-              <div className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between max-w-xs md:max-w-lg lg:max-w-sm mx-auto h-[400px] p-2 relative"
-                   style={{ width: '300px', height: '400px' }}>
-                <img
-                  src={spot.image ? `${BASE_URL}/${spot.image}` : `${BASE_URL}/${spot.businessLogo}`}
-                  alt={spot.name}
-                  className="w-full h-48 object-cover rounded-t-lg"
-                />
+              <div className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between mx-auto h-full p-2 relative"
+                style={{ width: '100%', maxWidth: '300px', height: '400px' }}>
+                <div className="w-full h-56 md:h-64 bg-gray-200 rounded-t-lg overflow-hidden">
+                  {spot.image ? (
+                    <img
+                      src={spot.image ? `${BASE_URL}/${spot.image}` : `${BASE_URL}/${spot.businessLogo}`}
+                      alt={spot.name}
+                      className="w-full h-48 object-cover rounded-t-lg"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span>No Image</span>
+                    </div>
+                  )}
+                </div>
                 <div className="flex-grow flex flex-col justify-between mt-4">
                   <div>
                     <div className="flex justify-between items-center mb-3">
@@ -382,6 +415,7 @@ const renderSwiperShopSection = (title, link, spots) => {
 const PrietoDiaz = () => {
   const [businesses, setBusinesses] = useState([]);
   const [currentZoom, setCurrentZoom] = useState(10); // Initial zoom level
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchBusinesses = async () => {
@@ -391,6 +425,8 @@ const PrietoDiaz = () => {
         setBusinesses(Array.isArray(response.data) ? response.data : []);
       } catch (error) {
         console.error('Error fetching businesses:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -486,16 +522,46 @@ const PrietoDiaz = () => {
         </div>
       </div>
 
-      {/* Swiper Sections */}
-      {Array.isArray(businesses) && businesses.length > 0 ? (
-        <>
-          {renderSwiperActivitySection('Top-Rated Activity Destinations: Your Guide to the Best Experiences', '/activities', businesses)}
-          {renderSwiperAccommodationSection('Nearby Accommodation Options', '/accomodations', businesses)}
-          {renderSwiperEaterySection('Eateries Worth Exploring Nearby', '/foodplaces', businesses)}
-          {renderSwiperShopSection('Explore Local Shops', '/shops', businesses)}
-        </>
+      {loading ? (
+        <div className="flex">
+        {Array.from({ length: 4 }).map((_, index) => {
+          const opacity = 1 - index * 0.25; // Adjust the values as needed (1, 0.75, 0.5, 0.25)
+          return (
+            <div className="p-4 md:p-6">
+              <div key={index} className='flex justify-center' style={{ opacity }}>
+                <div className="bg-white rounded-lg shadow-lg duration-300 flex flex-col justify-between max-w-xs md:max-w-lg lg:max-w-sm mx-auto h-[400px] p-2 relative"
+                    style={{ width: '300px', height: '400px' }}>
+                  <div className="w-full h-56 md:h-64 bg-gray-200 rounded-t-lg overflow-hidden">
+                  </div>
+                  <div className="flex-grow flex flex-col justify-between mt-4 px-2">
+                    <div className="p-4">
+                      <Skeleton className="h-3 mb-4" />
+                      <Skeleton className="h-6 mb-4" />
+                      <Skeleton className="h-4 mb-4" />
+                      <Skeleton className="h-5 mb-3" /> 
+                      <Skeleton className="h-10" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+        </div>
       ) : (
-        <p className="h-48 bg-gray-100 flex items-center justify-center italic text-center text-gray-500 mt-4 rounded-t-lg">No businesses available at the moment.</p>
+        <>
+          {/* Swiper Sections */}
+          {Array.isArray(businesses) && businesses.length > 0 ? (
+            <>
+              {renderSwiperActivitySection('Top-Rated Activity Destinations: Your Guide to the Best Experiences', '/activities', businesses)}
+              {renderSwiperAccommodationSection('Nearby Accommodation Options', '/accomodations', businesses)}
+              {renderSwiperEaterySection('Eateries Worth Exploring Nearby', '/foodplaces', businesses)}
+              {renderSwiperShopSection('Explore Local Shops', '/shops', businesses)}
+            </>
+          ) : (
+            <p className="h-48 bg-gray-100 flex items-center justify-center italic text-center text-gray-500 mt-4 rounded-t-lg">No businesses available at the moment.</p>
+          )}
+        </>
       )}
     </div>
   )

@@ -382,18 +382,7 @@ const Discover = () => {
     setShowFilters(!showFilters);
   };
   useEffect(() => {
-    const MIN_LOADING_TIME = 3000; // Minimum loading time in milliseconds
-
-    const fetchData = async () => {
-      // Simulate data fetching
-      await new Promise((resolve) => setTimeout(resolve, 3000)); // Simulate fetch delay
-      setLoading(false); // Set loading to false after data is set
-    };
-
-    const timer = setTimeout(() => {
-      fetchData();
-    }, MIN_LOADING_TIME);
-
+   
     // Show button when scrolled down
     const handleScroll = () => {
       if (window.scrollY > 300) {
@@ -405,7 +394,6 @@ const Discover = () => {
 
     window.addEventListener('scroll', handleScroll);
     return () => {
-      clearTimeout(timer);
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
@@ -544,18 +532,26 @@ const Discover = () => {
               animate="visible"
             >
               {loading ? (
-                // Render skeletons while loading
-                Array.from({ length: 6 }).map((_, index) => (
-                  <div key={index} className="bg-white rounded-lg shadow-lg p-2">
-                    <Skeleton className="w-full h-48 rounded-t-lg" />
-                    <div className="p-4">
-                      <Skeleton className="h-6 mb-2" />
-                      <Skeleton className="h-4 mb-2" />
-                      <Skeleton className="h-4 mb-2" />
-                      <Skeleton className="h-4" />
+                Array.from({ length: 4 }).map((_, index) => {
+                  const opacity = 1 - index * 0.25; // Adjust the values as needed (1, 0.8, 0.6, 0.4)
+                  return (
+                    <div key={index} style={{ opacity }}>
+                      <div className="bg-white rounded-lg shadow-lg p-2 duration-300 flex flex-col justify-between">
+                        <div className="w-full h-56 md:h-64 bg-gray-200 rounded-t-lg overflow-hidden">
+                        </div>
+                        <div className="flex-grow flex flex-col justify-between mt-4 px-2">
+                          <div className="p-4 flex-grow">
+                            <Skeleton className="h-3 mb-4" />
+                            <Skeleton className="h-6 mb-4" />
+                            <Skeleton className="h-4 mb-4" />
+                            <Skeleton className="h-5 mb-3" /> 
+                            <Skeleton className="h-10" />
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               ) : (
                 // Render actual content once loaded
                 Object.keys(mockData).map((category) => {
@@ -648,6 +644,9 @@ const Discover = () => {
                               <span className="text-gray-500 text-[12px]">No ratings</span>
                             )}
                           </div>
+                          
+                        </div>
+                        <div className="flex justify-between items-center mb-2">
                           <p className="text-md font-semibold text-black">
                             {item.lowest_price && item.highest_price ? (
                               `₱${item.lowest_price} - ₱${item.highest_price}`
