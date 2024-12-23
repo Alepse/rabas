@@ -69,8 +69,8 @@ const DestinationSection = () => {
         Find Breathtaking Destinations, Hidden Gems, and Attractions Worth Visiting.
         </p>
         <Link className='rounded-full text-center bg-color1 ml-1 text-white p-2 text-sm hover:bg-color2 duration-300 hover:translate-x-2 flex items-center hover:shadow-lg mt-4 ' to='/destinations' target='_blank'>
-            <button>View All ⇀</button>
-          </Link>
+          <button>View All ⇀</button>
+        </Link>
       </div>
       </div>
 

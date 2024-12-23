@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
-import { Navigation } from 'swiper/modules';
+import { Pagination, Navigation } from 'swiper/modules';
 import { Link } from 'react-router-dom';
 import { Button } from '@nextui-org/react';
 import { GiPositionMarker } from 'react-icons/gi';
@@ -89,17 +89,28 @@ const AccommodationSwiper = ({ title, link, isLast, accommodations, loading }) =
       )}
     </div>
     <Swiper
-      modules={[Navigation]}
-      navigation={{ nextEl: '.custom-next', prevEl: '.custom-prev' }}
+      modules={[Pagination, Navigation]}
       spaceBetween={20}
       slidesPerView={1}
       breakpoints={{
-        320: { slidesPerView: 1 },
-        640: { slidesPerView: 1 },
-        768: { slidesPerView: 2 },
-        1024: { slidesPerView: 3 },
-        1440: { slidesPerView: 4 },
+        320: { 
+          slidesPerView: 1,
+        },
+        640: { 
+          slidesPerView: 2,
+        },
+        768: { 
+          slidesPerView: 3,
+        },
+        1024: { 
+          slidesPerView: 4,
+        },
+        1440: { 
+          slidesPerView: 5,
+        },
       }}
+      pagination={{ clickable: true }}
+      navigation
       className='max-w-full p-4 md:p-6'
     >
       {loading ? (
@@ -208,17 +219,7 @@ const AccommodationSwiper = ({ title, link, isLast, accommodations, loading }) =
           </SwiperSlide>
         ))
       )}
-      {accommodations.length > 1 && (
-        <>
-          <div className="custom-prev absolute left-2 top-[25%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300">
-            <FaArrowLeft />
-          </div>
-          <div className="custom-next absolute right-2 top-[25%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300">
-            <FaArrowRight />
-          </div>
-        </>
-      )}
-    </Swiper>
+      </Swiper>
   </div>
 );
 
