@@ -328,7 +328,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && selectedUserId) {
       setSelectedUser(selectedUserId);
       // Flatten the users array if it contains nested arrays
       const flattenedUsers = users.flat();
@@ -339,7 +339,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
       // Check if the user was found before accessing properties
       if (selectedUser) {
         setActiveChatUser(selectedUser);
-        // console.log('activeChatUser', selectedUser);
+        console.log('activeChatUser', selectedUser);
       } else {
         // console.error(`User with ID ${selectedUserId} not found.`);
       }
@@ -379,8 +379,8 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
   }, []);
   
   useEffect(() => {
-    const fetchMessages = async () => {
-      if (user_id) {
+    if (user_id) {
+      const fetchMessages = async () => {
         try {
           // console.log('userId', user_id);
           const { data } = await axios.get(`${BASE_URL}/businessMessages/${user_id}`);
@@ -400,28 +400,29 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
           toast.error('Failed to load messages');
         }
       }
+
+      const fetchUsers = async (userIds) => {
+        try {
+          // Create an array of API requests
+          const userRequests = userIds.map(id =>
+            axios.get(`${BASE_URL}/usersInChat/${id}`)
+          );
+
+          // Resolve all requests concurrently
+          const responses = await Promise.all(userRequests);
+          const usersData = responses.map(response => response.data);
+
+          setUsers(usersData);
+          // console.log('users', usersData);
+        } catch (error) {
+          console.error('Error fetching users:', error.response ? error.response.data.message : 'An unknown error occurred');
+          toast.error('Failed to load users');
+        }
+      };
+
+      fetchMessages();
+      
     };
-
-    const fetchUsers = async (userIds) => {
-      try {
-        // Create an array of API requests
-        const userRequests = userIds.map(id =>
-          axios.get(`${BASE_URL}/usersInChat/${id}`)
-        );
-
-        // Resolve all requests concurrently
-        const responses = await Promise.all(userRequests);
-        const usersData = responses.map(response => response.data);
-
-        setUsers(usersData);
-        // console.log('users', usersData);
-      } catch (error) {
-        console.error('Error fetching users:', error.response ? error.response.data.message : 'An unknown error occurred');
-        toast.error('Failed to load users');
-      }
-    };
-
-    fetchMessages();
   }, [user_id]);
 
   useEffect(() => {
@@ -439,15 +440,32 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
         // console.log('fetchedMessages', fetchedMessages);
         // Extract unique user IDs and fetch users based on them
         const uniqueUserIds = [...new Set(data.map(({ userId }) => userId))];
+        // console.log('uniqueUserIds', uniqueUserIds);
+        fetchUsers(uniqueUserIds);
       } catch (error) {
         console.error('Error fetching messages:', error.response ? error.response.data.message : 'An unknown error occurred');
         toast.error('Failed to load messages');
       }
     }
 
+    const fetchUsers = async (userIds) => {
+      try {
+        const userRequests = userIds.map(id =>
+          axios.get(`${BASE_URL}/usersInChat/${id}`)
+        );
+        // Resolve all requests concurrently
+        const responses = await Promise.all(userRequests);
+        const usersData = responses.map(response => response.data);
+        setUsers(usersData);
+        // console.log('users', usersData);
+      } catch (error) {
+        console.error('Error fetching users:', error.response ? error.response.data.message : 'An unknown error occurred');
+        toast.error('Failed to load users');
+      }
+    };
+
     // Set an interval to fetch new messages every 5 seconds
     const intervalId = setInterval(fetchNewMessages, 5000);
-
     return () => clearInterval(intervalId); // Cleanup on unmount
   }, [user_id]); // Run when user_id or selectedBusiness changes
 

@@ -142,6 +142,7 @@ const UserChatModal = ({ isOpen, onClose }) => {
   const [imagePreview, setImagePreview] = useState(null);
   const [user_id, setUser_id] = useState(null);
   const [businesses, setBusinesses] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     axios.get(`${BASE_URL}/check-login`, { withCredentials: true })
@@ -223,30 +224,60 @@ const UserChatModal = ({ isOpen, onClose }) => {
           acc[businessId] = messages;
           return acc;
         }, {});
-        setMessages(fetchedMessages);
+        console.log("fetch new messages: ", fetchedMessages);
+        console.log("previous messages: ", messages);
+         // Check if there are new messages
+         if (JSON.stringify(fetchedMessages) !== JSON.stringify(messages)) {
+          console.log("not equal");
+          scrollToBottom();
+
+          setMessages(fetchedMessages);
+        }
+        // console.log('fetchedMessages', fetchedMessages);
+        // Extract unique business IDs and fetch businesses based on them
+        const uniqueBusinessIds = [...new Set(data.map(({ businessId }) => businessId))];
+        // console.log('uniqueBusinessIds', uniqueBusinessIds);
+        fetchBusinesses(uniqueBusinessIds);
       } catch (error) {
         console.error('Error fetching messages:', error.response ? error.response.data.message : 'An unknown error occurred');
         toast.error('Failed to load messages');
-      };
+      }
+    };
+
+    const fetchBusinesses = async (businessIds) => {
+      try {
+        const businessRequests = businessIds.map(id =>
+          axios.get(`${BASE_URL}/businessesInChat/${id}`)
+        );
+        const responses = await Promise.all(businessRequests);
+        const businessesData = responses.map(response => response.data);
+        setBusinesses(businessesData);
+      } catch (error) {
+        console.error('Error fetching businesses:', error.response ? error.response.data.message : 'An unknown error occurred');
+        toast.error('Failed to load businesses');
+      }
     };
 
     // Set an interval to fetch new messages every 5 seconds
     const intervalId = setInterval(fetchNewMessages, 5000);
-
     return () => clearInterval(intervalId); // Cleanup on unmount
-  }, [user_id]); // Run when user_id or selectedBusiness changes
+  }, [messages]);
 
   // Scroll chat to the bottom when new messages arrive
-  useEffect(() => {
-    // Delay the scroll to ensure the DOM updates
-    const scrollTimeout = setTimeout(() => {
-      if (messageEndRef.current) {
-        messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
+  const scrollToBottom = () => {
+    const chatContainer = messageEndRef.current?.parentNode; // Get the parent node of the ref
+    if (chatContainer) {
+      const isAtBottom = chatContainer.scrollHeight - chatContainer.scrollTop <= chatContainer.clientHeight + 1; // Check if at the bottom
+      if (isAtBottom) {
+        // Delay the scroll to ensure the DOM updates
+        const scrollTimeout = setTimeout(() => {
+          messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }, 100); // Adjust the delay as needed
+
+        return () => clearTimeout(scrollTimeout); // Cleanup timeout on unmount
       }
-    }, 100); // Adjust the delay as needed
-  
-    return () => clearTimeout(scrollTimeout); // Cleanup timeout on unmount
-  }, [messages, selectedBusiness]);
+    }
+  };
 
   // Handle image selection
   const handleImageChange = (event) => {
@@ -291,6 +322,7 @@ const UserChatModal = ({ isOpen, onClose }) => {
         isSending: true, // Indicate that the message is being sent
       };
 
+      scrollToBottom();
       // Update messages state immediately
       const currentMessages = messages[selectedBusiness] || [];
       setMessages({
@@ -410,6 +442,7 @@ const UserChatModal = ({ isOpen, onClose }) => {
       ...unreadMessages,
       [businessId]: 0,
     });
+    scrollToBottom();
   };
   
   // Function to get business by ID
