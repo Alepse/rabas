@@ -101,17 +101,27 @@ const ShopSwiper = ({ title, link, isLast, shops, loading }) => (
       className='max-w-full p-4 md:p-6'
     >
       {loading ? (
-        Array.from({ length: shops.length || 4 }).map((_, index) => (
-          <SwiperSlide key={index} className="bg-white rounded-lg shadow-lg p-2 max-w-[300px] w-full h-[400px] rounded-lg">
-            <Skeleton className="w-full h-56 md:h-64 bg-gray-200 rounded-t-lg overflow-hidden" />
-            <div className="p-4">
-              <Skeleton className="h-6 mb-2" />
-              <Skeleton className="h-4 mb-2" />
-              <Skeleton className="h-4 mb-2" />
-              <Skeleton className="h-4" />
-            </div>
-          </SwiperSlide>
-        ))
+        Array.from({ length: 4 }).map((_, index) => {
+          const opacity = 1 - index * 0.25; // Adjust the values as needed (1, 0.8, 0.6, 0.4)
+          return (
+            <SwiperSlide key={index} className='flex justify-center' style={{ opacity }}>
+              <div className="bg-white rounded-lg shadow-lg duration-300 flex flex-col justify-between mx-auto h-full p-2 relative"
+                   style={{ width: '100%', maxWidth: '300px', height: '400px' }}>
+                <div className="w-full h-56 md:h-64 bg-gray-200 rounded-t-lg overflow-hidden">
+                </div>
+                <div className="flex-grow flex flex-col justify-between mt-4 px-2">
+                  <div className="p-4">
+                    <Skeleton className="h-3 mb-4" />
+                    <Skeleton className="h-6 mb-4" />
+                    <Skeleton className="h-4 mb-4" />
+                    <Skeleton className="h-5 mb-3" /> 
+                    <Skeleton className="h-10" />
+                  </div>
+                </div>
+              </div>
+            </SwiperSlide>
+          );
+        })
       ) : (
         shops.map((shop, index) => (
           <SwiperSlide key={index} className='flex justify-center'>
