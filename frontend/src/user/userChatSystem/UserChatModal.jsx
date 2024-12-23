@@ -189,6 +189,7 @@ const UserChatModal = ({ isOpen, onClose }) => {
           // console.log('uniqueBusinessIds', uniqueBusinessIds);
           fetchBusinesses(uniqueBusinessIds);
         } catch (error) {
+          setMessages({});
           console.error('Error fetching messages:', error.response ? error.response.data.message : 'An unknown error occurred');
           toast.error('Failed to load messages');
         }

@@ -396,6 +396,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
           // console.log('uniqueUserIds', uniqueUserIds);
           fetchUsers(uniqueUserIds);
         } catch (error) {
+          setMessages({});
           console.error('Error fetching messages:', error.response ? error.response.data.message : 'An unknown error occurred');
           toast.error('Failed to load messages');
         }
