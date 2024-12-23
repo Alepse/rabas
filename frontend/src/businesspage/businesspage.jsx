@@ -227,7 +227,7 @@ const BusinessPage = () => {
         setIsLiked(true);
         fetchLikeCounts(businessId); // Pass businessId here
       } else {
-        showErrorAlert('Failed to like the business.');
+        // showErrorAlert('Failed to like the business.');
       }
     } catch (error) {
       console.error('Error liking business:', error);
@@ -242,7 +242,7 @@ const BusinessPage = () => {
         setIsLiked(false);
         fetchLikeCounts(businessId); // Pass businessId here
       } else {
-        showErrorAlert('Failed to unlike the business.');
+        // showErrorAlert('Failed to unlike the business.');
       }
     } catch (error) {
       console.error('Error unliking business:', error);
@@ -319,10 +319,10 @@ const BusinessPage = () => {
                 </div>
               </Button>
               <Button
+                onClick={handleLikeClick}
                 className={`h-9 px-3 ${
                   isLiked ? 'bg-color2 text-white' : 'bg-slate-300 hover:text-white hover:bg-color2/90'
                 }`}
-                onClick={handleLikeClick}
               >
               <div className='text-sm flex items-center gap-2'>
                 <AiOutlineLike />
