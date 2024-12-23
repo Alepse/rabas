@@ -534,10 +534,9 @@ const Juban = () => {
               <div key={index} className='flex justify-center' style={{ opacity }}>
                 <div className="bg-white rounded-lg shadow-lg duration-300 flex flex-col justify-between max-w-xs md:max-w-lg lg:max-w-sm mx-auto h-[400px] p-2 relative"
                     style={{ width: '300px', height: '400px' }}>
-                  <div className="w-full h-56 md:h-64 bg-gray-200 rounded-t-lg overflow-hidden">
-                  </div>
+                  <Skeleton className="w-full h-56 md:h-64 bg-gray-200 rounded-t-lg overflow-hidden" />
                   <div className="flex-grow flex flex-col justify-between mt-4 px-2">
-                    <div className="p-4">
+                    <div className="p-2">
                       <Skeleton className="h-3 mb-4" />
                       <Skeleton className="h-6 mb-4" />
                       <Skeleton className="h-4 mb-4" />

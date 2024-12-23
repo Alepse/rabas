@@ -537,10 +537,9 @@ const Discover = () => {
                   return (
                     <div key={index} style={{ opacity }}>
                       <div className="bg-white rounded-lg shadow-lg p-2 duration-300 flex flex-col justify-between">
-                        <div className="w-full h-56 md:h-64 bg-gray-200 rounded-t-lg overflow-hidden">
-                        </div>
+                        <Skeleton className="w-full h-56 md:h-64 bg-gray-200 rounded-t-lg overflow-hidden" />
                         <div className="flex-grow flex flex-col justify-between mt-4 px-2">
-                          <div className="p-4 flex-grow">
+                          <div className="p-2 flex-grow">
                             <Skeleton className="h-3 mb-4" />
                             <Skeleton className="h-6 mb-4" />
                             <Skeleton className="h-4 mb-4" />
