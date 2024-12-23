@@ -3554,6 +3554,7 @@ app.get('/getAllBusinesses', async (req, res) => {
       b.businessType,
       b.category,
       b.businessLogo,
+      b.heroImages AS coverPhotos,
       b.location AS destination,
       b.completeAddress AS defaultAddress,
       b.pin_location,

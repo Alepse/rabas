@@ -299,7 +299,7 @@ const BusinessPage = () => {
 
       {/* Hero Section with Animation */}
       <AnimatedSection>
-        <HeroAndGallery />
+        <HeroAndGallery images={businessData.coverPhotos} />
       </AnimatedSection>
 
       {/* Business Header Section */}
@@ -319,10 +319,10 @@ const BusinessPage = () => {
                 </div>
               </Button>
               <Button
-                onClick={handleLikeClick}
                 className={`h-9 px-3 ${
-                  isLiked ? 'bg-color2 text-white' : 'bg-slate-300 hover:text-white hover:bg-color2/90'
+                  isLiked ? 'bg-color2 text-white' : 'bg-slate-300'
                 }`}
+                onClick={handleLikeClick}
               >
               <div className='text-sm flex items-center gap-2'>
                 <AiOutlineLike />
