@@ -71,7 +71,7 @@ const BusinessHero = (coverPhotos) => {
   return (
     <div className="mx-auto container px-4 mt-3 sm:px-6 lg:px-8">
       {images.length > 1 ? (
-        <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6">
+        <div className="flex flex-col lg:flex-row items-start gap-6">
           <div className="w-full lg:w-2/3 relative">
             {imageLoadError ? (
               <div className="w-full h-[300px] sm:h-[400px] md:h-[500px] lg:h-[600px] bg-gray-200 flex items-center justify-center rounded-lg">
