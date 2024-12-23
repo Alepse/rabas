@@ -128,7 +128,7 @@ const Trip = () => {
 
   let [value, setValue] = useState({
     start: today(getLocalTimeZone()),
-    end: today(getLocalTimeZone()).add({ weeks: 1 }),
+    end: today(getLocalTimeZone()).add({ days: 0 }),
   });
   
 
@@ -222,14 +222,7 @@ const Trip = () => {
           showSuccessAlert('Trip added successfully', 'Your trip has been added to your trips list.');
 
           // Clear the form
-          setStep(1);
-          setProgress(10);
-          setTripName('');
-          setIsDetailsOpen(false);
-          setSelectedTrip(null);
-          setItinerary({});
-          setValue({ start: today(getLocalTimeZone()), end: today(getLocalTimeZone()).add({ weeks: 1 }) });
-          
+          resetForm();
         })
         .catch(error => {
           // Show message if error
@@ -241,6 +234,16 @@ const Trip = () => {
         showErrorAlert('Error fetching user data:', error.response ? error.response.data.message : 'An unknown error occurred');
       });
   };
+
+  const resetForm = () => {
+    setStep(1);
+    setProgress(10);
+    setTripName('');
+    setIsDetailsOpen(false);
+    setSelectedTrip(null);
+    setItinerary({});
+    setValue({ start: today(getLocalTimeZone()), end: today(getLocalTimeZone()).add({ days: 0 }) });
+  }
 
   const deleteTrip = (index, tripId) => {
     Swal.fire({
@@ -303,6 +306,11 @@ const Trip = () => {
     const formattedHour = hour % 12 || 12;
     return `${formattedHour}:${minute || '00'} ${ampm}`;
   };
+
+  const handleClose = () => {
+    resetForm();
+    onClose();
+  }
 
   return (
     <div className="mx-auto  bg-gray-100 min-h-screen font-sans flex flex-col" style={{ backgroundImage: `url(${wave})`, backgroundSize: 'auto', backgroundRepeat: 'repeat', backgroundPosition: 'center' }}>
@@ -389,17 +397,17 @@ const Trip = () => {
         </motion.button>
       )}
 
-      <Modal hideCloseButton isOpen={isOpen} onClose={() => {}} className="rounded-lg shadow-lg mx-auto p-3 max-h-screen max-w-[1200px]">
+      <Modal hideCloseButton isOpen={isOpen} onClose={handleClose} className="rounded-lg shadow-lg mx-auto p-3 max-h-screen max-w-[1200px]">
         <ModalContent className="rounded-lg overflow-y-auto scrollbar-custom">
           <ModalHeader className="bg-primary text-white p-4 rounded-t-lg flex justify-between items-center">
             <h2 className="text-2xl font-bold">Let's create your trip in Sorsogon</h2>
-                    <button 
-                        aria-label="Close" 
-                        className='text-white hover:text-gray-300 transition-colors duration-200'
-                        onClick={onClose}
-                    >
-                        <FaTimes />
-                    </button>
+              <button 
+                  aria-label="Close" 
+                  className='text-white hover:text-gray-300 transition-colors duration-200'
+                  onClick={handleClose}
+              >
+                  <FaTimes />
+              </button>
           </ModalHeader>
           <ModalBody className="bg-gray-50 p-2">
             <Progress value={progress} size="xs" classNames={{ indicator: "bg-color2",}} />
@@ -432,7 +440,7 @@ const Trip = () => {
               {step === 2 && (
                 <>
                   <h1 className="text-2xl font-semibold text-primary mb-4">How Many Days Is Your Trip?</h1>
-                  <h1 className='text-center text-lg font-medium mb-2'>Choose Your Trip Dates</h1>
+                  <h1 className='text-center text-lg font-medium mb-2'>Choose Your Start and End Trip Dates</h1>
                   
                   <div className='flex justify-center'>
                     <RangeCalendar
@@ -512,7 +520,7 @@ const Trip = () => {
           </ModalBody>
           <ModalFooter className="bg-gray-100 p-4 z-50 sticky bottom-[-10px] rounded-b-lg">
             <div className='flex justify-between w-full'>
-            <Button onClick={onClose} className="bg-red-500 hover:bg-red-600 text-white rounded-lg py-2 px-4 transition-all">
+            <Button onClick={handleClose} className="bg-red-500 hover:bg-red-600 text-white rounded-lg py-2 px-4 transition-all">
                 Close
               </Button>
               <div className='flex gap-3'>
@@ -539,7 +547,7 @@ const Trip = () => {
       {isDetailsOpen && selectedTrip && (
           <TripDetailsModal
               isOpen={isDetailsOpen}
-              onClose={() => setIsDetailsOpen(false)}
+              onClose={() => setIsDetailsOpen(true)}
               trip={selectedTrip}
               onUpdateTrip={updateTripDetails}
               itinerary={itinerary}

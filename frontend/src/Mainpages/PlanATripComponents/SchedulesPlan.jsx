@@ -37,7 +37,7 @@ const SchedulesPlan = ({ startDate, endDate, onItineraryChange }) => {
         return initialItems;
     });
 
-    const [currentDate, setCurrentDate] = useState("Tuesday, Oct 15");
+    const [currentDate, setCurrentDate] = useState(null);
     const [selectedItem, setSelectedItem] = useState(null);
     const [isSideUIVisible, setIsSideUIVisible] = useState(false);
 
