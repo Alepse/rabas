@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Swiper, SwiperSlide } from 'swiper/react';
 import { motion } from 'framer-motion';
 import Nav from '../components/nav';
 import Hero from '../components/heroaccomodation';
@@ -56,6 +57,8 @@ const Accommodations = () => {
         }
       } catch (error) {
         console.error('Error fetching accommodations:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -69,8 +72,6 @@ const Accommodations = () => {
   const isLargeScreen = useIsLargeScreen();
 
   useEffect(() => {
-    setTimeout(() => setLoading(false), 1000);
-
     const handleScroll = () => {
       if (window.scrollY > 300) {
         setShowButton(true);
@@ -86,10 +87,6 @@ const Accommodations = () => {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-
-  if (loading) {
-    return <Spinner className='flex justify-center items-center h-screen' size='lg' label="Loading..." color="primary" />;
-  }
 
   const handleTagChange = (selected) => {
     setSelectedTags(selected);
@@ -307,15 +304,31 @@ const Accommodations = () => {
           {/* Accommodation List */}
           <div className='w-full'>
             <motion.div 
-              className='grid grid-cols-1 gap-6 overflow-y-auto max-h-[1000px] scrollbar-custom  p-4'
+              className='grid grid-cols-1 gap-6 overflow-y-auto max-h-[1000px] scrollbar-custom  p-2'
               variants={containerVariants}
               initial="hidden"
               animate="visible"
             >
               {loading ? (
-                Array.from({ length: 4 }).map((_, index) => (
-                  <Skeleton key={index} className='w-full h-48 rounded-lg' />
-                ))
+                Array.from({ length: 2 }).map((_, index) => {
+                  const opacity = 1 - index * 0.25;
+                  return (
+                    <SwiperSlide key={index} className='flex justify-center' style={{ opacity }}>
+                      <div className="bg-white rounded-lg shadow-lg duration-300 flex flex-col justify-between w-full mx-auto h-full p-2 relative gap-2">
+                        <Skeleton className="w-full h-48 rounded-t-lg" />
+                        <div className="flex-grow flex flex-col justify-between mt-4 px-2">
+                          <div className="p-2">
+                            <Skeleton className="h-3 mb-4" />
+                            <Skeleton className="h-6 mb-4" />
+                            <Skeleton className="h-4 mb-4" />
+                            <Skeleton className="h-5 mb-3" /> 
+                            <Skeleton className="h-10" />
+                          </div>
+                        </div>
+                      </div>
+                    </SwiperSlide>
+                  );
+                })
               ) : (
                 filteredAccommodations.length > 0 ? (
                   filteredAccommodations.map((accommodation, index) => (
@@ -342,22 +355,21 @@ const Accommodations = () => {
                             </span>
                           ))}
                         </div>
-                         
-                          <div className='flex items-center gap-2'>
-                            <div className='flex items-center gap-1 '>
-                              {accommodation.rating ? (
-                                <>
-                                  <span className='text-black text-[12px] '>{accommodation.rating}</span> 
-                                  <span className='text-yellow-500'>
-                                    {'★'.repeat(Math.floor(accommodation.rating))}
-                                    {'☆'.repeat(5 - Math.floor(accommodation.rating))}
-                                  </span>
-                                </>
-                              ) : (
-                                <span className="text-gray-500 text-[12px]">No ratings</span>
-                              )}
-                            </div>
+                        <div className='flex items-center gap-2'>
+                          <div className='flex items-center gap-1 '>
+                            {accommodation.rating ? (
+                              <>
+                                <span className='text-black text-[12px] '>{accommodation.rating}</span> 
+                                <span className='text-yellow-500'>
+                                  {'★'.repeat(Math.floor(accommodation.rating))}
+                                  {'☆'.repeat(5 - Math.floor(accommodation.rating))}
+                                </span>
+                              </>
+                            ) : (
+                              <span className="text-gray-500 text-[12px]">No ratings</span>
+                            )}
                           </div>
+                        </div>
                         </div>
                         <h3 className='font-semibold text-lg text-color1'>{accommodation.businessName}</h3>
                         <div className='text-xs text-gray-500 mb-2 flex items-center'>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Swiper, SwiperSlide } from 'swiper/react';
 import { motion } from 'framer-motion';
 import Nav from '../components/nav';
 import Hero from '../components/heroshop';
@@ -54,6 +55,8 @@ const Shop = () => {
         }
       } catch (error) {
         console.error('Error fetching shops:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -67,7 +70,6 @@ const Shop = () => {
   const isLargeScreen = useIsLargeScreen();
 
   useEffect(() => {
-    setTimeout(() => setLoading(false), 1000);
 
     const handleScroll = () => {
       if (window.scrollY > 300) {
@@ -85,9 +87,6 @@ const Shop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  if (loading) {
-    return <Spinner className='flex justify-center items-center h-screen' size='lg' label="Loading..." color="primary" />;
-  }
 
   const handleCategoryChange = (selected) => {
     setSelectedCategories(selected);
@@ -280,15 +279,31 @@ const Shop = () => {
           {/* Shop List */}
           <div className='w-full'>
             <motion.div 
-              className='grid grid-cols-1 gap-6 overflow-y-auto max-h-[1000px] scrollbar-custom  p-4'
+              className='grid grid-cols-1 gap-6 overflow-y-auto max-h-[1000px] scrollbar-custom  p-2'
               variants={containerVariants}
               initial="hidden"
               animate="visible"
             >
               {loading ? (
-                Array.from({ length: 4 }).map((_, index) => (
-                  <Skeleton key={index} className='w-full h-48 rounded-lg' />
-                ))
+                Array.from({ length: 2 }).map((_, index) => {
+                  const opacity = 1 - index * 0.25;
+                  return (
+                    <SwiperSlide key={index} className='flex justify-center' style={{ opacity }}>
+                      <div className="bg-white rounded-lg shadow-lg duration-300 flex flex-col justify-between w-full mx-auto h-full p-2 relative gap-2">
+                        <Skeleton className="w-full h-48 rounded-t-lg" />
+                        <div className="flex-grow flex flex-col justify-between mt-4 px-2">
+                          <div className="p-2">
+                            <Skeleton className="h-3 mb-4" />
+                            <Skeleton className="h-6 mb-4" />
+                            <Skeleton className="h-4 mb-4" />
+                            <Skeleton className="h-5 mb-3" /> 
+                            <Skeleton className="h-10" />
+                          </div>
+                        </div>
+                      </div>
+                    </SwiperSlide>
+                  );
+                })
               ) : (
                 filteredShops.length > 0 ? (
                   filteredShops.map((shop, index) => (
