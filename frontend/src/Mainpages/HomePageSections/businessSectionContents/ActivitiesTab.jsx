@@ -208,12 +208,16 @@ const ActivitySwiper = ({ title, link, isLast, activities, loading }) => (
           </SwiperSlide>
         ))
       )}
-      <div className="custom-prev absolute left-2 top-[25%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300">
-        <FaArrowLeft />
-      </div>
-      <div className="custom-next absolute right-2 top-[25%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300">
-        <FaArrowRight />
-      </div>
+      {activities.length > 1 && (
+        <>
+          <div className="custom-prev absolute left-2 top-[25%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300">
+            <FaArrowLeft />
+          </div>
+          <div className="custom-next absolute right-2 top-[25%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300">
+            <FaArrowRight />
+          </div>
+        </>
+      )}
     </Swiper>
   </div>
 );
