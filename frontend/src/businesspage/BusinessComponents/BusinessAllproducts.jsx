@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { TbMessageStar } from "react-icons/tb";
+import { TbListDetails } from "react-icons/tb";
+import { IoCheckmarkCircleOutline } from "react-icons/io5";
 import {
   Tabs,
   Tab,
-  Card,
-  CardBody,
   Select,
   SelectItem,
   Slider,
@@ -21,7 +22,6 @@ import {
   Checkbox,
   Skeleton,
 } from '@nextui-org/react';
-import { MdRateReview } from 'react-icons/md';
 import { AiFillStar } from 'react-icons/ai';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import AccommodationBookingForm from './bookingFormModal/AccommodationBookingForm';
@@ -46,6 +46,30 @@ const showSuccessAlert = (message) => {
   });
 };
 
+// Mockup Component to Test InclusionsModal
+
+const mockInclusion = {  
+  name: "Luxury Beach Resort",  
+  inclusions: [  
+    "Free breakfast buffet",  
+    "Complimentary airport transfers",  
+    "Access to private beach area",  
+    "Unlimited use of the swimming pool and gym",  
+    "Free high-speed WiFi",  
+    "24-hour room service",  
+    "Daily housekeeping",  
+    "Complimentary welcome drinks",  
+    "On-site restaurant with diverse cuisine options",  
+    "Spa and wellness center access",  
+    "Kids' club or children’s activities",  
+    "Free parking",  
+    "Business center with meeting rooms",  
+    "Guided tours and excursions",  
+    "Yoga or fitness classes",  
+   
+  ],  
+};
+
 const showErrorAlert = (message) => {
   Swal.fire({
     title: 'Error!',
@@ -65,6 +89,10 @@ const ReviewModal = ({ isOpen, onClose, product, isLoggedIn }) => {
   const [newReview, setNewReview] = useState('');
   const [newRating, setNewRating] = useState(0);
   const [reviews, setReviews] = useState([]);
+
+
+ 
+
 
   const fetchUserData = () => {
     axios.get(`${BASE_URL}/get-userData`, { withCredentials: true })
@@ -151,11 +179,14 @@ const ReviewModal = ({ isOpen, onClose, product, isLoggedIn }) => {
     onClose();
   };
 
+
+ 
+
   return (
     <Modal scrollBehavior='inside' isOpen={isOpen} onClose={handleClose} className="max-w-full md:max-w-2xl">
       <ModalContent className="p-4">
         <ModalHeader>
-          <h2 className="text-xl font-semibold">Write a Review for {product.title}</h2>
+          <h2 className="text-xl font-semibold">Write a Review </h2>
         </ModalHeader>
         <ModalBody className="py-4">
           <div className="flex flex-col gap-4">
@@ -211,6 +242,9 @@ const ReviewModal = ({ isOpen, onClose, product, isLoggedIn }) => {
           </div>
         </ModalBody>
         <ModalFooter className="flex justify-end">
+        <Button color="danger" onClick={handleClose}>
+            Close
+          </Button>
           <Button 
             onClick={() => {
               if (isLoggedIn) {
@@ -224,19 +258,25 @@ const ReviewModal = ({ isOpen, onClose, product, isLoggedIn }) => {
           >
             Submit Review
           </Button>
-          <Button color="danger" onClick={handleClose}>
-            Close
-          </Button>
+         
         </ModalFooter>
       </ModalContent>
     </Modal>
+
+   
+
   );
 };
 
 // Product Card Component
 const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn }) => {
   const [isReviewModalOpen, setReviewModalOpen] = useState(false);
-
+  const [isInclusionsModalOpen, setInclusionsModalOpen] = useState(false);
+  const onModalOpen = () => {
+    openInclusionsModal();
+  };
+  const openInclusionsModal = () => setInclusionsModalOpen(true);
+  const closeInclusionsModal = () => setInclusionsModalOpen(false);
   const openReviewModal = () => setReviewModalOpen(true);
   const closeReviewModal = () => setReviewModalOpen(false);
 
@@ -248,112 +288,173 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn }) => {
     onOpen(product); // Pass the product object directly
   };
 
-  return (
-    <Card variant="shadow" className=" rounded-lg mb-4 ">
-      <CardBody className="flex flex-col">
-        <div className="relative w-full h-[250px] md:h-[200px]">
-          {product.images.length > 0 ?(
-            <img
-              src={
-                product.images.length > 0 && product.images[0].path
-                  ? `${BASE_URL}/${product.images[0].path}`
-                  : product.fileUrl || ''
-              }
-              alt={product.images.length > 0 ? product.images[0].title : product.name}
-              className="object-cover w-full h-full rounded-t-lg"
-            />
+  
+  const InclusionsModal = ({ isOpen, onClose, inclusions }) => {
+    return (
+      <Modal scrollBehavior="inside" isOpen={isOpen} onClose={onClose}>
+      <ModalContent className="p-4">
+        <ModalHeader>
+          <h2 className="text-xl font-semibold">Package Inclusions</h2>
+        </ModalHeader>
+        <ModalBody className="py-4">
+          {inclusions && inclusions.length > 0 ? (
+            <ul className="list-none space-y-2">
+              {inclusions.map((inclusion, index) => (
+                <li key={index} className="flex items-center">
+                  <IoCheckmarkCircleOutline className="text-green-500 mr-2" />
+                  <p className="text-gray-800">{inclusion}</p>
+                </li>
+              ))}
+            </ul>
           ) : (
-            <div className="w-full h-full flex items-center justify-center rounded-t-lg bg-gray-100 text-gray-500">
-              No images available
-            </div>
+            <p className="text-gray-600">No inclusions available.</p>
           )}
-          
-          {product.discount > 0 && (
-            <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
-              {product.discount}% OFF
-            </div>
-          )}
-          <Button 
-            size="sm" 
-            className="absolute bottom-2 right-2 text-white bg-color1" 
-            onClick={handleViewImages} // Use the new handler
-          >
-            View Images
+        </ModalBody>
+        <ModalFooter className="flex justify-end">
+          <Button color="danger" onClick={onClose}>
+            Close
           </Button>
-        </div>
-        <div className="p-4 flex flex-col justify-between flex-grow">
-          <div>
-            <div className="font-bold text-lg mb-1">{product.name}</div>
-            <div className="flex items-center gap-1 mb-2">
-              <span className="text-black font-semibold">{product.rating}</span>
-              <div className="flex">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <AiFillStar
-                    key={star}
-                    className={star <= product.rating ? 'text-yellow-500' : 'text-gray-300'}
-                  />
-                ))}
-              </div>
-              <Tooltip content="Write a Review">
-                <Button size="sm" className="bg-transparent" onClick={openReviewModal}>
-                  <MdRateReview className="text-lg cursor-pointer" />
-                </Button>
-              </Tooltip>
-            </div>
-            <div className="text-gray-700 mb-4">{product.description}</div>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
+    
+    );
+  };
+  
+
+  return (
+    <div className="shadow-lg rounded-lg overflow-hidden mb-4">
+    <div className="flex flex-col md:flex-row md:flex-wrap">
+      {/* Image Section */}
+      <div className="relative w-full h-[250px] md:w-[400px] md:h-[230px] flex-shrink-0">
+        {product.images.length > 0 ? (
+          <img
+            src={
+              product.images.length > 0 && product.images[0].path
+                ? `${BASE_URL}/${product.images[0].path}`
+                : product.fileUrl || ''
+            }
+            alt={product.images.length > 0 ? product.images[0].title : product.name}
+            className="object-cover w-full h-full"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-500">
+            No images available
           </div>
-          <div className="flex justify-between items-center mt-auto">
-            <div className="text-lg font-semibold">
-              {product.discount > 0 ? (
-                <>
-                  <span className="line-through text-gray-500">₱{product.price}</span>
-                  <span className="text-red-500 ml-2">₱{discountedPrice}</span>
-                  {product.expiration && (
-                    <p className="text-xs text-red-500 mt-1">
-                      Discount expires on:{" "}
-                      {new Date(product.expiration).toLocaleString("en-US", {
-                        weekday: "long",  // optional: includes the weekday (e.g., 'Monday')
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        hour12: true,  // to get AM/PM format
-                      })}
-                    </p>
-                  )}
-                </>
-              ) : (
-                `₱${product.price}`
-              )}
-              
-              <div className="flex mt-4 gap-2">
-                <Button color="primary">Inquire</Button>
-                {product.product_category !== 'shop' && (
-                  <Button
-                    color="success"
-                    className="text-white"
-                    onClick={() => {
-                      if (isLoggedIn) {
-                        openBookingModal(product);
-                      } else {
-                        showErrorAlert('Please log in to book this product.');
-                      }
-                    }}
-                  >
-                    {product.product_category === 'restaurant' ? 'Reserve Table' : 
-                     product.product_category === 'activity' ? 'Book Activity' : 
-                     product.product_category === 'accommodation' ? 'Book Stay' : 
-                     'Book'}
-                  </Button>
+        )}
+        {product.discount > 0 && (
+          <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+            {product.discount}% OFF
+          </div>
+        )}
+        <Button
+          size="sm"
+          className="absolute bottom-5 right-2 text-white bg-color1"
+          onClick={handleViewImages}
+        >
+          View Images
+        </Button>
+      </div>
+  
+      {/* Content Section */}
+      <div className="p-4 flex flex-col justify-between flex-grow">
+        {/* Product Info */}
+        <div className='flex justify-between'>
+          <h3 className="font-bold text-lg mb-2">{product.name}</h3>
+          <div className="flex items-center gap-2 ">
+            <span className="text-black font-semibold">{product.rating}</span>
+            <div className="flex">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <AiFillStar
+                  key={star}
+                  className={star <= product.rating ? 'text-yellow-500' : 'text-gray-300'}
+                />
+              ))}
+            </div>
+            <Tooltip content="Write a Review">
+              <button className="bg-transparent" onClick={openReviewModal}>
+                <TbMessageStar  className="text-lg cursor-pointer" />
+              </button>
+            </Tooltip>
+            <Tooltip content="View Inclusions">
+              <button  className="bg-transparent"      onClick={openInclusionsModal} >
+                <TbListDetails  className="text-lg cursor-pointer" />
+              </button>
+            </Tooltip>
+          </div>
+        </div>
+
+        <p className="text-gray-700 text-sm mb-4">{product.description}</p>
+  
+        {/* Price and Actions */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between mt-4">
+          <div className="text-lg font-semibold">
+            {product.discount > 0 ? (
+              <>
+                <span className="line-through text-gray-500">₱{product.price}</span>
+                <span className="text-red-500 ml-2">₱{discountedPrice}</span>
+                {product.expiration && (
+                  <p className="text-xs text-red-500 mt-1">
+                    Discount expires on:{' '}
+                    {new Date(product.expiration).toLocaleString('en-US', {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hour12: true,
+                    })}
+                  </p>
                 )}
-              </div>
-            </div>
+              </>
+            ) : (
+              `₱${product.price}`
+            )}
+          </div>
+          <div className="flex flex-wrap gap-2 justify-between mt-3 md:mt-2">
+            <Button color="primary">Inquire</Button>
+            {product.product_category !== 'shop' && (
+              <Button
+                color="success"
+                className="text-white"
+                onClick={() => {
+                  if (isLoggedIn) {
+                    openBookingModal(product);
+                  } else {
+                    showErrorAlert('Please log in to book this product.');
+                  }
+                }}
+              >
+                {product.product_category === 'restaurant'
+                  ? 'Reserve Table'
+                  : product.product_category === 'activity'
+                  ? 'Book Activity'
+                  : product.product_category === 'accommodation'
+                  ? 'Book Stay'
+                  : 'Book'}
+              </Button>
+            )}
           </div>
         </div>
-      </CardBody>
-      <ReviewModal isOpen={isReviewModalOpen} onClose={closeReviewModal} product={product} isLoggedIn={isLoggedIn} />
-    </Card>
+      </div>
+    </div>
+    <ReviewModal
+      isOpen={isReviewModalOpen}
+      onClose={closeReviewModal}
+      product={product}
+      isLoggedIn={isLoggedIn}
+    />
+   
+   <InclusionsModal
+        isOpen={isInclusionsModalOpen}
+        onClose={closeInclusionsModal}
+        inclusions={mockInclusion.inclusions}
+      />
+    </div>
+
+
+  
   );
 };
 
