@@ -679,7 +679,7 @@ const BusinessAllproducts = () => {
 
       <div className="flex flex-col lg:flex-row gap-2">
         {/* Filter Section */}
-        <div className="w-full lg:w-1/4 bg-white p-6 rounded-lg shadow-md">
+        <div className="w-full lg:w-1/4 min-h-screen bg-white p-6 rounded-lg shadow-md">
           <Filters
             activeTab={activeTab}
             setSelectedType={setSelectedType}
@@ -691,7 +691,7 @@ const BusinessAllproducts = () => {
         </div>
 
         {/* Main Content Area */}
-        <div className="flex max-h-screen flex-col w-full bg-white p-5 rounded-lg shadow-md">
+        <div className="flex max-h-screen flex-col w-full  p-5 rounded-lg ">
           {/* Tabs */}
           <Tabs
             aria-label="Business Offerings"

@@ -1,12 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Modal, ModalContent, ModalHeader, ModalBody } from '@nextui-org/react';
+import { Modal, ModalContent, ModalHeader, ModalBody, Select, SelectItem  } from '@nextui-org/react';
 import { Input, Button, Checkbox } from '@nextui-org/react';
 import Slider from 'react-slick';
 import { addProduct, handleUpdateShopProduct, deleteShopProducts, fetchBusinessProducts } from '@/redux/shopSlice';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { FaSearch, FaChevronLeft, FaChevronRight, FaImage } from 'react-icons/fa';
+import { FaSearch, FaChevronLeft, FaChevronRight, FaImage, FaPlus } from 'react-icons/fa';
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
@@ -29,6 +29,19 @@ const ShopSections = () => {
   const status = useSelector((state) => state.shop.status);
   const error = useSelector((state) => state.shop.error);
   const sliderRefs = useRef({});
+
+  const [options, setOptions] = useState([
+    { value: "none", label: "None" }, // Default option
+  ]);
+  const [newOption, setNewOption] = useState("");
+
+  const handleAddOption = () => {
+    if (newOption.trim() && !options.some((opt) => opt.label === newOption)) {
+      setOptions([...options, { value: newOption.toLowerCase(), label: newOption }]);
+      setNewOption(""); // Clear input after adding
+    }
+  };
+
 
   useEffect(() => {
     // console.log('Fetching business products...');
@@ -423,16 +436,45 @@ const ShopSections = () => {
                 {/* Add/Edit Product Form */}
                 <form className="space-y-4" onSubmit={handleSubmit}>
                   {/* Type */}
-                  <div className="mb-4">
+                  <div className="flex items-start gap-4 max-w-3xl mx-auto">
+                  {/* Add New Option */}
+                  <div className="flex flex-col flex-1">
                     <Input
-                      label="Type"
-                      placeholder="Enter the type of product"
-                      value={productType}
-                      onChange={(e) => setProductType(e.target.value)}
+                      clearable
+                      bordered
                       fullWidth
-                      required
+                      label="Add New Item"
+                      placeholder="Type new item"
+                      value={newOption}
+                      onChange={(e) => setNewOption(e.target.value)}
                     />
+                    <Button
+                      auto
+                      icon={<FaPlus />}
+                      onClick={handleAddOption}
+                      color="primary"
+                      className="mt-2"
+                    >
+                      Add Item
+                    </Button>
                   </div>
+
+                  {/* Dropdown Select */}
+                  <div className="flex-1">
+                    <Select
+                      label="Select Activity Type"
+                      placeholder="Select or add an item"
+                      defaultSelectedKey="none" // Default value as "none"
+                      onSelectionChange={(key) => console.log(`Selected: ${key}`)}
+                    >
+                      {options.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </Select>
+                  </div>
+                </div>
 
                   {/* Product Name */}
                   <div className="mb-4">
