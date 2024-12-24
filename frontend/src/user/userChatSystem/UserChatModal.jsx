@@ -176,19 +176,31 @@ const UserChatModal = ({ isOpen, onClose }) => {
     if (user_id) {
       const fetchMessages = async () => {
         try {
-          // console.log('userId', user_id);
           const { data } = await axios.get(`${BASE_URL}/userMessages/${user_id}`);
-          // console.log('data', data);
+          console.log('data', data);
+  
+          // Reduce messages into a dictionary keyed by businessId
           const fetchedMessages = data.reduce((acc, { businessId, messages }) => {
             acc[businessId] = messages;
             return acc;
           }, {});
           setMessages(fetchedMessages);
-          // console.log('fetchedMessages', fetchedMessages);
-          // Extract unique business IDs and fetch businesses based on them
+  
+          // Extract unique business IDs and sort them based on the latest message timestamp
           const uniqueBusinessIds = [...new Set(data.map(({ businessId }) => businessId))];
-          // console.log('uniqueBusinessIds', uniqueBusinessIds);
-          fetchBusinesses(uniqueBusinessIds);
+          const sortedBusinessIds = uniqueBusinessIds.sort((a, b) => {
+            // Get the latest message timestamp for each business
+            const latestMessageA = data.find(({ businessId }) => businessId === a)?.messages.at(-1)?.time;
+            const latestMessageB = data.find(({ businessId }) => businessId === b)?.messages.at(-1)?.time;
+  
+            // Sort by time in descending order (latest first)
+            return new Date(latestMessageB) - new Date(latestMessageA);
+          });
+  
+          console.log('sortedBusinessIds', sortedBusinessIds);
+  
+          // Fetch businesses based on the sorted business IDs
+          fetchBusinesses(sortedBusinessIds);
         } catch (error) {
           setMessages({});
           console.error('Error fetching messages:', error.response ? error.response.data.message : 'An unknown error occurred');
@@ -198,13 +210,13 @@ const UserChatModal = ({ isOpen, onClose }) => {
   
       const fetchBusinesses = async (businessIds) => {
         try {
-          const businessRequests = businessIds.map(id =>
+          const businessRequests = businessIds.map((id) =>
             axios.get(`${BASE_URL}/businessesInChat/${id}`)
           );
           const responses = await Promise.all(businessRequests);
-          const businessesData = responses.map(response => response.data);
+          const businessesData = responses.map((response) => response.data);
           setBusinesses(businessesData);
-          // console.log('businesses', businessesData);
+          console.log('businesses', businessesData);
         } catch (error) {
           console.error('Error fetching businesses:', error.response ? error.response.data.message : 'An unknown error occurred');
           toast.error('Failed to load businesses');
@@ -213,55 +225,67 @@ const UserChatModal = ({ isOpen, onClose }) => {
   
       fetchMessages();
     }
-  }, [user_id]);  // Dependency array ensures it re-runs only when user_id changes
+  }, [user_id]); // Dependency array ensures it re-runs only when user_id changes
+  
   
   useEffect(() => {
     // Polling function to fetch new messages
     const fetchNewMessages = async () => {
       try {
-        // console.log('userId', user_id);
         const { data } = await axios.get(`${BASE_URL}/userMessages/${user_id}`);
-        // console.log('data', data);
+        console.log('data', data);
+  
+        // Reduce messages into a dictionary keyed by businessId
         const fetchedMessages = data.reduce((acc, { businessId, messages }) => {
           acc[businessId] = messages;
           return acc;
         }, {});
-         // Check if there are new messages
-         if (JSON.stringify(fetchedMessages) !== JSON.stringify(messages)) {
-          // console.log("not equal");
+        
+        // Check if there are new messages
+        if (JSON.stringify(fetchedMessages) !== JSON.stringify(messages)) {
           scrollToBottom();
-
           setMessages(fetchedMessages);
         }
-        // console.log('fetchedMessages', fetchedMessages);
-        // Extract unique business IDs and fetch businesses based on them
+  
+        // Extract unique business IDs and sort them based on the latest message timestamp
         const uniqueBusinessIds = [...new Set(data.map(({ businessId }) => businessId))];
-        // console.log('uniqueBusinessIds', uniqueBusinessIds);
-        fetchBusinesses(uniqueBusinessIds);
+        const sortedBusinessIds = uniqueBusinessIds.sort((a, b) => {
+          // Get the latest message timestamp for each business
+          const latestMessageA = data.find(({ businessId }) => businessId === a)?.messages.at(-1)?.time;
+          const latestMessageB = data.find(({ businessId }) => businessId === b)?.messages.at(-1)?.time;
+  
+          // Sort by time in descending order (latest first)
+          return new Date(latestMessageB) - new Date(latestMessageA);
+        });
+  
+        console.log('sortedBusinessIds', sortedBusinessIds);
+  
+        // Fetch businesses based on the sorted business IDs
+        fetchBusinesses(sortedBusinessIds);
       } catch (error) {
         console.error('Error fetching messages:', error.response ? error.response.data.message : 'An unknown error occurred');
         toast.error('Failed to load messages');
       }
     };
-
+  
     const fetchBusinesses = async (businessIds) => {
       try {
-        const businessRequests = businessIds.map(id =>
+        const businessRequests = businessIds.map((id) =>
           axios.get(`${BASE_URL}/businessesInChat/${id}`)
         );
         const responses = await Promise.all(businessRequests);
-        const businessesData = responses.map(response => response.data);
+        const businessesData = responses.map((response) => response.data);
         setBusinesses(businessesData);
       } catch (error) {
         console.error('Error fetching businesses:', error.response ? error.response.data.message : 'An unknown error occurred');
         toast.error('Failed to load businesses');
       }
     };
-
+  
     // Set an interval to fetch new messages every 5 seconds
     const intervalId = setInterval(fetchNewMessages, 5000);
     return () => clearInterval(intervalId); // Cleanup on unmount
-  }, [messages]);
+  }, [messages]); // Dependency array ensures it re-runs when messages change  
 
   // Scroll chat to the bottom when new messages arrive
   const scrollToBottom = () => {
@@ -344,11 +368,11 @@ const UserChatModal = ({ isOpen, onClose }) => {
       formData.append('receiver_id', selectedBusiness);
       formData.append('receiver_account', 'business');
       formData.append('text', messageInput);
-
+  
       if (image) {
         formData.append('photo', image); // Append the image file
       }
-
+  
       // Create a new message object
       const newMessage = {
         id: Date.now(), // Temporary ID until we get the response
@@ -360,56 +384,122 @@ const UserChatModal = ({ isOpen, onClose }) => {
         text: messageInput,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         image: imagePreview,
-        isSending: true, // Indicate that the message is being sent
+        status: 'sending', // Indicate the initial status as 'sending'
       };
-
+  
+      // Scroll to the bottom
       scrollToBottom();
+  
       // Update messages state immediately
       const currentMessages = messages[selectedBusiness] || [];
       setMessages({
         ...messages,
         [selectedBusiness]: [...currentMessages, newMessage],
       });
-
+  
       setMessageInput('');
       setImage(null);
       setImagePreview(null);
-      sudoToBottom();
+  
       try {
         const response = await fetch(`${BASE_URL}/sendMessage`, {
           method: 'POST',
           body: formData,
         });
-
+  
         if (!response.ok) {
           throw new Error('Failed to send message');
         }
-
+  
         const result = await response.json();
         if (result.success) {
-          // Update the message with the actual ID from the server
+          // Update the message with the actual ID from the server and set status to 'sent'
           setMessages(prevMessages => ({
             ...prevMessages,
             [selectedBusiness]: prevMessages[selectedBusiness].map(msg =>
-              msg.id === newMessage.id ? { ...msg, id: result.messageId, isSending: false } : msg
+              msg.id === newMessage.id ? { ...msg, id: result.messageId, status: 'sent' } : msg
             ),
           }));
-          
           toast.success('Message sent!');
         } else {
           throw new Error('Failed to send message');
         }
       } catch (error) {
         console.error('Error:', error);
-        // Optionally, you can revert the message state if sending fails
+  
+        // Mark the message as 'failed'
         setMessages(prevMessages => ({
           ...prevMessages,
-          [selectedBusiness]: prevMessages[selectedBusiness].filter(msg => msg.id !== newMessage.id),
+          [selectedBusiness]: prevMessages[selectedBusiness].map(msg =>
+            msg.id === newMessage.id ? { ...msg, status: 'failed' } : msg
+          ),
         }));
+  
         toast.error('An error occurred while sending the message');
       }
     }
   };
+
+  const resendMessage = async (failedMessage) => {
+    const { id, senderId, senderAccount, receiverId, receiverAccount, text, image } = failedMessage;
+  
+    const formData = new FormData();
+    formData.append('sender_id', senderId);
+    formData.append('sender_account', senderAccount);
+    formData.append('receiver_id', receiverId);
+    formData.append('receiver_account', receiverAccount);
+    formData.append('text', text);
+  
+    if (image) {
+      formData.append('photo', image); // Append the image file
+    }
+  
+    // Update the status of the message to 'resending'
+    setMessages(prevMessages => ({
+      ...prevMessages,
+      [receiverId]: prevMessages[receiverId].map(msg =>
+        msg.id === id ? { ...msg, status: 'resending' } : msg
+      ),
+    }));
+  
+    try {
+      const response = await fetch(`${BASE_URL}/sendMessage`, {
+        method: 'POST',
+        body: formData,
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to resend message');
+      }
+  
+      const result = await response.json();
+      if (result.success) {
+        // Update the message with the actual ID from the server and set status to 'sent'
+        setMessages(prevMessages => ({
+          ...prevMessages,
+          [receiverId]: prevMessages[receiverId].map(msg =>
+            msg.id === id ? { ...msg, id: result.messageId, status: 'sent' } : msg
+          ),
+        }));
+        toast.success('Message resent successfully!');
+      } else {
+        throw new Error('Failed to resend message');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+  
+      // Revert the status back to 'failed'
+      setMessages(prevMessages => ({
+        ...prevMessages,
+        [receiverId]: prevMessages[receiverId].map(msg =>
+          msg.id === id ? { ...msg, status: 'failed' } : msg
+        ),
+      }));
+  
+      toast.error('An error occurred while resending the message');
+    }
+  };  
+  
   // Function to handle image click for preview
   const handleImageClick = (imageUrl) => {
     window.open(imageUrl, '_blank');
@@ -494,6 +584,7 @@ const UserChatModal = ({ isOpen, onClose }) => {
   // Function to render messages
   const renderMessages = (messages) => {
     let lastMessageTime = null;
+    const lastMessage = messages && messages[messages.length - 1]; // Get the last message
 
     return messages.map((message, index) => {
       const isSenderYou = ((message.senderId === user_id) && (message.senderAccount === 'user'));
@@ -511,6 +602,7 @@ const UserChatModal = ({ isOpen, onClose }) => {
 
       return (
         <div key={message.id}>
+          {/* Time Display */}
           {showTime && (
             <div className="text-center text-xs text-gray-500 mb-2">
               {isToday
@@ -518,6 +610,8 @@ const UserChatModal = ({ isOpen, onClose }) => {
                 : messageTime.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true })}
             </div>
           )}
+
+          {/* Message Content */}
           <div className={`flex ${isSenderYou ? 'justify-end' : 'justify-start'} mb-4`}>
             <div className={`p-4 rounded-lg max-w-[70%] ${isSenderYou ? 'bg-gray-200 text-black' : 'bg-color1 text-white'} shadow-md`}>
               {/* Message Text */}
@@ -561,9 +655,29 @@ const UserChatModal = ({ isOpen, onClose }) => {
                 )}
             </div>
           </div>
-          <div className='flex justify-end'>
-            {message.isSending && <span className="text-sm text-gray-500">Sending</span>} 
-          </div>
+
+          {/* Message Status */}
+          {isSenderYou && (
+            <div className="flex justify-end">
+              {message.status === 'sending' && (
+                <span className="text-sm text-gray-500">Sending...</span>
+              )}
+              {(message.status === 'sent' || (!message.status && message === lastMessage)) && (
+                <span className="text-sm text-gray-500">Sent</span>
+              )}
+              {message.status === 'failed' && (
+                <div className="text-sm text-red-500 flex items-center gap-2">
+                  Failed
+                  <button
+                    onClick={() => resendMessage(message)}
+                    className="text-blue-500 underline text-sm"
+                  >
+                    Retry
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       );
     });

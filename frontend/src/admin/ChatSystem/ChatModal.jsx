@@ -383,99 +383,122 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
     if (user_id) {
       const fetchMessages = async () => {
         try {
-          // console.log('userId', user_id);
           const { data } = await axios.get(`${BASE_URL}/businessMessages/${user_id}`);
           // console.log('data', data);
+  
+          // Reduce messages into a dictionary keyed by userId
           const fetchedMessages = data.reduce((acc, { userId, messages }) => {
             acc[userId] = messages;
             return acc;
           }, {});
           setMessages(fetchedMessages);
-          // console.log('fetchedMessages', fetchedMessages);
-          // Extract unique user IDs and fetch users based on them
+          console.log('fetchedMessages', fetchedMessages);
+  
+          // Extract unique user IDs and sort them based on the latest message timestamp
           const uniqueUserIds = [...new Set(data.map(({ userId }) => userId))];
-          // console.log('uniqueUserIds', uniqueUserIds);
-          fetchUsers(uniqueUserIds);
+          const sortedUserIds = uniqueUserIds.sort((a, b) => {
+            // Get the latest message timestamp for each user
+            const latestMessageA = data.find(({ userId }) => userId === a)?.messages.at(-1)?.time;
+            const latestMessageB = data.find(({ userId }) => userId === b)?.messages.at(-1)?.time;
+  
+            // Sort by time in descending order (latest first)
+            return new Date(latestMessageB) - new Date(latestMessageA);
+          });
+  
+          console.log('sortedUserIds', sortedUserIds);
+  
+          // Fetch users based on the sorted user IDs
+          fetchUsers(sortedUserIds);
         } catch (error) {
           setMessages({});
           console.error('Error fetching messages:', error.response ? error.response.data.message : 'An unknown error occurred');
           toast.error('Failed to load messages');
         }
-      }
-
+      };
+  
       const fetchUsers = async (userIds) => {
         try {
           // Create an array of API requests
-          const userRequests = userIds.map(id =>
+          const userRequests = userIds.map((id) =>
             axios.get(`${BASE_URL}/usersInChat/${id}`)
           );
-
+  
           // Resolve all requests concurrently
           const responses = await Promise.all(userRequests);
-          const usersData = responses.map(response => response.data);
-
+          const usersData = responses.map((response) => response.data);
+  
           setUsers(usersData);
-          // console.log('users', usersData);
+          console.log('users', usersData);
         } catch (error) {
           console.error('Error fetching users:', error.response ? error.response.data.message : 'An unknown error occurred');
           toast.error('Failed to load users');
         }
       };
-
+  
       fetchMessages();
-      
-    };
+    }
   }, [user_id]);
-
+  
   useEffect(() => {
     // Polling function to fetch new messages
     const fetchNewMessages = async () => {
       try {
-        // console.log('userId', user_id);
         const { data } = await axios.get(`${BASE_URL}/businessMessages/${user_id}`);
-        // console.log('data', data);
+        console.log('data', data);
+  
+        // Reduce messages into a dictionary keyed by userId
         const fetchedMessages = data.reduce((acc, { userId, messages }) => {
           acc[userId] = messages;
           return acc;
         }, {});
+  
         // Check if there are new messages
         if (JSON.stringify(fetchedMessages) !== JSON.stringify(messages)) {
-          // console.log("not equal");
           scrollToBottom();
-
           setMessages(fetchedMessages);
         }
-        // console.log('fetchedMessages', fetchedMessages);
-        // Extract unique user IDs and fetch users based on them
+  
+        // Extract unique user IDs and sort them based on the latest message timestamp
         const uniqueUserIds = [...new Set(data.map(({ userId }) => userId))];
-        // console.log('uniqueUserIds', uniqueUserIds);
-        fetchUsers(uniqueUserIds);
+        const sortedUserIds = uniqueUserIds.sort((a, b) => {
+          // Get the latest message timestamp for each user
+          const latestMessageA = data.find(({ userId }) => userId === a)?.messages.at(-1)?.time;
+          const latestMessageB = data.find(({ userId }) => userId === b)?.messages.at(-1)?.time;
+  
+          // Sort by time in descending order (latest first)
+          return new Date(latestMessageB) - new Date(latestMessageA);
+        });
+  
+        console.log('sortedUserIds', sortedUserIds);
+  
+        // Fetch users based on the sorted user IDs
+        fetchUsers(sortedUserIds);
       } catch (error) {
         console.error('Error fetching messages:', error.response ? error.response.data.message : 'An unknown error occurred');
         toast.error('Failed to load messages');
       }
-    }
-
+    };
+  
     const fetchUsers = async (userIds) => {
       try {
-        const userRequests = userIds.map(id =>
+        const userRequests = userIds.map((id) =>
           axios.get(`${BASE_URL}/usersInChat/${id}`)
         );
         // Resolve all requests concurrently
         const responses = await Promise.all(userRequests);
-        const usersData = responses.map(response => response.data);
+        const usersData = responses.map((response) => response.data);
         setUsers(usersData);
-        // console.log('users', usersData);
+        console.log('users', usersData);
       } catch (error) {
         console.error('Error fetching users:', error.response ? error.response.data.message : 'An unknown error occurred');
         toast.error('Failed to load users');
       }
     };
-
+  
     // Set an interval to fetch new messages every 5 seconds
     const intervalId = setInterval(fetchNewMessages, 5000);
     return () => clearInterval(intervalId); // Cleanup on unmount
-  }, [messages]); // Run when user_id or selectedBusiness changes
+  }, [messages]); // Run when `messages` changes  
 
   // Scroll chat to the bottom when new messages arrive
   const scrollToBottom = () => {
@@ -630,7 +653,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
         text: messageInput,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         image: imagePreview,
-        isSending: true, // Indicate that the message is being sent
+        status: 'sending', // Indicate the initial status as 'sending'
       };
 
       // Update messages state immediately
@@ -647,6 +670,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
       // Set loading state
       setIsLoading(true); // Assuming you have a state variable for loading
       sudoToBottom();
+
       try {
         const response = await fetch(`${BASE_URL}/sendMessage`, {
           method: 'POST',
@@ -659,11 +683,11 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
 
         const result = await response.json();
         if (result.success) {
-          // Update the message with the actual ID from the server
+          // Update the message with the actual ID from the server and set status to 'sent'
           setMessages(prevMessages => ({
             ...prevMessages,
             [selectedUser]: prevMessages[selectedUser].map(msg =>
-              msg.id === newMessage.id ? { ...msg, id: result.messageId, isSending: false } : msg
+              msg.id === newMessage.id ? { ...msg, id: result.messageId, status: 'sent' } : msg
             ),
           }));
           toast.success('Message sent!');
@@ -672,11 +696,15 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
         }
       } catch (error) {
         console.error('Error:', error);
-        // Optionally, you can revert the message state if sending fails
+
+        // Mark the message as 'failed'
         setMessages(prevMessages => ({
           ...prevMessages,
-          [selectedUser]: prevMessages[selectedUser].filter(msg => msg.id !== newMessage.id),
+          [selectedUser]: prevMessages[selectedUser].map(msg =>
+            msg.id === newMessage.id ? { ...msg, status: 'failed' } : msg
+          ),
         }));
+
         toast.error('An error occurred while sending the message');
       } finally {
         // Reset loading state
@@ -684,6 +712,60 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
       }
     }
   };
+
+  const resendMessage = async (failedMessage) => {
+    setMessages(prevMessages => ({
+      ...prevMessages,
+      [selectedUser]: prevMessages[selectedUser].map(msg =>
+        msg.id === failedMessage.id ? { ...msg, status: 'sending' } : msg
+      ),
+    }));
+  
+    const formData = new FormData();
+    formData.append('sender_id', failedMessage.senderId);
+    formData.append('sender_account', failedMessage.senderAccount);
+    formData.append('receiver_id', failedMessage.receiverId);
+    formData.append('receiver_account', failedMessage.receiverAccount);
+    formData.append('text', failedMessage.text);
+  
+    if (failedMessage.image) {
+      formData.append('photo', failedMessage.image);
+    }
+  
+    try {
+      const response = await fetch(`${BASE_URL}/sendMessage`, {
+        method: 'POST',
+        body: formData,
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to resend message');
+      }
+  
+      const result = await response.json();
+      if (result.success) {
+        setMessages(prevMessages => ({
+          ...prevMessages,
+          [selectedUser]: prevMessages[selectedUser].map(msg =>
+            msg.id === failedMessage.id ? { ...msg, id: result.messageId, status: 'sent' } : msg
+          ),
+        }));
+        toast.success('Message resent!');
+      } else {
+        throw new Error('Failed to resend message');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setMessages(prevMessages => ({
+        ...prevMessages,
+        [selectedUser]: prevMessages[selectedUser].map(msg =>
+          msg.id === failedMessage.id ? { ...msg, status: 'failed' } : msg
+        ),
+      }));
+      toast.error('An error occurred while resending the message');
+    }
+  };
+  
 
   // Handle key press in the input field
   const handleKeyPress = (event) => {
@@ -815,7 +897,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
                   : `https://ui-avatars.com/api/?name=${user.name}`} 
               alt={user.name} 
             />
-            <UnreadBadge count={unreadMessages[user.user_id] || 0} />  {/* Handle missing counts */}
+            {/* <UnreadBadge count={unreadMessages[user.user_id] || 0} />  Handle missing counts */}
           </div>
           <span className="text-black">{user.name}</span>
         </div>
@@ -826,6 +908,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
 
   const renderMessages = (messages) => {
     let lastMessageTime = null;
+    const lastMessage = messages && messages[messages.length - 1]; // Get the last message
   
     return messages?.map((message, index) => {
       const isSenderYou = ((message.senderId === user_id) && (message.senderAccount === 'business'));
@@ -852,60 +935,52 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
           )}
           <div className={`flex ${isSenderYou ? 'justify-end' : 'justify-start'} mb-4`}>
             <div className={`p-4 rounded-lg max-w-[70%] ${isSenderYou ? 'bg-gray-200 text-black' : 'bg-color1 text-white'} shadow-md`}>
-              {message.formType ? (
-                <BookingDetailsCard
-                  message={message}
-                  onCheckAvailability={handleCheckAvailability}
-                  isSenderYou={isSenderYou}
-                />
-              ) : (
-                <>
-                  {message.text && <p className="break-words mb-2">{message.text}</p>}
-                  {imageUrl && (
-                    <div className="relative">
-                      <img
-                        src={imageUrl}
-                        alt="Sent"
-                        className="mt-2 rounded-md max-w-full cursor-pointer"
-                        style={{ maxHeight: '400px', objectFit: 'cover' }}
-                        onClick={() => handleImageClick(imageUrl)}
-                      />
-                      <button
-                        onClick={() => handleImageDownload(imageUrl)}
-                        className="absolute top-2 right-2 bg-white p-1 rounded-full shadow-md"
-                      >
-                        <FiDownload size={16} className="text-black" />
-                      </button>
-                    </div>
-                  )}
-                  {message.additionalInfo && (
-                    <p className="text-sm text-gray-300 mb-2">{message.additionalInfo}</p>
-                  )}
-                  {message.messageNote && (
-                    <p className="text-sm text-gray-300 mb-2">
-                      <strong>Message:</strong> {message.messageNote}
-                    </p>
-                  )}
-                  {message.formDetails &&
-                    Object.keys(message.formDetails).some((key) => message.formDetails[key] !== null) && (
-                      <BookingDetailsCard
-                        message={message}
-                        isSender={isSenderYou}
-                        onCheckAvailability={handleCheckAvailability}
-                      />
-                    )}
-                </>
+              {message.text && <p className="break-words mb-2">{message.text}</p>}
+              {imageUrl && (
+                <div className="relative">
+                  <img
+                    src={imageUrl}
+                    alt="Sent"
+                    className="mt-2 rounded-md max-w-full cursor-pointer"
+                    style={{ maxHeight: '400px', objectFit: 'cover' }}
+                    onClick={() => handleImageClick(imageUrl)}
+                  />
+                  <button
+                    onClick={() => handleImageDownload(imageUrl)}
+                    className="absolute top-2 right-2 bg-white p-1 rounded-full shadow-md"
+                  >
+                    <FiDownload size={16} className="text-black" />
+                  </button>
+                </div>
               )}
             </div>
-            
           </div>
-          <div className='flex justify-end'>
-            {message.isSending && <span className="text-sm text-gray-500">Sending</span>} 
-          </div>
+          {isSenderYou && (
+            <div className="flex justify-end">
+              {message.status === 'sending' && (
+                <span className="text-sm text-gray-500">Sending...</span>
+              )}
+              {(message.status === 'sent' || (!message.status && message === lastMessage)) && (
+                <span className="text-sm text-gray-500">Sent</span>
+              )}
+              {message.status === 'failed' && (
+                <div className="text-sm text-red-500 flex items-center gap-2">
+                  Failed
+                  <button
+                    onClick={() => resendMessage(message)}
+                    className="text-blue-500 underline text-sm"
+                  >
+                    Retry
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       );
     });
   };
+  
 
   const handleClose = () => {
     setSelectedUser(null); // Set selectedUser to null

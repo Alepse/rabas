@@ -3523,7 +3523,6 @@ app.get('/usersInChat/:userId', async (req, res) => {
       u.contact
     FROM users u
     WHERE u.user_id = ?
-    ORDER BY u.user_id
   `;
 
   try {
@@ -3742,6 +3741,7 @@ app.get('/getBusinessesByBusinessType/:businessType', async (req, res) => {
       b.businessName AS name, 
       b.businessType, 
       b.businessLogo AS businessLogo, 
+      b.heroImages AS coverPhotos,
       b.location AS destination, 
       b.contactInfo, 
       b.openingHours, 
