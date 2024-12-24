@@ -3741,6 +3741,7 @@ app.get('/getBusinessesByBusinessType/:businessType', async (req, res) => {
       b.businessName AS name, 
       b.businessType, 
       b.businessLogo AS businessLogo, 
+      b.heroImages AS coverPhotos,
       b.location AS destination, 
       b.contactInfo, 
       b.openingHours, 
