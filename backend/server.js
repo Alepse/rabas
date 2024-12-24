@@ -3523,7 +3523,6 @@ app.get('/usersInChat/:userId', async (req, res) => {
       u.contact
     FROM users u
     WHERE u.user_id = ?
-    ORDER BY u.user_id
   `;
 
   try {
