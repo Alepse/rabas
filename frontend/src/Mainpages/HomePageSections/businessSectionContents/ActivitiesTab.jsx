@@ -96,16 +96,24 @@ const ActivitySwiper = ({ title, link, isLast, activities, loading, uniqueId }) 
   const swiperRef = useRef(null);
   const [isBeginning, setIsBeginning] = useState(true);
   const [isEnd, setIsEnd] = useState(false);
+  const [showArrows, setShowArrows] = useState(false);
 
   const handleInit = (swiper) => {
     swiperRef.current = swiper;
     setIsBeginning(swiper.isBeginning);
     setIsEnd(swiper.isEnd);
+    adjustArrowVisibility(swiper);
   };
 
   const handleSlideChange = (swiper) => {
     setIsBeginning(swiper.isBeginning);
     setIsEnd(swiper.isEnd);
+  };
+
+  const adjustArrowVisibility = (swiper) => {
+    const currentSlides = swiper.slides.length;
+    const visibleSlides = swiper.params.slidesPerView;
+    setShowArrows(currentSlides > visibleSlides);
   };
 
   const prevClass = `custom-prev-${uniqueId}`;
@@ -137,6 +145,7 @@ const ActivitySwiper = ({ title, link, isLast, activities, loading, uniqueId }) 
           slidesPerView={1}
           onInit={handleInit}
           onSlideChange={handleSlideChange}
+          onBreakpoint={(swiper) => adjustArrowVisibility(swiper)}
           breakpoints={{
             320: { slidesPerView: 1 },
             640: { slidesPerView: 1 },
@@ -155,7 +164,7 @@ const ActivitySwiper = ({ title, link, isLast, activities, loading, uniqueId }) 
                       width: "100%",
                       maxWidth: "300px",
                       height: "400px",
-                      opacity: 1 - index * 0.25, // Adjusted fade effect
+                      opacity: 1 - index * 0.25,
                     }}
                   >
                     <Skeleton className="w-full h-56 md:h-64 bg-gray-200 rounded-t-lg overflow-hidden" />
@@ -268,17 +277,17 @@ const ActivitySwiper = ({ title, link, isLast, activities, loading, uniqueId }) 
                 </SwiperSlide>
               ))}
         </Swiper>
-        {!isBeginning && (
+        {showArrows && !isBeginning && (
           <div
-            className="custom-prev absolute left-2 top-[50%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300"
+            className={`custom-prev absolute left-2 top-[50%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300`}
             onClick={() => swiperRef.current?.slidePrev()}
           >
             <FaArrowLeft />
           </div>
         )}
-        {!isEnd && (
+        {showArrows && !isEnd && (
           <div
-            className="custom-next absolute right-2 top-[50%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300"
+            className={`custom-next absolute right-2 top-[50%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300`}
             onClick={() => swiperRef.current?.slideNext()}
           >
             <FaArrowRight />

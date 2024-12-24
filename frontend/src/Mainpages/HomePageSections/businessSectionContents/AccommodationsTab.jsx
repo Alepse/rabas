@@ -97,11 +97,13 @@ const AccommodationSwiper = ({ title, link, isLast, accommodations, loading, uni
   const swiperRef = useRef(null);
   const [isBeginning, setIsBeginning] = useState(true);
   const [isEnd, setIsEnd] = useState(false);
+  const [showArrows, setShowArrows] = useState(false);
 
   const handleInit = (swiper) => {
     swiperRef.current = swiper;
     setIsBeginning(swiper.isBeginning);
     setIsEnd(swiper.isEnd);
+    adjustArrowVisibility(swiper);
   };
 
   const handleSlideChange = (swiper) => {
@@ -109,8 +111,15 @@ const AccommodationSwiper = ({ title, link, isLast, accommodations, loading, uni
     setIsEnd(swiper.isEnd);
   };
 
+  const adjustArrowVisibility = (swiper) => {
+    const currentSlides = swiper.slides.length;
+    const visibleSlides = swiper.params.slidesPerView;
+    setShowArrows(currentSlides > visibleSlides);
+  };
+
   const prevClass = `custom-prev-${uniqueId}`;
   const nextClass = `custom-next-${uniqueId}`;
+
 
   return(
     <div className="p-4 md:p-6">
@@ -134,6 +143,7 @@ const AccommodationSwiper = ({ title, link, isLast, accommodations, loading, uni
           slidesPerView={1}
           onInit={handleInit}
           onSlideChange={handleSlideChange}
+          onBreakpoint={(swiper) => adjustArrowVisibility(swiper)}
           breakpoints={{
             320: { slidesPerView: 1 },
             640: { slidesPerView: 1 },
@@ -264,17 +274,17 @@ const AccommodationSwiper = ({ title, link, isLast, accommodations, loading, uni
                 </SwiperSlide>
               ))}
         </Swiper>
-        {!isBeginning && (
+        {showArrows && !isBeginning && (
           <div
-            className="custom-prev absolute left-2 top-[50%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300"
+            className={`custom-prev absolute left-2 top-[50%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300`}
             onClick={() => swiperRef.current?.slidePrev()}
           >
             <FaArrowLeft />
           </div>
         )}
-        {!isEnd && (
+        {showArrows && !isEnd && (
           <div
-            className="custom-next absolute right-2 top-[50%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300"
+            className={`custom-next absolute right-2 top-[50%] transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 cursor-pointer hover:bg-gray-300 text-xl duration-300`}
             onClick={() => swiperRef.current?.slideNext()}
           >
             <FaArrowRight />
