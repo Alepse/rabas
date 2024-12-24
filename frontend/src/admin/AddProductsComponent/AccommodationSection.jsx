@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Modal, ModalContent, ModalHeader, ModalBody } from '@nextui-org/react';
+import { Modal, ModalContent, ModalHeader, ModalBody, Select, SelectItem  } from '@nextui-org/react';
 import { Input, Button, Checkbox } from '@nextui-org/react';
 import Slider from 'react-slick';
 import { addProduct, handleUpdateAccommodation, deleteAccommodations, fetchBusinessProducts } from '@/redux/accomodationSlice';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { FaSearch, FaChevronLeft, FaChevronRight, FaImage } from 'react-icons/fa';
+import { FaSearch, FaChevronLeft, FaChevronRight, FaImage, FaPlus } from 'react-icons/fa';
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
@@ -34,6 +34,19 @@ const AccommodationSection = () => {
   const status = useSelector((state) => state.accommodations.status);
   const error = useSelector((state) => state.accommodations.error);
   const sliderRefs = useRef({});
+
+  const [options, setOptions] = useState([
+    { value: "none", label: "None" }, // Default option
+  ]);
+  const [newOption, setNewOption] = useState("");
+
+  const handleAddOption = () => {
+    if (newOption.trim() && !options.some((opt) => opt.label === newOption)) {
+      setOptions([...options, { value: newOption.toLowerCase(), label: newOption }]);
+      setNewOption(""); // Clear input after adding
+    }
+  };
+
 
   useEffect(() => {
     // console.log('Fetching business products...');
@@ -506,25 +519,7 @@ const AccommodationSection = () => {
                   </Slider>
                 )}
                 
-                {/* Next and Previous buttons */}
-                {accommodation.images.length > 1 && (
-                  <>
-                    <button
-                      className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow"
-                      onClick={() => sliderRefs.current[accommodation.id].slickPrev()}
-                      aria-label="Previous image"
-                    >
-                      <FaChevronLeft />
-                    </button>
-                    <button
-                      className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow"
-                      onClick={() => sliderRefs.current[accommodation.id].slickNext()}
-                      aria-label="Next image"
-                    >
-                      <FaChevronRight />
-                    </button>
-                  </>
-                )}
+           
               </div>
             )}
             </div>
@@ -532,7 +527,7 @@ const AccommodationSection = () => {
       </div>
 
       {/* Modal for Adding/Editing Accommodations */}
-      <Modal isOpen={modalOpen} onOpenChange={setModalOpen} size="2xl">
+      <Modal scrollBehavior='inside' isOpen={modalOpen} onOpenChange={setModalOpen} size="2xl">
         <ModalContent>
           {() => (
             <>
@@ -543,16 +538,45 @@ const AccommodationSection = () => {
                 {/* Add/Edit Accommodation Form */}
                 <form className="space-y-4" onSubmit={handleSubmit}>
                   {/* Accommodation Type */}
-                  <div className="mb-4">
+                  <div className="flex items-start gap-4 max-w-3xl mx-auto">
+                  {/* Add New Option */}
+                  <div className="flex flex-col flex-1">
                     <Input
-                      label="Accommodation Type"
-                      placeholder="Enter the type of accommodation"
-                      value={accommodationType}
-                      onChange={(e) => setAccommodationType(e.target.value)}
+                      clearable
+                      bordered
                       fullWidth
-                      required
+                      label="Add New Item"
+                      placeholder="Type new item"
+                      value={newOption}
+                      onChange={(e) => setNewOption(e.target.value)}
                     />
+                    <Button
+                      auto
+                      icon={<FaPlus />}
+                      onClick={handleAddOption}
+                      color="primary"
+                      className="mt-2"
+                    >
+                      Add Item
+                    </Button>
                   </div>
+
+                  {/* Dropdown Select */}
+                  <div className="flex-1">
+                    <Select
+                      label="Select Activity Type"
+                      placeholder="Select or add an item"
+                      defaultSelectedKey="none" // Default value as "none"
+                      onSelectionChange={(key) => console.log(`Selected: ${key}`)}
+                    >
+                      {options.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </Select>
+                  </div>
+                </div>
 
                   {/* Accommodation Name */}
                   <div className="mb-4">

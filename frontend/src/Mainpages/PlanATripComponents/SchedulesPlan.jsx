@@ -224,7 +224,7 @@ const SchedulesPlan = ({ startDate, endDate, onItineraryChange }) => {
                     >
                         <div className='flex justify-end mb-4'>
                             <Button className='border-1 m-2 border-color1 rounded-full text-lg p-3 hover:bg-color2 bg-white hover:text-white duration-300 min-w-11' onClick={() => handleAdd(date)}>
-                                <FaPlus/> Add
+                                <FaPlus/> Add Trip
                             </Button>
                         </div>
                         <div className='mx-auto max-h-screen'>

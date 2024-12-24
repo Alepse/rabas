@@ -304,6 +304,15 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
                       key={date} 
                       title={date}
                     >
+
+                    <div className='flex justify-end mb-4'>
+                    {isEditing && (
+                            <Button className='border-1 m-2 border-color1 rounded-full text-lg p-3 hover:bg-color2 bg-white hover:text-white duration-300 min-w-11' onClick={() => handleAdd(date)}>
+                                <FaPlus/> Add Trip
+                            </Button>
+                        )}
+
+                        </div>
                       <div className="mb-6">
                         {itinerary[date].map((item, index) => (
                           <div key={index} className="flex flex-col sm:flex-row items-start mb-6 bg-white p-4 rounded-lg shadow-lg w-full sm:w-3/4 lg:w-2/3 mx-auto">
@@ -356,11 +365,7 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
                             </div>
                           </div>
                         ))}
-                        {isEditing && (
-                          <Button className='border-1 m-2 border-color1 rounded-full text-lg p-3 hover:bg-color2 bg-white hover:text-white duration-300 min-w-11' onClick={() => handleAdd(date)}>
-                            <FaPlus/> Add
-                          </Button>
-                        )}
+                       
                       </div>
                     </AccordionItem>
                   ))}
@@ -380,7 +385,7 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
               <Button onClick={handleEditToggle} className="bg-color1 text-white">Edit</Button>
             </div>
           )}
-          <Button onClick={onClose} className="bg-red-500 text-white">Close</Button>
+          <Button onClick={() => { onClose(); setIsAddOpen(false); }} className="bg-red-500 text-white">Close</Button>
         </ModalFooter>
       </ModalContent>
       <AddItemModal
