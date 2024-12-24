@@ -22,7 +22,7 @@ const [showButton, setShowButton] = useState(false); // State to show/hide butto
   useEffect(() => {
 
     // Simulate data fetching
-    setTimeout(() => setLoading(false), 1000);
+    setTimeout(() => setLoading(false), 250);
 
     // Show button when scrolled down
     const handleScroll = () => {

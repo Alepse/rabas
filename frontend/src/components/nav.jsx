@@ -23,6 +23,7 @@ import { Modal, ModalContent, ModalBody, useDisclosure } from "@nextui-org/react
 import { Link, useLocation } from 'react-router-dom';
 import UserChatModal from '@/user/userChatSystem/UserChatModal';
 import axios from 'axios';
+import { Skeleton } from "@nextui-org/skeleton";
 
 
 const Nav = () => {
@@ -40,6 +41,7 @@ const Nav = () => {
   const [isSearchOverlayOpen, setIsSearchOverlayOpen] = useState(false);
   const [activeLink, setActiveLink] = useState('');
   const location = useLocation();
+  const [loading, setLoading] = useState(true);
   // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
@@ -170,41 +172,38 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
       });
   };
 
-  const checkLoginStatus = () => {
-    axios.get(`${BASE_URL}/check-login`, { withCredentials: true })
+  const fetchUserData = () => {
+    axios
+      .get(`${BASE_URL}/check-login`, { withCredentials: true })
       .then(response => {
-        if (response.status === 200) {
-          setIsLoggedIn(response.data.isLoggedIn);
+        if (response.status === 200 && response.data.isLoggedIn) {
+          setIsLoggedIn(true);
+          // Fetch user data if logged in
+          return axios.get(`${BASE_URL}/get-userData`, { withCredentials: true });
         } else {
           setIsLoggedIn(false);
         }
       })
-      .catch(error => {
-        console.error('Error checking login status:', error.response ? error.response.data.message : 'An unknown error occurred');
-      });
-  };
-
-  const fetchUserData = () => {
-    axios.get(`${BASE_URL}/get-userData`, { withCredentials: true })
       .then(response => {
         setUserData(response.data.userData);
       })
       .catch(error => {
-        console.error('Error fetching username:', error.response ? error.response.data.message : 'An unknown error occurred');
+        console.error(
+          'Error:',
+          error.response ? error.response.data.message : error.message || 'An unknown error occurred'
+        );
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
+  
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+  
 
   const firstLetter = userData?.username?.charAt(0).toUpperCase() || '';
-
-  useEffect(() => {
-    checkLoginStatus();
-  }, []);
-
-  useEffect(() => {
-    if (isLoggedIn) {
-      fetchUserData();
-    }
-  }, [isLoggedIn]);
 
   const openChatModal = () => {
     setIsChatModalOpen(true);
@@ -231,220 +230,239 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
     setActiveLink(location.pathname);
   }, [location.pathname]);
 
-  if (isLoggedIn === null || (isLoggedIn && !userData)) {
-    return null;
-  }
-
   return (
     <div className={` bg-gradient-to-r from-color1 to-color2 flex justify-center fixed top-0 z-50 w-full shadow-lg`}>
-      <div className="flex justify-between items-center w-full container  mx-auto h-[4rem] p-4">
-        <a
-          className='flex items-center hover:scale-105 duration-500'
-          href='/'
-          onClick={() => handleLinkClick('/')}
-        >
-          <img className="lg:h-[3rem] max-h-[3rem] lg:w-[3rem] max-w-[3rem]" src={Logo} alt="Logo" />
-          <div className='text-white ml-2 text-lg font-mono '>RabaSorsogon</div>
-        </a>
-        
-        <div className="flex items-center gap-3 xl:hidden">
-          {isLoggedIn ? (
-            <Dropdown placement="bottom-end">
-              <DropdownTrigger>
-                <div className="cursor-pointer ml-6">
-                  <Avatar
-                    className='text-lg bg-color1 text-white  duration-300'
-                    src={userData?.image_path
-                      ? `${BASE_URL}/${userData.image_path}`
-                      : userData?.google_id
-                        ? userData.image
-                        : `https://ui-avatars.com/api/?name=${firstLetter}`
-                    }
-                  />
-                </div>
-              </DropdownTrigger>
-              <DropdownMenu>
-                <DropdownItem key="profile">
-                  <Link to='/userprofile' className="block w-full text-left p-2">
-                    Profile
-                  </Link>
-                </DropdownItem>
-                <DropdownItem key="messages" onClick={openChatModal}>
-                  <div className='flex items-center gap-4 p-2'>
-                    Messages
-                    <Badge color='danger' placement='top-right' content='2' />
-                  </div>
-                </DropdownItem>
-                <DropdownItem key="Bookings">
-                  <Link to='/userprofile#myBookings' className="block w-full text-left p-2">Bookings</Link>
-                </DropdownItem>
-                <DropdownItem key="logout" onClick={handleLogout}>
-                  <div className="block w-full text-left p-2">Logout</div>
-                </DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
-          ) : (
-            <div className="text-white hover:bg-color1 rounded-full cursor-pointer" onClick={onOpen}>
-              <FaRegCircleUser className="text-3xl" />
-            </div>
-          )}
+      {loading ? (
+        <div className="flex justify-between items-center w-full container mx-auto h-[4rem] p-4">
+          {/* Logo Skeleton */}
+          <div className="flex items-center space-x-2">
+            <Skeleton className="h-[3rem] w-[3rem] rounded-full" />
+            <Skeleton className="h-[1.5rem] w-[8rem] rounded-md" />
+          </div>
 
-          <button onClick={toggleMenu} className=" text-2xl z-50 p-2">
-            {isMenuOpen ? <FaTimes /> : <FaBars className='text-white' />}
-          </button>
+          {/* Right-side Skeleton */}
+          <div className="flex items-center space-x-4">
+            {/* Search Bar Skeleton */}
+            <div className="hidden xl:flex h-[2rem] w-[12rem] bg-gray-300 rounded-full"></div>
+            {/* Nav Items Skeleton */}
+            <div className="hidden xl:flex space-x-6">
+              <Skeleton className="h-[1.5rem] w-[4rem] rounded-md" />
+              <Skeleton className="h-[1.5rem] w-[6rem] rounded-md" />
+              <Skeleton className="h-[1.5rem] w-[6rem] rounded-md" />
+              <Skeleton className="h-[1.5rem] w-[5rem] rounded-md" />
+              <Skeleton className="h-[1.5rem] w-[6rem] rounded-md" />
+            </div>
+            {/* Avatar/Dropdown Skeleton */}
+            <Skeleton className="h-[2.5rem] w-[2.5rem] rounded-full" />
+            {/* Hamburger Menu Skeleton */}
+            <Skeleton className="h-[2rem] w-[2rem] rounded-md xl:hidden" />
+          </div>
         </div>
-
-        <div className="hidden xl:flex items-center gap-6">
-          <div className="flex space-x-8 items-center text-color1">
-          <div className="relative">
-              <input
-                type="text"
-                placeholder={`Search for ${activeTab}`}
-                value={searchQuery}
-                onFocus={openSearchOverlay}
-                onChange={handleInputChange}
-                className="border border-gray-300 rounded-full p-1 pl-8 text-sm shadow-md focus:outline-none focus:ring-2 focus:ring-color1 transition-all duration-300"
-              />
-              <FaSearch className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500" />
-              {searchQuery && (
-                <FaTimes
-                  onClick={clearSearchField}
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer"
-                />
-              )}
-            </div>
-            <div
-              className={`cursor-pointer text text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1 ${activeLink === '/' ? ' border-light border-b-1 p-1 font-semibold  ' : ''}`}
-              onClick={() => setActiveLink('/')}
-            >
-              <FaHome /> <a href='/'>Home</a>
-            </div>
-
-            <NavigationMenu className='z-50'>
-              <NavigationMenuList>
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger className={`cursor-pointer rounded-none text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1  ${activeLink === '/destinations' ? 'font-semibold border-b-1 border-light p-1' : ''}`}>
-                    <GiPositionMarker />
-                    <a href='/destinations'> Destinations</a>
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <NavigationMenuLink>
-                      <div className="p-9 w-max bg-light shadow-md">
-                        <ul className="space-y-2 text-dark text-md ">
-                          <Link to='/destinations?name=Barcelona'><li className=' py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Barcelona</li></Link>
-                          <Link to='/destinations?name=Bulan'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Bulan</li></Link>
-                          <Link to='/destinations?name=Bulusan'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Bulusan</li></Link>
-                          <Link to='/destinations?name=Casiguran'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Casiguran</li></Link>
-                          <Link to='/destinations?name=Castilla'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Castilla</li></Link>
-                          <Link to='/destinations?name=Donsol'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Donsol</li></Link>
-                          <Link to='/destinations?name=Gubat'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Gubat</li></Link>
-                          <Link to='/destinations?name=Irosin'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Irosin</li></Link>
-                          <Link to='/destinations?name=Juban'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Juban</li></Link>
-                          <Link to='/destinations?name=Magallanes'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Magallanes</li></Link>
-                          <Link to='/destinations?name=Matnog'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Matnog</li></Link>
-                          <Link to='/destinations?name=Pilar'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Pilar</li></Link>
-                          <Link to='/destinations?name=PrietoDiaz'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Prieto Diaz</li></Link>
-                          <Link to='/destinations?name=StaMagdalena'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Sta. Magdalena</li></Link>
-                          <Link to='/destinations?name=Sorsogon'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Sorsogon City</li></Link>
-                        </ul>
-                      </div>
-                    </NavigationMenuLink>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-              </NavigationMenuList>
-            </NavigationMenu>
-
-            <NavigationMenu className='z-40 '>
-              <NavigationMenuList>
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger className={`cursor-pointer rounded-none text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1  ${activeLink === '/Discover' ? 'font-semibold border-b-1 border-light p-1' : ''}`}>
-                    <FaPersonWalking />
-                    <a href='/Discover'> Discover </a>
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <NavigationMenuLink>
-                      <div className="w-max p-9 bg-light">
-                        <ul className="text-dark text-md space-y-3">
-                          <a href='/activities'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Activities</li></a>
-                          <a href='/accommodations'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Accommodations</li></a>
-                          <a href='/foodplaces'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Food Places</li></a>
-                          <a href='/shops'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Shops</li></a>
-                        </ul>
-                      </div>
-                    </NavigationMenuLink>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-              </NavigationMenuList>
-            </NavigationMenu>
-
-            {isLoggedIn && (
-              <div
-                className={`cursor-pointer text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1 ${activeLink === '/trip' ? ' border-b-1 border-light p-1 font-semibold ' : ''}`}
-                onClick={() => setActiveLink('/trip')}
-              >
-                <TbNotes /> <a href='/trip'>Trip</a>
+      ) : (
+        <div className="flex justify-between items-center w-full container  mx-auto h-[4rem] p-4">
+          <a
+            className='flex items-center hover:scale-105 duration-500'
+            href='/'
+            onClick={() => handleLinkClick('/')}
+          >
+            <img className="lg:h-[3rem] max-h-[3rem] lg:w-[3rem] max-w-[3rem]" src={Logo} alt="Logo" />
+            <div className='text-white ml-2 text-lg font-mono '>RabaSorsogon</div>
+          </a>
+        
+          <div className="flex items-center gap-3 xl:hidden">
+            {isLoggedIn ? (
+              <Dropdown placement="bottom-end">
+                <DropdownTrigger>
+                  <div className="cursor-pointer ml-6">
+                    <Avatar
+                      className='text-lg bg-color1 text-white  duration-300'
+                      src={userData?.image_path
+                        ? `${BASE_URL}/${userData.image_path}`
+                        : userData?.google_id
+                          ? userData.image
+                          : `https://ui-avatars.com/api/?name=${firstLetter}`
+                      }
+                    />
+                  </div>
+                </DropdownTrigger>
+                <DropdownMenu>
+                  <DropdownItem key="profile">
+                    <Link to='/userprofile' className="block w-full text-left p-2">
+                      Profile
+                    </Link>
+                  </DropdownItem>
+                  <DropdownItem key="messages" onClick={openChatModal}>
+                    <div className='flex items-center gap-4 p-2'>
+                      Messages
+                      <Badge color='danger' placement='top-right' content='2' />
+                    </div>
+                  </DropdownItem>
+                  <DropdownItem key="Bookings">
+                    <Link to='/userprofile#myBookings' className="block w-full text-left p-2">Bookings</Link>
+                  </DropdownItem>
+                  <DropdownItem key="logout" onClick={handleLogout}>
+                    <div className="block w-full text-left p-2">Logout</div>
+                  </DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
+            ) : (
+              <div className="text-white hover:bg-color1 rounded-full cursor-pointer" onClick={onOpen}>
+                <FaRegCircleUser className="text-3xl" />
               </div>
             )}
 
-            <div
-              className={`cursor-pointer text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1 ${activeLink === '/transportation' ? ' border-b-1 border-light p-1 font-semibold ': ''}`}
-              onClick={() => setActiveLink('/transportation')}
-            >
-              <PiJeep /> <a href='/transportation'>Transportation</a>
-            </div>
-
-            <div  className={`cursor-pointer text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1 ${activeLink === '/about' ? 'border-b-1 border-light p-1 font-semibold ': ''}`}
-             onClick={() => setActiveLink('/about')}>
-              <CiSquareInfo /> <a href='/about'>About</a>
-            </div>
-
-         
+            <button onClick={toggleMenu} className=" text-2xl z-50 p-2">
+              {isMenuOpen ? <FaTimes /> : <FaBars className='text-white' />}
+            </button>
           </div>
-         
-         
 
-          {isLoggedIn ? (
-            <Dropdown className='bg-light' placement="bottom-end">
-              <DropdownTrigger>
-                <div className="cursor-pointer ml-6">
-                  <Avatar
-                    className='text-lg bg-color1 text-light hover:bg-color2/80 transition-colors duration-300'
-                    src={userData?.image_path
-                      ? `${BASE_URL}/${userData.image_path}`
-                      : userData?.google_id
-                        ? userData.image
-                        : `https://ui-avatars.com/api/?name=${firstLetter}`
-                    }
+          <div className="hidden xl:flex items-center gap-6">
+            <div className="flex space-x-8 items-center text-color1">
+            <div className="relative">
+                <input
+                  type="text"
+                  placeholder={`Search for ${activeTab}`}
+                  value={searchQuery}
+                  onFocus={openSearchOverlay}
+                  onChange={handleInputChange}
+                  className="border border-gray-300 rounded-full p-1 pl-8 text-sm shadow-md focus:outline-none focus:ring-2 focus:ring-color1 transition-all duration-300"
+                />
+                <FaSearch className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500" />
+                {searchQuery && (
+                  <FaTimes
+                    onClick={clearSearchField}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer"
                   />
+                )}
+              </div>
+              <div
+                className={`cursor-pointer text text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1 ${activeLink === '/' ? ' border-light border-b-1 p-1 font-semibold  ' : ''}`}
+                onClick={() => setActiveLink('/')}
+              >
+                <FaHome /> <a href='/'>Home</a>
+              </div>
+
+              <NavigationMenu className='z-50'>
+                <NavigationMenuList>
+                  <NavigationMenuItem>
+                    <NavigationMenuTrigger className={`cursor-pointer rounded-none text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1  ${activeLink === '/destinations' ? 'font-semibold border-b-1 border-light p-1' : ''}`}>
+                      <GiPositionMarker />
+                      <a href='/destinations'> Destinations</a>
+                    </NavigationMenuTrigger>
+                    <NavigationMenuContent>
+                      <NavigationMenuLink>
+                        <div className="p-9 w-max bg-light shadow-md">
+                          <ul className="space-y-2 text-dark text-md ">
+                            <Link to='/destinations?name=Barcelona'><li className=' py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Barcelona</li></Link>
+                            <Link to='/destinations?name=Bulan'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Bulan</li></Link>
+                            <Link to='/destinations?name=Bulusan'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Bulusan</li></Link>
+                            <Link to='/destinations?name=Casiguran'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Casiguran</li></Link>
+                            <Link to='/destinations?name=Castilla'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Castilla</li></Link>
+                            <Link to='/destinations?name=Donsol'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Donsol</li></Link>
+                            <Link to='/destinations?name=Gubat'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Gubat</li></Link>
+                            <Link to='/destinations?name=Irosin'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Irosin</li></Link>
+                            <Link to='/destinations?name=Juban'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Juban</li></Link>
+                            <Link to='/destinations?name=Magallanes'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Magallanes</li></Link>
+                            <Link to='/destinations?name=Matnog'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Matnog</li></Link>
+                            <Link to='/destinations?name=Pilar'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Pilar</li></Link>
+                            <Link to='/destinations?name=PrietoDiaz'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Prieto Diaz</li></Link>
+                            <Link to='/destinations?name=StaMagdalena'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Sta. Magdalena</li></Link>
+                            <Link to='/destinations?name=Sorsogon'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Sorsogon City</li></Link>
+                          </ul>
+                        </div>
+                      </NavigationMenuLink>
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
+                </NavigationMenuList>
+              </NavigationMenu>
+
+              <NavigationMenu className='z-40 '>
+                <NavigationMenuList>
+                  <NavigationMenuItem>
+                    <NavigationMenuTrigger className={`cursor-pointer rounded-none text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1  ${activeLink === '/Discover' ? 'font-semibold border-b-1 border-light p-1' : ''}`}>
+                      <FaPersonWalking />
+                      <a href='/Discover'> Discover </a>
+                    </NavigationMenuTrigger>
+                    <NavigationMenuContent>
+                      <NavigationMenuLink>
+                        <div className="w-max p-9 bg-light">
+                          <ul className="text-dark text-md space-y-3">
+                            <a href='/activities'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Activities</li></a>
+                            <a href='/accommodations'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Accommodations</li></a>
+                            <a href='/foodplaces'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Food Places</li></a>
+                            <a href='/shops'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Shops</li></a>
+                          </ul>
+                        </div>
+                      </NavigationMenuLink>
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
+                </NavigationMenuList>
+              </NavigationMenu>
+
+              {isLoggedIn && (
+                <div
+                  className={`cursor-pointer text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1 ${activeLink === '/trip' ? ' border-b-1 border-light p-1 font-semibold ' : ''}`}
+                  onClick={() => setActiveLink('/trip')}
+                >
+                  <TbNotes /> <a href='/trip'>Trip</a>
                 </div>
-              </DropdownTrigger>
-              <DropdownMenu  >
-                <DropdownItem key="profile">
-                  <Link to='/userprofile' className="block w-full text-left text-md p-1">
-                    Profile
-                  </Link>
-                </DropdownItem>
-                <DropdownItem key="messages" onClick={openChatModal}>
-                  <div className='flex items-center gap-4 text-md  p-1'>
-                    Messages
-                    <Badge color='danger' placement='top-right' content='2' />
-                  </div>
-                </DropdownItem>
-                <DropdownItem key="Bookings">
-                  <Link to='/userprofile#myBookings' className="block w-full text-left p-1">Bookings</Link>
-                </DropdownItem>
-                <DropdownItem key="logout" onClick={handleLogout}>
-                  <div className="block w-full text-left p-1">Logout</div>
-                </DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
-          ) : (
-            <div className="text-white cursor-pointer ml-6" onClick={onOpen}>
-              <FaRegCircleUser className="text-3xl hover:bg-color1 hover:text-light text-white duration-300 rounded-full" />
+              )}
+
+              <div
+                className={`cursor-pointer text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1 ${activeLink === '/transportation' ? ' border-b-1 border-light p-1 font-semibold ': ''}`}
+                onClick={() => setActiveLink('/transportation')}
+              >
+                <PiJeep /> <a href='/transportation'>Transportation</a>
+              </div>
+
+              <div  className={`cursor-pointer text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1 ${activeLink === '/about' ? 'border-b-1 border-light p-1 font-semibold ': ''}`}
+              onClick={() => setActiveLink('/about')}>
+                <CiSquareInfo /> <a href='/about'>About</a>
+              </div>
             </div>
-          )}
+            {isLoggedIn ? (
+              <Dropdown className='bg-light' placement="bottom-end">
+                <DropdownTrigger>
+                  <div className="cursor-pointer ml-6">
+                    <Avatar
+                      className='text-lg bg-color1 text-light hover:bg-color2/80 transition-colors duration-300'
+                      src={userData?.image_path
+                        ? `${BASE_URL}/${userData.image_path}`
+                        : userData?.google_id
+                          ? userData.image
+                          : `https://ui-avatars.com/api/?name=${firstLetter}`
+                      }
+                    />
+                  </div>
+                </DropdownTrigger>
+                <DropdownMenu  >
+                  <DropdownItem key="profile">
+                    <Link to='/userprofile' className="block w-full text-left text-md p-1">
+                      Profile
+                    </Link>
+                  </DropdownItem>
+                  <DropdownItem key="messages" onClick={openChatModal}>
+                    <div className='flex items-center gap-4 text-md  p-1'>
+                      Messages
+                      <Badge color='danger' placement='top-right' content='2' />
+                    </div>
+                  </DropdownItem>
+                  <DropdownItem key="Bookings">
+                    <Link to='/userprofile#myBookings' className="block w-full text-left p-1">Bookings</Link>
+                  </DropdownItem>
+                  <DropdownItem key="logout" onClick={handleLogout}>
+                    <div className="block w-full text-left p-1">Logout</div>
+                  </DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
+            ) : (
+              <div className="text-white cursor-pointer ml-6" onClick={onOpen}>
+                <FaRegCircleUser className="text-3xl hover:bg-color1 hover:text-light text-white duration-300 rounded-full" />
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Search Results Popup for Desktop */}
       {!isMobile && searchResults.length > 0 && (
@@ -632,6 +650,7 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
       </Modal>
 
       <UserChatModal isOpen={isChatModalOpen} onClose={closeChatModal} />
+      
     </div>
   );
 };

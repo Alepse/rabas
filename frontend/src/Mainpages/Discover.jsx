@@ -66,6 +66,7 @@ const Discover = () => {
     shop: []
   });
   const [loading, setLoading] = useState(true);
+  const [spinner, setSpinner] = useState(true);
   const [businesses, setBusinesses] = useState([]);
   const [activeTab, setActiveTab] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
@@ -381,8 +382,10 @@ const Discover = () => {
   const toggleFilters = () => {
     setShowFilters(!showFilters);
   };
+
   useEffect(() => {
-   
+    // Simulate data fetching
+    setTimeout(() => setSpinner(false), 250);
     // Show button when scrolled down
     const handleScroll = () => {
       if (window.scrollY > 300) {
@@ -441,9 +444,9 @@ const Discover = () => {
     );
   };
 
-  // if (loading) {
-  //   return <Spinner className='flex justify-center items-center h-screen' size='lg' label="Loading..." color="primary" />;
-  // }
+  if (spinner) {
+    return <Spinner className='flex justify-center items-center h-screen' size='lg' label="Loading..." color="primary" />;
+  }
 
   return (
     <div className="mx-auto bg-light min-h-screen font-sans" style={{ backgroundImage: `url(${wave})`, backgroundSize: 'auto', backgroundRepeat: 'repeat', backgroundPosition: 'center' }}>
