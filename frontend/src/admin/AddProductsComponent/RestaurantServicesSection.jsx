@@ -365,7 +365,7 @@ const RestaurantSection = () => {
           <div className='relative'>
             <Input
               placeholder='Search ...'
-              className='w-72 pl-10 placeholder:text-gray-400 placeholder:italic focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+              className='w-72 pl-10 placeholder:text-gray-400 placeholder:italic focus:ring-2 focus:ring-color2 focus:border-color2'
             />
             <FaSearch className='absolute top-2 left-3 text-gray-500' />
           </div>
@@ -506,25 +506,6 @@ const RestaurantSection = () => {
                   </Slider>
                 )}
                 
-                {/* Next and Previous buttons */}
-                {restaurant.images.length > 1 && (
-                  <>
-                    <button
-                      className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow"
-                      onClick={() => sliderRefs.current[restaurant.id].slickPrev()}
-                      aria-label="Previous image"
-                    >
-                      <FaChevronLeft />
-                    </button>
-                    <button
-                      className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow"
-                      onClick={() => sliderRefs.current[restaurant.id].slickNext()}
-                      aria-label="Next image"
-                    >
-                      <FaChevronRight />
-                    </button>
-                  </>
-                )}
                 </div>
               )}
             </div>
@@ -532,7 +513,7 @@ const RestaurantSection = () => {
       </div>
 
       {/* Modal for Adding/Editing Restaurant Services */}
-      <Modal isOpen={modalOpen} onOpenChange={setModalOpen} size="2xl">
+      <Modal scrollBehavior='inside' isOpen={modalOpen} onOpenChange={setModalOpen} size="2xl">
         <ModalContent>
           {() => (
             <>

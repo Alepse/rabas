@@ -152,7 +152,7 @@ const ReviewModal = ({ isOpen, onClose, product, isLoggedIn }) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} className="max-w-full md:max-w-2xl">
+    <Modal scrollBehavior='inside' isOpen={isOpen} onClose={handleClose} className="max-w-full md:max-w-2xl">
       <ModalContent className="p-4">
         <ModalHeader>
           <h2 className="text-xl font-semibold">Write a Review for {product.title}</h2>
@@ -249,9 +249,9 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn }) => {
   };
 
   return (
-    <Card variant="shadow" className="border-0 rounded-lg mb-4 overflow-hidden">
+    <Card variant="shadow" className=" rounded-lg mb-4 ">
       <CardBody className="flex flex-col">
-        <div className="relative w-full h-[250px] md:h-[300px]">
+        <div className="relative w-full h-[250px] md:h-[200px]">
           {product.images.length > 0 ?(
             <img
               src={
@@ -752,6 +752,7 @@ const BusinessAllproducts = () => {
         scrollBehavior="inside"
         size="5xl"
         className='max-h-[100%]'
+        
       >
         <ModalContent>
           {(onClose) => (

@@ -594,10 +594,10 @@ const Discover = () => {
                   return filteredItems.map((item, index) => (
                     <motion.div
                       key={index}
-                      className="bg-white rounded-lg shadow-lg p-2 hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between"
+                      className="bg-white rounded-lg shadow-lg p-2 hover:shadow-slate-500 hover:scale-105 h-[400px]  duration-300 flex flex-col justify-between"
                       variants={cardVariants}
                     >
-                      <div className="w-full h-56 md:h-64 bg-gray-200 rounded-t-lg overflow-hidden">
+                      <div className="w-full h-40 border bg-gray-200 mb-2 rounded-t-lg overflow-hidden">
                         {item.cardImage ? (
                           <img
                             src={item.cardImage ? `${BASE_URL}/${item.cardImage}` : `${BASE_URL}/${item.businessLogo}`}
@@ -609,29 +609,25 @@ const Discover = () => {
                             <span>No Image</span>
                           </div>
                         )}        
-                      </div>              
+                      </div>  
+
                       <div className="p-4 flex-grow">
                         <div className="flex justify-between  items-center mb-2">
                           {renderTags(item.category, filters.selectedType)}
                         </div>
-                        <h3 className="text-lg font-semibold text-gray-800">
-                          {item.businessName}
-                        </h3>
+                        <h3 className="text-lg sm:text-base lg:text-lg font-semibold text-gray-800 truncate">
+                         {item.businessName}
+                         </h3>
+
                         <div className="text-xs text-gray-500 mb-2 flex items-center">
                           <GiPositionMarker className="mr-1" />
                           {item.destination}
                         </div>
-                        <div className="flex mb-2 max-w-[500px] max-h-[5rem] overflow-y-auto scrollbar-custom flex-col">
-                          {item.description ? (
-                            <p className="text-sm text-gray-600 mb-2">
-                              {item.description}
-                            </p>
-                          ) : (
-                            <p className="text-sm text-gray-400 italic mb-2">
-                              No description
-                            </p>
-                          )}
-                        </div>
+                        
+                      
+                      </div>
+
+                      <div className=' flex justify-between p-2'>
                         <div className="flex justify-between items-center mb-2">
                           <div className="flex items-center gap-1">
                             {item.rating ? (
@@ -653,11 +649,11 @@ const Discover = () => {
                             {item.lowest_price && item.highest_price ? (
                               `₱${item.lowest_price} - ₱${item.highest_price}`
                             ) : (
-                              <span className="text-gray-400 italic">Price Range Not available</span>
+                              <span className="text-gray-400 italic text-[12px]">Price Range Not available</span>
                             )}
                           </p>
                         </div>
-                      </div>
+                        </div>
                       <Link to={`/business/${encryptId(item.business_id)}`}>
                         <Button className="w-full bg-color1 text-color3 rounded-md hover:bg-color2">
                           Explore More

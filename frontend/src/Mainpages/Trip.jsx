@@ -547,7 +547,7 @@ const Trip = () => {
       {isDetailsOpen && selectedTrip && (
           <TripDetailsModal
               isOpen={isDetailsOpen}
-              onClose={() => setIsDetailsOpen(true)}
+              onClose={() => setIsDetailsOpen(false)}
               trip={selectedTrip}
               onUpdateTrip={updateTripDetails}
               itinerary={itinerary}

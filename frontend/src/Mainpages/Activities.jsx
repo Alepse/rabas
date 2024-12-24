@@ -312,113 +312,130 @@ const Activities = () => {
               </div>
             </div>
           )}
-
-          {/* Activity List */}
-          <div className='w-full'>
-            <motion.div 
-              className='grid grid-cols-1 gap-6 overflow-y-auto max-h-[1000px] scrollbar-custom  p-2'
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              {loading ? (
-                Array.from({ length: 2 }).map((_, index) => {
-                  const opacity = 1 - index * 0.25;
-                  return (
-                    <SwiperSlide key={index} className='flex justify-center' style={{ opacity }}>
-                      <div className="bg-white rounded-lg shadow-lg duration-300 flex flex-col justify-between w-full mx-auto h-full p-2 relative gap-2">
-                        <Skeleton className="w-full h-48 rounded-t-lg" />
-                        <div className="flex-grow flex flex-col justify-between mt-4 px-2">
-                          <div className="p-2">
-                            <Skeleton className="h-3 mb-4" />
-                            <Skeleton className="h-6 mb-4" />
-                            <Skeleton className="h-4 mb-4" />
-                            <Skeleton className="h-5 mb-3" /> 
-                            <Skeleton className="h-10" />
-                          </div>
-                        </div>
-                      </div>
-                    </SwiperSlide>
-                  );
-                })
+{/* Activity List */}
+<div className="w-full lg:w-3/4 max-h-[1300px] overflow-y-auto scrollbar-custom p-2">
+  <motion.div
+    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+    variants={containerVariants}
+    initial="hidden"
+    animate="visible"
+  >
+    {loading ? (
+      Array.from({ length: 2 }).map((_, index) => {
+        const opacity = 1 - index * 0.25;
+        return (
+          <SwiperSlide key={index} className="flex justify-center" style={{ opacity }}>
+            <div className="bg-white rounded-lg shadow-lg duration-300 flex flex-col justify-between w-full mx-auto h-[400px] p-2 relative gap-2">
+              <Skeleton className="w-full h-56 rounded-t-lg" />
+              <div className="flex-grow flex flex-col justify-between mt-4 px-2">
+                <div className="p-2">
+                  <Skeleton className="h-3 mb-4" />
+                  <Skeleton className="h-6 mb-4" />
+                  <Skeleton className="h-4 mb-4" />
+                  <Skeleton className="h-5 mb-3" />
+                  <Skeleton className="h-10" />
+                </div>
+              </div>
+            </div>
+          </SwiperSlide>
+        );
+      })
+    ) : (
+      filteredActivities.length > 0 ? (
+        filteredActivities.map((activity, index) => (
+          <motion.div
+            key={index}
+            className="bg-white rounded-lg shadow-lg p-2 hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between w-full mx-auto h-[400px]"
+            variants={cardVariants}
+          >
+            {/* Card Image */}
+            <div className="w-full h-48 border bg-gray-200 rounded-t-lg overflow-hidden">
+              {activity.businessLogo ? (
+                <img
+                  src={`${BASE_URL}/${activity.businessLogo}`}
+                  alt={activity.businessName}
+                  className="w-full h-full  object-cover" // Ensure the image covers the entire area
+                />
               ) : (
-                filteredActivities.length > 0 ? (
-                  filteredActivities.map((activity, index) => (
-                    <motion.div
-                      key={index}
-                      className='bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300'
-                      variants={cardVariants}
-                    >
-                      <img
-                        src={`${BASE_URL}/${activity.businessLogo}`}
-                        alt={activity.businessName}
-                        className='w-full h-48 object-cover rounded-t-lg'
-                      />
-                      <div className='p-4'>
-                        <div className='flex items-center justify-between gap-2'>
-                        {/* tags */}
-                        <div className='flex flex-wrap gap-2 mb-2'>
-                          {activity.category.map((cat, index) => (
-                            <span 
-                              key={index} 
-                              className={`text-xs px-2 py-1 rounded-full ${selectedActivities.map(a => a.toLowerCase()).includes(cat.toLowerCase().replace(/s$/, '')) ? 'bg-color2 text-white' : 'bg-gray-200 text-gray-700'}`}
-                            >
-                              {cat}
-                            </span>
-                          ))}
-                        </div>
-                        <div className='flex items-center gap-2'>
-                          <div className='flex items-center gap-1 '>
-                            {activity.rating ? (
-                              <>
-                                <span className='text-black text-[12px] '>{activity.rating}</span> 
-                                <span className='text-yellow-500'>
-                                  {'★'.repeat(Math.floor(activity.rating))}
-                                  {'☆'.repeat(5 - Math.floor(activity.rating))}
-                                </span>
-                              </>
-                            ) : (
-                              <span className="text-gray-500 text-[12px]">No ratings</span>
-                            )}
-                          </div>
-                        </div>
-                        </div>
-                        <h3 className='font-semibold text-lg text-color1'>{activity.businessName}</h3>
-                        <div className='text-xs text-gray-500 mb-2 flex items-center'>
-                          <GiPositionMarker/> {activity.destination}
-                        </div>
-                        
-                        <div className='flex mb-2 max-w-[500px] max-h-[5rem] overflow-y-auto scrollbar-custom flex-col'>      
-                          {activity.description ? (
-                            <p className='text-sm text-gray-600 mb-2'>{activity.description}</p>
-                          ) : (
-                            <p className='text-sm text-gray-400 italic mb-2'>No description</p>
-                          )}
-                        </div>
-                        
-                        <p className='font-semibold text-md mb-2'>
-                          {activity.lowest_price && activity.highest_price ? (
-                            `₱${activity.lowest_price} - ₱${activity.highest_price}`
-                          ) : (
-                            <span className="text-gray-400 italic">Price Range Not available</span>
-                          )}
-                        </p>
-                        <Link to={`/business/${encryptId(activity.business_id)}`} target='_blank'>
-                          <Button 
-                            className='w-full bg-color1 text-color3 hover:bg-color2'
-                          >
-                            Explore More
-                          </Button>
-                        </Link>
-                      </div>
-                    </motion.div>
-                  ))
-                ) : (
-                  <p className='col-span-full text-center text-gray-500'>No activities match your selected filters.</p>
-                )
+                <div className="w-full h-full flex items-center justify-center">
+                  <span>No Image</span>
+                </div>
               )}
-            </motion.div>
-          </div>
+            </div>
+
+            {/* Card Content */}
+            <div className="p-4 flex-grow">
+              {/* Tags */}
+              <div className="flex flex-wrap gap-2 mb-2">
+                {activity.category.map((cat, index) => (
+                  <span
+                    key={index}
+                    className={`text-xs px-2 py-1 rounded-full ${
+                      selectedActivities
+                        .map((a) => a.toLowerCase())
+                        .includes(cat.toLowerCase().replace(/s$/, ''))
+                        ? 'bg-color2 text-white'
+                        : 'bg-gray-200 text-gray-700'
+                    }`}
+                  >
+                    {cat}
+                  </span>
+                ))}
+              </div>
+
+              {/* Business Name */}
+              <h3 className="text-lg sm:text-base lg:text-lg font-semibold text-gray-800 truncate">
+                         {activity.businessName}
+                         </h3>
+
+              {/* Location */}
+              <div className="text-xs text-gray-500 mb-2 flex items-center">
+                <GiPositionMarker /> {activity.destination}
+              </div>
+
+            </div>
+            
+              {/* Ratings & Price */}
+              <div className="flex justify-between items-center p-2 mb-2 gap-2">
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
+                    {activity.rating ? (
+                      <>
+                        <span className="text-black text-[12px]">{activity.rating}</span>
+                        <span className="text-yellow-500">
+                          {'★'.repeat(Math.floor(activity.rating))}
+                          {'☆'.repeat(5 - Math.floor(activity.rating))}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-gray-500 text-[12px]">No ratings</span>
+                    )}
+                  </div>
+                </div>
+
+                <p className="font-semibold text-md">
+                  {activity.lowest_price && activity.highest_price ? (
+                    `₱${activity.lowest_price} - ₱${activity.highest_price}`
+                  ) : (
+                    <span className="text-gray-400 italic text-[12px]">Price Range Not available</span>
+                  )}
+                </p>
+              </div>
+            {/* Explore More Button */}
+            <Link to={`/business/${encryptId(activity.business_id)}`} target="_blank">
+              <Button className="w-full rounded-md bg-color1 text-color3 hover:bg-color2">
+                Explore More
+              </Button>
+            </Link>
+          </motion.div>
+        ))
+      ) : (
+        <p className="col-span-full text-center text-gray-500">No activities match your selected filters.</p>
+      )
+    )}
+  </motion.div>
+</div>
+
         </div>
       </div>
 

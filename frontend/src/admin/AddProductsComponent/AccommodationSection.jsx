@@ -506,25 +506,7 @@ const AccommodationSection = () => {
                   </Slider>
                 )}
                 
-                {/* Next and Previous buttons */}
-                {accommodation.images.length > 1 && (
-                  <>
-                    <button
-                      className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow"
-                      onClick={() => sliderRefs.current[accommodation.id].slickPrev()}
-                      aria-label="Previous image"
-                    >
-                      <FaChevronLeft />
-                    </button>
-                    <button
-                      className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow"
-                      onClick={() => sliderRefs.current[accommodation.id].slickNext()}
-                      aria-label="Next image"
-                    >
-                      <FaChevronRight />
-                    </button>
-                  </>
-                )}
+           
               </div>
             )}
             </div>
@@ -532,7 +514,7 @@ const AccommodationSection = () => {
       </div>
 
       {/* Modal for Adding/Editing Accommodations */}
-      <Modal isOpen={modalOpen} onOpenChange={setModalOpen} size="2xl">
+      <Modal scrollBehavior='inside' isOpen={modalOpen} onOpenChange={setModalOpen} size="2xl">
         <ModalContent>
           {() => (
             <>

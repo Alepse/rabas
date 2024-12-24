@@ -35,7 +35,8 @@ export default function PlanTripSection() {
             icon: 'warning',
             title: 'Not Logged In',
             text: 'You need to log in to access this page.',
-            confirmButtonText: 'OK'
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#0BDA51'
           });
           return false; // Not logged in
         }
