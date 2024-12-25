@@ -5,22 +5,43 @@ import ActivitySections from './AddProductsComponent/ActivitySections';
 import AccommodationSection from './AddProductsComponent/AccommodationSection';
 import RestaurantServicesSection from './AddProductsComponent/RestaurantServicesSection';
 import ShopSections from './AddProductsComponent/ShopSections';
+import axios from 'axios';
+import Swal from 'sweetalert2';
+
 // Use the environment variable for the base URL
-const BASE_URL = import.meta.env.VITE_BASE_URL; 
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const BusinessProducts = () => {
   const [showActivities, setShowActivities] = useState(false);
-  const [showAccommodation, setShowAccommodation] = useState(true);
+  const [showAccommodation, setShowAccommodation] = useState(false);
   const [showRestaurantServices, setShowRestaurantServices] = useState(false);
   const [showShop, setShowShop] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [businessType, setBusinessType] = useState(null);
+
+  // Function to show admin request popup
+  const showRequestPopup = (dealType) => {
+    Swal.fire({
+      title: 'Request Access',
+      text: `You need admin approval to enable ${dealType} deals.`,
+      icon: 'info',
+      showCancelButton: true,
+      confirmButtonText: 'Request Approval',
+      cancelButtonText: 'Cancel',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Handle request approval logic here
+        Swal.fire('Request Sent', 'Your request has been sent to the admin.', 'success');
+      }
+    });
+  };
 
   // Function to check login status
   const checkLoginStatus = useCallback(async () => {
     try {
       const response = await fetch(`${BASE_URL}/check-login`, {
         method: 'GET',
-        credentials: 'include' // Include cookies
+        credentials: 'include', // Include cookies
       });
       if (response.ok) {
         const data = await response.json();
@@ -36,16 +57,43 @@ const BusinessProducts = () => {
       console.error('Error checking login status:', error);
     }
   }, []);
-  
+
   useEffect(() => {
     checkLoginStatus();
   }, [checkLoginStatus]);
 
-    // Title Tab
-    useEffect(() => {
-      document.title = 'BusinessName | Admin products';
-    });
+  useEffect(() => {
+    const fetchBusinessType = async () => {
+      if (isLoggedIn) {
+        try {
+          const response = await axios.get(`${BASE_URL}/get-businessData`, {
+            withCredentials: true,
+          });
+          if (response.status === 200 && response.data) {
+            const type = response.data.businessData[0].businessType; // Adjust based on API structure
+            setBusinessType(type);
 
+            // Enable the corresponding deal section based on businessType
+            setShowActivities(type === 'attraction');
+            setShowAccommodation(type === 'accommodation');
+            setShowRestaurantServices(type === 'restaurant');
+            setShowShop(type === 'shop');
+          }
+        } catch (error) {
+          console.error('Error fetching business data:', error);
+        }
+      }
+    };
+
+    fetchBusinessType();
+  }, [isLoggedIn]);
+
+  // Title Tab
+  useEffect(() => {
+    document.title = 'BusinessName | Admin products';
+  });
+
+  const isBusinessType = (type) => businessType === type.toLowerCase();
 
   return (
     <div className="flex flex-col lg:flex-row bg-light font-sans min-h-screen">
@@ -59,56 +107,69 @@ const BusinessProducts = () => {
           <h1 className="text-2xl md:text-3xl font-semibold text-gray-800 mb-4 md:mb-0">
             Manage Products and Services
           </h1>
-         
         </div>
 
         {/* Sections Toggle */}
         <div className="mb-6">
           <h2 className="text-md font-semibold text-gray-700 mb-4">Switch on Sections to Add Products and Services:</h2>
-          <div className='flex flex-col sm:flex-row gap-4'>
+          <div className="flex flex-col sm:flex-row gap-4">
             <Switch
-              color='success'
+              color="success"
               isSelected={showActivities}
-              onChange={(e) => setShowActivities(e.target.checked)}
+              onChange={(e) =>
+                businessType === 'attraction'
+                  ? setShowActivities(e.target.checked)
+                  : showRequestPopup('Activity')
+              }
             >
-              <span className='font-semibold text-md'>Activities</span>
+              <span className="font-semibold text-md">Activities</span>
             </Switch>
 
             <Switch
               color='success'
               isSelected={showAccommodation}
-              onChange={(e) => setShowAccommodation(e.target.checked)}
+              onChange={(e) =>
+                businessType === 'accommodation'
+                  ? setShowAccommodation(e.target.checked)
+                  : showRequestPopup('Accommodation')
+              }
             >
-              <span className='font-semibold text-md'>Accommodation</span>
+              <span className="font-semibold text-md">Accommodation</span>
             </Switch>
 
             <Switch
               color='success'
               isSelected={showRestaurantServices}
-              onChange={(e) => setShowRestaurantServices(e.target.checked)}
+              onChange={(e) =>
+                businessType === 'restaurant'
+                  ? setShowRestaurantServices(e.target.checked)
+                  : showRequestPopup('Restaurant')
+              }
             >
-              <span className='font-semibold text-md'>Restaurant Services</span>
+              <span className="font-semibold text-md">Restaurant Services</span>
             </Switch>
 
             <Switch
               color='success'
               isSelected={showShop}
-              onChange={(e) => setShowShop(e.target.checked)}
+              onChange={(e) =>
+                businessType === 'shop'
+                  ? setShowShop(e.target.checked)
+                  : showRequestPopup('Shop')
+              }
             >
-              <span className='font-semibold text-md'>Shop</span>
+              <span className="font-semibold text-md">Shop</span>
             </Switch>
           </div>
         </div>
 
         {/* Sections of business products and services */}
-        <div className='w-full flex flex-wrap gap-6'>
-          {/* Conditionally render sections based on toggles */}
+        <div className="w-full flex flex-wrap gap-6">
           {showActivities && <ActivitySections />}
           {showAccommodation && <AccommodationSection />}
           {showRestaurantServices && <RestaurantServicesSection />}
           {showShop && <ShopSections />}
         </div>
-
       </div>
     </div>
   );

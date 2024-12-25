@@ -5,8 +5,11 @@ import ActivityDeals from '@/admin/AddDealsComponent/ActivityDeals';
 import AccommodationDeals from '@/admin/AddDealsComponent/AccomodationDeals';
 import RestaurantDeals from '@/admin/AddDealsComponent/RestaurantDeals';
 import ShopDeals from '@/admin/AddDealsComponent/ShopDeals';
+import axios from 'axios';
+import Swal from 'sweetalert2';
+
 // Use the environment variable for the base URL
-const BASE_URL = import.meta.env.VITE_BASE_URL; 
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const BusinessDeals = () => {
   const [showActivities, setShowActivities] = useState(false);
@@ -14,13 +17,31 @@ const BusinessDeals = () => {
   const [showRestaurantServices, setShowRestaurantServices] = useState(false);
   const [showShop, setShowShop] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [businessType, setBusinessType] = useState(null);
+
+  // Function to show admin request popup
+  const showRequestPopup = (dealType) => {
+    Swal.fire({
+      title: 'Request Access',
+      text: `You need admin approval to enable ${dealType} deals.`,
+      icon: 'info',
+      showCancelButton: true,
+      confirmButtonText: 'Request Approval',
+      cancelButtonText: 'Cancel',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Handle request approval logic here
+        Swal.fire('Request Sent', 'Your request has been sent to the admin.', 'success');
+      }
+    });
+  };
 
   // Function to check login status
   const checkLoginStatus = useCallback(async () => {
     try {
       const response = await fetch(`${BASE_URL}/check-login`, {
         method: 'GET',
-        credentials: 'include' // Include cookies
+        credentials: 'include', // Include cookies
       });
       if (response.ok) {
         const data = await response.json();
@@ -36,11 +57,37 @@ const BusinessDeals = () => {
       console.error('Error checking login status:', error);
     }
   }, []);
-  
+
   useEffect(() => {
     checkLoginStatus();
   }, [checkLoginStatus]);
-  
+
+  useEffect(() => {
+    const fetchBusinessType = async () => {
+      if (isLoggedIn) {
+        try {
+          const response = await axios.get(`${BASE_URL}/get-businessData`, {
+            withCredentials: true,
+          });
+          if (response.status === 200 && response.data) {
+            const type = response.data.businessData[0].businessType; // Adjust based on API structure
+            setBusinessType(type);
+
+            // Enable the corresponding deal section based on businessType
+            setShowActivities(type === 'attraction');
+            setShowAccommodation(type === 'accommodation');
+            setShowRestaurantServices(type === 'restaurant');
+            setShowShop(type === 'shop');
+          }
+        } catch (error) {
+          console.error('Error fetching business data:', error);
+        }
+      }
+    };
+
+    fetchBusinessType();
+  }, [isLoggedIn]);
+
   // Title Tab
   useEffect(() => {
     document.title = 'BusinessName | Admin deals';
@@ -68,7 +115,11 @@ const BusinessDeals = () => {
             <Switch
               color="success"
               isSelected={showActivities}
-              onChange={(e) => setShowActivities(e.target.checked)}
+              onChange={(e) =>
+                businessType === 'attraction'
+                  ? setShowActivities(e.target.checked)
+                  : showRequestPopup('Activity')
+              }
             >
               <span className="font-semibold text-md">Activity Deals</span>
             </Switch>
@@ -77,7 +128,11 @@ const BusinessDeals = () => {
             <Switch
               color="success"
               isSelected={showAccommodation}
-              onChange={(e) => setShowAccommodation(e.target.checked)}
+              onChange={(e) =>
+                businessType === 'accommodation'
+                  ? setShowAccommodation(e.target.checked)
+                  : showRequestPopup('Accommodation')
+              }
             >
               <span className="font-semibold text-md">Accommodation Deals</span>
             </Switch>
@@ -86,7 +141,11 @@ const BusinessDeals = () => {
             <Switch
               color="success"
               isSelected={showRestaurantServices}
-              onChange={(e) => setShowRestaurantServices(e.target.checked)}
+              onChange={(e) =>
+                businessType === 'restaurant'
+                  ? setShowRestaurantServices(e.target.checked)
+                  : showRequestPopup('Restaurant')
+              }
             >
               <span className="font-semibold text-md">Restaurant Deals</span>
             </Switch>
@@ -95,7 +154,11 @@ const BusinessDeals = () => {
             <Switch
               color="success"
               isSelected={showShop}
-              onChange={(e) => setShowShop(e.target.checked)}
+              onChange={(e) =>
+                businessType === 'shop'
+                  ? setShowShop(e.target.checked)
+                  : showRequestPopup('Shop')
+              }
             >
               <span className="font-semibold text-md">Shop Deals</span>
             </Switch>
@@ -103,7 +166,7 @@ const BusinessDeals = () => {
         </div>
 
         {/* Deals of business products and services */}
-        <div className="w-full flex flex-wrap gap-6 ">
+        <div className="w-full flex flex-wrap gap-6">
           {/* Conditionally render deal components based on toggle states */}
           {showActivities && <ActivityDeals />}
           {showAccommodation && <AccommodationDeals />}
