@@ -28,29 +28,105 @@ const ShopSections = () => {
   const products = useSelector((state) => state.shop.shopProducts);
   const status = useSelector((state) => state.shop.status);
   const error = useSelector((state) => state.shop.error);
+  const [errorText, setErrorText] = useState(""); // State for validation messages
+  const [errorTextTerms, setErrorTextTerms] = useState("");
+  const [errorTextInclusions, setErrorTextInclusions] = useState("");
   const sliderRefs = useRef({});
 
   const [options, setOptions] = useState([
-    { value: "none", label: "None" }, // Default option
+    { value: 'souvenir', label: 'Souver' },
+    { value: 'clothing', label: 'Clothing' },
+    { value: 'grocery', label: 'Grocery' },
+    { value: 'elctronics', label: 'Electronic' },
+    { value: 'book', label: 'Book' },
+    { value: 'custom', label: 'Custom' },
   ]);
   const [newOption, setNewOption] = useState("");
 
-  const handleAddOption = () => {
-    if (newOption.trim() && !options.some((opt) => opt.label === newOption)) {
-      setOptions([...options, { value: newOption.toLowerCase(), label: newOption }]);
-      setNewOption(""); // Clear input after adding
+  // Sync restaurant with options and remove duplicates
+  useEffect(() => {
+  
+    // Normalize product types to lowercase and remove duplicates
+    const productTypes = products
+      .map((acc) => acc.productType?.toLowerCase())
+      .filter((type, index, self) => type && self.indexOf(type) === index);
+  
+    // Filter types not already in options
+    const newOptions = productTypes
+      .filter((type) => !options.some((option) => option.value === type))
+      .map((type) => ({ value: type, label: type.charAt(0).toUpperCase() + type.slice(1) }));
+  
+    // Add new options to the state if any
+    if (newOptions.length > 0) {
+      setOptions((prevOptions) => {
+        // Filter to avoid duplicates in the combined options list
+        const updatedOptions = [
+          ...prevOptions,
+          ...newOptions.filter(
+            (newOption) =>
+              !prevOptions.some(
+                (existingOption) =>
+                  existingOption.value.toLowerCase() === newOption.value.toLowerCase()
+              )
+          ),
+        ];
+  
+        // Ensure 'custom' is always the last option
+        const customOption = updatedOptions.find(option => option.value === 'custom');
+        const optionsWithoutCustom = updatedOptions.filter(option => option.value !== 'custom');
+        const finalOptions = [...optionsWithoutCustom, customOption];
+  
+        return finalOptions;
+      });
     }
-  };
+  }, [products, options]);
+
+  const handleAddOption = () => {
+    const normalizedOption = newOption.trim().toLowerCase();
+  
+    if (!newOption.trim()) {
+      setErrorText("Please enter a valid option."); // Show error for empty input
+      return;
+    }
+  
+    // Prevent adding duplicate options
+    if (options.some((opt) => opt.value === normalizedOption)) {
+      setErrorText(`The option "${newOption.trim()}" already exists.`); // Show error for duplicate
+      return;
+    }
+  
+    // If the selected type is 'custom', update the label of the 'custom' option
+    if (productType === "custom") {
+      const newOptionObj = { value: normalizedOption, label: newOption.trim() };
+  
+      // Add the new option to the list of options
+      setOptions((prevOptions) => {
+        const updatedOptions = [
+          ...prevOptions,
+          newOptionObj,
+        ];
+  
+        // Ensure 'custom' is always the last option
+        const customOption = updatedOptions.find(option => option.value === 'custom');
+        const optionsWithoutCustom = updatedOptions.filter(option => option.value !== 'custom');
+        const finalOptions = [...optionsWithoutCustom, customOption];
+  
+        return finalOptions;
+      });
+  
+      // Set the productType to the new custom option
+      setProductType(normalizedOption); // Set the selected custom type as the product type
+    }
+  
+    setNewOption(""); // Clear input after adding
+    setErrorText(""); // Clear error after successful addition
+  };  
 
 
   useEffect(() => {
     // console.log('Fetching business products...');
     dispatch(fetchBusinessProducts());
   }, [dispatch]);
-
-  // useEffect(() => {
-    // console.log('Products from Redux state:', shopProducts);
-  // }, [shopProducts]);
 
   if (status === 'loading') {
     return <div>Loading shop products...</div>;
@@ -425,7 +501,17 @@ const ShopSections = () => {
       </div>
 
       {/* Modal for Adding/Editing Products */}
-      <Modal scrollBehavior='inside' isOpen={modalOpen} onOpenChange={setModalOpen} size="2xl">
+      <Modal
+        scrollBehavior="inside"
+        isOpen={modalOpen}
+        onOpenChange={(open) => {
+          setModalOpen(open);
+          if (!open) {
+            resetForm(); // Reset state when modal is closed
+          }
+        }}
+        size="2xl"
+      >
         <ModalContent>
           {() => (
             <>
@@ -437,44 +523,59 @@ const ShopSections = () => {
                 <form className="space-y-4" onSubmit={handleSubmit}>
                   {/* Type */}
                   <div className="flex items-start gap-4 max-w-3xl mx-auto">
-                  {/* Add New Option */}
-                  <div className="flex flex-col flex-1">
-                    <Input
-                      clearable
-                      bordered
-                      fullWidth
-                      label="Add New Item"
-                      placeholder="Type new item"
-                      value={newOption}
-                      onChange={(e) => setNewOption(e.target.value)}
-                    />
-                    <Button
-                      auto
-                      icon={<FaPlus />}
-                      onClick={handleAddOption}
-                      color="primary"
-                      className="mt-2"
-                    >
-                      Add Item
-                    </Button>
-                  </div>
+                    {/* Dropdown Select */}
+                    <div className="flex-1 mb-4">
+                      <Select
+                        label="Select product Type"
+                        placeholder={productType ? productType : "Select or add an item"}
+                        selectedKey={productType} // Use selectedKey to reflect the selected value
+                        onSelectionChange={(key) => {
+                          const selectedKey = key instanceof Set ? Array.from(key)[0] : key;
+                          const selectedOption = options.find(option => option.value === selectedKey);
+                          console.log("Selected Key:", selectedKey); // Log the selected key
+                          if (selectedOption) {
+                            setProductType(selectedOption.value); // Set only the value
+                          }
+                        }}
+                      >
+                        {options.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </Select>
 
-                  {/* Dropdown Select */}
-                  <div className="flex-1">
-                    <Select
-                      label="Select Activity Type"
-                      placeholder="Select or add an item"
-                      defaultSelectedKey="none" // Default value as "none"
-                      onSelectionChange={(key) => console.log(`Selected: ${key}`)}
-                    >
-                      {options.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </Select>
+                      {/* Add Custom Type */}
+                      {productType === 'custom' && (
+                        <div className="flex flex-col mt-4">
+                          <Input
+                            clearable
+                            bordered
+                            fullWidth
+                            placeholder="Enter custom type (default value is custom)"
+                            value={newOption}
+                            onChange={(e) => {
+                              setNewOption(e.target.value);
+                              setErrorText(''); // Clear error when the user starts typing
+                            }}
+                          />
+
+                          {errorText && (
+                            <div className="text-red-500 text-sm mt-1">{errorText}</div> // Display error message
+                          )}
+                          <Button
+                            auto
+                            icon={<FaPlus />}
+                            onClick={handleAddOption}
+                            color="primary"
+                            className="mt-2"
+                          >
+                            Add Item
+                          </Button>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
 
                   {/* Product Name */}
                   <div className="mb-4">

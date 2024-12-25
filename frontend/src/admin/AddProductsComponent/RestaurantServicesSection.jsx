@@ -35,29 +35,102 @@ const RestaurantSection = () => {
   const restaurants = useSelector((state) => state.restaurantServices.restaurants);
   const status = useSelector((state) => state.restaurantServices.status);
   const error = useSelector((state) => state.restaurantServices.error);
+  const [errorText, setErrorText] = useState(""); // State for validation messages
+  const [errorTextTerms, setErrorTextTerms] = useState("");
+  const [errorTextInclusions, setErrorTextInclusions] = useState("");
   const sliderRefs = useRef({});
 
   const [options, setOptions] = useState([
-    { value: "none", label: "None" }, // Default option
+    { value: 'restaurant', label: 'Restaurant' },
+    { value: 'bar', label: 'Bar' },
+    { value: 'cafe', label: 'Cafe' },
+    { value: 'custom', label: 'Custom' },
   ]);
   const [newOption, setNewOption] = useState("");
 
-  const handleAddOption = () => {
-    if (newOption.trim() && !options.some((opt) => opt.label === newOption)) {
-      setOptions([...options, { value: newOption.toLowerCase(), label: newOption }]);
-      setNewOption(""); // Clear input after adding
+  // Sync restaurants with options and remove duplicates
+  useEffect(() => {
+  
+    // Normalize restaurant types to lowercase and remove duplicates
+    const resturantTypes = restaurants
+      .map((acc) => acc.restaurantType?.toLowerCase())
+      .filter((type, index, self) => type && self.indexOf(type) === index);
+  
+    // Filter types not already in options
+    const newOptions = resturantTypes
+      .filter((type) => !options.some((option) => option.value === type))
+      .map((type) => ({ value: type, label: type.charAt(0).toUpperCase() + type.slice(1) }));
+  
+    // Add new options to the state if any
+    if (newOptions.length > 0) {
+      setOptions((prevOptions) => {
+        // Filter to avoid duplicates in the combined options list
+        const updatedOptions = [
+          ...prevOptions,
+          ...newOptions.filter(
+            (newOption) =>
+              !prevOptions.some(
+                (existingOption) =>
+                  existingOption.value.toLowerCase() === newOption.value.toLowerCase()
+              )
+          ),
+        ];
+  
+        // Ensure 'custom' is always the last option
+        const customOption = updatedOptions.find(option => option.value === 'custom');
+        const optionsWithoutCustom = updatedOptions.filter(option => option.value !== 'custom');
+        const finalOptions = [...optionsWithoutCustom, customOption];
+  
+        return finalOptions;
+      });
     }
-  };
+  }, [restaurants, options]);
 
+  const handleAddOption = () => {
+    const normalizedOption = newOption.trim().toLowerCase();
+  
+    if (!newOption.trim()) {
+      setErrorText("Please enter a valid option."); // Show error for empty input
+      return;
+    }
+  
+    // Prevent adding duplicate options
+    if (options.some((opt) => opt.value === normalizedOption)) {
+      setErrorText(`The option "${newOption.trim()}" already exists.`); // Show error for duplicate
+      return;
+    }
+  
+    // If the selected type is 'custom', update the label of the 'custom' option
+    if (restaurantType === "custom") {
+      const newOptionObj = { value: normalizedOption, label: newOption.trim() };
+  
+      // Add the new option to the list of options
+      setOptions((prevOptions) => {
+        const updatedOptions = [
+          ...prevOptions,
+          newOptionObj,
+        ];
+  
+        // Ensure 'custom' is always the last option
+        const customOption = updatedOptions.find(option => option.value === 'custom');
+        const optionsWithoutCustom = updatedOptions.filter(option => option.value !== 'custom');
+        const finalOptions = [...optionsWithoutCustom, customOption];
+  
+        return finalOptions;
+      });
+  
+      // Set the restaurantType to the new custom option
+      setRestaurantType(normalizedOption); // Set the selected custom type as the restaurant type
+    }
+  
+    setNewOption(""); // Clear input after adding
+    setErrorText(""); // Clear error after successful addition
+  };  
 
   useEffect(() => {
     // console.log('Fetching business products...');
     dispatch(fetchBusinessProducts());
   }, [dispatch]);
-
-  // useEffect(() => {
-    // console.log('Restaurants from Redux state:', restaurants);
-  // }, [restaurants]);
 
   if (status === 'loading') {
     return <div>Loading restaurants...</div>;
@@ -69,18 +142,26 @@ const RestaurantSection = () => {
 
   // Handlers for Inclusions
   const handleAddInclusion = () => {
-    if (typeof inclusions === 'string' && inclusions.trim()) {
-      // Create a new inclusion object
-      const newInclusion = {
-        id: Date.now(), // or generate a unique ID as appropriate
-        item: inclusions.trim()
-      };
-      // Add the new inclusion to the inclusion list
-      setInclusionList([...inclusionList, newInclusion]);
-      // Clear the input
-      setInclusions('');
+    const inclusion = inclusions.trim();
+    
+    if (!inclusion) {
+      setErrorTextInclusions("Please enter a valid inclusion.");
+      return;
     }
-  };
+  
+    if (inclusionList.some((i) => i.item === inclusion)) {
+      setErrorTextInclusions("This inclusion already exists.");
+      return;
+    }
+  
+    // Add the new inclusion to the inclusion list
+    const newInclusion = { id: Date.now(), item: inclusion };
+    setInclusionList([...inclusionList, newInclusion]);
+  
+    // Clear the input and error text
+    setInclusions("");
+    setErrorTextInclusions("");
+  };  
 
   const handleRemoveInclusion = (id) => {
     const updatedInclusionList = inclusionList.filter((inclusion) => inclusion.id !== id);
@@ -89,21 +170,31 @@ const RestaurantSection = () => {
 
   // Handlers for Terms and Conditions
   const handleAddTerm = () => {
-    // Check if termsAndConditions is a string and not empty after trimming
-    if (typeof termsAndConditions === 'string' && termsAndConditions.trim()) {
-      // Create a new term object
-      const newTerm = {
-        id: Date.now(), // or generate a unique ID as appropriate
-        item: termsAndConditions.trim()
-      };
+    if (typeof termsAndConditions === "string") {
+      const term = termsAndConditions.trim();
+      
+      if (!term) {
+        setErrorTextTerms("Please enter a valid term or condition.");
+        return;
+      }
+    
+      if (termsList.some((t) => t.item === term)) {
+        setErrorTextTerms("This term already exists.");
+        return;
+      }
+    
       // Add the new term to the terms list
+      const newTerm = { id: Date.now(), item: term };
       setTermsList([...termsList, newTerm]);
-      // Clear the input
-      setTermsAndConditions('');
+    
+      // Clear the input and error text
+      setTermsAndConditions("");
+      setErrorTextTerms(""); 
     } else {
-      console.error("termsAndConditions is not a valid string:", termsAndConditions);
+      setErrorTextTerms("Please enter a valid term or condition.");
+      return;
     }
-  };
+  };  
 
   const handleRemoveTerm = (id) => {
     const updatedTermsList = termsList.filter((terms) => terms.id !==id);
@@ -528,7 +619,17 @@ const RestaurantSection = () => {
       </div>
 
       {/* Modal for Adding/Editing Restaurant Services */}
-      <Modal scrollBehavior='inside' isOpen={modalOpen} onOpenChange={setModalOpen} size="2xl">
+      <Modal
+        scrollBehavior="inside"
+        isOpen={modalOpen}
+        onOpenChange={(open) => {
+          setModalOpen(open);
+          if (!open) {
+            resetForm(); // Reset state when modal is closed
+          }
+        }}
+        size="2xl"
+      >
         <ModalContent>
           {() => (
             <>
@@ -540,44 +641,59 @@ const RestaurantSection = () => {
                 <form className="space-y-4" onSubmit={handleSubmit}>
                   {/* Restaurant Type */}
                   <div className="flex items-start gap-4 max-w-3xl mx-auto">
-                  {/* Add New Option */}
-                  <div className="flex flex-col flex-1">
-                    <Input
-                      clearable
-                      bordered
-                      fullWidth
-                      label="Add New Item"
-                      placeholder="Type new item"
-                      value={newOption}
-                      onChange={(e) => setNewOption(e.target.value)}
-                    />
-                    <Button
-                      auto
-                      icon={<FaPlus />}
-                      onClick={handleAddOption}
-                      color="primary"
-                      className="mt-2"
-                    >
-                      Add Item
-                    </Button>
-                  </div>
+                    {/* Dropdown Select */}
+                    <div className="flex-1 mb-4">
+                      <Select
+                        label="Select Type"
+                        placeholder={restaurantType ? restaurantType : "Select or add an item"}
+                        selectedKey={restaurantType} // Use selectedKey to reflect the selected value
+                        onSelectionChange={(key) => {
+                          const selectedKey = key instanceof Set ? Array.from(key)[0] : key;
+                          const selectedOption = options.find(option => option.value === selectedKey);
+                          console.log("Selected Key:", selectedKey); // Log the selected key
+                          if (selectedOption) {
+                            setRestaurantType(selectedOption.value); // Set only the value
+                          }
+                        }}
+                      >
+                        {options.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </Select>
 
-                  {/* Dropdown Select */}
-                  <div className="flex-1">
-                    <Select
-                      label="Select Activity Type"
-                      placeholder="Select or add an item"
-                      defaultSelectedKey="none" // Default value as "none"
-                      onSelectionChange={(key) => console.log(`Selected: ${key}`)}
-                    >
-                      {options.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </Select>
+                      {/* Add Custom Type */}
+                      {restaurantType === 'custom' && (
+                        <div className="flex flex-col mt-4">
+                          <Input
+                            clearable
+                            bordered
+                            fullWidth
+                            placeholder="Enter custom type (default value is custom)"
+                            value={newOption}
+                            onChange={(e) => {
+                              setNewOption(e.target.value);
+                              setErrorText(''); // Clear error when the user starts typing
+                            }}
+                          />
+
+                          {errorText && (
+                            <div className="text-red-500 text-sm mt-1">{errorText}</div> // Display error message
+                          )}
+                          <Button
+                            auto
+                            icon={<FaPlus />}
+                            onClick={handleAddOption}
+                            color="primary"
+                            className="mt-2"
+                          >
+                            Add Item
+                          </Button>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
 
                   {/* Restaurant Name */}
                   <div className="mb-4">
@@ -645,9 +761,15 @@ const RestaurantSection = () => {
                         label="Terms and Conditions"
                         placeholder="Enter a term or condition"
                         value={termsAndConditions}
-                        onChange={(e) => setTermsAndConditions(e.target.value)}
+                        onChange={(e) => {
+                          setTermsAndConditions(e.target.value);
+                          setErrorTextTerms("");
+                        }}
                         fullWidth
                       />
+                      {errorTextTerms && (
+                        <div className="text-red-500 text-sm mt-1">{errorTextTerms}</div>
+                      )}
                       <Button
                         type="button"
                         color="primary"
@@ -656,10 +778,10 @@ const RestaurantSection = () => {
                       >
                         Add Term or Condition
                       </Button>
-
+                    
                       {/* Terms List */}
                       <ul className="mt-3 flex items-center flex-wrap gap-3 pl-5 text-sm">
-                        {Array.isArray(termsList) && termsList.length > 0 ? (
+                        {termsList.length > 0 ? (
                           termsList.map((term) => (
                             <li key={term.id} className="flex gap-3 items-center bg-light p-2 rounded-md">
                               {term.item}
@@ -684,23 +806,29 @@ const RestaurantSection = () => {
                   <div className="mb-4">
                     <Input
                       label="Inclusions"
-                      placeholder="Enter an inclusion or details about the restaurant service"
+                      placeholder="Enter an inclusion"
                       value={inclusions}
-                      onChange={(e) => setInclusions(e.target.value)}
+                      onChange={(e) => {
+                        setInclusions(e.target.value)
+                        setErrorTextInclusions("");
+                      }}
                       fullWidth
                     />
+                    {errorTextInclusions && (
+                      <div className="text-red-500 text-sm mt-1">{errorTextInclusions}</div>
+                    )}
                     <Button
                       type="button"
                       color="primary"
                       className="mt-2 hover:bg-color2"
                       onClick={handleAddInclusion}
                     >
-                      Add Inclusions or Details
+                      Add Inclusion
                     </Button>
 
-                    {/* Inclusions List */}
+                    {/* Inclusion List */}
                     <ul className="mt-3 flex items-center flex-wrap gap-3 pl-5 text-sm">
-                      {Array.isArray(inclusionList) && inclusionList.length > 0 ? (
+                      {inclusionList.length > 0 ? (
                         inclusionList.map((inclusion) => (
                           <li key={inclusion.id} className="flex gap-3 items-center bg-light p-2 rounded-md">
                             {inclusion.item}

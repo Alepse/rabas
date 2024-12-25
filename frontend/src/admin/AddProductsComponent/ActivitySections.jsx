@@ -34,28 +34,102 @@ const ActivitySections = () => {
   const activities = useSelector((state) => state.activities.activities);
   const status = useSelector((state) => state.activities.status);
   const error = useSelector((state) => state.activities.error);
+  const [errorText, setErrorText] = useState(""); // State for validation messages
+  const [errorTextTerms, setErrorTextTerms] = useState("");
+  const [errorTextInclusions, setErrorTextInclusions] = useState("");
   const sliderRefs = useRef({});
 
   const [options, setOptions] = useState([
-    { value: "none", label: "None" }, // Default option
+    { value: 'none', label: 'Select an option' },
+    { value: 'hiking', label: 'Hiking' },
+    { value: 'adventure', label: 'Adventure' },
+    { value: 'custom', label: 'Custom' },
   ]);
   const [newOption, setNewOption] = useState("");
 
-  const handleAddOption = () => {
-    if (newOption.trim() && !options.some((opt) => opt.label === newOption)) {
-      setOptions([...options, { value: newOption.toLowerCase(), label: newOption }]);
-      setNewOption(""); // Clear input after adding
+  // Sync activities with options and remove duplicates
+  useEffect(() => {
+  
+    // Normalize activity types to lowercase and remove duplicates
+    const activityTypes = activities
+      .map((acc) => acc.activityType?.toLowerCase())
+      .filter((type, index, self) => type && self.indexOf(type) === index);
+  
+    // Filter types not already in options
+    const newOptions = activityTypes
+      .filter((type) => !options.some((option) => option.value === type))
+      .map((type) => ({ value: type, label: type.charAt(0).toUpperCase() + type.slice(1) }));
+  
+    // Add new options to the state if any
+    if (newOptions.length > 0) {
+      setOptions((prevOptions) => {
+        // Filter to avoid duplicates in the combined options list
+        const updatedOptions = [
+          ...prevOptions,
+          ...newOptions.filter(
+            (newOption) =>
+              !prevOptions.some(
+                (existingOption) =>
+                  existingOption.value.toLowerCase() === newOption.value.toLowerCase()
+              )
+          ),
+        ];
+  
+        // Ensure 'custom' is always the last option
+        const customOption = updatedOptions.find(option => option.value === 'custom');
+        const optionsWithoutCustom = updatedOptions.filter(option => option.value !== 'custom');
+        const finalOptions = [...optionsWithoutCustom, customOption];
+  
+        return finalOptions;
+      });
     }
-  };
+  }, [activities, options]);
+
+  const handleAddOption = () => {
+    const normalizedOption = newOption.trim().toLowerCase();
+  
+    if (!newOption.trim()) {
+      setErrorText("Please enter a valid option."); // Show error for empty input
+      return;
+    }
+  
+    // Prevent adding duplicate options
+    if (options.some((opt) => opt.value === normalizedOption)) {
+      setErrorText(`The option "${newOption.trim()}" already exists.`); // Show error for duplicate
+      return;
+    }
+  
+    // If the selected type is 'custom', update the label of the 'custom' option
+    if (activityType === "custom") {
+      const newOptionObj = { value: normalizedOption, label: newOption.trim() };
+  
+      // Add the new option to the list of options
+      setOptions((prevOptions) => {
+        const updatedOptions = [
+          ...prevOptions,
+          newOptionObj,
+        ];
+  
+        // Ensure 'custom' is always the last option
+        const customOption = updatedOptions.find(option => option.value === 'custom');
+        const optionsWithoutCustom = updatedOptions.filter(option => option.value !== 'custom');
+        const finalOptions = [...optionsWithoutCustom, customOption];
+  
+        return finalOptions;
+      });
+  
+      // Set the activityType to the new custom option
+      setActivityType(normalizedOption); // Set the selected custom type as the activity type
+    }
+  
+    setNewOption(""); // Clear input after adding
+    setErrorText(""); // Clear error after successful addition
+  };  
 
   useEffect(() => {
     // console.log('Fetching business products...');
     dispatch(fetchBusinessProducts());
   }, [dispatch]);
-
-  // useEffect(() => {
-    // console.log('Activities from Redux state:', activities);
-  // }, [activities]);
 
   if (status === 'loading') {
     return <div>Loading accommodations...</div>;
@@ -67,18 +141,26 @@ const ActivitySections = () => {
 
   // Handlers for Inclusions
   const handleAddInclusion = () => {
-    if (typeof inclusions === 'string' && inclusions.trim()) {
-      // Create a new inclusion object
-      const newInclusion = {
-        id: Date.now(), // or generate a unique ID as appropriate
-        item: inclusions.trim()
-      };
-      // Add the new inclusion to the inclusion list
-      setInclusionList([...inclusionList, newInclusion]);
-      // Clear the input
-      setInclusions('');
+    const inclusion = inclusions.trim();
+    
+    if (!inclusion) {
+      setErrorTextInclusions("Please enter a valid inclusion.");
+      return;
     }
-  };
+  
+    if (inclusionList.some((i) => i.item === inclusion)) {
+      setErrorTextInclusions("This inclusion already exists.");
+      return;
+    }
+  
+    // Add the new inclusion to the inclusion list
+    const newInclusion = { id: Date.now(), item: inclusion };
+    setInclusionList([...inclusionList, newInclusion]);
+  
+    // Clear the input and error text
+    setInclusions("");
+    setErrorTextInclusions("");
+  };  
 
   const handleRemoveInclusion = (id) => {
     const updatedInclusionList = inclusionList.filter((inclusion) => inclusion.id !== id);
@@ -87,21 +169,31 @@ const ActivitySections = () => {
 
   // Handlers for Terms and Conditions
   const handleAddTerm = () => {
-    // Check if termsAndConditions is a string and not empty after trimming
-    if (typeof termsAndConditions === 'string' && termsAndConditions.trim()) {
-      // Create a new term object
-      const newTerm = {
-        id: Date.now(), // or generate a unique ID as appropriate
-        item: termsAndConditions.trim()
-      };
+    if (typeof termsAndConditions === "string") {
+      const term = termsAndConditions.trim();
+      
+      if (!term) {
+        setErrorTextTerms("Please enter a valid term or condition.");
+        return;
+      }
+    
+      if (termsList.some((t) => t.item === term)) {
+        setErrorTextTerms("This term already exists.");
+        return;
+      }
+    
       // Add the new term to the terms list
+      const newTerm = { id: Date.now(), item: term };
       setTermsList([...termsList, newTerm]);
-      // Clear the input
-      setTermsAndConditions('');
+    
+      // Clear the input and error text
+      setTermsAndConditions("");
+      setErrorTextTerms(""); 
     } else {
-      console.error("termsAndConditions is not a valid string:", termsAndConditions);
+      setErrorTextTerms("Please enter a valid term or condition.");
+      return;
     }
-  };
+  };  
 
   const handleRemoveTerm = (id) => {
     const updatedTermsList = termsList.filter((terms) => terms.id !==id);
@@ -527,7 +619,17 @@ const ActivitySections = () => {
       </div>
 
       {/* Modal for Adding/Editing Activities */}
-      <Modal scrollBehavior='inside' isOpen={modalOpen} onOpenChange={setModalOpen} size="2xl">
+      <Modal
+        scrollBehavior="inside"
+        isOpen={modalOpen}
+        onOpenChange={(open) => {
+          setModalOpen(open);
+          if (!open) {
+            resetForm(); // Reset state when modal is closed
+          }
+        }}
+        size="2xl"
+      >
         <ModalContent>
           {() => (
             <>
@@ -539,46 +641,61 @@ const ActivitySections = () => {
                 <form className="space-y-4" onSubmit={handleSubmit}>
                   {/* Activity Type */}
                   <div className="flex items-start gap-4 max-w-3xl mx-auto">
-                  {/* Add New Option */}
-                  <div className="flex flex-col flex-1">
-                    <Input
-                      clearable
-                      bordered
-                      fullWidth
-                      label="Add New Item"
-                      placeholder="Type new item"
-                      value={newOption}
-                      onChange={(e) => setNewOption(e.target.value)}
-                    />
-                    <Button
-                      auto
-                      icon={<FaPlus />}
-                      onClick={handleAddOption}
-                      color="primary"
-                      className="mt-2"
-                    >
-                      Add Item
-                    </Button>
+          
+                    {/* Dropdown Select */}
+                    <div className="flex-1 mb-4">
+                      <Select
+                        label="Select Activity Type"
+                        placeholder={activityType ? activityType : "Select or add an item"}
+                        selectedKey={activityType} // Use selectedKey instead of defaultSelectedKey
+                        onSelectionChange={(key) => {
+                          const selectedKey = key instanceof Set ? Array.from(key)[0] : key;
+                          const selectedOption = options.find(option => option.value === selectedKey);
+                          console.log("Selected Key:", selectedKey); // Log the selected key
+                          if (selectedOption) {
+                            setActivityType(selectedOption.value); // Set only the value
+                          }
+                        }}
+                      >
+                        {options.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </Select>
+
+                      {/* Add Custom Type */}
+                      {activityType === 'custom' && (
+                        <div className="flex flex-col mt-4">
+                          <Input
+                            clearable
+                            bordered
+                            fullWidth
+                            label="Add Custom Type"
+                            placeholder="Type custom type"
+                            value={newOption}
+                            onChange={(e) => {
+                              setNewOption(e.target.value);
+                              setErrorText(''); // Clear error when the user starts typing
+                            }}
+                          />
+
+                          {errorText && (
+                            <div className="text-red-500 text-sm mt-1">{errorText}</div> // Display error message
+                          )}
+                          <Button
+                            auto
+                            icon={<FaPlus />}
+                            onClick={handleAddOption}
+                            color="primary"
+                            className="mt-2"
+                          >
+                            Add Item
+                          </Button>
+                        </div>
+                      )}
+                    </div>
                   </div>
-
-                  {/* Dropdown Select */}
-                  <div className="flex-1">
-                    <Select
-                      label="Select Activity Type"
-                      placeholder="Select or add an item"
-                      defaultSelectedKey="none" // Default value as "none"
-                      onSelectionChange={(key) => console.log(`Selected: ${key}`)}
-                    >
-                      {options.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </Select>
-                  </div>
-                </div>
-
-
 
                   {/* Activity Name */}
                   <div className="mb-4">
@@ -646,9 +763,15 @@ const ActivitySections = () => {
                         label="Terms and Conditions"
                         placeholder="Enter a term or condition"
                         value={termsAndConditions}
-                        onChange={(e) => setTermsAndConditions(e.target.value)}
+                        onChange={(e) => {
+                          setTermsAndConditions(e.target.value);
+                          setErrorTextTerms("");
+                        }}
                         fullWidth
                       />
+                      {errorTextTerms && (
+                        <div className="text-red-500 text-sm mt-1">{errorTextTerms}</div>
+                      )}
                       <Button
                         type="button"
                         color="primary"
@@ -657,10 +780,10 @@ const ActivitySections = () => {
                       >
                         Add Term or Condition
                       </Button>
-
+                    
                       {/* Terms List */}
                       <ul className="mt-3 flex items-center flex-wrap gap-3 pl-5 text-sm">
-                        {Array.isArray(termsList) && termsList.length > 0 ? (
+                        {termsList.length > 0 ? (
                           termsList.map((term) => (
                             <li key={term.id} className="flex gap-3 items-center bg-light p-2 rounded-md">
                               {term.item}
@@ -685,23 +808,29 @@ const ActivitySections = () => {
                   <div className="mb-4">
                     <Input
                       label="Inclusions"
-                      placeholder="Enter an inclusion or details about the accommodation"
+                      placeholder="Enter an inclusion"
                       value={inclusions}
-                      onChange={(e) => setInclusions(e.target.value)}
+                      onChange={(e) => {
+                        setInclusions(e.target.value)
+                        setErrorTextInclusions("");
+                      }}
                       fullWidth
                     />
+                    {errorTextInclusions && (
+                      <div className="text-red-500 text-sm mt-1">{errorTextInclusions}</div>
+                    )}
                     <Button
                       type="button"
                       color="primary"
                       className="mt-2 hover:bg-color2"
                       onClick={handleAddInclusion}
                     >
-                      Add Inclusions or Details
+                      Add Inclusion
                     </Button>
 
-                    {/* Inclusions List */}
+                    {/* Inclusion List */}
                     <ul className="mt-3 flex items-center flex-wrap gap-3 pl-5 text-sm">
-                      {Array.isArray(inclusionList) && inclusionList.length > 0 ? (
+                      {inclusionList.length > 0 ? (
                         inclusionList.map((inclusion) => (
                           <li key={inclusion.id} className="flex gap-3 items-center bg-light p-2 rounded-md">
                             {inclusion.item}

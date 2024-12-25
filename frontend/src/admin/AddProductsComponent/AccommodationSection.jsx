@@ -8,7 +8,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { FaSearch, FaChevronLeft, FaChevronRight, FaImage, FaPlus } from 'react-icons/fa';
 // Use the environment variable for the base URL
-const BASE_URL = import.meta.env.VITE_BASE_URL; 
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const AccommodationSection = () => {
   // State Management
@@ -33,29 +33,100 @@ const AccommodationSection = () => {
   const accommodations = useSelector((state) => state.accommodations.accommodations);
   const status = useSelector((state) => state.accommodations.status);
   const error = useSelector((state) => state.accommodations.error);
+  const [errorText, setErrorText] = useState(""); // State for validation messages
+  const [errorTextTerms, setErrorTextTerms] = useState("");
+  const [errorTextInclusions, setErrorTextInclusions] = useState("");
   const sliderRefs = useRef({});
 
   const [options, setOptions] = useState([
-    { value: "none", label: "None" }, // Default option
+    { value: 'hotel', label: 'Hotel' },
+    { value: 'resort', label: 'Resort' },
+    { value: 'custom', label: 'Custom' },
   ]);
   const [newOption, setNewOption] = useState("");
 
-  const handleAddOption = () => {
-    if (newOption.trim() && !options.some((opt) => opt.label === newOption)) {
-      setOptions([...options, { value: newOption.toLowerCase(), label: newOption }]);
-      setNewOption(""); // Clear input after adding
-    }
-  };
-
-
+  // Sync accommodations with options and remove duplicates
   useEffect(() => {
-    // console.log('Fetching business products...');
+  
+    // Normalize accommodation types to lowercase and remove duplicates
+    const accommodationTypes = accommodations
+      .map((acc) => acc.accommodationType?.toLowerCase())
+      .filter((type, index, self) => type && self.indexOf(type) === index);
+  
+    // Filter types not already in options
+    const newOptions = accommodationTypes
+      .filter((type) => !options.some((option) => option.value === type))
+      .map((type) => ({ value: type, label: type.charAt(0).toUpperCase() + type.slice(1) }));
+  
+    // Add new options to the state if any
+    if (newOptions.length > 0) {
+      setOptions((prevOptions) => {
+        // Filter to avoid duplicates in the combined options list
+        const updatedOptions = [
+          ...prevOptions,
+          ...newOptions.filter(
+            (newOption) =>
+              !prevOptions.some(
+                (existingOption) =>
+                  existingOption.value.toLowerCase() === newOption.value.toLowerCase()
+              )
+          ),
+        ];
+  
+        // Ensure 'custom' is always the last option
+        const customOption = updatedOptions.find(option => option.value === 'custom');
+        const optionsWithoutCustom = updatedOptions.filter(option => option.value !== 'custom');
+        const finalOptions = [...optionsWithoutCustom, customOption];
+  
+        return finalOptions;
+      });
+    }
+  }, [accommodations, options]);
+  
+  const handleAddOption = () => {
+    const normalizedOption = newOption.trim().toLowerCase();
+  
+    if (!newOption.trim()) {
+      setErrorText("Please enter a valid option."); // Show error for empty input
+      return;
+    }
+  
+    // Prevent adding duplicate options
+    if (options.some((opt) => opt.value === normalizedOption)) {
+      setErrorText(`The option "${newOption.trim()}" already exists.`); // Show error for duplicate
+      return;
+    }
+  
+    // If the selected type is 'custom', update the label of the 'custom' option
+    if (accommodationType === "custom") {
+      const newOptionObj = { value: normalizedOption, label: newOption.trim() };
+  
+      // Add the new option to the list of options
+      setOptions((prevOptions) => {
+        const updatedOptions = [
+          ...prevOptions,
+          newOptionObj,
+        ];
+  
+        // Ensure 'custom' is always the last option
+        const customOption = updatedOptions.find(option => option.value === 'custom');
+        const optionsWithoutCustom = updatedOptions.filter(option => option.value !== 'custom');
+        const finalOptions = [...optionsWithoutCustom, customOption];
+  
+        return finalOptions;
+      });
+  
+      // Set the accommodationType to the new custom option
+      setAccommodationType(normalizedOption); // Set the selected custom type as the accommodation type
+    }
+  
+    setNewOption(""); // Clear input after adding
+    setErrorText(""); // Clear error after successful addition
+  };  
+  
+  useEffect(() => {
     dispatch(fetchBusinessProducts());
   }, [dispatch]);
-
-  // useEffect(() => {
-  //   console.log('Accommodations from Redux state:', accommodations);
-  // }, [accommodations]);
 
   if (status === 'loading') {
     return <div>Loading accommodations...</div>;
@@ -67,18 +138,26 @@ const AccommodationSection = () => {
 
   // Handlers for Inclusions
   const handleAddInclusion = () => {
-    if (typeof inclusions === 'string' && inclusions.trim()) {
-      // Create a new inclusion object
-      const newInclusion = {
-        id: Date.now(), // or generate a unique ID as appropriate
-        item: inclusions.trim()
-      };
-      // Add the new inclusion to the inclusion list
-      setInclusionList([...inclusionList, newInclusion]);
-      // Clear the input
-      setInclusions('');
+    const inclusion = inclusions.trim();
+    
+    if (!inclusion) {
+      setErrorTextInclusions("Please enter a valid inclusion.");
+      return;
     }
-  };
+  
+    if (inclusionList.some((i) => i.item === inclusion)) {
+      setErrorTextInclusions("This inclusion already exists.");
+      return;
+    }
+  
+    // Add the new inclusion to the inclusion list
+    const newInclusion = { id: Date.now(), item: inclusion };
+    setInclusionList([...inclusionList, newInclusion]);
+  
+    // Clear the input and error text
+    setInclusions("");
+    setErrorTextInclusions("");
+  };  
 
   const handleRemoveInclusion = (id) => {
     const updatedInclusionList = inclusionList.filter((inclusion) => inclusion.id !== id);
@@ -87,21 +166,31 @@ const AccommodationSection = () => {
 
   // Handlers for Terms and Conditions
   const handleAddTerm = () => {
-    // Check if termsAndConditions is a string and not empty after trimming
-    if (typeof termsAndConditions === 'string' && termsAndConditions.trim()) {
-      // Create a new term object
-      const newTerm = {
-        id: Date.now(), // or generate a unique ID as appropriate
-        item: termsAndConditions.trim()
-      };
+    if (typeof termsAndConditions === "string") {
+      const term = termsAndConditions.trim();
+      
+      if (!term) {
+        setErrorTextTerms("Please enter a valid term or condition.");
+        return;
+      }
+    
+      if (termsList.some((t) => t.item === term)) {
+        setErrorTextTerms("This term already exists.");
+        return;
+      }
+    
       // Add the new term to the terms list
+      const newTerm = { id: Date.now(), item: term };
       setTermsList([...termsList, newTerm]);
-      // Clear the input
-      setTermsAndConditions('');
+    
+      // Clear the input and error text
+      setTermsAndConditions("");
+      setErrorTextTerms(""); 
     } else {
-      console.error("termsAndConditions is not a valid string:", termsAndConditions);
+      setErrorTextTerms("Please enter a valid term or condition.");
+      return;
     }
-  };
+  };  
 
   const handleRemoveTerm = (id) => {
     const updatedTermsList = termsList.filter((terms) => terms.id !==id);
@@ -300,7 +389,7 @@ const AccommodationSection = () => {
       formData.append('removedImages', JSON.stringify(removedImages)); // Send removed images
 
       // console.log('existing images: ', existingImages);
-      // console.log('FormData: ', formData);
+      console.log('FormData: ', formData);
       
       try {
         let result;
@@ -341,8 +430,10 @@ const AccommodationSection = () => {
     setTermsList([]); // Reset terms list
   };
 
-  // Handler for Editing an Accommodation
   const handleEdit = (accommodation) => {
+    console.log("Editing accommodation:", accommodation); // Log the entire accommodation object
+    
+    // Set accommodation details
     setAccommodationName(accommodation.accommodationName);
     setPricing(accommodation.pricing);
     setPricingUnit(accommodation.pricingUnit);
@@ -518,8 +609,6 @@ const AccommodationSection = () => {
                     ))}
                   </Slider>
                 )}
-                
-           
               </div>
             )}
             </div>
@@ -527,7 +616,17 @@ const AccommodationSection = () => {
       </div>
 
       {/* Modal for Adding/Editing Accommodations */}
-      <Modal scrollBehavior='inside' isOpen={modalOpen} onOpenChange={setModalOpen} size="2xl">
+      <Modal
+        scrollBehavior="inside"
+        isOpen={modalOpen}
+        onOpenChange={(open) => {
+          setModalOpen(open);
+          if (!open) {
+            resetForm(); // Reset state when modal is closed
+          }
+        }}
+        size="2xl"
+      >
         <ModalContent>
           {() => (
             <>
@@ -535,39 +634,24 @@ const AccommodationSection = () => {
                 {isEditing ? 'Update Accommodation' : 'Add Your Accommodation'}
               </ModalHeader>
               <ModalBody>
-                {/* Add/Edit Accommodation Form */}
-                <form className="space-y-4" onSubmit={handleSubmit}>
-                  {/* Accommodation Type */}
-                  <div className="flex items-start gap-4 max-w-3xl mx-auto">
-                  {/* Add New Option */}
-                  <div className="flex flex-col flex-1">
-                    <Input
-                      clearable
-                      bordered
-                      fullWidth
-                      label="Add New Item"
-                      placeholder="Type new item"
-                      value={newOption}
-                      onChange={(e) => setNewOption(e.target.value)}
-                    />
-                    <Button
-                      auto
-                      icon={<FaPlus />}
-                      onClick={handleAddOption}
-                      color="primary"
-                      className="mt-2"
-                    >
-                      Add Item
-                    </Button>
-                  </div>
-
+              {/* Add/Edit Accommodation Form */}
+              <form className="space-y-4" onSubmit={handleSubmit}>
+                {/* Accommodation Type */}
+                <div className="flex items-start gap-4 max-w-3xl mx-auto">
                   {/* Dropdown Select */}
-                  <div className="flex-1">
+                  <div className="flex-1 mb-4">
                     <Select
-                      label="Select Activity Type"
-                      placeholder="Select or add an item"
-                      defaultSelectedKey="none" // Default value as "none"
-                      onSelectionChange={(key) => console.log(`Selected: ${key}`)}
+                      label="Select Accommodation Type"
+                      placeholder={accommodationType ? accommodationType : "Select or add an item"}
+                      selectedKey={accommodationType} // Use selectedKey to reflect the selected value
+                      onSelectionChange={(key) => {
+                        const selectedKey = key instanceof Set ? Array.from(key)[0] : key;
+                        const selectedOption = options.find(option => option.value === selectedKey);
+                        console.log("Selected Key:", selectedKey); // Log the selected key
+                        if (selectedOption) {
+                          setAccommodationType(selectedOption.value); // Set only the value
+                        }
+                      }}
                     >
                       {options.map((option) => (
                         <SelectItem key={option.value} value={option.value}>
@@ -575,217 +659,267 @@ const AccommodationSection = () => {
                         </SelectItem>
                       ))}
                     </Select>
+
+                    {/* Add Custom Type */}
+                    {accommodationType === 'custom' && (
+                      <div className="flex flex-col mt-4">
+                        <Input
+                          clearable
+                          bordered
+                          fullWidth
+                          placeholder="Enter custom type (default value is custom)"
+                          value={newOption}
+                          onChange={(e) => {
+                            setNewOption(e.target.value);
+                            setErrorText(''); // Clear error when the user starts typing
+                          }}
+                        />
+
+                        {errorText && (
+                          <div className="text-red-500 text-sm mt-1">{errorText}</div> // Display error message
+                        )}
+                        <Button
+                          auto
+                          icon={<FaPlus />}
+                          onClick={handleAddOption}
+                          color="primary"
+                          className="mt-2"
+                        >
+                          Add Item
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                  {/* Accommodation Name */}
-                  <div className="mb-4">
+                {/* Accommodation Name */}
+                <div className="mb-4">
+                  <Input
+                    label="Accommodation Name"
+                    placeholder="Enter the name of the accommodation"
+                    value={accommodationName}
+                    onChange={(e) => setAccommodationName(e.target.value)}
+                    fullWidth
+                    required
+                  />
+                </div>
+
+                {/* Pricing with Unit */}
+                <div className="mb-4 flex space-x-2">
+                  <div className="w-1/2">
                     <Input
-                      label="Accommodation Name"
-                      placeholder="Enter the name of the accommodation"
-                      value={accommodationName}
-                      onChange={(e) => setAccommodationName(e.target.value)}
+                      label="Pricing"
+                      placeholder="e.g. 300"
+                      type="number"
+                      value={pricing}
+                      onChange={(e) => setPricing(e.target.value)}
+                      fullWidth
+                      required
+                      min="0"
+                    />
+                  </div>
+                  <div className="w-1/2">
+                    <Input
+                      label="Pricing Unit"
+                      placeholder="per pax, per person, etc."
+                      value={pricingUnit}
+                      onChange={(e) => setPricingUnit(e.target.value)}
                       fullWidth
                       required
                     />
                   </div>
+                </div>
 
-                  {/* Pricing with Unit */}
-                  <div className="mb-4 flex space-x-2">
-                    <div className="w-1/2">
-                      <Input
-                        label="Pricing"
-                        placeholder="e.g. 300"
-                        type="number"
-                        value={pricing}
-                        onChange={(e) => setPricing(e.target.value)}
-                        fullWidth
-                        required
-                        min="0"
-                      />
-                    </div>
-                    <div className="w-1/2">
-                      <Input
-                        label="Pricing Unit"
-                        placeholder="per pax, per person, etc."
-                        value={pricingUnit}
-                        onChange={(e) => setPricingUnit(e.target.value)}
-                        fullWidth
-                        required
-                      />
-                    </div>
-                  </div>
+                {/* Description */}
+                <div className="mb-4">
+                  <Input
+                    label="Description"
+                    placeholder="Enter Accommodation description"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    fullWidth
+                  />
+                </div>
 
-                  {/* Description */}
+                {/* Booking Option */}
+                <div className="mb-4">
+                  <Checkbox
+                    isSelected={hasBooking}
+                    onChange={(e) => {
+                      const isChecked = e.target.checked;
+                      setHasBooking(isChecked);
+
+                      // Clear the terms list if checkbox is unchecked
+                      if (!isChecked) {
+                        setTermsList([]); // Reset the terms list
+                      }
+                    }}
+                  >
+                    Accommodation has booking option
+                  </Checkbox>
+                </div>
+
+                {/* Terms and Conditions */}
+                {hasBooking && (
                   <div className="mb-4">
                     <Input
-                      label="Description"
-                      placeholder="Enter Accommodation description"
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
+                      label="Terms and Conditions"
+                      placeholder="Enter a term or condition"
+                      value={termsAndConditions}
+                      onChange={(e) => {
+                        setTermsAndConditions(e.target.value);
+                        setErrorTextTerms("");
+                      }}
                       fullWidth
                     />
-                  </div>
-
-                  {/* Booking Option */}
-                  <div className="mb-4">
-                    <Checkbox
-                      isSelected={hasBooking}
-                      onChange={(e) => setHasBooking(e.target.checked)}
-                    >
-                      Accommodation has booking option
-                    </Checkbox>
-                  </div>
-
-                  {/* Terms and Conditions */}
-                  {hasBooking && (
-                    <div className="mb-4">
-                      <Input
-                        label="Terms and Conditions"
-                        placeholder="Enter a term or condition"
-                        value={termsAndConditions}
-                        onChange={(e) => setTermsAndConditions(e.target.value)}
-                        fullWidth
-                      />
-                      <Button
-                        type="button"
-                        color="primary"
-                        className="mt-2 hover:bg-color2"
-                        onClick={handleAddTerm}
-                      >
-                        Add Term or Condition
-                      </Button>
-
-                      {/* Terms List */}
-                      <ul className="mt-3 flex items-center flex-wrap gap-3 pl-5 text-sm">
-                        {Array.isArray(termsList) && termsList.length > 0 ? (
-                          termsList.map((term) => (
-                            <li key={term.id} className="flex gap-3 items-center bg-light p-2 rounded-md">
-                              {term.item}
-                              <Button
-                                auto
-                                color="danger"
-                                size="sm"
-                                onClick={() => handleRemoveTerm(term.id)}
-                              >
-                                Remove
-                              </Button>
-                            </li>
-                          ))
-                        ) : (
-                          <li>No terms added.</li>
-                        )}
-                      </ul>
-                    </div>
-                  )}
-
-                  {/* Inclusions */}
-                  <div className="mb-4">
-                    <Input
-                      label="Inclusions"
-                      placeholder="Enter an inclusion or details about the accommodation"
-                      value={inclusions}
-                      onChange={(e) => setInclusions(e.target.value)}
-                      fullWidth
-                    />
+                    {errorTextTerms && (
+                      <div className="text-red-500 text-sm mt-1">{errorTextTerms}</div>
+                    )}
                     <Button
                       type="button"
                       color="primary"
                       className="mt-2 hover:bg-color2"
-                      onClick={handleAddInclusion}
+                      onClick={handleAddTerm}
                     >
-                      Add Inclusions or Details
+                      Add Term or Condition
                     </Button>
-
-                    {/* Inclusions List */}
+                  
+                    {/* Terms List */}
                     <ul className="mt-3 flex items-center flex-wrap gap-3 pl-5 text-sm">
-                      {Array.isArray(inclusionList) && inclusionList.length > 0 ? (
-                        inclusionList.map((inclusion) => (
-                          <li key={inclusion.id} className="flex gap-3 items-center bg-light p-2 rounded-md">
-                            {inclusion.item}
+                      {termsList.length > 0 ? (
+                        termsList.map((term) => (
+                          <li key={term.id} className="flex gap-3 items-center bg-light p-2 rounded-md">
+                            {term.item}
                             <Button
                               auto
                               color="danger"
                               size="sm"
-                              onClick={() => handleRemoveInclusion(inclusion.id)}
+                              onClick={() => handleRemoveTerm(term.id)}
                             >
                               Remove
                             </Button>
                           </li>
                         ))
                       ) : (
-                        <li>No inclusions added.</li>
+                        <li>No terms added.</li>
                       )}
                     </ul>
                   </div>
+                )}
 
-                  {/* Image Upload */}
-                  <div className="mb-4">
-                    {/* Hidden input field */}
-                    <input
-                      id="imageUpload"
-                      type="file"
-                      multiple
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="hidden"
-                    />
-                    
-                    {/* Label with FaImage icon to trigger the file input */}
-                    <label
-                      htmlFor="imageUpload"
-                      className="flex items-center justify-center gap-2 cursor-pointer p-3 border border-gray-300 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
-                    >
-                      <FaImage className="text-2xl text-gray-600" />
-                      <span className="text-sm font-semibold text-gray-600">Upload Images</span>
-                    </label>
+                {/* Inclusions */}
+                <div className="mb-4">
+                  <Input
+                    label="Inclusions"
+                    placeholder="Enter an inclusion"
+                    value={inclusions}
+                    onChange={(e) => {
+                      setInclusions(e.target.value)
+                      setErrorTextInclusions("");
+                    }}
+                    fullWidth
+                  />
+                  {errorTextInclusions && (
+                    <div className="text-red-500 text-sm mt-1">{errorTextInclusions}</div>
+                  )}
+                  <Button
+                    type="button"
+                    color="primary"
+                    className="mt-2 hover:bg-color2"
+                    onClick={handleAddInclusion}
+                  >
+                    Add Inclusion
+                  </Button>
 
-                    {/* Text below the input */}
-                    <p className="text-sm font-semibold mt-2 text-gray-500">
-                      You can upload up to 5 images.
-                    </p>
-                  </div>
-
-                  {/* Uploaded Images Preview with Title Input and Remove Option */}
-                  <div className="mb-4 flex flex-wrap gap-3">
-                    {images && Array.isArray(images) && images.length > 0 ? (
-                      images.map((image, index) => (
-                        <div key={`${image}-${index}`} className="flex flex-col gap-2 mb-2">
-                          <img
-                            src={
-                              image.path
-                                ? `${BASE_URL}/${image.path}`
-                                : image.fileUrl || ''
-                            }
-                            alt={`Uploaded ${index + 1}`}
-                            className="h-16 w-16 object-cover rounded-lg"
-                          />
-                          <Input
-                            placeholder="Enter image title"
-                            value={image.title || ''}
-                            onChange={(e) => handleImageTitleChange(index, e.target.value)}
-                            fullWidth
-                          />
+                  {/* Inclusion List */}
+                  <ul className="mt-3 flex items-center flex-wrap gap-3 pl-5 text-sm">
+                    {inclusionList.length > 0 ? (
+                      inclusionList.map((inclusion) => (
+                        <li key={inclusion.id} className="flex gap-3 items-center bg-light p-2 rounded-md">
+                          {inclusion.item}
                           <Button
                             auto
                             color="danger"
-                            size="xs"
-                            onClick={() => handleRemoveImage(index)}
+                            size="sm"
+                            onClick={() => handleRemoveInclusion(inclusion.id)}
                           >
                             Remove
                           </Button>
-                        </div>
+                        </li>
                       ))
                     ) : (
-                      <p>No images to display</p>
+                      <li>No inclusions added.</li>
                     )}
-                  </div>
+                  </ul>
+                </div>
 
-                  {/* Submit Button */}
-                  <Button type="submit" color='primary' className="w-full hover:bg-color2">
-                    {isEditing ? 'Update Accommodation' : 'Add Accommodation'}
-                  </Button>
-                </form>
+                {/* Image Upload */}
+                <div className="mb-4">
+                  {/* Hidden input field */}
+                  <input
+                    id="imageUpload"
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                  
+                  {/* Label with FaImage icon to trigger the file input */}
+                  <label
+                    htmlFor="imageUpload"
+                    className="flex items-center justify-center gap-2 cursor-pointer p-3 border border-gray-300 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
+                  >
+                    <FaImage className="text-2xl text-gray-600" />
+                    <span className="text-sm font-semibold text-gray-600">Upload Images</span>
+                  </label>
+
+                  {/* Text below the input */}
+                  <p className="text-sm font-semibold mt-2 text-gray-500">
+                    You can upload up to 5 images.
+                  </p>
+                </div>
+
+                {/* Uploaded Images Preview with Title Input and Remove Option */}
+                <div className="mb-4 flex flex-wrap gap-3">
+                  {images && Array.isArray(images) && images.length > 0 ? (
+                    images.map((image, index) => (
+                      <div key={`${image}-${index}`} className="flex flex-col gap-2 mb-2">
+                        <img
+                          src={
+                            image.path
+                              ? `${BASE_URL}/${image.path}`
+                              : image.fileUrl || ''
+                          }
+                          alt={`Uploaded ${index + 1}`}
+                          className="h-16 w-16 object-cover rounded-lg"
+                        />
+                        <Input
+                          placeholder="Enter image title"
+                          value={image.title || ''}
+                          onChange={(e) => handleImageTitleChange(index, e.target.value)}
+                          fullWidth
+                        />
+                        <Button
+                          auto
+                          color="danger"
+                          size="xs"
+                          onClick={() => handleRemoveImage(index)}
+                        >
+                          Remove
+                        </Button>
+                      </div>
+                    ))
+                  ) : (
+                    <p>No images to display</p>
+                  )}
+                </div>
+
+                {/* Submit Button */}
+                <Button type="submit" color='primary' className="w-full hover:bg-color2">
+                  {isEditing ? 'Update Accommodation' : 'Add Accommodation'}
+                </Button>
+              </form>
               </ModalBody>
             </>
           )}

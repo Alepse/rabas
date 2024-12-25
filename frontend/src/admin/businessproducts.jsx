@@ -10,7 +10,7 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const BusinessProducts = () => {
   const [showActivities, setShowActivities] = useState(false);
-  const [showAccommodation, setShowAccommodation] = useState(false);
+  const [showAccommodation, setShowAccommodation] = useState(true);
   const [showRestaurantServices, setShowRestaurantServices] = useState(false);
   const [showShop, setShowShop] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(true);
