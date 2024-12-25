@@ -276,125 +276,125 @@ const Shop = () => {
             </div>
           )}
 
-         {/* Shop List */}
-<div className="w-full lg:w-3/4 max-h-[1300px] overflow-y-auto scrollbar-custom p-2">
-  <motion.div
-    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-    variants={containerVariants}
-    initial="hidden"
-    animate="visible"
-  >
-    {loading ? (
-      Array.from({ length: 2 }).map((_, index) => {
-        const opacity = 1 - index * 0.25;
-        return (
-          <SwiperSlide key={index} className="flex justify-center" style={{ opacity }}>
-            <div className="bg-white rounded-lg shadow-lg duration-300 flex flex-col justify-between w-full mx-auto h-[400px] p-2 relative gap-2">
-              <Skeleton className="w-full h-48 rounded-t-lg" />
-              <div className="flex-grow flex flex-col justify-between mt-4 px-2">
-                <div className="p-2">
-                  <Skeleton className="h-3 mb-4" />
-                  <Skeleton className="h-6 mb-4" />
-                  <Skeleton className="h-4 mb-4" />
-                  <Skeleton className="h-5 mb-3" />
-                  <Skeleton className="h-10" />
-                </div>
-              </div>
-            </div>
-          </SwiperSlide>
-        );
-      })
-    ) : filteredShops.length > 0 ? (
-      filteredShops.map((shop, index) => (
-        <motion.div
-          key={index}
-          className="bg-white rounded-lg shadow-lg p-2 hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between w-full mx-auto h-[400px]"
-          variants={cardVariants}
-        >
-          {/* Card Image */}
-          <div className="w-full h-48 bg-gray-200 rounded-t-lg overflow-hidden">
-            {shop.businessLogo ? (
-              <img
-                src={`${BASE_URL}/${shop.businessLogo}`}
-                alt={shop.businessName}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <span>No Image</span>
-              </div>
-            )}
+          {/* Shop List */}
+          <div className="w-full lg:w-3/4 max-h-[1300px] overflow-y-auto scrollbar-custom p-2">
+            <motion.div
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              {loading ? (
+                Array.from({ length: 2 }).map((_, index) => {
+                  const opacity = 1 - index * 0.25;
+                  return (
+                    <SwiperSlide key={index} className="flex justify-center" style={{ opacity }}>
+                      <div className="bg-white rounded-lg shadow-lg duration-300 flex flex-col justify-between w-full mx-auto h-[400px] p-2 relative gap-2">
+                        <Skeleton className="w-full h-48 rounded-t-lg" />
+                        <div className="flex-grow flex flex-col justify-between mt-4 px-2">
+                          <div className="p-2">
+                            <Skeleton className="h-3 mb-4" />
+                            <Skeleton className="h-6 mb-4" />
+                            <Skeleton className="h-4 mb-4" />
+                            <Skeleton className="h-5 mb-3" />
+                            <Skeleton className="h-10" />
+                          </div>
+                        </div>
+                      </div>
+                    </SwiperSlide>
+                  );
+                })
+              ) : filteredShops.length > 0 ? (
+                filteredShops.map((shop, index) => (
+                  <motion.div
+                    key={index}
+                    className="bg-white rounded-lg shadow-lg p-2 hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between w-full mx-auto h-[400px]"
+                    variants={cardVariants}
+                  >
+                    {/* Card Image */}
+                    <div className="w-full h-48 bg-gray-200 rounded-t-lg overflow-hidden">
+                      {shop.cardImage ? (
+                        <img
+                          src={`${BASE_URL}/${shop.cardImage}`}
+                          alt={shop.businessName}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <span>No Image</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Card Content */}
+                    <div className="p-4 flex-grow">
+                      {/* Tags */}
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        {shop.category.map((cat, index) => (
+                          <span
+                            key={index}
+                            className={`text-xs px-2 py-1 rounded-full ${
+                              selectedCategories
+                                .map((c) => c.toLowerCase())
+                                .includes(cat.toLowerCase())
+                                ? 'bg-color2 text-white'
+                                : 'bg-gray-200 text-gray-700'
+                            }`}
+                          >
+                            {cat}
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* Business Name */}
+                      <h3 className="text-lg sm:text-base lg:text-lg font-semibold text-gray-800 truncate">{shop.businessName}</h3>
+
+                      {/* Location */}
+                      <div className="text-xs text-gray-500 mb-2 flex items-center">
+                        <GiPositionMarker /> {shop.destination}
+                      </div>
+
+                    </div>
+
+                        {/* Ratings & Price */}
+                        <div className="flex justify-between items-center mb-2 p-2 gap-2">
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1">
+                            {shop.rating ? (
+                              <>
+                                <span className="text-black text-[12px]">{shop.rating}</span>
+                                <span className="text-yellow-500">
+                                  {'★'.repeat(Math.floor(shop.rating))}
+                                  {'☆'.repeat(5 - Math.floor(shop.rating))}
+                                </span>
+                              </>
+                            ) : (
+                              <span className="text-gray-500 text-[12px]">No ratings</span>
+                            )}
+                          </div>
+                        </div>
+                        <p className="font-semibold text-md">
+                          {shop.lowest_price && shop.highest_price ? (
+                            `₱${shop.lowest_price} - ₱${shop.highest_price}`
+                          ) : (
+                            <span className="text-gray-400 italic">Price Range Not available</span>
+                          )}
+                        </p>
+                      </div>
+
+                    {/* Explore More Button */}
+                    <Link to={`/business/${encryptId(shop.business_id)}`} target="_blank">
+                      <Button className="w-full rounded-md bg-color1 text-color3 hover:bg-color2">
+                        Explore More
+                      </Button>
+                    </Link>
+                  </motion.div>
+                ))
+              ) : (
+                <p className="col-span-full text-center text-gray-500">No shops match your selected filters.</p>
+              )}
+            </motion.div>
           </div>
-
-          {/* Card Content */}
-          <div className="p-4 flex-grow">
-            {/* Tags */}
-            <div className="flex flex-wrap gap-2 mb-2">
-              {shop.category.map((cat, index) => (
-                <span
-                  key={index}
-                  className={`text-xs px-2 py-1 rounded-full ${
-                    selectedCategories
-                      .map((c) => c.toLowerCase())
-                      .includes(cat.toLowerCase())
-                      ? 'bg-color2 text-white'
-                      : 'bg-gray-200 text-gray-700'
-                  }`}
-                >
-                  {cat}
-                </span>
-              ))}
-            </div>
-
-            {/* Business Name */}
-            <h3 className="text-lg sm:text-base lg:text-lg font-semibold text-gray-800 truncate">{shop.businessName}</h3>
-
-            {/* Location */}
-            <div className="text-xs text-gray-500 mb-2 flex items-center">
-              <GiPositionMarker /> {shop.destination}
-            </div>
-
-          </div>
-
-               {/* Ratings & Price */}
-               <div className="flex justify-between items-center mb-2 p-2 gap-2">
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1">
-                  {shop.rating ? (
-                    <>
-                      <span className="text-black text-[12px]">{shop.rating}</span>
-                      <span className="text-yellow-500">
-                        {'★'.repeat(Math.floor(shop.rating))}
-                        {'☆'.repeat(5 - Math.floor(shop.rating))}
-                      </span>
-                    </>
-                  ) : (
-                    <span className="text-gray-500 text-[12px]">No ratings</span>
-                  )}
-                </div>
-              </div>
-              <p className="font-semibold text-md">
-                {shop.lowest_price && shop.highest_price ? (
-                  `₱${shop.lowest_price} - ₱${shop.highest_price}`
-                ) : (
-                  <span className="text-gray-400 italic">Price Range Not available</span>
-                )}
-              </p>
-            </div>
-
-          {/* Explore More Button */}
-          <Link to={`/business/${encryptId(shop.business_id)}`} target="_blank">
-            <Button className="w-full rounded-md bg-color1 text-color3 hover:bg-color2">
-              Explore More
-            </Button>
-          </Link>
-        </motion.div>
-      ))
-    ) : (
-      <p className="col-span-full text-center text-gray-500">No shops match your selected filters.</p>
-    )}
-  </motion.div>
-</div>
 
         </div>
       </div>

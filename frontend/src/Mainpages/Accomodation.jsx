@@ -301,127 +301,127 @@ const Accommodations = () => {
             </div>
           )}
 
-      {/* Accommodation List */}
-<div className="w-full lg:w-3/4 max-h-[1300px] overflow-y-auto scrollbar-custom p-2">
-  <motion.div
-    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-    variants={containerVariants}
-    initial="hidden"
-    animate="visible"
-  >
-    {loading ? (
-      Array.from({ length: 2 }).map((_, index) => {
-        const opacity = 1 - index * 0.25;
-        return (
-          <SwiperSlide key={index} className="flex justify-center" style={{ opacity }}>
-            <div className="bg-white rounded-lg shadow-lg duration-300 flex flex-col justify-between w-full mx-auto h-[400px] p-2 relative gap-2">
-              <Skeleton className="w-full h-48 rounded-t-lg" />
-              <div className="flex-grow flex flex-col justify-between mt-4 px-2">
-                <div className="p-2">
-                  <Skeleton className="h-3 mb-4" />
-                  <Skeleton className="h-6 mb-4" />
-                  <Skeleton className="h-4 mb-4" />
-                  <Skeleton className="h-5 mb-3" />
-                  <Skeleton className="h-10" />
-                </div>
-              </div>
-            </div>
-          </SwiperSlide>
-        );
-      })
-    ) : (
-      filteredAccommodations.length > 0 ? (
-        filteredAccommodations.map((accommodation, index) => (
-          <motion.div
-            key={index}
-            className="bg-white rounded-lg shadow-lg p-2 hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between w-full mx-auto h-[400px]"
-            variants={cardVariants}
-          >
-            {/* Card Image */}
-            <div className="w-full h-48 border bg-gray-200 rounded-t-lg overflow-hidden">
-              {accommodation.businessLogo ? (
-                <img
-                  src={`${BASE_URL}/${accommodation.businessLogo}`}
-                  alt={accommodation.businessName}
-                  className="w-full h-full object-cover"
-                />
+          {/* Accommodation List */}
+          <div className="w-full lg:w-3/4 max-h-[1300px] overflow-y-auto scrollbar-custom p-2">
+            <motion.div
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              {loading ? (
+                Array.from({ length: 2 }).map((_, index) => {
+                  const opacity = 1 - index * 0.25;
+                  return (
+                    <SwiperSlide key={index} className="flex justify-center" style={{ opacity }}>
+                      <div className="bg-white rounded-lg shadow-lg duration-300 flex flex-col justify-between w-full mx-auto h-[400px] p-2 relative gap-2">
+                        <Skeleton className="w-full h-48 rounded-t-lg" />
+                        <div className="flex-grow flex flex-col justify-between mt-4 px-2">
+                          <div className="p-2">
+                            <Skeleton className="h-3 mb-4" />
+                            <Skeleton className="h-6 mb-4" />
+                            <Skeleton className="h-4 mb-4" />
+                            <Skeleton className="h-5 mb-3" />
+                            <Skeleton className="h-10" />
+                          </div>
+                        </div>
+                      </div>
+                    </SwiperSlide>
+                  );
+                })
               ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <span>No Image</span>
-                </div>
+                filteredAccommodations.length > 0 ? (
+                  filteredAccommodations.map((accommodation, index) => (
+                    <motion.div
+                      key={index}
+                      className="bg-white rounded-lg shadow-lg p-2 hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between w-full mx-auto h-[400px]"
+                      variants={cardVariants}
+                    >
+                      {/* Card Image */}
+                      <div className="w-full h-48 border bg-gray-200 rounded-t-lg overflow-hidden">
+                        {accommodation.cardImage ? (
+                          <img
+                            src={`${BASE_URL}/${accommodation.cardImage}`}
+                            alt={accommodation.businessName}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <span>No Image</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Card Content */}
+                      <div className="p-4 flex-grow">
+                        {/* Tags */}
+                        <div className="flex flex-wrap gap-2 mb-2">
+                          {accommodation.category.map((tag, index) => (
+                            <span
+                              key={index}
+                              className={`text-xs px-2 py-1 rounded-full ${
+                                selectedTags
+                                  .map((t) => t.toLowerCase())
+                                  .includes(tag.toLowerCase())
+                                  ? 'bg-color2 text-white'
+                                  : 'bg-gray-200 text-gray-700'
+                              }`}
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+
+                        {/* Business Name */}
+                        <h3 className="text-lg sm:text-base lg:text-lg font-semibold text-gray-800 truncate">{accommodation.businessName}</h3>
+
+                        {/* Location */}
+                        <div className="text-xs text-gray-500 mb-2 flex items-center">
+                          <GiPositionMarker /> {accommodation.destination}
+                        </div>
+                        
+                      </div>
+                          {/* Ratings & Price */}
+                        <div className="flex justify-between p-2 items-center mb-2 gap-2">
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1">
+                              {accommodation.rating ? (
+                                <>
+                                  <span className="text-black text-[12px]">{accommodation.rating}</span>
+                                  <span className="text-yellow-500">
+                                    {'★'.repeat(Math.floor(accommodation.rating))}
+                                    {'☆'.repeat(5 - Math.floor(accommodation.rating))}
+                                  </span>
+                                </>
+                              ) : (
+                                <span className="text-gray-500 text-[12px]">No ratings</span>
+                              )}
+                            </div>
+                          </div>
+
+                          <p className="font-semibold text-md">
+                            {accommodation.lowest_price && accommodation.highest_price ? (
+                              `₱${accommodation.lowest_price} - ₱${accommodation.highest_price}`
+                            ) : (
+                              <span className="text-gray-400 italic text-[12px]">Price Range Not available</span>
+                            )}
+                          </p>
+                        </div>
+
+                      {/* Explore More Button */}
+                      <Link to={`/business/${encryptId(accommodation.business_id)}`} target="_blank">
+                        <Button className="w-full rounded-md bg-color1 text-color3 hover:bg-color2">
+                          Explore More
+                        </Button>
+                      </Link>
+                    </motion.div>
+                  ))
+                ) : (
+                  <p className="col-span-full text-center text-gray-500">No accommodations match your selected filters.</p>
+                )
               )}
-            </div>
-
-            {/* Card Content */}
-            <div className="p-4 flex-grow">
-              {/* Tags */}
-              <div className="flex flex-wrap gap-2 mb-2">
-                {accommodation.category.map((tag, index) => (
-                  <span
-                    key={index}
-                    className={`text-xs px-2 py-1 rounded-full ${
-                      selectedTags
-                        .map((t) => t.toLowerCase())
-                        .includes(tag.toLowerCase())
-                        ? 'bg-color2 text-white'
-                        : 'bg-gray-200 text-gray-700'
-                    }`}
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-
-              {/* Business Name */}
-              <h3 className="text-lg sm:text-base lg:text-lg font-semibold text-gray-800 truncate">{accommodation.businessName}</h3>
-
-              {/* Location */}
-              <div className="text-xs text-gray-500 mb-2 flex items-center">
-                <GiPositionMarker /> {accommodation.destination}
-              </div>
-              
-            </div>
-                 {/* Ratings & Price */}
-              <div className="flex justify-between p-2 items-center mb-2 gap-2">
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1">
-                    {accommodation.rating ? (
-                      <>
-                        <span className="text-black text-[12px]">{accommodation.rating}</span>
-                        <span className="text-yellow-500">
-                          {'★'.repeat(Math.floor(accommodation.rating))}
-                          {'☆'.repeat(5 - Math.floor(accommodation.rating))}
-                        </span>
-                      </>
-                    ) : (
-                      <span className="text-gray-500 text-[12px]">No ratings</span>
-                    )}
-                  </div>
-                </div>
-
-                <p className="font-semibold text-md">
-                  {accommodation.lowest_price && accommodation.highest_price ? (
-                    `₱${accommodation.lowest_price} - ₱${accommodation.highest_price}`
-                  ) : (
-                    <span className="text-gray-400 italic text-[12px]">Price Range Not available</span>
-                  )}
-                </p>
-              </div>
-
-            {/* Explore More Button */}
-            <Link to={`/business/${encryptId(accommodation.business_id)}`} target="_blank">
-              <Button className="w-full rounded-md bg-color1 text-color3 hover:bg-color2">
-                Explore More
-              </Button>
-            </Link>
-          </motion.div>
-        ))
-      ) : (
-        <p className="col-span-full text-center text-gray-500">No accommodations match your selected filters.</p>
-      )
-    )}
-  </motion.div>
-</div>
+            </motion.div>
+          </div>
 
         </div>
       </div>

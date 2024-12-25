@@ -48,7 +48,7 @@ const DestinationSection = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadTimer = setTimeout(() => setLoading(false), 1000);
+    const loadTimer = setTimeout(() => setLoading(false), 250);
     return () => clearTimeout(loadTimer);
   }, []);
 
