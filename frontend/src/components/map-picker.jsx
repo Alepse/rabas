@@ -68,9 +68,6 @@ const MapPicker = ({ setLatitude, setLongitude }) => {
 
   return (
     <div style={{ position: 'relative' }}>
-      <h2 className="text-2xl font-bold text-center text-gray-800 mb-4">
-        Pin Your Business Location
-      </h2>
       <MapContainer
         center={latLng || [13, 124]} // Default map center without a marker
         zoom={11}
@@ -94,7 +91,7 @@ const MapPicker = ({ setLatitude, setLongitude }) => {
         zIndex: 1000
       }}>
         <button
-          className='bg-color1'
+          className='bg-color1 hover:bg-color2'
           onClick={handleGetLocation}
           style={{
             padding: '10px 20px',

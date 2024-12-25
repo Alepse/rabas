@@ -295,6 +295,9 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
         return (
           <div className="mt-4">
             <h3 className="text-xl font-bold mb-4">Business Location</h3>
+            <h2 className="text-2xl font-bold text-center text-gray-800 mb-4">
+              Pin Your Business Location
+            </h2>
             <MapPicker
               setLatitude={handleLatitudeChange}
               setLongitude={handleLongitudeChange}

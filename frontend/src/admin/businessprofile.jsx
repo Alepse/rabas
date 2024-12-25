@@ -8,6 +8,7 @@ import { businessIcons } from '../businesspage/BusinessComponents/businessIcons'
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import { AiOutlineEdit, AiOutlineCheck, AiOutlineClose } from "react-icons/ai";
+import MapPicker from '../components/map-picker';
 import {
   updateBusinessData,
   addFacility,
@@ -71,6 +72,10 @@ const BusinessProfile = () => {
   const fileInputRef = useRef(null);
   const heroImagesInputRef = useRef(null);
   const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [address, setAddress] = useState('');
+  const [latitude, setLatitude] = useState(null);
+  const [longitude, setLongitude] = useState(null);
+  
 
   // Default opening hours
   const defaultOpeningHours = [
@@ -960,6 +965,24 @@ const BusinessProfile = () => {
     }
   }, [businessData.openingHours]);
 
+  // For updating locations
+  const handleLatitudeChange = (lat) => {
+    setLatitude(lat);
+  };
+
+  const handleLongitudeChange = (lng) => {
+    setLongitude(lng);
+  };
+
+  // Save address
+  const handleSaveLocation = () => {    
+    console.log("New Address: ", address);
+    console.log("New pin location: ");
+    console.log("Latitude: ", latitude);
+    console.log("Longitude: ", longitude);
+    
+  };
+
   return (
     <div className="flex flex-col lg:flex-row min-h-screen mx-auto bg-gray-100 font-sans">
       <Sidebar />
@@ -1477,9 +1500,12 @@ const BusinessProfile = () => {
                   <h2 className="text-lg lg:text-xl font-semibold text-gray-700">Business Location</h2>
                   
                   {/* Map Container */}
-                  <div className="w-full h-[400px] bg-gray-200 rounded-lg flex items-center justify-center">
+                  <div className="w-full h-full rounded-lg">
                     {/* Placeholder for the actual map implementation */}
-                    <p className="text-gray-500">Map will be displayed here</p>
+                      <MapPicker
+                        setLatitude={handleLatitudeChange}
+                        setLongitude={handleLongitudeChange}
+                      />
                   </div>
 
                   {/* Location Controls */}
@@ -1490,26 +1516,15 @@ const BusinessProfile = () => {
                         label="Address"
                         placeholder="Enter address"
                         className="flex-1"
+                        value={address} 
+                        onChange={(event) => setAddress(event.target.value)}
                       />
                     </div>
                     
                     <div className="flex gap-3">
                       <Button 
                         className="flex-1 bg-color1 text-white hover:bg-color2 transition"
-                        onClick={() => {
-                          // Add logic to get current pin location
-                          console.log('Getting pin location...');
-                        }}
-                      >
-                        Get Pin Current Location
-                      </Button>
-                      
-                      <Button 
-                        className="flex-1 bg-green-500 text-white hover:bg-green-600 transition"
-                        onClick={() => {
-                          // Add logic to save location
-                          console.log('Saving location...');
-                        }}
+                        onClick={() => handleSaveLocation()}
                       >
                         Save Location
                       </Button>
@@ -1518,10 +1533,13 @@ const BusinessProfile = () => {
 
                   {/* Location Preview */}
                   <div className="mt-4">
-                    <h3 className="text-md font-semibold mb-2">Current Location</h3>
+                    <h3 className="text-md font-semibold mb-2">Current Coordinate Location</h3>
                     <div className="p-3 bg-gray-50 rounded-lg">
                       <p className="text-sm text-gray-600">
-                        No location set. Place a pin on the map or enter coordinates manually.
+                        Latitude: {latitude}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        Longitude: {longitude}
                       </p>
                     </div>
                   </div>
