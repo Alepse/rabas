@@ -323,10 +323,10 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn }) => {
   
 
   return (
-    <div className="shadow-lg rounded-lg overflow-hidden mb-4">
+    <div className="shadow-lg border p-1 hover:shadow-slate-300 rounded-lg overflow-hidden mb-4">
     <div className="flex flex-col md:flex-row md:flex-wrap">
       {/* Image Section */}
-      <div className="relative w-full h-[250px] md:w-[400px] md:h-[230px] flex-shrink-0">
+      <div className="relative w-full   h-[260px] md:w-[400px] md:h-[250px] flex-shrink-0">
         {product.images.length > 0 ? (
           <img
             src={
@@ -335,7 +335,7 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn }) => {
                 : product.fileUrl || ''
             }
             alt={product.images.length > 0 ? product.images[0].title : product.name}
-            className="object-cover w-full h-full"
+            className="object-cover w-full h-full rounded-md"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-500">
@@ -357,7 +357,7 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn }) => {
       </div>
   
       {/* Content Section */}
-      <div className="p-4 flex flex-col justify-between flex-grow">
+      <div className="p-4 flex flex-col justify-between flex-grow ">
         {/* Product Info */}
         <div className='flex justify-between'>
           <h3 className="font-bold text-lg mb-2">{product.name}</h3>
@@ -413,9 +413,10 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn }) => {
             )}
           </div>
           <div className="flex flex-wrap gap-2 justify-between mt-3 md:mt-2">
-            <Button color="primary">Inquire</Button>
+            <Button size='sm' color="primary">Inquire</Button>
             {product.product_category !== 'shop' && (
               <Button
+              size='sm'
                 color="success"
                 className="text-white"
                 onClick={() => {
@@ -903,8 +904,8 @@ const BusinessAllproducts = () => {
                         alt="Preview"
                         className="max-w-full max-h-[85vh] w-auto h-auto object-contain rounded-md"
                         style={{
-                          minWidth: '300px',  // Minimum width for very small images
-                          minHeight: '200px', // Minimum height for very small images
+                          minWidth: '900px',  // Minimum width for very small images
+                          minHeight: '900px', // Minimum height for very small images
                         }}
                       />
                     </div>
