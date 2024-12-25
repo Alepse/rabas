@@ -218,7 +218,7 @@ const SchedulesPlan = ({ startDate, endDate, onItineraryChange }) => {
             <Accordion selectionMode="multiple">
                 {Object.keys(itineraryItems).map(date => (
                     <AccordionItem 
-                      className='max-h-[700px] h-full overflow-auto scrollbar-custom'
+                      className='max-h-[700px] p-2 h-full overflow-auto scrollbar-custom'
                       key={date} 
                       title={date}
                     >
@@ -229,7 +229,7 @@ const SchedulesPlan = ({ startDate, endDate, onItineraryChange }) => {
                         </div>
                         <div className='mx-auto max-h-screen'>
                             {itineraryItems[date].map((item, index) => (
-                                <div key={index} className="flex flex-col sm:flex-row items-start mb-6 bg-white p-4 rounded-lg shadow-lg w-full sm:w-3/4 lg:w-2/3 mx-auto">
+                                <div key={index} className="flex flex-col sm:flex-row items-start mb-6  border p-2 rounded-lg shadow-lg w-full sm:w-3/4 lg:w-2/3 mx-auto">
                                     <div className="flex-shrink-0 w-12 text-center">
                                         <div className="bg-color1 text-white rounded-full w-10 h-10 flex items-center justify-center mb-2">
                                             {index + 1}

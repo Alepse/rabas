@@ -338,8 +338,8 @@ const Trip = () => {
           {trips.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {trips.map((trip, index) => (
-                <div key={index} className="flex flex-col md:flex-row border rounded-lg shadow-md overflow-hidden">
-                  <img src={`${BASE_URL}/${trip.imageUrl}`} alt="Trip" className="w-full md:w-1/3 object-cover" />
+                <div key={index} className="flex items-center flex-col md:flex-row border rounded-lg shadow-md overflow-hidden">
+                  <img src={`${BASE_URL}/${trip.imageUrl}`} alt="Trip" className="w-[12rem] md:w-1/3 object-cover" />
                   <div className="p-4 flex flex-col justify-between w-full md:w-2/3">
                     <div>
                       <h2 className="text-xl font-semibold">{trip.tripName}</h2>
