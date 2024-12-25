@@ -13,6 +13,9 @@ import {
 import Swal from 'sweetalert2';
 import { today, isWeekend, getLocalTimeZone } from '@internationalized/date';
 import { useLocale } from '@react-aria/i18n';
+import { FaUserPen } from "react-icons/fa6";
+import { MdEditCalendar } from "react-icons/md";
+import { CgNotes } from "react-icons/cg";
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
@@ -249,13 +252,14 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
 
   const steps = [
     <div key="step1" className="space-y-4">
+        <h1 className='p-1 text-lg border-b flex gap-2 items-center'><FaUserPen/>Personl Details</h1>
       <Input label="First Name" required fullWidth placeholder="Enter your first name" value={formData.firstName} onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} />
       <Input label="Last Name" required fullWidth placeholder="Enter your last name" value={formData.lastName} onChange={(e) => setFormData({ ...formData, lastName: e.target.value })} />
       <Input type="tel" label="Phone Number" required fullWidth placeholder="Enter your phone number" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
       <Input type="email" label="Email Address" required fullWidth placeholder="Enter your email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
     </div>,
     <div key="step2" className="space-y-4">
-      <h1 className='text-center font-medium'>Availability: Select Visit Date</h1>
+  <h1 className='p-1 text-lg border-b flex gap-2 items-center '><MdEditCalendar/> Appointment Date/Time </h1>
       <div className='flex justify-center'>
         <DatePicker
           aria-label="Select Visit Date"
@@ -266,13 +270,12 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
         />
       </div>
       <div className="mb-4">
-        <label htmlFor="activityTime" className="block text-sm font-medium text-gray-700">Activity Time</label>
         <input
           type="time"
           id="activityTime"
           value={formData.activityTime}
           onChange={handleTimeChange}
-          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-color1 focus:border-color1 sm:text-sm"
           style={{
             padding: '0.5rem',
             borderRadius: '0.375rem',
@@ -300,23 +303,9 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
       />
     </div>,
     <div key="step3" className="space-y-4">
-      <Input 
-        type="number" 
-        label="Amount to Pay" 
-        required 
-        fullWidth 
-        value={formData.discountedPrice} 
-        readOnly 
-      />
-      <Checkbox
-        checked={formData.agreeToTerms}
-        onChange={handleCheckboxChange}
-        className="mt-4"
-      >
-        I agree to the <span className="text-blue-500 cursor-pointer" onClick={() => setPolicyModalOpen(true)}>Terms & Conditions</span>
-      </Checkbox>
+    
       <div className="mt-4">
-        <h3 className="text-lg font-bold">Booking Summary</h3>
+        <h1 className='p-1 text-lg border-b flex gap-2 items-center'> <CgNotes/> Booking Summary</h1>
         <p><strong>First Name:</strong> {formData.firstName}</p>
         <p><strong>Last Name:</strong> {formData.lastName}</p>
         <p><strong>Phone Number:</strong> {formData.phone}</p>
@@ -329,10 +318,10 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
         <p><strong>Special Requests:</strong> {formData.specialRequests || 'None'}</p>
         
         {/* Price details section */}
-        <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-          <h4 className="font-semibold mb-2">Price Details</h4>
+        <div className="mt-3  bg-gray-100 p-2 rounded-lg">
+          <h4 className="font-bold text-lg mb-2">Price Details</h4>
           <div className="space-y-1">
-            <p>
+          <p className='font-semibold'>
               <strong>Original Price:</strong> 
               <span className={Number(formData.discount) > 0 ? "line-through text-gray-500 ml-2" : "ml-2"}>
                 ₱{Number(formData.originalPrice).toFixed(2)}
@@ -340,11 +329,11 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
             </p>
             {Number(formData.discount) > 0 && (
               <>
-                <p className="text-green-600">
+              <p className='font-semibold'>
                   <strong>Discount:</strong> 
                   <span className="ml-2">{Number(formData.discount).toFixed(0)}% OFF</span>
                 </p>
-                <p className="font-bold text-lg">
+                <p className='font-semibold'>
                   <strong>Final Price:</strong> 
                   <span className="ml-2 text-green-600">₱{Number(formData.discountedPrice).toFixed(2)}</span>
                 </p>
@@ -352,6 +341,13 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
             )}
           </div>
         </div>
+        <Checkbox
+        checked={formData.agreeToTerms}
+        onChange={handleCheckboxChange}
+        className="mt-4"
+      >
+        I agree to the <span className="text-blue-500 cursor-pointer" onClick={() => setPolicyModalOpen(true)}>Terms & Conditions</span>
+      </Checkbox>
       </div>
     </div>
   ];
@@ -362,13 +358,13 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
       hideCloseButton
         isOpen={isOpen}
         onClose={() => {}}
-        className="max-w-2xl p-8 bg-white rounded-lg shadow-2xl"
+        className="max-w-2xl p-3 bg-white rounded-lg shadow-2xl"
         closeOnOverlayClick={false} // Ensure the modal does not close on overlay click
       >
         <ModalContent className="rounded-lg">
-          <ModalHeader className="text-3xl font-bold text-gray-800 border-b pb-4">
-            Activity Booking - {product.name}
-          </ModalHeader>
+                <ModalHeader className="text-xl flex justify-center font-bold bg-light  text-black ">
+                   Book an Appointment 
+                  </ModalHeader>
           <ModalBody className="space-y-6">
             {steps[currentStep]}
             <div className="flex justify-between mt-4">

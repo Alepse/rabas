@@ -11,6 +11,9 @@ import {
   RangeCalendar
 } from '@nextui-org/react';
 import Swal from 'sweetalert2';
+import { FaUserPen } from "react-icons/fa6";
+import { MdEditCalendar } from "react-icons/md";
+import { CgNotes } from "react-icons/cg";
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
@@ -179,7 +182,9 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
   };
 
   const steps = [
+    
     <div key="step1" className="space-y-4">
+    <h1 className='p-1 text-lg border-b flex gap-2 items-center'><FaUserPen/>Personl Details</h1>
       <Input 
         label="First Name" 
         required 
@@ -216,7 +221,7 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
       />
     </div>,
     <div key="step2" className="space-y-4">
-      <h1 className='text-center font-medium'>Availability: Select Check-in and Check-out Dates  </h1>
+       <h1 className='p-1 text-lg border-b flex gap-2 items-center '><MdEditCalendar/>Select Check-in/Check-out Dates   </h1>
       <div className='flex justify-center'>
       <RangeCalendar
         aria-label="Select Check-in and Check-out Dates"
@@ -242,23 +247,8 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
       />
     </div>,
     <div key="step3" className="space-y-4">
-      <Input 
-        type="number" 
-        label="Amount to Pay" 
-        required 
-        fullWidth 
-        value={formData.discountedPrice} 
-        readOnly 
-      />
-      <Checkbox
-        checked={formData.agreeToTerms}
-        onChange={handleCheckboxChange}
-        className="mt-4"
-      >
-        I agree to the <span className="text-blue-500 cursor-pointer" onClick={() => setPolicyModalOpen(true)}>Terms & Conditions</span>
-      </Checkbox>
       <div className="mt-4">
-        <h3 className="text-lg font-bold">Booking Summary</h3>
+      <h1 className='p-1 text-lg border-b flex gap-2 items-center'> <CgNotes/> Booking Summary</h1>
         <p><strong>First Name:</strong> {formData.firstName}</p>
         <p><strong>Last Name:</strong> {formData.lastName}</p>
         <p><strong>Phone Number:</strong> {formData.phone}</p>
@@ -270,14 +260,13 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
           </>
         )}
         <p><strong>Number of Guests:</strong> {formData.numberOfGuests}</p>
-        <p><strong>Special Requests:</strong> {formData.specialRequests || 'None'}</p>
-        
+        <p><strong>Special Requests:</strong> {formData.specialRequests || 'None'}</p>  
         {/* Price details section */}
-        <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-          <h4 className="font-semibold mb-2">Price Details</h4>
-          <div className="space-y-1">
-            <p>
-              <strong>Original Price:</strong> 
+        <div className="mt-3  bg-gray-100 p-2 rounded-lg">
+          <h4 className="font-bold text-lg mb-2">Price Details</h4>
+          <div className="space-y-1 ">
+            <p className='font-semibold'>
+              <strong>Original Price: </strong>
               <span className={Number(formData.discount) > 0 ? "line-through text-gray-500 ml-2" : "ml-2"}>
                 ₱{Number(formData.originalPrice).toFixed(2)}
               </span>
@@ -295,17 +284,25 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
               </>
             )}
           </div>
+          
         </div>
+        <Checkbox
+        checked={formData.agreeToTerms}
+        onChange={handleCheckboxChange}
+        className="mt-4"
+      >
+        I agree to the <span className="text-blue-500 cursor-pointer" onClick={() => setPolicyModalOpen(true)}>Terms & Conditions</span>
+      </Checkbox>
       </div>
     </div>
   ];
 
   return (
     <>
-      <Modal hideCloseButton isOpen={isOpen} onClose={() => {}} className="max-w-2xl p-8 bg-white rounded-lg shadow-2xl">
+      <Modal hideCloseButton isOpen={isOpen} onClose={() => {}} className="max-w-2xl p-3 bg-white rounded-lg shadow-2xl">
         <ModalContent className="rounded-lg">
-          <ModalHeader className="text-3xl font-bold text-gray-800 border-b pb-4">
-            Book a Room in - {product.name}
+          <ModalHeader className="text-xl flex justify-center font-bold bg-light  text-black ">
+          Accommodation Booking
           </ModalHeader>
           <ModalBody className="space-y-6">
             {steps[currentStep]}
@@ -317,7 +314,7 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
                 {currentStep > 0 && <Button auto flat color='primary' onClick={prevStep}>Back</Button>}
               </div>
               {currentStep < steps.length - 1 ? (
-                <Button auto color='success' className='text-white' onClick={nextStep}>Next</Button>
+                <Button auto color='primary' className='text-white' onClick={nextStep}>Next</Button>
               ) : (
                 <Button auto color="success" className='text-white' onClick={handleSubmit}>Submit</Button>
               )}
@@ -341,7 +338,7 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
             </ul>
           </ModalBody>
           <ModalFooter>
-            <Button auto onClick={() => setPolicyModalOpen(false)}>
+            <Button auto color='danger'  onClick={() => setPolicyModalOpen(false)}>
               Close
             </Button>
           </ModalFooter>
