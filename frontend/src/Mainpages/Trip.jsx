@@ -338,9 +338,11 @@ const Trip = () => {
           {trips.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {trips.map((trip, index) => (
-                <div key={index} className="flex items-center flex-col md:flex-row border rounded-lg shadow-md overflow-hidden">
-                  <img src={`${BASE_URL}/${trip.imageUrl}`} alt="Trip" className="w-[12rem] md:w-1/3 object-cover" />
-                  <div className="p-4 flex flex-col justify-between w-full md:w-2/3">
+                <div key={index} className="flex items-center flex-col md:flex-row border rounded-lg shadow-md overflow-hidden p-2">
+                  <div className="flex h-full w-[12rem] md:w-1/3 p-2">
+                    <img src={`${BASE_URL}/${trip.imageUrl}`} alt="Trip" className="w-full h-full object-cover rounded-lg" />
+                  </div>
+                  <div className="p-2 flex flex-col justify-between w-full md:w-2/3">
                     <div>
                       <h2 className="text-xl font-semibold">{trip.tripName}</h2>
                       <p className="text-gray-600">{new Date(trip.startDate).toLocaleString('en-US', {
@@ -503,7 +505,14 @@ const Trip = () => {
                                     <h3 className="font-semibold text-xl">{item.title}</h3>
                                     <span className="text-sm text-gray-500"> <span className='text-black font-medium'>Time of Visit:</span> {formatTime(item.time)}</span>
                                   </div>
-                                  <img src={`${BASE_URL}/${item.imageUrl}` || 'https://via.placeholder.com/300'} alt={item.title} className="w-full h-56 object-cover rounded-md mb-4" />
+                                  {item.imageUrl ? (
+                                    <img src={`${BASE_URL}/${item.imageUrl}` || 'https://via.placeholder.com/300'} alt={item.title} className="w-full h-56 object-cover rounded-md mb-4" />
+                                  ) : (
+                                    <div className="w-full h-56 object-cover rounded-md mb-4">
+                                      <div className="w-full h-full flex items-center justify-center text-gray-500 bg-gray-200 rounded-lg">
+                                        No images available
+                                      </div>
+                                    </div>                                                          )}
                                   <p className="text-sm mb-2"><strong>Booked:</strong> {item.isBooked ? 'Yes' : 'No'}</p>
                                   <p className="text-sm mb-4"><strong>Notes:</strong> {item.notes}</p>
                                 </div>

@@ -176,9 +176,17 @@ const BusinessSection = () => {
           >
             {discountedProducts.map((deal, index) => (
               <SwiperSlide key={`${deal.id}-${index}`} className='flex justify-center'>
-                <div className='shadow-lg rounded-lg overflow-hidden bg-white relative max-w-sm mx-1 transform transition-transform duration-300 hover:scale-105 hover:shadow-xl' style={{ height: '450px', width: '300px' }}>
-                  {deal.images && deal.images.length > 0 && (
-                    <img src={`${BASE_URL}/${deal.images[0].path}`} alt={deal.name} className='w-full h-48 object-cover' />
+                <div className='shadow-lg rounded-lg overflow-hidden bg-white relative max-w-sm mx-1 transform transition-transform duration-300 hover:scale-105 hover:shadow-xl' style={{ height: '450px', width: '320px' }}>
+                  {deal.images.length > 0 ? (
+                    <div className="w-full h-48 p-4 ">
+                      <img src={`${BASE_URL}/${deal.images[0].path}`} alt={deal.name} className='object-cover w-full h-full rounded-lg' />
+                    </div>
+                  ) : (
+                    <div className="w-full h-48 flex items-center justify-center text-gray-500 p-4">
+                      <div className="w-full h-full flex items-center justify-center text-gray-500 bg-gray-200 rounded-lg">
+                        No images available
+                      </div>
+                    </div>
                   )}
                   <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
                     {deal.discount}% OFF

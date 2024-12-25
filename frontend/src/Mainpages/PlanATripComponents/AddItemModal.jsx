@@ -422,7 +422,7 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                     name: selectedItem.businessName,
                     description: selectedItem.description,
                     title: selectedItem.businessName,
-                    imageUrl: selectedItem.businessLogo,
+                    imageUrl: selectedItem.cardImage,
                     location: selectedItem.destination,
                     pin_location: selectedItem.pin_location,
                     time: itineraryTime || '',
@@ -593,25 +593,30 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
 
                                 const filteredItems = filterData(mockData[category], filters);
 
-                                // console.log('filteredItems:', filteredItems);
+                                console.log('filteredItems:', filteredItems);
 
                                 return filteredItems.map((item, index) => (
                                         <motion.div
                                             key={index}
-                                            className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 relative"
+                                            className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 relative p-2"
                                             variants={cardVariants}
                                         >
-                                            <button
-                                                className="absolute top-2 right-2 bg-color1 text-color3 p-1 rounded-full"
-                                                onClick={() => handleAddItemClick(item)}
-                                            >
-                                                <FaPlus />
-                                            </button>
-                                            <img
-                                                src={`${BASE_URL}/${item.businessLogo}`}
-                                                alt={item.businessName}
-                                                className="w-full h-48 object-cover rounded-t-lg"
-                                            />
+                                            {item.cardImage ? (
+                                            <div className="w-full h-48 p-4">
+                                                <img
+                                                    src={`${BASE_URL}/${item.cardImage}`}
+                                                    alt={item.businessName}
+                                                    className="w-full h-full object-cover rounded-t-lg"
+                                                />
+                                            </div>
+                                            ) : (
+                                                <div className="w-full h-48 flex items-center justify-center text-gray-500 p-4">
+                                                    <div className="w-full h-full flex items-center justify-center text-gray-500 bg-gray-200 rounded-lg">
+                                                        No images available
+                                                    </div>
+                                                </div>
+                                            )}
+                                            
                                             <div className="p-4">
                                                 <div className="flex justify-between items-center mb-2">
                                                     <div className="flex flex-wrap gap-2">
@@ -660,9 +665,19 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                                                     <span className="text-gray-400 italic">Price Range Not available</span>
                                                     )}
                                                 </p>
-                                                <Button as={Link} to={`/business/${encryptId(item.business_id)}`} target="_blank" className="w-full bg-color1 text-color3 hover:bg-color2">
-                                                    View
-                                                </Button>
+                                                <div className="p-1">
+                                                    <Button
+                                                        className="w-full bg-color1 text-color3 hover:bg-color2 "
+                                                        onClick={() => handleAddItemClick(item)}
+                                                    >
+                                                        Add
+                                                    </Button>
+                                                </div>
+                                                <div className="p-1">
+                                                    <Button as={Link} to={`/business/${encryptId(item.business_id)}`} target="_blank" className="w-full bg-color1 text-color3 hover:bg-color2">
+                                                        View
+                                                    </Button>
+                                                </div>
                                             </div>
                                         </motion.div>
                                     ))
@@ -720,9 +735,18 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                                 <h2 className="text-xl font-semibold">Add to Itinerary</h2>
                                 <Button auto color='danger' flat onClick={() => setIsSideUIVisible(false)}>Close</Button>
                             </div>
-                            <div className="mb-4">
-                                <img src={`${BASE_URL}/${selectedItem.businessLogo}`} alt={selectedItem.businessName} className="w-full h-48 object-cover rounded-md" />
-                            </div>
+                            {selectedItem.cardImage ? (
+                                <div className="mb-4">
+                                    <img src={`${BASE_URL}/${selectedItem.cardImage}`} alt={selectedItem.businessName} className="w-full h-48 object-cover rounded-md" />
+                                </div>
+                            ) : (
+                                <div className="w-full h-48 flex items-center justify-center text-gray-500 mb-4">
+                                    <div className="w-full h-full flex items-center justify-center text-gray-500 bg-gray-200 rounded-lg">
+                                        No images available
+                                    </div>
+                                </div>
+                            )}
+                            
                             <h3 className="text-lg font-bold">{selectedItem.title}</h3>
                             <p className="text-sm text-gray-500 mb-2">{selectedItem.destination}</p>
                             <p className="text-sm text-gray-600 mb-2">{selectedItem.description}</p>

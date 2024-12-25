@@ -298,18 +298,22 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn }) => {
         {/* Image Section */}
         <div className="relative w-full   h-[260px] md:w-[400px] md:h-[250px] flex-shrink-0">
           {product.images.length > 0 ? (
-            <img
-              src={
-                product.images.length > 0 && product.images[0].path
-                  ? `${BASE_URL}/${product.images[0].path}`
-                  : product.fileUrl || ''
-              }
-              alt={product.images.length > 0 ? product.images[0].title : product.name}
-              className="object-cover w-full h-full rounded-md"
-            />
+            <div className="w-full h-full p-4">
+              <img
+                src={
+                  product.images.length > 0 && product.images[0].path
+                    ? `${BASE_URL}/${product.images[0].path}`
+                    : product.fileUrl || ''
+                }
+                alt={product.images.length > 0 ? product.images[0].title : product.name}
+                className="object-cover w-full h-full rounded-lg"
+              />
+            </div>
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-500">
-              No images available
+            <div className="w-full h-full flex items-center justify-center text-gray-500 p-4">
+              <div className="w-full h-full flex items-center justify-center text-gray-500 bg-gray-200 rounded-lg">
+                No images available
+              </div>
             </div>
           )}
           {product.discount > 0 && (
