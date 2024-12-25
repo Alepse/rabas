@@ -241,7 +241,7 @@ const TableReservationForm = ({ isOpen, onClose, product = {} }) => {
       <Input type="email" label="Email Address" required fullWidth placeholder="Enter your email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
     </div>,
     <div key="step2" className="space-y-4">
-             <h1 className='p-1 text-lg border-b flex gap-2 items-center '><MdEditCalendar/> Availability: Select Check-in and Check-out Dates   </h1>
+             <h1 className='p-1 text-lg border-b flex gap-2 items-center '><MdEditCalendar/> Reservation Date and Time   </h1>
       <div className='flex justify-center'>
         <DatePicker
           aria-label="Select Reservation Date"
@@ -252,7 +252,6 @@ const TableReservationForm = ({ isOpen, onClose, product = {} }) => {
         />
       </div>
       <div className="mb-4">
-        <label htmlFor="reservationTime" className="block text-sm font-medium text-gray-700">Reservation Time</label>
         <input
           type="time"
           id="reservationTime"
@@ -337,7 +336,7 @@ const TableReservationForm = ({ isOpen, onClose, product = {} }) => {
 
   return (
     <>
-      <Modal hideCloseButton isOpen={isOpen} onClose={() => {}} className="max-w-2xl p-8 bg-white rounded-lg shadow-2xl">
+      <Modal hideCloseButton isOpen={isOpen} onClose={() => {}} className="max-w-2xl p-3 bg-white rounded-lg shadow-2xl">
         <ModalContent className="rounded-lg">
            <ModalHeader className="text-xl flex justify-center font-bold bg-light  text-black ">
                    Book A Table

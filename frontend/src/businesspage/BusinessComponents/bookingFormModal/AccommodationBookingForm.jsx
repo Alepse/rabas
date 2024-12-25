@@ -221,7 +221,7 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
       />
     </div>,
     <div key="step2" className="space-y-4">
-       <h1 className='p-1 text-lg border-b flex gap-2 items-center '><MdEditCalendar/> Availability: <span>Select Check-in and Check-out Dates </span>  </h1>
+       <h1 className='p-1 text-lg border-b flex gap-2 items-center '><MdEditCalendar/>Select Check-in/Check-out Dates   </h1>
       <div className='flex justify-center'>
       <RangeCalendar
         aria-label="Select Check-in and Check-out Dates"

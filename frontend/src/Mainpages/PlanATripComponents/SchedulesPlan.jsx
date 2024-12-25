@@ -275,7 +275,7 @@ const SchedulesPlan = ({ startDate, endDate, onItineraryChange }) => {
                                                 </div>
                                                 <div className="flex space-x-2">
                                                     <Button size="sm" color="danger" className="w-full" onClick={() => handleDelete(date, index)}>Delete</Button>
-                                                    <Button size="sm" className="w-full" onClick={() => handleEdit(date, index)}>Edit</Button>
+                                                    <Button size="sm" color='primary' className="w-full" onClick={() => handleEdit(date, index)}>Edit</Button>
                                                 </div>
                                             </div>
                                         )}

@@ -259,7 +259,7 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
       <Input type="email" label="Email Address" required fullWidth placeholder="Enter your email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
     </div>,
     <div key="step2" className="space-y-4">
-  <h1 className='p-1 text-lg border-b flex gap-2 items-center '><MdEditCalendar/> Availability: Select a Visit Date </h1>
+  <h1 className='p-1 text-lg border-b flex gap-2 items-center '><MdEditCalendar/> Appointment Date/Time </h1>
       <div className='flex justify-center'>
         <DatePicker
           aria-label="Select Visit Date"
@@ -270,7 +270,6 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
         />
       </div>
       <div className="mb-4">
-        <label htmlFor="activityTime" className="block text-sm font-medium text-gray-700">Activity Time</label>
         <input
           type="time"
           id="activityTime"
@@ -359,7 +358,7 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
       hideCloseButton
         isOpen={isOpen}
         onClose={() => {}}
-        className="max-w-2xl p-8 bg-white rounded-lg shadow-2xl"
+        className="max-w-2xl p-3 bg-white rounded-lg shadow-2xl"
         closeOnOverlayClick={false} // Ensure the modal does not close on overlay click
       >
         <ModalContent className="rounded-lg">
