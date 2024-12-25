@@ -275,7 +275,7 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
                 <DropdownTrigger>
                   <div className="cursor-pointer ml-6">
                     <Avatar
-                      className='text-lg bg-color1 text-white  duration-300'
+                      className='text-lg bg-color1 text-white duration-300'
                       src={userData?.image_path
                         ? `${BASE_URL}/${userData.image_path}`
                         : userData?.google_id
@@ -533,8 +533,8 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="xl:hidden fixed inset-0 bg-light z-40 overflow-y-auto flex flex-col items-center justify-center p-4">
-          <div className="flex flex-col items-center space-y-6 w-full">
+        <div className="xl:hidden fixed right-0 w-auto h-auto bg-light z-40 flex flex-col items-center p-4 m-2 rounded-large">
+          <div className="flex flex-col space-y-1 w-full m-4">
             <div className="relative w-full max-w-md mb-4">
               <input
                 type="text"
@@ -551,80 +551,28 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
                 />
               )}
             </div>
-
-            <div className="hover:text-gray-700 cursor-pointer hover:font-semibold duration-100 text-lg font-light flex items-center gap-1">
-              <FaHome /> <a href='/'>Home</a>
+            <div className="hover:text-gray-700 hover:bg-gray-300 cursor-pointer duration-100 text-lg font-light flex items-center gap-2">
+              <FaHome className='m-2' /> <a href='/' className='m-2'>Home</a>
             </div>
-
-            <NavigationMenu className='z-50'>
-              <NavigationMenuList>
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger className="flex gap-1 text-color1 hover:text-gray-700 text-lg cursor-pointer hover:font-semibold duration-100 font-light">
-                    <GiPositionMarker />
-                    <a href='/destinations'> Destinations</a>
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <NavigationMenuLink>
-                      <div className="p-9 w-max bg-light shadow-md">
-                        <ul className="space-y-2 text-dark text-sm">
-                          <Link to='/destinations?name=Barcelona'><li className=' py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Barcelona</li></Link>
-                          <Link to='/destinations?name=Bulan'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Bulan</li></Link>
-                          <Link to='/destinations?name=Bulusan'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Bulusan</li></Link>
-                          <Link to='/destinations?name=Casiguran'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Casiguran</li></Link>
-                          <Link to='/destinations?name=Castilla'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Castilla</li></Link>
-                          <Link to='/destinations?name=Donsol'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Donsol</li></Link>
-                          <Link to='/destinations?name=Gubat'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Gubat</li></Link>
-                          <Link to='/destinations?name=Irosin'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Irosin</li></Link>
-                          <Link to='/destinations?name=Juban'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Juban</li></Link>
-                          <Link to='/destinations?name=Magallanes'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Magallanes</li></Link>
-                          <Link to='/destinations?name=Matnog'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Matnog</li></Link>
-                          <Link to='/destinations?name=Pilar'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Pilar</li></Link>
-                          <Link to='/destinations?name=PrietoDiaz'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Prieto Diaz</li></Link>
-                          <Link to='/destinations?name=StaMagdalena'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Sta. Magdalena</li></Link>
-                          <Link to='/destinations?name=Sorsogon'><li className='py-1 hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Sorsogon City</li></Link>
-                        </ul>
-                      </div>
-                    </NavigationMenuLink>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-              </NavigationMenuList>
-            </NavigationMenu>
-
-            <NavigationMenu className='z-40'>
-              <NavigationMenuList>
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger className="flex gap-1 text-color1 hover:text-gray-700 text-lg cursor-pointer hover:font-semibold duration-100 font-light">
-                    <FaPersonWalking />
-                    <a href='/Discover'> Discover </a>
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <NavigationMenuLink>
-                      <div className="w-max p-9 bg-light">
-                        <ul className="text-dark text-sm space-y-3">
-                          <a href='/activities'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Activities</li></a>
-                          <a href='/accommodations'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Accommodations</li></a>
-                          <a href='/foodplaces'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Food Places</li></a>
-                          <a href='/shops'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Shops</li></a>
-                        </ul>
-                      </div>
-                    </NavigationMenuLink>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-              </NavigationMenuList>
-            </NavigationMenu>
+            <div className="hover:text-gray-700 hover:bg-gray-300 cursor-pointer duration-100 text-lg font-light flex items-center gap-2">
+              <GiPositionMarker className='m-2' /> <a href='/destinations' className='m-2'> Destinations</a>
+            </div>
+            <div className="hover:text-gray-700 hover:bg-gray-300 cursor-pointer duration-100 text-lg font-light flex items-center gap-2">
+              <FaPersonWalking className='m-2' /> <a href='/Discover' className='m-2' > Discover </a>
+            </div>
             {isLoggedIn && (
               <div
-                className={`cursor-pointer  hover:font-semibold duration-100 text-lg font-light flex items-center gap-1 ${activeLink === '/trip' ? ' border-b-1 border-light p-1 font-semibold ' : ''}`}
+                className={`cursor-pointer  hover:bg-gray-300 duration-100 text-lg font-light flex items-center gap-2 ${activeLink === '/trip' ? ' border-b-1 border-light p-1 font-semibold ' : ''}`}
                 onClick={() => setActiveLink('/trip')}
               >
-                <TbNotes /> <a href='/trip'>Trip</a>
+                <TbNotes className='m-2' /> <a href='/trip' className='m-2' >Trip</a>
               </div>
             )}
-            <div className="hover:text-gray-700 cursor-pointer hover:font-semibold duration-100 text-lg font-light flex items-center gap-1">
-              <PiJeep /> <a href='/transportation'>Transportation</a>
+            <div className="hover:text-gray-700 hover:bg-gray-300 cursor-pointer duration-100 text-lg font-light flex items-center gap-2">
+              <PiJeep className='m-2' /> <a href='/transportation' className='m-2' >Transportation</a>
             </div>
-            <div className="hover:text-gray-700 cursor-pointer hover:font-semibold duration-100 text-lg font-light flex items-center gap-1">
-              <CiSquareInfo /> <a href='/about'>About</a>
+            <div className="hover:text-gray-700 hover:bg-gray-300 cursor-pointer duration-100 text-lg font-light flex items-center gap-2">
+              <CiSquareInfo className='m-2' /> <a href='/about' className='m-2'>About</a>
             </div>
 
           </div>
