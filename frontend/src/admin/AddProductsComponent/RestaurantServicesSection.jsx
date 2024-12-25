@@ -264,7 +264,7 @@ const RestaurantSection = () => {
         console.error('Error deleting products:', error);
       }
     } else {
-      console.log('No restaurants selected for deletion.');
+      // console.log('No restaurants selected for deletion.');
     }
   };
 
@@ -400,7 +400,7 @@ const RestaurantSection = () => {
         // Check if we are in editing mode or adding a new restaurant
         if (isEditing) {
           result = dispatch(handleUpdateRestaurant(formData));
-          console.log('Restaurant updated successfully:', result);
+          // console.log('Restaurant updated successfully:', result);
         } else {
           result = dispatch(addProduct(formData));
           // console.log('Restaurant added successfully:', result.payload);
@@ -650,7 +650,6 @@ const RestaurantSection = () => {
                         onSelectionChange={(key) => {
                           const selectedKey = key instanceof Set ? Array.from(key)[0] : key;
                           const selectedOption = options.find(option => option.value === selectedKey);
-                          console.log("Selected Key:", selectedKey); // Log the selected key
                           if (selectedOption) {
                             setRestaurantType(selectedOption.value); // Set only the value
                           }

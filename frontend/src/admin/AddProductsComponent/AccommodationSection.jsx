@@ -260,7 +260,7 @@ const AccommodationSection = () => {
         console.error('Error deleting products:', error);
       }
     } else {
-      console.log('No accommodations selected for deletion.');
+      // console.log('No accommodations selected for deletion.');
     }
   };
 
@@ -389,14 +389,14 @@ const AccommodationSection = () => {
       formData.append('removedImages', JSON.stringify(removedImages)); // Send removed images
 
       // console.log('existing images: ', existingImages);
-      console.log('FormData: ', formData);
+      // console.log('FormData: ', formData);
       
       try {
         let result;
         // Check if we are in editing mode or adding a new accommodation
         if (isEditing) {
           result = dispatch(handleUpdateAccommodation(formData));
-          console.log('Accommodation updated successfully:', result);
+          // console.log('Accommodation updated successfully:', result);
         } else {
           result = dispatch(addProduct(formData));
           // console.log('Accommodation added successfully:', result.payload);
@@ -431,7 +431,7 @@ const AccommodationSection = () => {
   };
 
   const handleEdit = (accommodation) => {
-    console.log("Editing accommodation:", accommodation); // Log the entire accommodation object
+    // console.log("Editing accommodation:", accommodation); // Log the entire accommodation object
     
     // Set accommodation details
     setAccommodationName(accommodation.accommodationName);
@@ -647,7 +647,6 @@ const AccommodationSection = () => {
                       onSelectionChange={(key) => {
                         const selectedKey = key instanceof Set ? Array.from(key)[0] : key;
                         const selectedOption = options.find(option => option.value === selectedKey);
-                        console.log("Selected Key:", selectedKey); // Log the selected key
                         if (selectedOption) {
                           setAccommodationType(selectedOption.value); // Set only the value
                         }

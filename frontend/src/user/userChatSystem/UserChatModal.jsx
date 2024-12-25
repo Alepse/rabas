@@ -177,7 +177,7 @@ const UserChatModal = ({ isOpen, onClose }) => {
       const fetchMessages = async () => {
         try {
           const { data } = await axios.get(`${BASE_URL}/userMessages/${user_id}`);
-          console.log('data', data);
+          // console.log('data', data);
   
           // Reduce messages into a dictionary keyed by businessId
           const fetchedMessages = data.reduce((acc, { businessId, messages }) => {
@@ -197,7 +197,7 @@ const UserChatModal = ({ isOpen, onClose }) => {
             return new Date(latestMessageB) - new Date(latestMessageA);
           });
   
-          console.log('sortedBusinessIds', sortedBusinessIds);
+          // console.log('sortedBusinessIds', sortedBusinessIds);
   
           // Fetch businesses based on the sorted business IDs
           fetchBusinesses(sortedBusinessIds);
@@ -233,7 +233,7 @@ const UserChatModal = ({ isOpen, onClose }) => {
     const fetchNewMessages = async () => {
       try {
         const { data } = await axios.get(`${BASE_URL}/userMessages/${user_id}`);
-        console.log('data', data);
+        // console.log('data', data);
   
         // Reduce messages into a dictionary keyed by businessId
         const fetchedMessages = data.reduce((acc, { businessId, messages }) => {
@@ -258,7 +258,7 @@ const UserChatModal = ({ isOpen, onClose }) => {
           return new Date(latestMessageB) - new Date(latestMessageA);
         });
   
-        console.log('sortedBusinessIds', sortedBusinessIds);
+        // console.log('sortedBusinessIds', sortedBusinessIds);
   
         // Fetch businesses based on the sorted business IDs
         fetchBusinesses(sortedBusinessIds);

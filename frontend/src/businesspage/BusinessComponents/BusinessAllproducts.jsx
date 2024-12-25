@@ -46,30 +46,6 @@ const showSuccessAlert = (message) => {
   });
 };
 
-// Mockup Component to Test InclusionsModal
-
-const mockInclusion = {  
-  name: "Luxury Beach Resort",  
-  inclusions: [  
-    "Free breakfast buffet",  
-    "Complimentary airport transfers",  
-    "Access to private beach area",  
-    "Unlimited use of the swimming pool and gym",  
-    "Free high-speed WiFi",  
-    "24-hour room service",  
-    "Daily housekeeping",  
-    "Complimentary welcome drinks",  
-    "On-site restaurant with diverse cuisine options",  
-    "Spa and wellness center access",  
-    "Kids' club or children’s activities",  
-    "Free parking",  
-    "Business center with meeting rooms",  
-    "Guided tours and excursions",  
-    "Yoga or fitness classes",  
-   
-  ],  
-};
-
 const showErrorAlert = (message) => {
   Swal.fire({
     title: 'Error!',
@@ -89,10 +65,6 @@ const ReviewModal = ({ isOpen, onClose, product, isLoggedIn }) => {
   const [newReview, setNewReview] = useState('');
   const [newRating, setNewRating] = useState(0);
   const [reviews, setReviews] = useState([]);
-
-
- 
-
 
   const fetchUserData = () => {
     axios.get(`${BASE_URL}/get-userData`, { withCredentials: true })
@@ -179,8 +151,6 @@ const ReviewModal = ({ isOpen, onClose, product, isLoggedIn }) => {
     onClose();
   };
 
-
- 
 
   return (
     <Modal scrollBehavior='inside' isOpen={isOpen} onClose={handleClose} className="max-w-full md:max-w-2xl">
@@ -302,7 +272,7 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn }) => {
               {inclusions.map((inclusion, index) => (
                 <li key={index} className="flex items-center">
                   <IoCheckmarkCircleOutline className="text-green-500 mr-2" />
-                  <p className="text-gray-800">{inclusion}</p>
+                  <p className="text-gray-800">{inclusion.item}</p>
                 </li>
               ))}
             </ul>
@@ -324,138 +294,135 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn }) => {
 
   return (
     <div className="shadow-lg border p-1 hover:shadow-slate-300 rounded-lg overflow-hidden mb-4">
-    <div className="flex flex-col md:flex-row md:flex-wrap">
-      {/* Image Section */}
-      <div className="relative w-full   h-[260px] md:w-[400px] md:h-[250px] flex-shrink-0">
-        {product.images.length > 0 ? (
-          <img
-            src={
-              product.images.length > 0 && product.images[0].path
-                ? `${BASE_URL}/${product.images[0].path}`
-                : product.fileUrl || ''
-            }
-            alt={product.images.length > 0 ? product.images[0].title : product.name}
-            className="object-cover w-full h-full rounded-md"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-500">
-            No images available
-          </div>
-        )}
-        {product.discount > 0 && (
-          <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
-            {product.discount}% OFF
-          </div>
-        )}
-        <Button
-          size="sm"
-          className="absolute bottom-5 right-2 text-white bg-color1"
-          onClick={handleViewImages}
-        >
-          View Images
-        </Button>
-      </div>
-  
-      {/* Content Section */}
-      <div className="p-4 flex flex-col justify-between flex-grow ">
-        {/* Product Info */}
-        <div className='flex justify-between'>
-          <h3 className="font-bold text-lg mb-2">{product.name}</h3>
-          <div className="flex items-center gap-2 ">
-            <span className="text-black font-semibold">{product.rating}</span>
-            <div className="flex">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <AiFillStar
-                  key={star}
-                  className={star <= product.rating ? 'text-yellow-500' : 'text-gray-300'}
-                />
-              ))}
+      <div className="flex flex-col md:flex-row md:flex-wrap">
+        {/* Image Section */}
+        <div className="relative w-full   h-[260px] md:w-[400px] md:h-[250px] flex-shrink-0">
+          {product.images.length > 0 ? (
+            <img
+              src={
+                product.images.length > 0 && product.images[0].path
+                  ? `${BASE_URL}/${product.images[0].path}`
+                  : product.fileUrl || ''
+              }
+              alt={product.images.length > 0 ? product.images[0].title : product.name}
+              className="object-cover w-full h-full rounded-md"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-500">
+              No images available
             </div>
-            <Tooltip content="Write a Review">
-              <button className="bg-transparent" onClick={openReviewModal}>
-                <TbMessageStar  className="text-lg cursor-pointer" />
-              </button>
-            </Tooltip>
-            <Tooltip content="View Inclusions">
-              <button  className="bg-transparent"      onClick={openInclusionsModal} >
-                <TbListDetails  className="text-lg cursor-pointer" />
-              </button>
-            </Tooltip>
-          </div>
+          )}
+          {product.discount > 0 && (
+            <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+              {product.discount}% OFF
+            </div>
+          )}
+          <Button
+            size="sm"
+            className="absolute bottom-5 right-2 text-white bg-color1"
+            onClick={handleViewImages}
+          >
+            View Images
+          </Button>
         </div>
-
-        <p className="text-gray-700 text-sm mb-4">{product.description}</p>
-  
-        {/* Price and Actions */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between mt-4">
-          <div className="text-lg font-semibold">
-            {product.discount > 0 ? (
-              <>
-                <span className="line-through text-gray-500">₱{product.price}</span>
-                <span className="text-red-500 ml-2">₱{discountedPrice}</span>
-                {product.expiration && (
-                  <p className="text-xs text-red-500 mt-1">
-                    Discount expires on:{' '}
-                    {new Date(product.expiration).toLocaleString('en-US', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      hour12: true,
-                    })}
-                  </p>
-                )}
-              </>
-            ) : (
-              `₱${product.price}`
-            )}
+    
+        {/* Content Section */}
+        <div className="p-4 flex flex-col justify-between flex-grow ">
+          {/* Product Info */}
+          <div className='flex justify-between'>
+            <h3 className="font-bold text-lg mb-2">{product.name}</h3>
+            <div className="flex items-center gap-2 ">
+              <span className="text-black font-semibold">{product.rating}</span>
+              <div className="flex">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <AiFillStar
+                    key={star}
+                    className={star <= product.rating ? 'text-yellow-500' : 'text-gray-300'}
+                  />
+                ))}
+              </div>
+              <Tooltip content="Write a Review">
+                <button className="bg-transparent" onClick={openReviewModal}>
+                  <TbMessageStar  className="text-lg cursor-pointer" />
+                </button>
+              </Tooltip>
+              <Tooltip content="View Inclusions">
+                <button  className="bg-transparent"      onClick={openInclusionsModal} >
+                  <TbListDetails  className="text-lg cursor-pointer" />
+                </button>
+              </Tooltip>
+            </div>
           </div>
-          <div className="flex flex-wrap gap-2 justify-between mt-3 md:mt-2">
-            <Button size='sm' color="primary">Inquire</Button>
-            {product.product_category !== 'shop' && (
-              <Button
-              size='sm'
-                color="success"
-                className="text-white"
-                onClick={() => {
-                  if (isLoggedIn) {
-                    openBookingModal(product);
-                  } else {
-                    showErrorAlert('Please log in to book this product.');
-                  }
-                }}
-              >
-                {product.product_category === 'restaurant'
-                  ? 'Reserve Table'
-                  : product.product_category === 'activity'
-                  ? 'Book Activity'
-                  : product.product_category === 'accommodation'
-                  ? 'Book Stay'
-                  : 'Book'}
-              </Button>
-            )}
+
+          <p className="text-gray-700 text-sm mb-4">{product.description}</p>
+    
+          {/* Price and Actions */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between mt-4">
+            <div className="text-lg font-semibold">
+              {product.discount > 0 ? (
+                <>
+                  <span className="line-through text-gray-500">₱{product.price}</span>
+                  <span className="text-red-500 ml-2">₱{discountedPrice}</span>
+                  {product.expiration && (
+                    <p className="text-xs text-red-500 mt-1">
+                      Discount expires on:{' '}
+                      {new Date(product.expiration).toLocaleString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: true,
+                      })}
+                    </p>
+                  )}
+                </>
+              ) : (
+                `₱${product.price}`
+              )}
+            </div>
+            <div className="flex flex-wrap gap-2 justify-between mt-3 md:mt-2">
+              <Button size='sm' color="primary">Inquire</Button>
+              {product.product_category !== 'shop' && (
+                <Button
+                size='sm'
+                  color="success"
+                  className="text-white"
+                  onClick={() => {
+                    if (isLoggedIn) {
+                      openBookingModal(product);
+                    } else {
+                      showErrorAlert('Please log in to book this product.');
+                    }
+                  }}
+                >
+                  {product.product_category === 'restaurant'
+                    ? 'Reserve Table'
+                    : product.product_category === 'activity'
+                    ? 'Book Activity'
+                    : product.product_category === 'accommodation'
+                    ? 'Book Stay'
+                    : 'Book'}
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <ReviewModal
-      isOpen={isReviewModalOpen}
-      onClose={closeReviewModal}
-      product={product}
-      isLoggedIn={isLoggedIn}
-    />
-   
-   <InclusionsModal
+      <ReviewModal
+        isOpen={isReviewModalOpen}
+        onClose={closeReviewModal}
+        product={product}
+        isLoggedIn={isLoggedIn}
+      />
+    
+      <InclusionsModal
         isOpen={isInclusionsModalOpen}
         onClose={closeInclusionsModal}
-        inclusions={mockInclusion.inclusions}
+        inclusions={product.inclusions}
       />
     </div>
-
-
-  
   );
 };
 
@@ -618,7 +585,7 @@ const BusinessAllproducts = () => {
         if (contentType && contentType.includes("application/json")) {
           const data = await response.json();
 
-          // console.log('Products: ', data);
+          console.log('Products: ', data);
 
           if (data.success) {
             // Filter products based on their category and decrypted business_id

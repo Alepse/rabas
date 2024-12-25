@@ -263,7 +263,7 @@ const ActivitySections = () => {
         console.error('Error deleting products:', error);
       }
     } else {
-      console.log('No activities selected for deletion.');
+      // console.log('No activities selected for deletion.');
     }
   };
 
@@ -399,7 +399,7 @@ const ActivitySections = () => {
         // Check if we are in editing mode or adding a new activity
         if (isEditing) {
           result = dispatch(handleUpdateActivity(formData));
-          console.log('Activity updated successfully:', result);
+          // console.log('Activity updated successfully:', result);
         } else {
           result = dispatch(addProduct(formData));
           // console.log('Activity added successfully:', result.payload);
@@ -651,7 +651,6 @@ const ActivitySections = () => {
                         onSelectionChange={(key) => {
                           const selectedKey = key instanceof Set ? Array.from(key)[0] : key;
                           const selectedOption = options.find(option => option.value === selectedKey);
-                          console.log("Selected Key:", selectedKey); // Log the selected key
                           if (selectedOption) {
                             setActivityType(selectedOption.value); // Set only the value
                           }

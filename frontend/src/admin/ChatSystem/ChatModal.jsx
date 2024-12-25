@@ -340,7 +340,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
       // Check if the user was found before accessing properties
       if (selectedUser) {
         setActiveChatUser(selectedUser);
-        console.log('activeChatUser', selectedUser);
+        // console.log('activeChatUser', selectedUser);
       } else {
         // console.error(`User with ID ${selectedUserId} not found.`);
       }
@@ -392,7 +392,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
             return acc;
           }, {});
           setMessages(fetchedMessages);
-          console.log('fetchedMessages', fetchedMessages);
+          // console.log('fetchedMessages', fetchedMessages);
   
           // Extract unique user IDs and sort them based on the latest message timestamp
           const uniqueUserIds = [...new Set(data.map(({ userId }) => userId))];
@@ -405,7 +405,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
             return new Date(latestMessageB) - new Date(latestMessageA);
           });
   
-          console.log('sortedUserIds', sortedUserIds);
+          // console.log('sortedUserIds', sortedUserIds);
   
           // Fetch users based on the sorted user IDs
           fetchUsers(sortedUserIds);
@@ -428,7 +428,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
           const usersData = responses.map((response) => response.data);
   
           setUsers(usersData);
-          console.log('users', usersData);
+          // console.log('users', usersData);
         } catch (error) {
           console.error('Error fetching users:', error.response ? error.response.data.message : 'An unknown error occurred');
           toast.error('Failed to load users');
@@ -444,7 +444,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
     const fetchNewMessages = async () => {
       try {
         const { data } = await axios.get(`${BASE_URL}/businessMessages/${user_id}`);
-        console.log('data', data);
+        // console.log('data', data);
   
         // Reduce messages into a dictionary keyed by userId
         const fetchedMessages = data.reduce((acc, { userId, messages }) => {
@@ -469,7 +469,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
           return new Date(latestMessageB) - new Date(latestMessageA);
         });
   
-        console.log('sortedUserIds', sortedUserIds);
+        // console.log('sortedUserIds', sortedUserIds);
   
         // Fetch users based on the sorted user IDs
         fetchUsers(sortedUserIds);
@@ -488,7 +488,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
         const responses = await Promise.all(userRequests);
         const usersData = responses.map((response) => response.data);
         setUsers(usersData);
-        console.log('users', usersData);
+        // console.log('users', usersData);
       } catch (error) {
         console.error('Error fetching users:', error.response ? error.response.data.message : 'An unknown error occurred');
         toast.error('Failed to load users');

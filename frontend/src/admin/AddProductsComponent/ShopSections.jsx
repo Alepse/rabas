@@ -199,7 +199,7 @@ const ShopSections = () => {
         console.error('Error deleting products:', error);
       }
     } else {
-      console.log('No products selected for deletion.');
+      // console.log('No products selected for deletion.');
     }
   };
 
@@ -312,7 +312,7 @@ const ShopSections = () => {
         // Check if we are in editing mode or adding a new product
         if (isEditing) {
           result = dispatch(handleUpdateShopProduct(formData));
-          console.log('Product updated successfully:', result);
+          // console.log('Product updated successfully:', result);
         } else {
           result = dispatch(addProduct(formData));
           // console.log('Product added successfully:', result.payload);
@@ -532,7 +532,6 @@ const ShopSections = () => {
                         onSelectionChange={(key) => {
                           const selectedKey = key instanceof Set ? Array.from(key)[0] : key;
                           const selectedOption = options.find(option => option.value === selectedKey);
-                          console.log("Selected Key:", selectedKey); // Log the selected key
                           if (selectedOption) {
                             setProductType(selectedOption.value); // Set only the value
                           }
