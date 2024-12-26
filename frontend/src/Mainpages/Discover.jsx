@@ -679,17 +679,17 @@ const Discover = () => {
               <MapEvents setCurrentZoom={setCurrentZoom} />
 
               {/* Check if any businesses have valid pin locations */}
-              {businesses.some(business => business.pin_location) ? (
+              {businesses.some(business => business.pin_location && business.pin_location.latitude && business.pin_location.longitude) ? (
                 businesses.map((business, index) => {
                   const { pin_location, businessName, businessLogo } = business;
 
-                  // Skip rendering for businesses without pin_location
-                  if (!pin_location) {
-                    console.warn(`Business "${businessName}" does not have a pin location.`);
+                  // Skip rendering for businesses without valid latitude or longitude
+                  if (!pin_location || pin_location.latitude == null || pin_location.longitude == null) {
+                    // console.warn(`Business "${businessName}" has invalid pin location:`, pin_location);
                     return null;
                   }
 
-                  // Proceed to render marker if pin_location exists and zoom is sufficient
+                  // Proceed to render marker if pin_location is valid and zoom is sufficient
                   if (currentZoom >= 7) {
                     const position = [pin_location.latitude, pin_location.longitude];
                     const showLogo = currentZoom >= 12; // Set zoom level to show/hide logo
@@ -724,7 +724,7 @@ const Discover = () => {
                 })
               ) : (
                 <div className="text-center text-gray-500 mt-4">
-                  No businesses have pin locations to display on the map.
+                  No businesses have valid pin locations to display on the map.
                 </div>
               )}
             </MapContainer>
