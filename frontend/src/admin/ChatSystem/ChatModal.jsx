@@ -184,7 +184,7 @@ const AvailabilityModalActivity = ({ isOpen, onClose, currentBookingDetails, onA
           />
           <Textarea
             placeholder="Add your acceptance message"
-            value={acceptMessage}
+            value={message}
             onChange={(e) => setMessage(e.target.value)}
           />
         </ModalBody>
@@ -212,10 +212,10 @@ const BookingDetailsCard = ({ message, onCheckAvailability, isSenderYou }) => {
       <div className="p-3 mt-3 bg-gray-50 rounded-lg text-sm text-black border border-gray-200 break-words">
         <h4 className="font-semibold mb-2">Booking Details:</h4>
         <ul className="space-y-1">
-          <li><strong>Product:</strong> {message.formDetails?.productName || 'Sample Product'}</li>
-          <li><MdPeople className="inline-block text-lg" /> <strong> Guests:</strong> {message.formDetails?.numberOfGuests || '2'}</li>
-          <li><MdEmail className="inline-block text-lg" /> <strong> Email:</strong> {message.formDetails?.email || 'john.doe@example.com'}</li>
-          <li><MdPhone className="inline-block text-lg" /> <strong> Phone:</strong> {message.formDetails?.phone || '123-456-7890'}</li>
+          <li><strong>Product:</strong> {message.formDetails?.productName}</li>
+          <li><MdPeople className="inline-block text-lg" /> <strong> Guests:</strong> {message.formDetails?.numberOfGuests}</li>
+          <li><MdEmail className="inline-block text-lg" /> <strong> Email:</strong> {message.formDetails?.email}</li>
+          <li><MdPhone className="inline-block text-lg" /> <strong> Phone:</strong> {message.formDetails?.phone}</li>
           
           {message.formType === 'accommodationBooking' && (
             <>
@@ -821,8 +821,8 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
   const handleAcceptBooking = async (bookingDetails, customMessage) => {
     const baseMessage = `Booking for ${bookingDetails.formDetails.productName} has been accepted.`;
   
-    // console.log('customMessage', customMessage);
-    // console.log('Booking details', bookingDetails);
+    console.log('customMessage', customMessage);
+    console.log('Booking details', bookingDetails);
   
     const formData = new FormData();
     formData.append('sender_id', user_id);
