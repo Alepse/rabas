@@ -998,8 +998,10 @@ app.post('/submitBusinessApplication', async (req, res) => {
   // Convert category array to JSON string
   const categoryJSON = JSON.stringify(category);
 
-  // Create JSON object for pin_location
-  const pinLocationJSON = JSON.stringify({ latitude, longitude });
+  // Set pin_location to null if latitude or longitude is null
+  const pinLocationJSON = (latitude == null || longitude == null) 
+  ? null 
+  : JSON.stringify({ latitude, longitude });
 
   try {
     // SQL query to insert business application data into the database, including application_id

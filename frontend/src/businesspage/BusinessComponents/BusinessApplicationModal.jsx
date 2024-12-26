@@ -308,7 +308,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
               fullWidth
               label={<span className="font-bold">Complete Address</span>}
               name="completeAddress"
-              placeholder="Enter Complete Address"
+              placeholder="e.g., 123 Main St, Sorsogon City"
               value={formData.completeAddress}
               onChange={handleInputChange}
               className="mt-4"
