@@ -615,7 +615,7 @@ const BusinessBooking = () => {
   const pendingBookings = useSelector(state => state.bookings.pendingBookings);
   const activeBookings = useSelector(state => state.bookings.activeBookings);
   const declinedBookings = useSelector(state => state.bookings.declinedBookings);
-  console.log("delined bookingssssssss: ", declinedBookings);
+  // console.log("delined bookingssssssss: ", declinedBookings);
   const bookingHistory = useSelector(state => state.bookings.bookingHistory);
   const chatMessages = useSelector(state => state.bookings.chatMessages);
   const walkInCustomers = useSelector(state => state.bookings.activeWalkInCustomers);
@@ -733,13 +733,10 @@ const BusinessBooking = () => {
       });
   
       const data = await response.json();
-      console.log('response:', data);
+      // console.log('response:', data);
       if (!data.success) {
         throw new Error(data.message || 'Failed to accept booking');
       }
-  
-      dispatch(markBookingAsActive(bookingId));
-      showSuccessAlert('Booking accepted successfully!');
   
       // Send a message after accepting the booking
       const messageData = {
@@ -764,8 +761,9 @@ const BusinessBooking = () => {
       if (!messageResult.success) {
         throw new Error('Failed to send acceptance message');
       }
-  
-      showSuccessAlert('Acceptance message sent successfully!');
+
+      dispatch(markBookingAsActive(bookingId));
+      showSuccessAlert('Booking accepted successfully!');
     } catch (error) {
       console.error('Error accepting booking:', error);
       showErrorAlert(error.message || 'Failed to accept booking');
