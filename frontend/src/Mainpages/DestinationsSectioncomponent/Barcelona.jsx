@@ -449,8 +449,9 @@ const Barcelona = () => {
 
   return (
     <div className="font-sans mt-5  mx-auto w-full  ">
-      <h1 className="text-4xl font-bold mb-6 text-center">Barcelona, Sorsogon</h1>
-      
+    <div className='p-[4rem]'>
+      <h1 className="text-4xl font-bold  text-center">Barcelona, Sorsogon</h1>
+      </div>
       {/* Image Collage */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-6">
         <img src={barcelonapic1} className="col-span-2 md:col-span-2 row-span-2 rounded-lg w-full h-full object-cover" />
@@ -459,7 +460,7 @@ const Barcelona = () => {
         <img src={barcelonapic4} className="rounded-lg w-full h-32 md:h-60 object-cover" />
         <img src={barcelonapic5} className="rounded-lg w-full h-32 md:h-60 object-cover" />
       </div>
-
+      
       {/* Content Sections */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <section className='bg-white rounded-lg p-6 shadow-md'>

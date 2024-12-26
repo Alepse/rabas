@@ -80,7 +80,7 @@ const Destinations = () => {
   }, []);
 
   useEffect(() => {
-    const handleScroll = () => setShowButton(window.scrollY > 300);
+    const handleScroll = () => setShowButton(window.scrollY > 200);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -136,11 +136,11 @@ const Destinations = () => {
         </div>
 
         {/* Municipalities grid */}
-        <div className='bg-transparent text-sm grid grid-cols-1 sm:grid-cols-2 font-font1 md:grid-cols-4 lg:grid-cols-5 gap-4'>
+        <div className='bg-transparent text-[11px] md:text-sm grid grid-cols-3 sm:grid-cols-2 font-font1 md:grid-cols-4 lg:grid-cols-5 gap-4'>
           {loading ? (
             Array.from({ length: 15 }).map((_, index) => (
               <AnimatedSection key={index}>
-                <Skeleton className='h-[200px] w-full rounded-sm' />
+                <Skeleton className=' h-[100px] md:h-[200px] w-full rounded-sm' />
               </AnimatedSection>
             ))
           ) : (
@@ -163,11 +163,11 @@ const Destinations = () => {
             ].map(({ name, img }) => (
               <AnimatedSection key={name}>
                 <div
-                  className="relative h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer"
+                  className="relative h-[100px]  md:h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer"
                   onClick={() => handleDestinationClick(name)}
                 >
                   <img className="h-full w-full object-cover rounded-sm shadow-md" src={img} alt={name} />
-                  <div className="absolute bottom-0 left-0 right-0 bg-dark/60 text-white rounded-lg p-1 text-md text-center w-full">
+                  <div className="absolute  bottom-0 left-0 right-0 bg-dark/60 text-white rounded-lg p-1 text-md text-center w-full">
                     {name}
                   </div>
                 </div>
@@ -225,7 +225,7 @@ const AnimatedSection = ({ children }) => {
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 50 }}
       animate={controls}
     >
       {children}

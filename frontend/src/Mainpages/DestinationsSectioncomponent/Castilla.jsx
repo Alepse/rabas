@@ -449,7 +449,9 @@ const Castilla = () => {
 
   return (
     <div className="font-sans mt-5  mx-auto w-full  ">
-      <h1 className="text-4xl font-bold mb-6 text-center">Castilla, Sorsogon</h1>
+       <div className='p-[4rem]'>
+      <h1 className="text-4xl font-bold  text-center">Castilla, Sorsogon</h1>
+      </div>
       
       {/* Image Collage */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-6">
