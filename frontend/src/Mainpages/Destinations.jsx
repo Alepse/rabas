@@ -145,26 +145,26 @@ const Destinations = () => {
             ))
           ) : (
             [
-              { name: 'Bulusan', img: bulusan },
-              { name: 'Bulan', img: bulan },
-              { name: 'Barcelona', img: barcelona },
-              { name: 'Casiguran', img: casiguran },
-              { name: 'Castilla', img: castilla },
-              { name: 'Donsol', img: donsol },
-              { name: 'Gubat', img: gubat },
-              { name: 'Irosin', img: irosin },
-              { name: 'Juban', img: juban },
-              { name: 'Magallanes', img: magallanes },
-              { name: 'Matnog', img: matnog },
-              { name: 'Pilar', img: pilar },
-              { name: 'PrietoDiaz', img: prieto },
-              { name: 'Sta. Magdalena', img: santa },
-              { name: 'Sorsogon', img: Sorso },
-            ].map(({ name, img }) => (
-              <AnimatedSection key={name}>
+              { name: 'Bulusan', value: "Bulusan", img: bulusan },
+              { name: 'Bulan', value: "Bulan", img: bulan },
+              { name: 'Barcelona', value: "Barcelona", img: barcelona },
+              { name: 'Casiguran', value: "Casiguran", img: casiguran },
+              { name: 'Castilla', value: "Castilla", img: castilla },
+              { name: 'Donsol', value: "Donsol", img: donsol },
+              { name: 'Gubat', value: "Gubat", img: gubat },
+              { name: 'Irosin', value: "Irosin", img: irosin },
+              { name: 'Juban', value: "Juban", img: juban },
+              { name: 'Magallanes', value: "Magallanes", img: magallanes },
+              { name: 'Matnog', value: "Matnog", img: matnog },
+              { name: 'Pilar', value: "Pilar", img: pilar },
+              { name: 'Prieto Diaz', value: "PrietoDiaz", img: prieto },
+              { name: 'Sta. Magdalena', value: "StaMagdalena", img: santa },
+              { name: 'Sorsogon', value: "Sorsogon", img: Sorso },
+            ].map(({name, value, img }) => (
+              <AnimatedSection key={value}>
                 <div
                   className="relative h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer"
-                  onClick={() => handleDestinationClick(name)}
+                  onClick={() => handleDestinationClick(value)}
                 >
                   <img className="h-full w-full object-cover rounded-sm shadow-md" src={img} alt={name} />
                   <div className="absolute bottom-0 left-0 right-0 bg-dark/60 text-white rounded-lg p-1 text-md text-center w-full">
