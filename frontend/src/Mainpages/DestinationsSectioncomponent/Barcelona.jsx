@@ -16,9 +16,22 @@ import img from '@/assets/shop.webp'; // Sample image
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa'
 import axios from 'axios';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
+import CryptoJS from 'crypto-js';
 import { Skeleton } from "@nextui-org/skeleton";
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
+
+// Function to encrypt the business_id
+const encryptId = (id) => {
+  const secretKey = import.meta.env.VITE_SECRET_KEY;
+  if (!secretKey) {
+    console.error('Secret key is not defined');
+    return null;
+  }
+  const ciphertext = CryptoJS.AES.encrypt(id.toString(), secretKey).toString();
+  return encodeURIComponent(ciphertext);
+};
+
 
 const renderSwiperActivitySection = (title, link, spots) => {
   const activitySpots = spots.filter(spot => spot.businessType === 'attraction');
@@ -94,7 +107,7 @@ const renderSwiperActivitySection = (title, link, spots) => {
                     <p className="text-md font-semibold text-black mb-4">
                       ₱{spot.lowest_price} - ₱{spot.highest_price}
                     </p>
-                    <Link to="/business" target="_blank">
+                    <Link to={`/business/${encryptId(spot.business_id)}`}>
                       <Button className="w-full bg-color1 text-white text-sm font-medium px-5 py-2 rounded hover:bg-color2">
                         Explore More
                       </Button>
@@ -192,7 +205,7 @@ const renderSwiperAccommodationSection = (title, link, spots) => {
                     <p className="text-md font-semibold text-black mb-4">
                       ₱{spot.lowest_price} - ₱{spot.highest_price}
                     </p>
-                    <Link to="/business" target="_blank">
+                    <Link to={`/business/${encryptId(spot.business_id)}`}>
                       <Button className="w-full bg-color1 text-white text-sm font-medium px-5 py-2 rounded hover:bg-color2">
                         Explore More
                       </Button>
@@ -290,7 +303,7 @@ const renderSwiperEaterySection = (title, link, spots) => {
                     <p className="text-md font-semibold text-black mb-4">
                       ₱{spot.lowest_price} - ₱{spot.highest_price}
                     </p>
-                    <Link to="/business" target="_blank">
+                    <Link to={`/business/${encryptId(spot.business_id)}`}>
                       <Button className="w-full bg-color1 text-white text-sm font-medium px-5 py-2 rounded hover:bg-color2">
                         Explore More
                       </Button>
@@ -389,7 +402,7 @@ const renderSwiperShopSection = (title, link, spots) => {
                     <p className="text-md font-semibold text-black mb-4">
                       ₱{spot.lowest_price} - ₱{spot.highest_price}
                     </p>
-                    <Link to="/business" target="_blank">
+                    <Link to={`/business/${encryptId(spot.business_id)}`}>
                       <Button className="w-full bg-color1 text-white text-sm font-medium px-5 py-2 rounded hover:bg-color2">
                         Explore More
                       </Button>
@@ -524,8 +537,8 @@ const Barcelona = () => {
       </div>
       
       {loading ? (
-        <div className="flex">
-        {Array.from({ length: 4 }).map((_, index) => {
+        <div className="font-sans mx-auto w-full">
+        {Array.from({ length: 1 }).map((_, index) => {
           const opacity = 1 - index * 0.25; // Adjust the values as needed (1, 0.75, 0.5, 0.25)
           return (
             <div className="p-4 md:p-6">
