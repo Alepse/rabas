@@ -345,7 +345,7 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
               <NavigationMenu className='z-50'>
                 <NavigationMenuList>
                   <NavigationMenuItem>
-                    <NavigationMenuTrigger className={`cursor-pointer rounded-none text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1  ${activeLink === '/destinations' ? 'font-semibold border-b-1 border-light p-1' : ''}`}>
+                    <NavigationMenuTrigger className={`cursor-pointer rounded-none text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1 rounded-large ${activeLink === '/destinations' ? 'font-semibold border-b-1 border-light p-1' : ''}`}>
                       <GiPositionMarker />
                       <a href='/destinations'> Destinations</a>
                     </NavigationMenuTrigger>
@@ -353,21 +353,21 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
                       <NavigationMenuLink>
                         <div className="py-2 px-1 w-max bg-light shadow-md">
                           <ul className="space-y-2 text-dark text-md ">
-                            <Link to='/destinations?name=Barcelona'><li className=' py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer'>Barcelona</li></Link>
-                            <Link to='/destinations?name=Bulan'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer'>Bulan</li></Link>
-                            <Link to='/destinations?name=Bulusan'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer'>Bulusan</li></Link>
-                            <Link to='/destinations?name=Casiguran'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer'>Casiguran</li></Link>
-                            <Link to='/destinations?name=Castilla'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer'>Castilla</li></Link>
-                            <Link to='/destinations?name=Donsol'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer'>Donsol</li></Link>
-                            <Link to='/destinations?name=Gubat'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer'>Gubat</li></Link>
-                            <Link to='/destinations?name=Irosin'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer'>Irosin</li></Link>
-                            <Link to='/destinations?name=Juban'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer'>Juban</li></Link>
-                            <Link to='/destinations?name=Magallanes'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer'>Magallanes</li></Link>
-                            <Link to='/destinations?name=Matnog'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer'>Matnog</li></Link>
-                            <Link to='/destinations?name=Pilar'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer'>Pilar</li></Link>
-                            <Link to='/destinations?name=PrietoDiaz'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer'>Prieto Diaz</li></Link>
-                            <Link to='/destinations?name=StaMagdalena'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer'>Sta. Magdalena</li></Link>
-                            <Link to='/destinations?name=Sorsogon'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer'>Sorsogon City</li></Link>
+                            <Link to='/destinations?name=Barcelona'><li className=' py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Barcelona</li></Link>
+                            <Link to='/destinations?name=Bulan'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Bulan</li></Link>
+                            <Link to='/destinations?name=Bulusan'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Bulusan</li></Link>
+                            <Link to='/destinations?name=Casiguran'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Casiguran</li></Link>
+                            <Link to='/destinations?name=Castilla'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Castilla</li></Link>
+                            <Link to='/destinations?name=Donsol'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Donsol</li></Link>
+                            <Link to='/destinations?name=Gubat'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Gubat</li></Link>
+                            <Link to='/destinations?name=Irosin'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Irosin</li></Link>
+                            <Link to='/destinations?name=Juban'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Juban</li></Link>
+                            <Link to='/destinations?name=Magallanes'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Magallanes</li></Link>
+                            <Link to='/destinations?name=Matnog'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Matnog</li></Link>
+                            <Link to='/destinations?name=Pilar'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Pilar</li></Link>
+                            <Link to='/destinations?name=PrietoDiaz'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Prieto Diaz</li></Link>
+                            <Link to='/destinations?name=StaMagdalena'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Sta. Magdalena</li></Link>
+                            <Link to='/destinations?name=Sorsogon'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Sorsogon City</li></Link>
                           </ul>
                         </div>
                       </NavigationMenuLink>
@@ -379,7 +379,7 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
               <NavigationMenu className='z-40 '>
                 <NavigationMenuList>
                   <NavigationMenuItem>
-                    <NavigationMenuTrigger className={`cursor-pointer rounded-none text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1  ${activeLink === '/Discover' ? 'font-semibold border-b-1 border-light p-1' : ''}`}>
+                    <NavigationMenuTrigger className={`cursor-pointer rounded-none text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1 rounded-large  ${activeLink === '/Discover' ? 'font-semibold border-b-1 border-light p-1' : ''}`}>
                       <FaPersonWalking />
                       <a href='/Discover'> Discover </a>
                     </NavigationMenuTrigger>
@@ -387,10 +387,10 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
                       <NavigationMenuLink>
                         <div className="py-2 px-1 w-max bg-light">
                           <ul className="text-dark text-md space-y-3">
-                            <a href='/activities'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer'>Activities</li></a>
-                            <a href='/accommodations'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer'>Accommodations</li></a>
-                            <a href='/foodplaces'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer'>Food Places</li></a>
-                            <a href='/shops'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer'>Shops</li></a>
+                            <a href='/activities'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Activities</li></a>
+                            <a href='/accommodations'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Accommodations</li></a>
+                            <a href='/foodplaces'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Food Places</li></a>
+                            <a href='/shops'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Shops</li></a>
                           </ul>
                         </div>
                       </NavigationMenuLink>
@@ -551,10 +551,10 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
                 />
               )}
             </div>
-            <div className="hover:text-gray-700 hover:bg-gray-300 cursor-pointer duration-100 text-lg font-light flex items-center gap-2 p-1">
+            <div className="hover:text-gray-700 hover:bg-gray-300 cursor-pointer duration-100 text-lg font-light flex items-center gap-2 p-1 rounded-large">
               <FaHome className='m-2' /> <a href='/' className='m-2'>Home</a>
             </div>
-            <div className="hover:text-gray-700 hover:bg-gray-300 cursor-pointer duration-100 text-lg font-light flex items-center gap-2 p-1">
+            <div className="hover:text-gray-700 hover:bg-gray-300 cursor-pointer duration-100 text-lg font-light flex items-center gap-2 p-1 rounded-large">
               <NavigationMenu className=''>
                 <NavigationMenuList>
                   <NavigationMenuItem>
@@ -565,23 +565,23 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
                     </NavigationMenuTrigger>
                     <NavigationMenuContent>
                       <NavigationMenuLink className='z-1'>
-                        <div className="py-2 px-1 h-max w-max max-h-[190px] overflow-y-auto bg-light shadow-md">
+                        <div className="py-2 px-1 h-max w-max max-h-[190px] overflow-y-auto bg-light shadow-md rounded-large">
                           <ul className="space-y-2 text-dark text-sm">
-                            <Link to='/destinations?name=Barcelona'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer'>Barcelona</li></Link>
-                            <Link to='/destinations?name=Bulan'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer'>Bulan</li></Link>
-                            <Link to='/destinations?name=Bulusan'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer'>Bulusan</li></Link>
-                            <Link to='/destinations?name=Casiguran'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer'>Casiguran</li></Link>
-                            <Link to='/destinations?name=Castilla'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer'>Castilla</li></Link>
-                            <Link to='/destinations?name=Donsol'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer'>Donsol</li></Link>
-                            <Link to='/destinations?name=Gubat'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer'>Gubat</li></Link>
-                            <Link to='/destinations?name=Irosin'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer'>Irosin</li></Link>
-                            <Link to='/destinations?name=Juban'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer'>Juban</li></Link>
-                            <Link to='/destinations?name=Magallanes'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer'>Magallanes</li></Link>
-                            <Link to='/destinations?name=Matnog'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer'>Matnog</li></Link>
-                            <Link to='/destinations?name=Pilar'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer'>Pilar</li></Link>
-                            <Link to='/destinations?name=PrietoDiaz'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer'>Prieto Diaz</li></Link>
-                            <Link to='/destinations?name=StaMagdalena'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer'>Sta. Magdalena</li></Link>
-                            <Link to='/destinations?name=Sorsogon'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer'>Sorsogon City</li></Link>
+                            <Link to='/destinations?name=Barcelona'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Barcelona</li></Link>
+                            <Link to='/destinations?name=Bulan'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Bulan</li></Link>
+                            <Link to='/destinations?name=Bulusan'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Bulusan</li></Link>
+                            <Link to='/destinations?name=Casiguran'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Casiguran</li></Link>
+                            <Link to='/destinations?name=Castilla'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Castilla</li></Link>
+                            <Link to='/destinations?name=Donsol'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Donsol</li></Link>
+                            <Link to='/destinations?name=Gubat'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Gubat</li></Link>
+                            <Link to='/destinations?name=Irosin'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Irosin</li></Link>
+                            <Link to='/destinations?name=Juban'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Juban</li></Link>
+                            <Link to='/destinations?name=Magallanes'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Magallanes</li></Link>
+                            <Link to='/destinations?name=Matnog'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Matnog</li></Link>
+                            <Link to='/destinations?name=Pilar'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Pilar</li></Link>
+                            <Link to='/destinations?name=PrietoDiaz'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Prieto Diaz</li></Link>
+                            <Link to='/destinations?name=StaMagdalena'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Sta. Magdalena</li></Link>
+                            <Link to='/destinations?name=Sorsogon'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Sorsogon City</li></Link>
                           </ul>
                         </div>
                       </NavigationMenuLink>
@@ -590,7 +590,7 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
                 </NavigationMenuList>
               </NavigationMenu>
             </div>
-            <div className="hover:text-gray-700 hover:bg-gray-300 cursor-pointer duration-100 text-lg font-light flex items-center gap-2 p-1">
+            <div className="hover:text-gray-700 hover:bg-gray-300 cursor-pointer duration-100 text-lg font-light flex items-center gap-2 p-1 rounded-large">
               <NavigationMenu className='z-1'>
                 <NavigationMenuList>
                   <NavigationMenuItem>
@@ -603,10 +603,10 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
                       <NavigationMenuLink>
                         <div className="py-4 px-2 w-max bg-light shadow-md">
                           <ul className="space-y-2 text-dark text-sm">
-                            <Link to='/activities'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer'>Activities</li></Link>
-                            <Link to='/accommodations'><li className='py-1 px-14 duration-100 hover:bg-gray-300 cursor-pointer'>Accommodations</li></Link>
-                            <Link to='/foodplaces'><li className='py-1 px-14 duration-100 hover:bg-gray-300 cursor-pointer'>Food Places</li></Link>
-                            <Link to='/shops'><li className='py-1 px-14 duration-100 hover:bg-gray-300 cursor-pointer'>Shops</li></Link>
+                            <Link to='/activities'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Activities</li></Link>
+                            <Link to='/accommodations'><li className='py-1 px-14 duration-100 hover:bg-gray-300 cursor-pointer rounded-lg'>Accommodations</li></Link>
+                            <Link to='/foodplaces'><li className='py-1 px-14 duration-100 hover:bg-gray-300 cursor-pointer rounded-lg'>Food Places</li></Link>
+                            <Link to='/shops'><li className='py-1 px-14 duration-100 hover:bg-gray-300 cursor-pointer rounded-lg'>Shops</li></Link>
                           </ul>
                         </div>
                       </NavigationMenuLink>
@@ -617,16 +617,16 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
             </div>
             {isLoggedIn && (
               <div
-                className={`cursor-pointer  hover:bg-gray-300 duration-100 text-lg font-light flex items-center gap-2 p-1 ${activeLink === '/trip' ? ' border-b-1 border-light p-1 font-semibold ' : ''}`}
+                className={`cursor-pointer  hover:bg-gray-300 duration-100 text-lg font-light flex items-center gap-2 p-1 rounded-large ${activeLink === '/trip' ? ' border-b-1 border-light p-1 font-semibold ' : ''}`}
                 onClick={() => setActiveLink('/trip')}
               >
                 <TbNotes className='m-2' /> <a href='/trip' className='m-2' >Trip</a>
               </div>
             )}
-            <div className="hover:text-gray-700 hover:bg-gray-300 cursor-pointer duration-100 text-lg font-light flex items-center gap-2 p-1">
+            <div className="hover:text-gray-700 hover:bg-gray-300 cursor-pointer duration-100 text-lg font-light flex items-center gap-2 p-1 rounded-large">
               <PiJeep className='m-2' /> <a href='/transportation' className='m-2' >Transportation</a>
             </div>
-            <div className="hover:text-gray-700 hover:bg-gray-300 cursor-pointer duration-100 text-lg font-light flex items-center gap-2 p-1">
+            <div className="hover:text-gray-700 hover:bg-gray-300 cursor-pointer duration-100 text-lg font-light flex items-center gap-2 p-1 rounded-large">
               <CiSquareInfo className='m-2' /> <a href='/about' className='m-2'>About</a>
             </div>
 
