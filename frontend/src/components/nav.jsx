@@ -312,7 +312,7 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
             )}
 
             <button onClick={toggleMenu} className=" text-2xl z-50 p-2">
-              {isMenuOpen ? <FaTimes /> : <FaBars className='text-white' />}
+              {isMenuOpen ? <FaTimes className='text-xl mb-3'/> : <FaBars className='text-white ' />}
             </button>
           </div>
 
@@ -345,7 +345,7 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
               <NavigationMenu className='z-50'>
                 <NavigationMenuList>
                   <NavigationMenuItem>
-                    <NavigationMenuTrigger className={`cursor-pointer rounded-none text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1 rounded-large ${activeLink === '/destinations' ? 'font-semibold border-b-1 border-light p-1' : ''}`}>
+                    <NavigationMenuTrigger className={`cursor-pointer rounded-none text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1  ${activeLink === '/destinations' ? 'font-semibold border-b-1 border-light p-1' : ''}`}>
                       <GiPositionMarker />
                       <a href='/destinations'> Destinations</a>
                     </NavigationMenuTrigger>
@@ -379,7 +379,7 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
               <NavigationMenu className='z-40 '>
                 <NavigationMenuList>
                   <NavigationMenuItem>
-                    <NavigationMenuTrigger className={`cursor-pointer rounded-none text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1 rounded-large  ${activeLink === '/Discover' ? 'font-semibold border-b-1 border-light p-1' : ''}`}>
+                    <NavigationMenuTrigger className={`cursor-pointer rounded-none text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1   ${activeLink === '/Discover' ? 'font-semibold border-b-1 border-light p-1' : ''}`}>
                       <FaPersonWalking />
                       <a href='/Discover'> Discover </a>
                     </NavigationMenuTrigger>
@@ -535,7 +535,7 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
       {isMenuOpen && (
         <div className="xl:hidden fixed right-0 w-auto h-auto bg-light z-40 flex flex-col items-center p-4 m-2 rounded-large">
           <div className="flex flex-col space-y-1 w-full m-4">
-            <div className="relative w-full max-w-md mb-4">
+            <div className="relative w-full mt-4 max-w-md mb-4">
               <input
                 type="text"
                 placeholder={`Search for ${activeTab}`}

@@ -35,7 +35,7 @@ const renderSwiperActivitySection = (title, link, spots) => {
   const activitySpots = spots.filter(spot => spot.businessType === 'attraction');
 
   return (
-    <div className="p-4 md:p-6">
+    <div className="p-2 md:p-6">
       <div className='flex flex-col md:flex-row justify-between items-center mt-5'>
         <h1 className='text-xl md:text-2xl font-bold p-2 text-center lg:text-start'>
           {title}
@@ -70,7 +70,7 @@ const renderSwiperActivitySection = (title, link, spots) => {
                     <img
                       src={spot.image ? `${BASE_URL}/${spot.image}` : `${BASE_URL}/${spot.businessLogo}`}
                       alt={spot.name}
-                      className="w-full h-48 object-cover rounded-t-lg"
+                      className="w-full h-full object-cover"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
@@ -133,7 +133,7 @@ const renderSwiperAccommodationSection = (title, link, spots) => {
   const accommodationSpots = spots.filter(spot => spot.businessType === 'accommodation');
 
   return (
-    <div className="p-4 md:p-6">
+    <div className="p-2 md:p-6">
       <div className='flex flex-col md:flex-row justify-between items-center mt-5'>
         <h1 className='text-xl md:text-2xl font-bold p-2 text-center lg:text-start'>
           {title}
@@ -231,7 +231,7 @@ const renderSwiperEaterySection = (title, link, spots) => {
   const eaterySpots = spots.filter(spot => spot.businessType === 'restaurant');
 
   return (
-    <div className="p-4 md:p-6">
+    <div className="p-2 md:p-6">
       <div className='flex flex-col md:flex-row justify-between items-center mt-5'>
         <h1 className='text-xl md:text-2xl font-bold p-2 text-center lg:text-start'>
           {title}
@@ -330,7 +330,7 @@ const renderSwiperShopSection = (title, link, spots) => {
   const shopSpots = spots.filter(spot => spot.businessType === 'shop');
 
   return (
-    <div className="p-4 md:p-6">
+    <div className="p-2 md:p-6">
       <div className='flex flex-col md:flex-row justify-between items-center mt-5'>
         <h1 className='text-xl md:text-2xl font-bold p-2 text-center lg:text-start'>
           {title}
@@ -446,7 +446,7 @@ const StaMagdalena = () => {
   }, []);
 
   return (
-    <div className="font-sans mt-5 p-5 mx-auto w-full max-w-7xl">
+    <div className="font-sans mt-5  mx-auto w-full  ">
       <h1 className="text-4xl font-bold mb-6 text-center">Sta. Magdalena, Sorsogon</h1>
       
       {/* Image Collage */}
@@ -537,7 +537,7 @@ const StaMagdalena = () => {
         {Array.from({ length: 1 }).map((_, index) => {
           const opacity = 1 - index * 0.25; // Adjust the values as needed (1, 0.75, 0.5, 0.25)
           return (
-            <div className="p-4 md:p-6">
+            <div className="p-2 md:p-6">
               <div key={index} className='flex justify-center' style={{ opacity }}>
                 <div className="bg-white rounded-lg shadow-lg duration-300 flex flex-col justify-between max-w-xs md:max-w-lg lg:max-w-sm mx-auto h-[400px] p-2 relative"
                     style={{ width: '300px', height: '400px' }}>

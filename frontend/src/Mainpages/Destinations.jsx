@@ -158,7 +158,7 @@ const Destinations = () => {
               { name: 'Matnog', img: matnog },
               { name: 'Pilar', img: pilar },
               { name: 'PrietoDiaz', img: prieto },
-              { name: 'StaMagdalena', img: santa },
+              { name: 'Sta. Magdalena', img: santa },
               { name: 'Sorsogon', img: Sorso },
             ].map(({ name, img }) => (
               <AnimatedSection key={name}>
