@@ -2655,11 +2655,16 @@ app.put('/update-booking-status/:id', async (req, res) => {
       SELECT 
         b.user_id, 
         b.productName AS product, 
+        bu.businessName,
         u.email AS email, 
         u.Fname AS firstName, 
         u.Lname AS lastName 
       FROM 
         bookings AS b
+      LEFT JOIN
+        businesses AS bu
+      ON
+        b.business_id = bu.business_id
       LEFT JOIN 
         users AS u 
       ON 
@@ -2677,7 +2682,7 @@ app.put('/update-booking-status/:id', async (req, res) => {
       });
     }
 
-    const { user_id: userId, product, email, firstName, lastName } = bookingDetails[0];
+    const { user_id: userId, product, email, firstName, lastName, businessName } = bookingDetails[0];
 
     // Configure email transporter
     const transporter = nodemailer.createTransport({
@@ -2692,16 +2697,16 @@ app.put('/update-booking-status/:id', async (req, res) => {
     let subject, text;
     if (status === 1) { // Booking confirmed
       subject = 'Booking Confirmed';
-      text = `Dear ${firstName} ${lastName},\n\nYour booking for ${product} has been confirmed. Thank you for choosing us!\n\nBest regards,\nRabaSorsogon`;
-    } else if (status === 2) { // Booking Completed
+      text = `Dear ${firstName} ${lastName},\n\nYour booking for ${product} from ${businessName} has been confirmed. Thank you for choosing us!\n\nBest regards,\nRabaSorsogon`;
+    } else if (status === 2) { // Booking completed
       subject = 'Booking Completed';
-      text = `Dear ${firstName} ${lastName},\n\nYour booking for ${product} has been completed. Thank you for choosing us!\n\nBest regards,\nRabaSorsogon`;
-    }else if (status === -1) { // Booking declined
+      text = `Dear ${firstName} ${lastName},\n\nYour booking for ${product} from ${businessName} has been completed. Thank you for choosing us!\n\nBest regards,\nRabaSorsogon`;
+    } else if (status === -1) { // Booking declined
       subject = 'Booking Declined';
-      text = `Dear ${firstName} ${lastName},\n\nWe regret to inform you that your booking for ${product} has been declined. Please contact us for more information.\n\nBest regards,\nRabaSorsogon`;
+      text = `Dear ${firstName} ${lastName},\n\nWe regret to inform you that your booking for ${product} from ${businessName} has been declined. Please contact us for more information.\n\nBest regards,\nRabaSorsogon`;
     } else {
       subject = 'Booking Status Updated';
-      text = `Dear ${firstName} ${lastName},\n\nYour booking status for ${product} has been updated. Please check your account for details.\n\nBest regards,\nRabaSorsogon`;
+      text = `Dear ${firstName} ${lastName},\n\nYour booking status for ${product} from ${businessName} has been updated. Please check your account for details.\n\nBest regards,\nRabaSorsogon`;
     }
 
     // Send the email notification
