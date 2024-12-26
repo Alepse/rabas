@@ -2647,9 +2647,24 @@ app.put('/update-booking-status/:id', async (req, res) => {
       });
     }
 
-    // Fetch the user_id and productName associated with the booking
+    // Fetch the user details and product information for the booking
     const [bookingDetails] = await pool.query(
-      'SELECT user_id, productName FROM bookings WHERE booking_id = ?',
+      `
+      SELECT 
+        b.user_id, 
+        b.productName AS product, 
+        u.email AS email, 
+        u.Fname AS firstName, 
+        u.Lname AS lastName 
+      FROM 
+        bookings AS b
+      LEFT JOIN 
+        users AS u 
+      ON 
+        b.user_id = u.user_id 
+      WHERE 
+        b.booking_id = ?
+      `,
       [bookingId]
     );
 
@@ -2660,12 +2675,45 @@ app.put('/update-booking-status/:id', async (req, res) => {
       });
     }
 
-    const { user_id: userId, productName: product } = bookingDetails[0];
+    const { user_id: userId, product, email, firstName, lastName } = bookingDetails[0];
+
+    // Configure email transporter
+    const transporter = nodemailer.createTransport({
+      service: 'Gmail',
+      auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_PASS
+      }
+    });
+
+    // Determine the email content based on the booking status
+    let subject, text;
+    if (status === 1) { // Booking confirmed
+      subject = 'Booking Confirmed';
+      text = `Dear ${firstName} ${lastName},\n\nYour booking for ${product} has been confirmed. Thank you for choosing us!\n\nBest regards,\nRabaSorsogon`;
+    } else if (status === 2) { // Booking Completed
+      subject = 'Booking Completed';
+      text = `Dear ${firstName} ${lastName},\n\nYour booking for ${product} has been completed. Thank you for choosing us!\n\nBest regards,\nRabaSorsogon`;
+    }else if (status === -1) { // Booking declined
+      subject = 'Booking Declined';
+      text = `Dear ${firstName} ${lastName},\n\nWe regret to inform you that your booking for ${product} has been declined. Please contact us for more information.\n\nBest regards,\nRabaSorsogon`;
+    } else {
+      subject = 'Booking Status Updated';
+      text = `Dear ${firstName} ${lastName},\n\nYour booking status for ${product} has been updated. Please check your account for details.\n\nBest regards,\nRabaSorsogon`;
+    }
+
+    // Send the email notification
+    await transporter.sendMail({
+      from: process.env.GMAIL_USER,
+      to: email,
+      subject,
+      text
+    });
 
     return res.json({ 
       success: true, 
-      message: 'Booking status updated successfully',
-      receiver_id: userId, // Set receiver id for messaging purposes
+      message: 'Booking status updated and email notification sent successfully',
+      receiver_id: userId,
       title: product,
     });
   } catch (err) {

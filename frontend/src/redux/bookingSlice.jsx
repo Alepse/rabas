@@ -5,6 +5,7 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 const initialState = {
   pendingBookings: [],
   activeBookings: [],
+  declinedBookings: [],
   bookingHistory: [],
   chatMessages: [],
   activeWalkInCustomers: [],
@@ -30,6 +31,7 @@ export const fetchBookings = createAsyncThunk(
       const transformed = {
         pendingBookings: [],
         activeBookings: [],
+        declinedBookings: [],
         bookingHistory: [],
         activeWalkInCustomers: [],
         walkInHistory: []
@@ -42,6 +44,7 @@ export const fetchBookings = createAsyncThunk(
             case 0: return 'Pending';
             case 1: return 'Active';
             case 2: return 'Completed';
+            case -1: return 'Declined';
             default: return 'Pending';
           }
         };
@@ -96,6 +99,8 @@ export const fetchBookings = createAsyncThunk(
             transformed.pendingBookings.push(formattedBooking);
           } else if (formattedBooking.status === 'Active') {
             transformed.activeBookings.push(formattedBooking);
+          } else if (formattedBooking.status === 'Declined') {
+            transformed.declinedBookings.push(formattedBooking);
           } else {
             transformed.bookingHistory.push(formattedBooking);
           }
@@ -125,6 +130,16 @@ const bookingsSlice = createSlice({
         booking.status = 'Active';
         state.activeBookings.push(booking);
         state.pendingBookings = state.pendingBookings.filter(b => b.id !== bookingId);
+      }
+    },
+    markBookingAsDeclined: (state, action) => {
+      const booking = state.pendingBookings.find(b => b.id === action.payload);
+      if (booking) {
+        booking.status = 'Declined';  // Use string status
+        state.declinedBookings.push(booking);
+        state.pendingBookings = state.pendingBookings.filter(b => b.id !== bookingId);
+      } else {
+        console.error('Booking not found for completion:', action.payload);
       }
     },
     markBookingAsCompleted: (state, action) => {
@@ -173,6 +188,7 @@ const bookingsSlice = createSlice({
         state.error = null;
         state.pendingBookings = action.payload.pendingBookings;
         state.activeBookings = action.payload.activeBookings;
+        state.declinedBookings = action.payload.declinedBookings;
         state.bookingHistory = action.payload.bookingHistory;
         state.activeWalkInCustomers = action.payload.activeWalkInCustomers;
         state.walkInHistory = action.payload.walkInHistory;
@@ -184,6 +200,6 @@ const bookingsSlice = createSlice({
   }
 });
 
-export const { addChatMessage, markBookingAsCompleted, updateWalkInCustomerStatus, addWalkInCustomer, markWalkInAsCompleted, markBookingAsActive } = bookingsSlice.actions;
+export const { addChatMessage, markBookingAsCompleted, markBookingAsDeclined, updateWalkInCustomerStatus, addWalkInCustomer, markWalkInAsCompleted, markBookingAsActive } = bookingsSlice.actions;
 
 export default bookingsSlice.reducer;

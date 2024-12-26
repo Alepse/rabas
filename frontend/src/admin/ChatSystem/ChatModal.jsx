@@ -11,7 +11,7 @@ import { MdDateRange, MdPeople, MdEmail, MdPhone } from "react-icons/md";
 import axios from "axios";
 import Swal from 'sweetalert2';
 import { useSelector, useDispatch } from 'react-redux';
-import { markBookingAsActive } from '@/redux/bookingSlice';
+import { markBookingAsActive, markBookingAsDeclined } from '@/redux/bookingSlice';
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
@@ -57,14 +57,19 @@ const useUnavailableDates = () => {
 };
 
 // AvailabilityModal for table reservation
-const AvailabilityModalTable = ({ isOpen, onClose, currentBookingDetails, onAcceptBooking }) => {
+const AvailabilityModalTable = ({ isOpen, onClose, currentBookingDetails, onAcceptBooking, onDeclineBooking }) => {
   const isDateUnavailable = useUnavailableDates();
-  const [acceptMessage, setAcceptMessage] = useState('');
+  const [message, setMessage] = useState('');
 
   if (!currentBookingDetails) return null;
 
   const handleAccept = () => {
-    onAcceptBooking(currentBookingDetails, acceptMessage);
+    onAcceptBooking(currentBookingDetails, message);
+    onClose();
+  };
+
+  const handleDecline = () => {
+    onDeclineBooking(currentBookingDetails, message);
     onClose();
   };
 
@@ -82,13 +87,13 @@ const AvailabilityModalTable = ({ isOpen, onClose, currentBookingDetails, onAcce
             isDateUnavailable={isDateUnavailable}
           />
           <Textarea
-            placeholder="Add your acceptance message"
-            value={acceptMessage}
-            onChange={(e) => setAcceptMessage(e.target.value)}
+            placeholder="Add message"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
           />
         </ModalBody>
         <ModalFooter className="flex justify-between">
-          <Button auto onClick={onClose} color="error">Decline</Button>
+          <Button auto onClick={handleDecline} color="error">Decline</Button>
           <Button auto onClick={handleAccept} color="success">Accept</Button>
         </ModalFooter>
       </ModalContent>
@@ -97,16 +102,21 @@ const AvailabilityModalTable = ({ isOpen, onClose, currentBookingDetails, onAcce
 };
 
 // AvailabilityModal for accommodation booking
-const AvailabilityModalAccommodation = ({ isOpen, onClose, currentBookingDetails, onAcceptBooking }) => {
+const AvailabilityModalAccommodation = ({ isOpen, onClose, currentBookingDetails, onAcceptBooking, onDeclineBooking }) => {
   const isDateUnavailable = useUnavailableDates();
   const [checkInTime, setCheckInTime] = useState(new Time(14, 0));
   const [checkOutTime, setCheckOutTime] = useState(new Time(11, 0));
-  const [acceptMessage, setAcceptMessage] = useState('');
+  const [message, setMessage] = useState('');
 
   if (!currentBookingDetails) return null;
 
   const handleAccept = () => {
-    onAcceptBooking(currentBookingDetails, acceptMessage);
+    onAcceptBooking(currentBookingDetails, message);
+    onClose();
+  };
+
+  const handleDecline = () => {
+    onDeclineBooking(currentBookingDetails, message);
     onClose();
   };
 
@@ -129,12 +139,12 @@ const AvailabilityModalAccommodation = ({ isOpen, onClose, currentBookingDetails
           </div>
           <Textarea
             placeholder="Add your acceptance message"
-            value={acceptMessage}
-            onChange={(e) => setAcceptMessage(e.target.value)}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
           />
         </ModalBody>
         <ModalFooter className="flex justify-between">
-          <Button auto onClick={onClose} color="error">Decline</Button>
+          <Button auto onClick={handleDecline} color="error">Decline</Button>
           <Button auto onClick={handleAccept} color="success">Accept</Button>
         </ModalFooter>
       </ModalContent>
@@ -143,14 +153,19 @@ const AvailabilityModalAccommodation = ({ isOpen, onClose, currentBookingDetails
 };
 
 // AvailabilityModal for activity booking
-const AvailabilityModalActivity = ({ isOpen, onClose, currentBookingDetails, onAcceptBooking }) => {
+const AvailabilityModalActivity = ({ isOpen, onClose, currentBookingDetails, onAcceptBooking, onDeclineBooking }) => {
   const isDateUnavailable = useUnavailableDates();
-  const [acceptMessage, setAcceptMessage] = useState('');
+  const [message, setMessage] = useState('');
 
   if (!currentBookingDetails) return null;
 
   const handleAccept = () => {
-    onAcceptBooking(currentBookingDetails, acceptMessage);
+    onAcceptBooking(currentBookingDetails, message);
+    onClose();
+  };
+
+  const handleDecline = () => {
+    onDeclineBooking(currentBookingDetails, message);
     onClose();
   };
 
@@ -170,11 +185,11 @@ const AvailabilityModalActivity = ({ isOpen, onClose, currentBookingDetails, onA
           <Textarea
             placeholder="Add your acceptance message"
             value={acceptMessage}
-            onChange={(e) => setAcceptMessage(e.target.value)}
+            onChange={(e) => setMessage(e.target.value)}
           />
         </ModalBody>
         <ModalFooter className="flex justify-between">
-          <Button auto onClick={onClose} color="error">Decline</Button>
+          <Button auto onClick={handleDecline} color="error">Decline</Button>
           <Button auto onClick={handleAccept} color="success">Accept</Button>
         </ModalFooter>
       </ModalContent>
@@ -876,6 +891,77 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
     }
   };  
 
+  // Handle declining a booking
+  const handleDeclineBooking = async (bookingDetails, customMessage) => {
+    const baseMessage = `Booking for ${bookingDetails.formDetails.productName} has been declined.`;
+    
+    const formData = new FormData();
+    formData.append('sender_id', user_id);
+    formData.append('sender_account', 'business');
+    formData.append('receiver_id', selectedUser);
+    formData.append('receiver_account', 'user');
+    formData.append('text', baseMessage);
+    formData.append('formType', 'bookingDeclined');
+    formData.append('form_details', JSON.stringify(bookingDetails.formDetails));
+
+    try {
+      // Update booking status
+      const updateResponse = await fetch(`${BASE_URL}/update-booking-status/${bookingDetails?.formDetails?.booking_id}`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: -1 }) // Set status to 'Declined'
+      });
+
+      const updateData = await updateResponse.json();
+      if (!updateData.success) {
+        throw new Error(updateData.message || 'Failed to decline booking');
+      }
+
+      dispatch(markBookingAsDeclined(bookingDetails?.formDetails?.booking_id));
+
+      // Send message after successful booking status update
+      const messageResponse = await fetch(`${BASE_URL}/sendMessage`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!messageResponse.ok) {
+        throw new Error('Failed to send message');
+      }
+
+      const result = await messageResponse.json();
+      if (result.success) {
+        const currentMessages = messages[selectedUser] || [];
+        const newMessage = {
+          id: result.messageId, // Use the messageId returned from the server
+          sender: 'You',
+          senderId: user_id,
+          senderAccount: 'business',
+          receiverId: selectedUser,
+          receiverAccount: 'user',
+          text: baseMessage, // Store the JSX element directly
+          time: formatTime(new Date()),
+          formType: 'bookingDeclined',
+          formDetails: bookingDetails.formDetails
+        };
+
+        setMessages({
+          ...messages,
+          [selectedUser]: [...currentMessages, newMessage]
+        });
+        toast.success('Booking declined and message sent!');
+      } else {
+        toast.error('Failed to send message');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error('An error occurred while sending the message');
+    }
+  };
+
   const renderUserList = () => {
     // Flatten the nested array structure
     const flattenedUsers = users.flat();  // Merge nested arrays into a single array
@@ -935,47 +1021,74 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
           )}
           <div className={`flex ${isSenderYou ? 'justify-end' : 'justify-start'} mb-4`}>
             <div className={`p-4 rounded-lg max-w-[70%] ${isSenderYou ? 'bg-gray-200 text-black' : 'bg-color1 text-white'} shadow-md`}>
-              {message.text && <p className="break-words mb-2">{message.text}</p>}
-              {imageUrl && (
-                <div className="relative">
-                  <img
-                    src={imageUrl}
-                    alt="Sent"
-                    className="mt-2 rounded-md max-w-full cursor-pointer"
-                    style={{ maxHeight: '400px', objectFit: 'cover' }}
-                    onClick={() => handleImageClick(imageUrl)}
-                  />
-                  <button
-                    onClick={() => handleImageDownload(imageUrl)}
-                    className="absolute top-2 right-2 bg-white p-1 rounded-full shadow-md"
-                  >
-                    <FiDownload size={16} className="text-black" />
-                  </button>
-                </div>
+              {message.formType ? (
+                <BookingDetailsCard
+                  message={message}
+                  onCheckAvailability={handleCheckAvailability}
+                  isSenderYou={isSenderYou}
+                />
+              ) : (
+                <>
+                  {message.text && <p className="break-words mb-2">{message.text}</p>}
+                  {imageUrl && (
+                    <div className="relative">
+                      <img
+                        src={imageUrl}
+                        alt="Sent"
+                        className="mt-2 rounded-md max-w-full cursor-pointer"
+                        style={{ maxHeight: '400px', objectFit: 'cover' }}
+                        onClick={() => handleImageClick(imageUrl)}
+                      />
+                      <button
+                        onClick={() => handleImageDownload(imageUrl)}
+                        className="absolute top-2 right-2 bg-white p-1 rounded-full shadow-md"
+                      >
+                        <FiDownload size={16} className="text-black" />
+                      </button>
+                    </div>
+                  )}
+                  {message.additionalInfo && (
+                    <p className="text-sm text-gray-300 mb-2">{message.additionalInfo}</p>
+                  )}
+                  {message.messageNote && (
+                    <p className="text-sm text-gray-300 mb-2">
+                      <strong>Message:</strong> {message.messageNote}
+                    </p>
+                  )}
+                  {message.formDetails &&
+                    Object.keys(message.formDetails).some((key) => message.formDetails[key] !== null) && (
+                      <BookingDetailsCard
+                        message={message}
+                        isSender={isSenderYou}
+                        onCheckAvailability={handleCheckAvailability}
+                      />
+                    )}
+                </>
               )}
             </div>
           </div>
-          {isSenderYou && (
-            <div className="flex justify-end">
-              {message.status === 'sending' && (
-                <span className="text-sm text-gray-500">Sending...</span>
-              )}
-              {(message.status === 'sent' || (!message.status && message === lastMessage)) && (
-                <span className="text-sm text-gray-500">Sent</span>
-              )}
-              {message.status === 'failed' && (
-                <div className="text-sm text-red-500 flex items-center gap-2">
-                  Failed
-                  <button
-                    onClick={() => resendMessage(message)}
-                    className="text-blue-500 underline text-sm"
-                  >
-                    Retry
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
+          <div className={`flex ${isSenderYou ? 'justify-end' : 'justify-start'}`}>
+            {isSenderYou && (
+              <>
+                {message.status === 'sending' && <span className="text-sm text-gray-500">Sending...</span>}
+                {(message.status === 'sent' || (!message.status && message === lastMessage)) && (
+                  <span className="text-sm text-gray-500">Sent</span>
+                )}
+                {message.status === 'failed' && (
+                  <div className="text-sm text-red-500 flex items-center gap-2">
+                    Failed
+                    <button
+                      onClick={() => resendMessage(message)}
+                      className="text-blue-500 underline text-sm"
+                    >
+                      Retry
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+            {message.isSending && <span className="text-sm text-gray-500">Sending</span>}
+          </div>
         </div>
       );
     });
@@ -1102,6 +1215,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
           onClose={() => setAvailabilityModalOpen(false)}
           currentBookingDetails={currentBookingDetails}
           onAcceptBooking={handleAcceptBooking}
+          onDeclineBooking={handleDeclineBooking}
         />
       )}
       {currentBookingDetails?.formType === 'accommodationBooking' && (
@@ -1110,6 +1224,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
           onClose={() => setAvailabilityModalOpen(false)}
           currentBookingDetails={currentBookingDetails}
           onAcceptBooking={handleAcceptBooking}
+          onDeclineBooking={handleDeclineBooking}
         />
       )}
       {currentBookingDetails?.formType === 'activityBooking' && (
@@ -1118,6 +1233,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
           onClose={() => setAvailabilityModalOpen(false)}
           currentBookingDetails={currentBookingDetails}
           onAcceptBooking={handleAcceptBooking}
+          onDeclineBooking={handleDeclineBooking}
         />
       )}
     </Modal>

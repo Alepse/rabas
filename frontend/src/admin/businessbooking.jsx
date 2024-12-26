@@ -122,23 +122,36 @@ const BookingCard = ({ booking, onOpenChatModal, onMarkAsCompleted, onAcceptBook
       <strong>Total Amount:</strong> ₱{booking.amount || '0'}
     </p>
 
+    <Badge color={booking.status === 'Pending' ? 'warning' : booking.status === 'Active' ? 'success' : 'default'}>
+    <p className="text-gray-500">
+      <strong>Status:</strong> {booking.status}
+    </p> 
+    </Badge>
+
     <div className="flex justify-between items-center">
-      <Badge color={booking.status === 'Pending' ? 'warning' : booking.status === 'Active' ? 'success' : 'default'}>
-        {booking.status}
-      </Badge>
-      
       {booking.status === 'Pending' ? (
+        <>
         <Button
-          auto
-          color="success"
-          onClick={() => onAcceptBooking(booking.id)}
-          className="px-4"
-        >
-          <div className="flex items-center gap-2">
-            <MdCheck className="text-lg" />
-            Accept Booking
-          </div>
-        </Button>
+            auto
+            color="danger" // Red color for decline
+            onClick={() => onDeclineBooking(booking.id)} // Pass the booking ID for decline
+            className="px-4"
+          >
+            <div className="flex items-center gap-2">
+              Decline Booking
+            </div>
+          </Button>
+          <Button
+            auto
+            color="success"
+            onClick={() => onAcceptBooking(booking.id)}
+            className="px-4"
+          >
+            <div className="flex items-center gap-2">
+              Accept Booking
+            </div>
+          </Button>
+        </>
       ) : booking.status === 'Active' && (
         <Button
           auto
@@ -147,7 +160,6 @@ const BookingCard = ({ booking, onOpenChatModal, onMarkAsCompleted, onAcceptBook
           className="px-4"
         >
           <div className="flex items-center gap-2">
-            <MdDone className="text-lg" />
             Mark as Completed
           </div>
         </Button>
@@ -602,6 +614,8 @@ const BusinessBooking = () => {
   const [isLoading, setIsLoading] = useState(false);
   const pendingBookings = useSelector(state => state.bookings.pendingBookings);
   const activeBookings = useSelector(state => state.bookings.activeBookings);
+  const declinedBookings = useSelector(state => state.bookings.declinedBookings);
+  console.log("delined bookingssssssss: ", declinedBookings);
   const bookingHistory = useSelector(state => state.bookings.bookingHistory);
   const chatMessages = useSelector(state => state.bookings.chatMessages);
   const walkInCustomers = useSelector(state => state.bookings.activeWalkInCustomers);
@@ -861,6 +875,18 @@ const BusinessBooking = () => {
               />
             </Tab>
 
+            <Tab title="Declined Bookings" className="flex-1 min-w-[150px]">
+              <BookingSection
+                title="Current Bookings"
+                bookings={declinedBookings}
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                openChatModal={openChatModal}
+                onMarkAsCompleted={handleMarkAsCompleted}
+                filteredBookingsByType={filteredBookingsByType}
+              />
+            </Tab>
+
             <Tab title="Booking History" className="flex-1 min-w-[150px]">
               <BookingSection
                 title="Completed Bookings"
@@ -1009,7 +1035,9 @@ const BookingTypeSection = ({ type, bookings, searchQuery, setSearchQuery, openC
     const allowedTypes = typeMapping[type] || [];
     const typeMatch = allowedTypes.includes(booking.reservationType);
     const searchMatch = !searchQuery || 
-      booking.customerName.toLowerCase().includes(searchQuery.toLowerCase());
+      booking.customerName.toLowerCase().includes(searchQuery.toLowerCase())||
+      booking.productName.toLowerCase().includes(searchQuery.toLowerCase() 
+    );
     
     // console.log('Type match:', typeMatch, 'Search match:', searchMatch);
     return typeMatch && searchMatch;
