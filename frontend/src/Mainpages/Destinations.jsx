@@ -164,7 +164,7 @@ const Destinations = () => {
               <AnimatedSection key={value}>
                 <div
                   className="relative h-[100px] md:h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer"
-                  onClick={() => handleDestinationClick(name)}
+                  onClick={() => handleDestinationClick(value)}
                 >
                   <img className="h-full w-full object-cover rounded-sm shadow-md" src={img} alt={name} />
                   <div className="absolute  bottom-0 left-0 right-0 bg-dark/60 text-white rounded-lg p-1 text-md text-center w-full">
