@@ -216,7 +216,7 @@ const UserChatModal = ({ isOpen, onClose }) => {
           const responses = await Promise.all(businessRequests);
           const businessesData = responses.map((response) => response.data);
           setBusinesses(businessesData);
-          console.log('businesses', businessesData);
+          // console.log('businesses', businessesData);
         } catch (error) {
           console.error('Error fetching businesses:', error.response ? error.response.data.message : 'An unknown error occurred');
           toast.error('Failed to load businesses');
