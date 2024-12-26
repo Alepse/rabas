@@ -163,7 +163,7 @@ const Destinations = () => {
             ].map(({name, value, img }) => (
               <AnimatedSection key={value}>
                 <div
-                  className="relative h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer"
+                  className="relative h-[100px] md:h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer"
                   onClick={() => handleDestinationClick(name)}
                 >
                   <img className="h-full w-full object-cover rounded-sm shadow-md" src={img} alt={name} />
