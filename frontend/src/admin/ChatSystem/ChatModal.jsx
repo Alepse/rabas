@@ -184,7 +184,7 @@ const AvailabilityModalActivity = ({ isOpen, onClose, currentBookingDetails, onA
           />
           <Textarea
             placeholder="Add your acceptance message"
-            value={acceptMessage}
+            value={message}
             onChange={(e) => setMessage(e.target.value)}
           />
         </ModalBody>
