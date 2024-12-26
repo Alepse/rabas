@@ -447,7 +447,9 @@ const StaMagdalena = () => {
 
   return (
     <div className="font-sans mt-5  mx-auto w-full  ">
-      <h1 className="text-4xl font-bold mb-6 text-center">Sta. Magdalena, Sorsogon</h1>
+      <div className='p-[4rem]'>
+      <h1 className="text-4xl font-bold  text-center">Sta. Magdalena, Sorsogon</h1>
+      </div>
       
       {/* Image Collage */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-6">
