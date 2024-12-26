@@ -136,7 +136,7 @@ const UserChatModal = ({ isOpen, onClose }) => {
   const [messageInput, setMessageInput] = useState('');
   const [messages, setMessages] = useState({});
   const [selectedBusiness, setSelectedBusiness] = useState(null);
-  const [unreadMessages, setUnreadMessages] = useState({ 1: 3, 2: 2, 3: 1 });
+  const [unreadMessages, setUnreadMessages] = useState({});
   const messageEndRef = useRef(null);
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);

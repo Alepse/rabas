@@ -330,7 +330,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
   // console.log('selectedUser', selectedUser);
   const [messages, setMessages] = useState({});
   const [user_id, setUser_id] = useState(null);
-  const [unreadMessages, setUnreadMessages] = useState({ 1: 3, 2: 2, 3: 1 }); // Keep track of unread message counts
+  const [unreadMessages, setUnreadMessages] = useState({}); // Keep track of unread message counts
   const [messageInput, setMessageInput] = useState('');
   const [activeChatUser, setActiveChatUser] = useState(null);
   const messageEndRef = useRef(null);

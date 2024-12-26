@@ -294,7 +294,7 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
                   <DropdownItem key="messages" onClick={openChatModal}>
                     <div className='flex items-center gap-4 p-2'>
                       Messages
-                      <Badge color='danger' placement='top-right' content='2' />
+                      {/* <Badge color='danger' placement='top-right' content='2' /> */}
                     </div>
                   </DropdownItem>
                   <DropdownItem key="Bookings">
