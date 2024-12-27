@@ -643,7 +643,7 @@ const AccommodationSection = () => {
                     <Select
                       label="Select Accommodation Type"
                       placeholder={accommodationType ? accommodationType : "Select or add an item"}
-                      selectedKey={accommodationType} // Use selectedKey to reflect the selected value
+                      selectedKeys={new Set([accommodationType.toLowerCase()])} // Use selectedKey to reflect the selected value
                       onSelectionChange={(key) => {
                         const selectedKey = key instanceof Set ? Array.from(key)[0] : key;
                         const selectedOption = options.find(option => option.value === selectedKey);

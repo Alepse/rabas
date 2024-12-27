@@ -36,6 +36,15 @@ const BusinessDeals = () => {
     });
   };
 
+  const showWarningPopup = (dealType) => {
+    Swal.fire({
+      title: 'Warning',
+      text: `This feature is currently not available for you because your business type doesn't match this product type.`,
+      icon: 'warning',
+      confirmButtonText: 'Got it',
+    });
+  };
+
   // Function to check login status
   const checkLoginStatus = useCallback(async () => {
     try {
@@ -118,7 +127,7 @@ const BusinessDeals = () => {
               onChange={(e) =>
                 businessType === 'attraction'
                   ? setShowActivities(e.target.checked)
-                  : showRequestPopup('Activity')
+                  : showWarningPopup('Activity')
               }
             >
               <span className="font-semibold text-md">Activity Deals</span>
@@ -131,7 +140,7 @@ const BusinessDeals = () => {
               onChange={(e) =>
                 businessType === 'accommodation'
                   ? setShowAccommodation(e.target.checked)
-                  : showRequestPopup('Accommodation')
+                  : showWarningPopup('Accommodation')
               }
             >
               <span className="font-semibold text-md">Accommodation Deals</span>
@@ -144,7 +153,7 @@ const BusinessDeals = () => {
               onChange={(e) =>
                 businessType === 'restaurant'
                   ? setShowRestaurantServices(e.target.checked)
-                  : showRequestPopup('Restaurant')
+                  : showWarningPopup('Restaurant')
               }
             >
               <span className="font-semibold text-md">Restaurant Deals</span>
@@ -157,7 +166,7 @@ const BusinessDeals = () => {
               onChange={(e) =>
                 businessType === 'shop'
                   ? setShowShop(e.target.checked)
-                  : showRequestPopup('Shop')
+                  : showWarningPopup('Shop')
               }
             >
               <span className="font-semibold text-md">Shop Deals</span>

@@ -1642,6 +1642,75 @@ app.delete('/businessCoverPhoto/:id', async (req, res) => {
   }
 });
 
+// Endpoint to get business location and pin_location
+app.get('/getBusinessLocation', async (req, res) => {
+  const userId = req.session?.user?.user_id;
+
+  if (!userId) {
+    return res.status(400).json({ success: false, message: 'User not logged in or user ID missing' });
+  }
+
+  try {
+    const [rows] = await pool.query(
+      'SELECT location, pin_location FROM businesses WHERE user_id = ?',
+      [userId]
+    );
+
+    if (rows.length > 0) {
+      return res.json({ success: true, businessLocation: rows[0] });
+    } else {
+      return res.status(404).json({ success: false, message: 'Business not found' });
+    }
+  } catch (err) {
+    console.error('Error executing SQL query:', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+// Endpoint to update business location and pin_location
+app.put('/updateBusinessLocation', async (req, res) => {
+  const userId = req.session?.user?.user_id;
+  const { location, pin_location } = req.body;
+  if (!userId) {
+    return res.status(400).json({ success: false, message: 'User not logged in or user ID missing' });
+  }
+
+  if (!location && !pin_location) {
+    return res.status(400).json({ success: false, message: 'At least one of location or pin_location must be provided' });
+  }
+
+  try {
+    const updateFields = [];
+    const updateValues = [];
+
+    if (location) {
+      updateFields.push('location = ?');
+      updateValues.push(location);
+    }
+
+    if (pin_location) {
+      updateFields.push('pin_location = ?');
+      updateValues.push(JSON.stringify(pin_location));
+    }
+
+    updateValues.push(userId);
+
+    const [result] = await pool.query(
+      `UPDATE businesses SET ${updateFields.join(', ')} WHERE user_id = ?`,
+      updateValues
+    );
+
+    if (result.affectedRows > 0) {
+      return res.json({ success: true, message: 'Location updated successfully' });
+    } else {
+      return res.status(404).json({ success: false, message: 'Business not found or no changes made' });
+    }
+  } catch (err) {
+    console.error('Error executing SQL query:', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
 // May babaguhin pa dito, dapat yung products lang nung business na selected ang lalabas
 // Endpoint to get all business products
 app.get('/getAllBusinessProduct', async (req, res) => {

@@ -646,7 +646,7 @@ const RestaurantSection = () => {
                       <Select
                         label="Select Type"
                         placeholder={restaurantType ? restaurantType : "Select or add an item"}
-                        selectedKey={restaurantType} // Use selectedKey to reflect the selected value
+                        selectedKeys={new Set([restaurantType.toLowerCase()])} // Use selectedKey to reflect the selected value
                         onSelectionChange={(key) => {
                           const selectedKey = key instanceof Set ? Array.from(key)[0] : key;
                           const selectedOption = options.find(option => option.value === selectedKey);

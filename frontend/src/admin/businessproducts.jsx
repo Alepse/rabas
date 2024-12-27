@@ -20,10 +20,10 @@ const BusinessProducts = () => {
   const [businessType, setBusinessType] = useState(null);
 
   // Function to show admin request popup
-  const showRequestPopup = (dealType) => {
+  const showRequestPopup = (productType) => {
     Swal.fire({
       title: 'Request Access',
-      text: `You need admin approval to enable ${dealType} deals.`,
+      text: `You need admin approval to enable ${productType} deals.`,
       icon: 'info',
       showCancelButton: true,
       confirmButtonText: 'Request Approval',
@@ -33,6 +33,15 @@ const BusinessProducts = () => {
         // Handle request approval logic here
         Swal.fire('Request Sent', 'Your request has been sent to the admin.', 'success');
       }
+    });
+  };
+
+  const showWarningPopup = (productType) => {
+    Swal.fire({
+      title: 'Warning',
+      text: `This feature is currently not available for you because your business type doesn't match this product type.`,
+      icon: 'warning',
+      confirmButtonText: 'Got it',
     });
   };
 
@@ -119,7 +128,7 @@ const BusinessProducts = () => {
               onChange={(e) =>
                 businessType === 'attraction'
                   ? setShowActivities(e.target.checked)
-                  : showRequestPopup('Activity')
+                  : showWarningPopup('Activity')
               }
             >
               <span className="font-semibold text-md">Activities</span>
@@ -131,7 +140,7 @@ const BusinessProducts = () => {
               onChange={(e) =>
                 businessType === 'accommodation'
                   ? setShowAccommodation(e.target.checked)
-                  : showRequestPopup('Accommodation')
+                  : showWarningPopup('Accommodation')
               }
             >
               <span className="font-semibold text-md">Accommodation</span>
@@ -143,7 +152,7 @@ const BusinessProducts = () => {
               onChange={(e) =>
                 businessType === 'restaurant'
                   ? setShowRestaurantServices(e.target.checked)
-                  : showRequestPopup('Restaurant')
+                  : showWarningPopup('Restaurant')
               }
             >
               <span className="font-semibold text-md">Restaurant Services</span>
@@ -155,7 +164,7 @@ const BusinessProducts = () => {
               onChange={(e) =>
                 businessType === 'shop'
                   ? setShowShop(e.target.checked)
-                  : showRequestPopup('Shop')
+                  : showWarningPopup('Shop')
               }
             >
               <span className="font-semibold text-md">Shop</span>

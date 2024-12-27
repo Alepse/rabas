@@ -647,7 +647,7 @@ const ActivitySections = () => {
                       <Select
                         label="Select Activity Type"
                         placeholder={activityType ? activityType : "Select or add an item"}
-                        selectedKey={activityType} // Use selectedKey instead of defaultSelectedKey
+                        selectedKeys={new Set([activityType.toLowerCase()])} // Use selectedKey instead of defaultSelectedKey
                         onSelectionChange={(key) => {
                           const selectedKey = key instanceof Set ? Array.from(key)[0] : key;
                           const selectedOption = options.find(option => option.value === selectedKey);

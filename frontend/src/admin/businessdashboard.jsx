@@ -236,14 +236,14 @@ const MostReviewedProducts = ({ products }) => {
     dots: true,
     infinite: products.length > 1,
     speed: 500,
-    slidesToShow: 3,
-    slidesToScroll: 3,
+    slidesToShow: Math.min(3, products.length),
+    slidesToScroll: Math.min(3, products.length),
     responsive: [
       {
         breakpoint: 1024,
         settings: {
-          slidesToShow: 2,
-          slidesToScroll: 2,
+          slidesToShow: Math.min(2, products.length),
+          slidesToScroll: Math.min(2, products.length),
         },
       },
       {
@@ -317,15 +317,15 @@ const OngoingDeals = ({ deals }) => {
     dots: true,
     infinite: deals.length >1 ,
     speed: 500,
-    slidesToShow: 3,
-    slidesToScroll: 3,
+    slidesToShow: Math.min(3, deals.length),
+    slidesToScroll: Math.min(3, deals.length),
     arrows: deals.length > 1,
     responsive: [
       {
         breakpoint: 1024,
         settings: {
-          slidesToShow: 2,
-          slidesToScroll: 2,
+          slidesToShow: Math.min(2, deals.length),
+          slidesToScroll: Math.min(2, deals.length),
         },
       },
       {
@@ -406,15 +406,15 @@ const AllProducts = ({ products }) => {
     dots: true,
     infinite: products.length >1 ,
     speed: 500,
-    slidesToShow: 3,
-    slidesToScroll: 3,
+    slidesToShow: Math.min(3, products.length),
+    slidesToScroll: Math.min(3, products.length),
     arrows: products.length > 1,
     responsive: [
       {
         breakpoint: 1024,
         settings: {
-          slidesToShow: 2,
-          slidesToScroll: 2,
+          slidesToShow: Math.min(2, products.length),
+          slidesToScroll: Math.min(2, products.length),
         },
       },
       {

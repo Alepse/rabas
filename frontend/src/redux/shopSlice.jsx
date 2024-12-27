@@ -12,6 +12,7 @@ export const fetchBusinessProducts = createAsyncThunk(
         params: { category: 'shop'},
         withCredentials: true,
       });
+      console.log(response.data);
       return response.data.businessProducts || []; // Return an empty array if no products
     } catch (error) {
       throw new Error(error.response?.data.message || 'Failed to fetch shops');
@@ -173,7 +174,7 @@ const shopSlice = createSlice({
           id: product.product_id,
           productName: product.name,
           pricing: product.price,
-          pricingUnit: product.priceUnit,
+          pricingUnit: product.pricing_unit,
           description: product.description,
           images: product.images || [],
           productType: product.type || "Unknown",

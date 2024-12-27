@@ -26,6 +26,7 @@ const ShopSections = () => {
 
   const dispatch = useDispatch();
   const products = useSelector((state) => state.shop.shopProducts);
+  console.log(products);
   const status = useSelector((state) => state.shop.status);
   const error = useSelector((state) => state.shop.error);
   const [errorText, setErrorText] = useState(""); // State for validation messages
@@ -42,7 +43,7 @@ const ShopSections = () => {
     { value: 'custom', label: 'Custom' },
   ]);
   const [newOption, setNewOption] = useState("");
-
+  console.log(pricingUnit);
   // Sync restaurant with options and remove duplicates
   useEffect(() => {
   
@@ -528,7 +529,7 @@ const ShopSections = () => {
                       <Select
                         label="Select product Type"
                         placeholder={productType ? productType : "Select or add an item"}
-                        selectedKey={productType} // Use selectedKey to reflect the selected value
+                        selectedKeys={new Set([productType.toLowerCase()])} // Use selectedKey to reflect the selected value
                         onSelectionChange={(key) => {
                           const selectedKey = key instanceof Set ? Array.from(key)[0] : key;
                           const selectedOption = options.find(option => option.value === selectedKey);
@@ -588,7 +589,7 @@ const ShopSections = () => {
                     />
                   </div>
 
-                  {/* Pricing with Unit */}
+                  {/* Pricing */}
                   <div className="mb-4 flex space-x-2">
                     <div className="w-1/2">
                       <Input

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Sidebar from '../components/sidebar';
-import { Switch } from "@nextui-org/react";
+import { Select, Switch, SelectItem } from "@nextui-org/react";
 import { FaUpload, FaSave, FaPlus, FaTrash } from 'react-icons/fa';
 import { Tabs, Tab, Card, CardBody, Input, Button, Modal, ModalContent, ModalHeader, ModalBody } from "@nextui-org/react";
 import { businessIcons } from '../businesspage/BusinessComponents/businessIcons';
@@ -33,19 +33,20 @@ import {
   updateFacilityItem,
   removeFacilityItem,
 } from '../redux/businessSlice';
+import axios from 'axios';
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
+
+const municipalities = [
+  "Barcelona", "Bulan", "Bulusan", "Casiguran", "Castilla", "Donsol",
+  "Gubat", "Irosin", "Juban", "Magallanes", "Matnog", "Pilar",
+  "Prieto Diaz", "Sta. Magdalena", "Sorsogon City"
+];
 
 const BusinessProfile = () => {
   const dispatch = useDispatch();
   const businessData = useSelector((state) => state.business);
   const businessCard = useSelector((state) => state.business.businessCard);
-
-  // Title Tab
-  useEffect(() => {
-    document.title = 'BusinessName | Admin profile';
-  });
-
 
   const [isIconModalOpen, setIsIconModalOpen] = useState(false);
   const [currentEditingField, setCurrentEditingField] = useState(null);
@@ -71,11 +72,15 @@ const BusinessProfile = () => {
   const MySwal = withReactContent(Swal);
   const fileInputRef = useRef(null);
   const heroImagesInputRef = useRef(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [address, setAddress] = useState('');
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
-  
+    
+  // Title Tab
+  useEffect(() => {
+    document.title = 'BusinessName | Admin profile';
+  });
 
   // Default opening hours
   const defaultOpeningHours = [
@@ -133,6 +138,31 @@ const BusinessProfile = () => {
   useEffect(() => {
     fetchBusinessData(); // Fetch business data on component mount
   }, []);
+
+  // Fetch the current location data
+  useEffect(() => {
+    const fetchLocation = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/getBusinessLocation`, {
+          withCredentials: 'include',
+        });
+        console.log(response.data.businessLocation);
+        if (response.data.success) {
+          const { location, pin_location } = response.data.businessLocation;
+          setAddress(location);
+          setLatitude(pin_location?.latitude);
+          setLongitude(pin_location?.longitude);
+        }
+        
+      } catch (error) {
+        console.error('Error fetching location data:', error);
+      }
+    };
+
+    if (isLoggedIn) {
+      fetchLocation();
+    }
+  }, [isLoggedIn]);
 
   // Fetch business data and set initial state
   useEffect(() => {
@@ -974,15 +1004,28 @@ const BusinessProfile = () => {
     setLongitude(lng);
   };
 
-  // Save address
-  const handleSaveLocation = () => {    
-    console.log("New Address: ", address);
-    console.log("New pin location: ");
-    console.log("Latitude: ", latitude);
-    console.log("Longitude: ", longitude);
-    
-  };
+  const handleSaveLocation = async () => {
+    try {
+      const requestData = {
+        location: address,
+        pin_location: { latitude, longitude },
+      };
+      console.log('Request Data:', requestData);
 
+      const response = await axios.put(`${BASE_URL}/updateBusinessLocation`, requestData, {
+        withCredentials: 'include', // Include credentials like cookies
+      });
+      if (response.data.success) {
+        alert('Location updated successfully'); // Replace with your notification logic
+      } else {
+        alert(response.data.message); // Display error message
+      }
+    } catch (error) {
+      console.error('Error updating location:', error);
+      alert('Failed to update location');
+    }
+  };
+  
   return (
     <div className="flex flex-col lg:flex-row min-h-screen mx-auto bg-gray-100 font-sans">
       <Sidebar />
@@ -1511,14 +1554,19 @@ const BusinessProfile = () => {
                   {/* Location Controls */}
                   <div className="flex flex-col gap-3">
                     <div className="flex gap-3">
-                      <Input
-                        type="text"
-                        label="Address"
-                        placeholder="Enter address"
-                        className="flex-1"
-                        value={address} 
-                        onChange={(event) => setAddress(event.target.value)}
-                      />
+                    <Select
+                      label="Address"
+                      placeholder="Enter address"
+                      className="flex-1"
+                      selectedKeys={new Set([address])} // Use `selectedKeys` for controlled selection
+                      onSelectionChange={(key) => setAddress(key.currentKey)} // Update state with the selected key
+                    >
+                      {municipalities.map((municipality) => (
+                        <SelectItem key={municipality} value={municipality}>
+                          {municipality}
+                        </SelectItem>
+                      ))}
+                    </Select>
                     </div>
                     
                     <div className="flex gap-3">
