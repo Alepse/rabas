@@ -5,13 +5,14 @@ import Nav from '../components/nav';
 import Hero from '../components/herofood';
 import Footer from '@/components/Footer';
 import { Button, Spinner } from "@nextui-org/react";
-import { Checkbox, CheckboxGroup, Select, SelectItem, Slider } from "@nextui-org/react";
+import { Checkbox, CheckboxGroup, Select, SelectItem, Slider, Tooltip } from "@nextui-org/react";
 import { GiPositionMarker } from "react-icons/gi";
 import { Link } from 'react-router-dom';
 import Search from '@/components/Search';
 import wave from '@/assets/wave2.webp'
 import CryptoJS from 'crypto-js';
 import { Skeleton } from "@nextui-org/skeleton";
+import { IoInformationCircleOutline } from "react-icons/io5";
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
@@ -42,6 +43,13 @@ const Foods = () => {
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
   const [showButton, setShowButton] = useState(false);
+
+  const [openTooltip, setOpenTooltip] = useState(null); // Store the ID of the open tooltip
+  
+    // Function to toggle a specific tooltip
+    const toggleTooltip = (id) => {
+      setOpenTooltip((prev) => (prev === id ? null : id)); // Toggle the tooltip visibility
+    };
 
   useEffect(() => {
     const fetchFoods = async () => {
@@ -370,10 +378,30 @@ const Foods = () => {
                             </span>
                           ))}
                         </div>
-
+                        <div className='flex gap-2 items-center flex-wrap'>
                         {/* Business Name */}
                         <h3 className="text-lg sm:text-base lg:text-lg font-semibold text-gray-800 truncate">{food.businessName}</h3>
 
+                        <Tooltip
+                                              content={
+                                                <div className="max-w-[320px] p-2">
+                                                  <div className="text-sm md:text-base text-center break-words">
+                                                    {food.description}
+                                                  </div>
+                                                </div>
+                                              }
+                                              isOpen={openTooltip === food.id} // Only open for the active item
+                                              onOpenChange={(open) => setOpenTooltip(open ? food.id : null)} // Sync state
+                                            >
+                                              <button
+                                                className="bg-transparent"
+                                                onClick={() => toggleTooltip(food.id)}
+                                                aria-expanded={openTooltip === food.id}
+                                              >
+                                                <IoInformationCircleOutline className="text-xl cursor-pointer" />
+                                              </button>
+                                            </Tooltip>
+                                            </div>
                         {/* Location */}
                         <div className="text-xs text-gray-500 mb-2 flex items-center">
                           <GiPositionMarker /> {food.destination}

@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import Nav from '@/components/nav';
 import Hero from '@/components/herodiscover';
 import Footer from '@/components/Footer';
-import { Button, Checkbox, CheckboxGroup, Select, SelectItem, Slider, Tabs, Tab, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from '@nextui-org/react';
+import { Button, Checkbox, CheckboxGroup,Tooltip, Select, SelectItem, Slider, Tabs, Tab, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from '@nextui-org/react';
 import { GiPositionMarker } from 'react-icons/gi';
 import { Link } from 'react-router-dom';
 import "slick-carousel/slick/slick.css";
@@ -13,6 +13,7 @@ import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import wave from '@/assets/wave2.webp'
+import { IoInformationCircleOutline } from "react-icons/io5";
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
@@ -30,6 +31,7 @@ const containerVariants = {
     },
   },
 };
+
 
 const cardVariants = {
   hidden: { opacity: 0, y: 50 },
@@ -73,7 +75,13 @@ const Discover = () => {
   const [showButton, setShowButton] = useState(false); // State to show/hide button
 
   const businesscategories = ['activity', 'accommodation', 'restaurant', 'shop'];
+  
+  const [openTooltip, setOpenTooltip] = useState(null); // Store the ID of the open tooltip
 
+  // Function to toggle a specific tooltip
+  const toggleTooltip = (id) => {
+    setOpenTooltip((prev) => (prev === id ? null : id)); // Toggle the tooltip visibility
+  };
   // Fetch businesses from the backend
   useEffect(() => {
     const fetchBusinesses = async (businessType) => {
@@ -611,20 +619,41 @@ const Discover = () => {
                         )}        
                       </div>  
 
-                      <div className="p-4 flex-grow">
+                      <div className="p-2 ">
                         <div className="flex justify-between  items-center mb-2">
                           {renderTags(item.category, filters.selectedType)}
                         </div>
+                        <div>
+                        <div className='flex gap-2 items-center flex-wrap'>
                         <h3 className="text-lg sm:text-base lg:text-lg font-semibold text-gray-800 truncate">
-                         {item.businessName}
+                         {item.businessName} 
                          </h3>
+                         <Tooltip
+                      content={
+                        <div className="max-w-[320px] p-2">
+                          <div className="text-sm md:text-base text-center break-words">
+                            {item.description}
+                          </div>
+                        </div>
+                      }
+                      isOpen={openTooltip === item.id} // Only open for the active item
+                      onOpenChange={(open) => setOpenTooltip(open ? item.id : null)} // Sync state
+                    >
+                      <button
+                        className="bg-transparent"
+                        onClick={() => toggleTooltip(item.id)}
+                        aria-expanded={openTooltip === item.id}
+                      >
+                        <IoInformationCircleOutline className="text-xl cursor-pointer" />
+                      </button>
+                    </Tooltip>
+                         </div>
 
-                        <div className="text-xs text-gray-500 mb-2 flex items-center">
+                        </div>
+                        <div className="text-sm text-gray-500  flex items-center">
                           <GiPositionMarker className="mr-1" />
                           {item.destination}
                         </div>
-                        
-                      
                       </div>
 
                       <div className=' flex justify-between p-2'>

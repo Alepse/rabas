@@ -930,7 +930,7 @@ const BusinessBooking = () => {
 
         {/* Floating chat button */}
         <button
-          className="fixed bottom-4 right-4 bg-color1 text-white p-4 rounded-full shadow-lg hover:bg-color2 focus:outline-none z-50"
+          className="fixed top-36 right-12 bg-color1 text-white p-4 rounded-full shadow-lg hover:bg-color2 focus:outline-none z-50"
           onClick={() => setChatModalVisible(true)}
         >
           <PiChatCircleText size={24} />
