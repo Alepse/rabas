@@ -74,7 +74,7 @@ const AvailabilityModalTable = ({ isOpen, onClose, currentBookingDetails, onAcce
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-2xl p-8 bg-white rounded-lg shadow-2xl">
+    <Modal disableAnimation isOpen={isOpen} onClose={onClose} className="max-w-2xl p-8 bg-white rounded-lg shadow-2xl">
       <ModalContent className="rounded-lg">
         <ModalHeader className="text-2xl font-bold text-gray-800 border-b pb-4">
           Check Availability for {currentBookingDetails.formDetails.productName}
@@ -93,8 +93,8 @@ const AvailabilityModalTable = ({ isOpen, onClose, currentBookingDetails, onAcce
           />
         </ModalBody>
         <ModalFooter className="flex justify-between">
-          <Button auto onClick={handleDecline} color="error">Decline</Button>
-          <Button auto onClick={handleAccept} color="success">Accept</Button>
+        <Button auto onClick={handleDecline} color="danger">Decline</Button>
+        <Button auto onClick={handleAccept} className='text-white' color="success">Accept</Button>
         </ModalFooter>
       </ModalContent>
     </Modal>
@@ -121,7 +121,7 @@ const AvailabilityModalAccommodation = ({ isOpen, onClose, currentBookingDetails
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-2xl p-8 bg-white rounded-lg shadow-2xl">
+    <Modal disableAnimation isOpen={isOpen} onClose={onClose} className="max-w-2xl p-5 bg-white rounded-lg shadow-2xl">
       <ModalContent className="rounded-lg">
         <ModalHeader className="text-2xl font-bold text-gray-800 border-b pb-4">
           Check Availability for {currentBookingDetails.formDetails.productName}
@@ -144,8 +144,8 @@ const AvailabilityModalAccommodation = ({ isOpen, onClose, currentBookingDetails
           />
         </ModalBody>
         <ModalFooter className="flex justify-between">
-          <Button auto onClick={handleDecline} color="error">Decline</Button>
-          <Button auto onClick={handleAccept} color="success">Accept</Button>
+          <Button auto onClick={handleDecline} color="danger">Decline</Button>
+          <Button auto onClick={handleAccept} className='text-white' color="success">Accept</Button>
         </ModalFooter>
       </ModalContent>
     </Modal>
@@ -170,7 +170,7 @@ const AvailabilityModalActivity = ({ isOpen, onClose, currentBookingDetails, onA
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-2xl p-8 bg-white rounded-lg shadow-2xl">
+    <Modal disableAnimation isOpen={isOpen} onClose={onClose} className="max-w-2xl p-5 bg-white rounded-lg shadow-2xl">
       <ModalContent className="rounded-lg">
         <ModalHeader className="text-2xl font-bold text-gray-800 border-b pb-4">
           Check Availability for {currentBookingDetails.formDetails.productName}
@@ -304,7 +304,7 @@ const BookingDetailsCard = ({ message, onCheckAvailability, isSenderYou }) => {
         </ul>
 
         {message.formType !== 'bookingAccepted' && (
-          <Button auto color="primary" onClick={() => onCheckAvailability(message)} className="mt-2">
+          <Button size='sm' auto color="primary" onClick={() => onCheckAvailability(message)} className="mt-2">
             Check Availability
           </Button>
         )}
@@ -1102,7 +1102,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} hideCloseButton={true} size="full"
+    <Modal disableAnimation isOpen={isOpen} onClose={onClose} hideCloseButton={true} size="full"
       className="bg-white transition-colors duration-300 w-full h-full">
       <ModalContent className="w-full h-full">
         <ModalHeader className="flex justify-between items-center px-6 py-4">
@@ -1114,7 +1114,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
           </div>
         </ModalHeader>
 
-        <ModalBody className="flex flex-col lg:flex-row gap-4 overflow-y-auto max-h-screen p-6 bg-gray-100 text-black">
+        <ModalBody className="flex flex-col lg:flex-row gap-4 overflow-y-auto max-h-screen  bg-gray-100 text-black">
           {/* Sidebar for user list */}
           <div className="w-full lg:w-1/4 bg-gray-200 p-4 rounded-lg">
             <h3 className="font-semibold mb-4">Available Users</h3>
@@ -1124,7 +1124,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
           </div>
 
           {/* Main chat area */}
-          <div className="flex flex-col justify-between w-full lg:w-3/4 h-full bg-white rounded-md p-4 relative">
+          <div className="flex flex-col justify-between w-full lg:w-3/4 h-full bg-white rounded-md p-0 relative">
             {selectedUser ? (
               <>
                 <div className="flex items-center space-x-3 p-3 bg-color1 text-white rounded-t-lg">
@@ -1144,7 +1144,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
                 </div>
 
                 {/* Render messages */}
-                <div className="flex-grow overflow-y-auto">
+                <div className="flex-grow p-1 overflow-y-auto">
                   {renderMessages(messages[selectedUser])}
                   <div ref={messageEndRef}></div>
                 </div>
@@ -1159,13 +1159,13 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
                   )}
 
                 {/* Input to send messages */}
-                <div className="flex items-center space-x-2 mt-4 justify-between">
+                <div className="flex  items-center space-x-2 mt-4 justify-between">
                   <Textarea
                     value={messageInput}
                     onChange={(e) => setMessageInput(e.target.value)}
                     onKeyDown={handleKeyPress}
                     placeholder="Type a message..."
-                    className="w-full bg-white text-black rounded-lg border border-gray-300 focus:border-black focus:ring resize-none p-2"
+                    className="w-[13rem] h-[4rem] md:w-full bg-white text-black rounded-lg border border-gray-300 focus:border-black focus:ring resize-none p-2"
                     rows="2"
                   />
                   <input
@@ -1178,7 +1178,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
                   <label htmlFor="image-upload" className="cursor-pointer">
                     <FiImage size={24} className="text-gray-500 hover:text-black" />
                   </label>
-                  <Button onClick={handleSendMessage} color="primary" className="rounded-lg h-full max-w-[100px] w-full">
+                  <Button size='sm' onClick={handleSendMessage} color="primary" className="rounded-lg h-[3.5rem]  w-32">
                     <FiSend />
                   </Button>
                 </div>

@@ -450,6 +450,7 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
 
     return (
         <Modal 
+         disableAnimation
             hideCloseButton 
             isOpen={isOpen} 
             onClose={onClose}

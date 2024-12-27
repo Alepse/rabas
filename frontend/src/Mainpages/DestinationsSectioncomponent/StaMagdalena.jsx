@@ -490,11 +490,10 @@ const StaMagdalena = () => {
 
       {/* Map Placeholder */}
       <div className="mt-8">
-        <h2 className="text-2xl font-semibold mb-4">Location</h2>
+      <h2 className="text-2xl font-semibold mb-4">Locations</h2>
         <div className='flex justify-center'>
           {/* Map Section */}
-          <div className="mt-8 z-10  bg-color1 rounded-lg shadow-md p-4 w-full bg-gradient-to-r from-color1 to-color2">
-            <h2 className="text-lg font-semibold text-light mb-4">Locations</h2>
+          <div className="mt-8 z-10  bg-color1 rounded-lg shadow-md p-1 w-full bg-gradient-to-r from-color1 to-color2">
             <MapContainer center={[12.9738, 123.9807]} zoom={10} className="w-full h-96">
               <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

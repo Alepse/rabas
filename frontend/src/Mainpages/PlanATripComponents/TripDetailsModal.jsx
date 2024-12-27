@@ -187,7 +187,7 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} isDismissable={false} hideCloseButton className="rounded-lg shadow-lg mx-auto p-3 max-h-screen max-w-[1200px]">
+    <Modal disableAnimation isOpen={isOpen} onClose={onClose} isDismissable={false} hideCloseButton className="rounded-lg shadow-lg mx-auto p-3 max-h-screen max-w-[1200px]">
       <ModalContent>
         <ModalHeader className="bg-primary text-white p-4 rounded-t-lg">
           <h2 className="text-2xl font-bold">{isEditing ? 'Edit Trip Details' : trip.tripName}</h2>

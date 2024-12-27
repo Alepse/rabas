@@ -153,7 +153,7 @@ const ReviewModal = ({ isOpen, onClose, product, isLoggedIn }) => {
 
 
   return (
-    <Modal scrollBehavior='inside' isOpen={isOpen} onClose={handleClose} className="max-w-full md:max-w-2xl">
+    <Modal disableAnimation scrollBehavior='inside' isOpen={isOpen} onClose={handleClose} className="max-w-full md:max-w-2xl">
       <ModalContent className="p-4">
         <ModalHeader>
           <h2 className="text-xl font-semibold">Write a Review </h2>
@@ -261,7 +261,7 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn }) => {
   
   const InclusionsModal = ({ isOpen, onClose, inclusions }) => {
     return (
-      <Modal scrollBehavior="inside" isOpen={isOpen} onClose={onClose}>
+      <Modal disableAnimation scrollBehavior="inside" isOpen={isOpen} onClose={onClose}>
       <ModalContent className="p-4">
         <ModalHeader>
           <h2 className="text-xl font-semibold">Package Inclusions</h2>
@@ -322,8 +322,8 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn }) => {
             </div>
           )}
           <Button
-            size="sm"
-            className="absolute bottom-5 right-2 text-white bg-color1"
+            size='sm'
+            className="absolute bottom-5  right-5 text-xs text-white bg-color1"
             onClick={handleViewImages}
           >
             View Images
@@ -415,6 +415,7 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn }) => {
         </div>
       </div>
       <ReviewModal
+      disableAnimation
         isOpen={isReviewModalOpen}
         onClose={closeReviewModal}
         product={product}
@@ -422,6 +423,7 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn }) => {
       />
     
       <InclusionsModal
+      disableAnimation
         isOpen={isInclusionsModalOpen}
         onClose={closeInclusionsModal}
         inclusions={product.inclusions}
@@ -818,6 +820,7 @@ const BusinessAllproducts = () => {
 
       {/* Image Modal */}
       <Modal
+        disableAnimation
         isOpen={isOpen}
         onOpenChange={onOpenChange}
         scrollBehavior="inside"

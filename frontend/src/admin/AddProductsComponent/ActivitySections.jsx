@@ -620,6 +620,7 @@ const ActivitySections = () => {
 
       {/* Modal for Adding/Editing Activities */}
       <Modal
+       disableAnimation
         scrollBehavior="inside"
         isOpen={modalOpen}
         onOpenChange={(open) => {
