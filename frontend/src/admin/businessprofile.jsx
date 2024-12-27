@@ -1005,26 +1005,53 @@ const BusinessProfile = () => {
   };
 
   const handleSaveLocation = async () => {
-    try {
-      const requestData = {
-        location: address,
-        pin_location: { latitude, longitude },
-      };
-      console.log('Request Data:', requestData);
-
-      const response = await axios.put(`${BASE_URL}/updateBusinessLocation`, requestData, {
-        withCredentials: 'include', // Include credentials like cookies
-      });
-      if (response.data.success) {
-        alert('Location updated successfully'); // Replace with your notification logic
-      } else {
-        alert(response.data.message); // Display error message
+    MySwal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to save the updated location?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#32CD32',
+      cancelButtonColor: '#FF7F7F',
+      confirmButtonText: 'Yes, save it!',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const requestData = {
+            location: address,
+            pin_location: { latitude, longitude },
+          };
+  
+          const response = await axios.put(`${BASE_URL}/updateBusinessLocation`, requestData, {
+            withCredentials: 'include', // Include credentials like cookies
+          });
+  
+          if (response.data.success) {
+            MySwal.fire({
+              title: 'Success!',
+              text: 'Location updated successfully.',
+              icon: 'success',
+              confirmButtonColor: '#32CD32',
+            });
+          } else {
+            MySwal.fire({
+              title: 'Error!',
+              text: response.data.message,
+              icon: 'error',
+              confirmButtonColor: '#FF7F7F',
+            });
+          }
+        } catch (error) {
+          console.error('Error updating location:', error);
+          MySwal.fire({
+            title: 'Failed!',
+            text: 'Failed to update location. Please try again later.',
+            icon: 'error',
+            confirmButtonColor: '#FF7F7F',
+          });
+        }
       }
-    } catch (error) {
-      console.error('Error updating location:', error);
-      alert('Failed to update location');
-    }
-  };
+    });
+  };  
   
   return (
     <div className="flex flex-col lg:flex-row min-h-screen mx-auto bg-gray-100 font-sans">
