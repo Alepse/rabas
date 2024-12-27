@@ -181,17 +181,11 @@ const Destinations = () => {
             ))
           )}
         </div>
-      
-        {/* Selected destination section */}
-        <div ref={destinationSectionRef}>
-          {renderDestinationSection()}
-        </div>
-      </div>
 
-         {/* Emergency Hotlines Section */}
-         <AnimatedSection>
+        {/* Emergency Hotlines Section */}
+        <AnimatedSection>
         <EmergencyHotlines />
-      </AnimatedSection>
+        </AnimatedSection>
 
       <Footer />
 

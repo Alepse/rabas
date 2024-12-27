@@ -625,56 +625,31 @@ const Discover = () => {
                           {renderTags(item.category, filters.selectedType)}
                         </div>
                         <div>
-                        <div className='flex gap-2 items-center flex-wrap'>
-                        <h3 className="text-lg sm:text-base lg:text-lg font-semibold text-gray-800 truncate">
-                         {item.businessName} 
-                         </h3>
-                         <Tooltip className='bg-color1'
-                      content={
-                        <div className="max-w-[300px] flex justify-center    p-1">
-                          <div className="text-sm flex gap-1  font-light text-white    md:text-md text-start break-words">
-      
-                          <IoIosInformationCircleOutline className='text-light text-xl'/> {item.description}
-                          </div>
-                        </div>
-                      }
-                      isOpen={openTooltip === item.id} // Only open for the active item
-                      onOpenChange={(open) => setOpenTooltip(open ? item.id : null)} // Sync state
-                    >
-                      <button
-                        className="bg-transparent"
-                        onClick={() => toggleTooltip(item.id)}
-                        aria-expanded={openTooltip === item.id}
-                      >
-                        <IoInformationCircleOutline className="text-xl cursor-pointer" />
-                      </button>
-                    </Tooltip>
-                         </div>
-
                           <div className='flex gap-2 items-center flex-wrap'>
-                          <h3 className="text-lg sm:text-base lg:text-lg font-semibold text-gray-800 truncate">
-                          {item.businessName} 
-                          </h3>
-                          <Tooltip
-                            content={
-                              <div className="max-w-[320px] p-2">
-                                <div className="text-sm md:text-base text-center break-words">
-                                  {item.description 
-                                  ? item.description 
-                                  : <span className="italic text-gray-500">No description provided.</span>}
+                            <h3 className="text-lg sm:text-base lg:text-lg font-semibold text-gray-800 truncate">
+                              {item.businessName} 
+                            </h3>
+                            <Tooltip className='bg-color1'
+                              content={
+                                <div className="max-w-[300px] flex justify-center    p-1">
+                                  <div className="text-sm flex gap-1  font-light text-white    md:text-md text-start break-words">      
+                                    <IoIosInformationCircleOutline className='text-light text-xl'/> {item.description 
+                                    ? item.description 
+                                    : <span className="italic">No description provided.</span>}
+                                  </div>
                                 </div>
-                              </div>
-                            }
-                            isOpen={openTooltip === item.business_id}
-                            onOpenChange={(open) => setOpenTooltip(open ? item.business_id : null)}
-                          >
-                            <button
-                              className="bg-transparent"
-                              aria-expanded={openTooltip === item.business_id}
+                              }
+                              isOpen={openTooltip === item.business_id} // Only open for the active item
+                              onOpenChange={(open) => setOpenTooltip(open ? item.business_id : null)} // Sync state
                             >
-                              <IoInformationCircleOutline className="text-xl cursor-pointer" />
-                            </button>
-                          </Tooltip>
+                              <button
+                                className="bg-transparent"
+                                onClick={() => toggleTooltip(item.business_id)}
+                                aria-expanded={openTooltip === item.business_id}
+                              >
+                                <IoInformationCircleOutline className="text-xl cursor-pointer" />
+                              </button>
+                            </Tooltip>
                           </div>
                         </div>
                         <div className="text-sm text-gray-500  flex items-center">
