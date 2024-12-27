@@ -617,6 +617,7 @@ const AccommodationSection = () => {
 
       {/* Modal for Adding/Editing Accommodations */}
       <Modal
+      disableAnimation
         scrollBehavior="inside"
         isOpen={modalOpen}
         onOpenChange={(open) => {

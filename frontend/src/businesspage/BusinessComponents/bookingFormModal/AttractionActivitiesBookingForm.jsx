@@ -355,6 +355,7 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
   return (
     <>
       <Modal
+      disableAnimation
       hideCloseButton
         isOpen={isOpen}
         onClose={() => {}}

@@ -145,7 +145,7 @@ const BookingCard = ({ booking, onOpenChatModal, onMarkAsCompleted, onAcceptBook
             auto
             color="success"
             onClick={() => onAcceptBooking(booking.id)}
-            className="px-4"
+            className="px-4 text-white"
           >
             <div className="flex items-center gap-2">
               Accept Booking
@@ -157,7 +157,7 @@ const BookingCard = ({ booking, onOpenChatModal, onMarkAsCompleted, onAcceptBook
           auto
           color="success"
           onClick={() => onMarkAsCompleted(booking.id)}
-          className="px-4"
+          className="px-4 text-white"
         >
           <div className="flex items-center gap-2">
             Mark as Completed
@@ -343,6 +343,7 @@ const BookingForm = ({ isOpen, onClose, title, products, onSubmit, type }) => {
 
   return (
     <Modal 
+    disableAnimation
       isOpen={isOpen} 
       onClose={handleClose}
       size='3xl'
@@ -845,11 +846,21 @@ const BusinessBooking = () => {
       <div className="flex-1 p-6 md:p-8 max-h-screen overflow-y-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Bookings and Reservations</h1>
+          <div>  <button
+         disableAnimation
+          className="  bg-color1 text-white p-4 rounded-full shadow-lg hover:bg-color2 focus:outline-none z-50"
+          onClick={() => setChatModalVisible(true)}
+        >
+          <PiChatCircleText  size={20} />
+        </button></div>
         </div>
 
         <div className="overflow-x-auto scrollbar-custom">
+        
           <Tabs keepMounted variant="solid" className="sticky top-0 z-10 bg-gray-50 flex flex-wrap">
+         
             <Tab title="Pending Bookings" className="flex-1 min-w-[150px]">
+          
               <BookingSection
                 title="New Bookings"
                 bookings={pendingBookings}
@@ -859,6 +870,7 @@ const BusinessBooking = () => {
                 filteredBookingsByType={filteredBookingsByType}
                 onAcceptBooking={handleAcceptBooking}
               />
+              
             </Tab>
 
             <Tab title="Active Bookings" className="flex-1 min-w-[150px]">
@@ -926,17 +938,14 @@ const BusinessBooking = () => {
               />
             </Tab>
           </Tabs>
+          
         </div>
 
-        {/* Floating chat button */}
-        <button
-          className="fixed top-36 right-12 bg-color1 text-white p-4 rounded-full shadow-lg hover:bg-color2 focus:outline-none z-50"
-          onClick={() => setChatModalVisible(true)}
-        >
-          <PiChatCircleText size={24} />
-        </button>
+       
+       
 
         <ChatModal
+        disableAnimation
           isOpen={isChatModalVisible}
           onClose={closeChatModal}
           selectedBooking={currentBookingDetails}
@@ -946,6 +955,7 @@ const BusinessBooking = () => {
 
         {/* Booking Forms */}
         <BookingForm
+        disableAnimation
           isOpen={isAccommodationFormOpen}
           onClose={() => setAccommodationFormOpen(false)}
           title="Accommodation"
@@ -954,6 +964,7 @@ const BusinessBooking = () => {
           type="Accommodation"
         />
         <BookingForm
+        disableAnimation
           isOpen={isTableReservationFormOpen}
           onClose={() => setTableReservationFormOpen(false)}
           title="Table Reservation"
@@ -962,6 +973,7 @@ const BusinessBooking = () => {
           type="Table Reservation"
         />
         <BookingForm
+        disableAnimation
           isOpen={isAttractionActivitiesFormOpen}
           onClose={() => setAttractionActivitiesFormOpen(false)}
           title="Activity"

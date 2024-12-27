@@ -11,98 +11,125 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 // Component for rendering booking details
 const BookingDetailsCard = ({ message, isSender }) => {
   return (
-    <div className={`bg-white shadow-md text-black p-4 rounded-lg border border-gray-200 mt-2`}>
-      <h4 className="font-semibold mb-2">Booking Details:</h4>
-      <ul className="space-y-1">
-        <li><strong>Product:</strong> {message.formDetails?.productName || 'No product provided'}</li>
-        <li><MdPeople className="inline-block text-lg" /> <strong> Guests:</strong> {message.formDetails?.numberOfGuests || 'No guests provided'}</li>
-        <li><MdEmail className="inline-block text-lg" /> <strong> Email:</strong> {message.formDetails?.email || 'No email provided'}</li>
-        <li><MdPhone className="inline-block text-lg" /> <strong> Phone:</strong> {message.formDetails?.phone || 'No number provided'}</li>
-         
-        {message.formType === 'accommodationBooking' && (
-          <>
-            <li>
-              <MdDateRange className="inline-block text-lg" /> 
-              <strong> Check-in: </strong> 
-              {`${message.formDetails?.checkInOutDates?.start?.day}-${message.formDetails?.checkInOutDates?.start?.month}-${message.formDetails?.checkInOutDates?.start?.year}`}
-            </li>
-            <li>
-              <MdDateRange className="inline-block text-lg" /> 
-              <strong> Check-out: </strong> 
-              {`${message.formDetails?.checkInOutDates?.end?.day}-${message.formDetails?.checkInOutDates?.end?.month}-${message.formDetails?.checkInOutDates?.end?.year}`}
-            </li>
-          </>
-        )}
-        
-        {message.formType === 'tableReservation' && (
-          <>
-            <li><MdDateRange className="inline-block text-lg" /> <strong> Reservation Date:</strong> {`${message.formDetails?.reservationDate?.day}-${message.formDetails?.reservationDate?.month}-${message.formDetails?.reservationDate?.year}`}</li>
-            <li><strong>Reservation Time:</strong> {new Date(`1970-01-01T${message.formDetails?.reservationTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</li>
-          </>
-        )}
-        
-        {message.formType === 'activityBooking' && (
-          <>
-            <li>
-              <MdDateRange className="inline-block text-lg" /> 
-              <strong> Activity Date: </strong> 
-              {`${message.formDetails?.visitDate?.day}-${message.formDetails?.visitDate?.month}-${message.formDetails?.visitDate?.year}`}
-            </li>
-            <li>
-              <strong>Activity Time: </strong> 
-              {new Date(`1970-01-01T${message.formDetails?.activityTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
-            </li>
-          </>
-        )}
+    <div className="bg-white shadow-md text-black p-4 rounded-lg border border-gray-200 mt-2 max-w-md mx-auto sm:max-w-lg md:max-w-xl">
+  <h4 className="font-semibold mb-2 text-base sm:text-lg md:text-xl">Booking Details:</h4>
+  <ul className="space-y-2 text-sm sm:text-base">
+    <li>
+      <strong>Product:</strong> 
+      <span className="block sm:inline">{message.formDetails?.productName || 'No product provided'}</span>
+    </li>
+    <li>
+      <MdPeople className="inline-block text-lg" /> 
+      <strong> Guests:</strong> 
+      <span className="block sm:inline">{message.formDetails?.numberOfGuests || 'No guests provided'}</span>
+    </li>
+    <li>
+      <MdEmail className="inline-block text-lg" /> 
+      <strong> Email:</strong> 
+      <span className="break-words">{message.formDetails?.email || 'No email provided'}</span>
+    </li>
+    <li>
+      <MdPhone className="inline-block text-lg" /> 
+      <strong> Phone:</strong> 
+      <span className="block sm:inline">{message.formDetails?.phone || 'No number provided'}</span>
+    </li>
 
-        {message.formType === 'bookingAccepted' && (
+    {message.formType === 'accommodationBooking' && (
+      <>
+        <li>
+          <MdDateRange className="inline-block text-lg" /> 
+          <strong> Check-in:</strong> 
+          <span className="block sm:inline">{`${message.formDetails?.checkInOutDates?.start?.day}-${message.formDetails?.checkInOutDates?.start?.month}-${message.formDetails?.checkInOutDates?.start?.year}`}</span>
+        </li>
+        <li>
+          <MdDateRange className="inline-block text-lg" /> 
+          <strong> Check-out:</strong> 
+          <span className="block sm:inline">{`${message.formDetails?.checkInOutDates?.end?.day}-${message.formDetails?.checkInOutDates?.end?.month}-${message.formDetails?.checkInOutDates?.end?.year}`}</span>
+        </li>
+      </>
+    )}
+
+    {message.formType === 'tableReservation' && (
+      <>
+        <li>
+          <MdDateRange className="inline-block text-lg" /> 
+          <strong> Reservation Date:</strong> 
+          <span className="block sm:inline">{`${message.formDetails?.reservationDate?.day}-${message.formDetails?.reservationDate?.month}-${message.formDetails?.reservationDate?.year}`}</span>
+        </li>
+        <li>
+          <strong> Reservation Time:</strong> 
+          <span className="block sm:inline">{new Date(`1970-01-01T${message.formDetails?.reservationTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</span>
+        </li>
+      </>
+    )}
+
+    {message.formType === 'activityBooking' && (
+      <>
+        <li>
+          <MdDateRange className="inline-block text-lg" /> 
+          <strong> Activity Date:</strong> 
+          <span className="block sm:inline">{`${message.formDetails?.visitDate?.day}-${message.formDetails?.visitDate?.month}-${message.formDetails?.visitDate?.year}`}</span>
+        </li>
+        <li>
+          <strong>Activity Time:</strong> 
+          <span className="block sm:inline">{new Date(`1970-01-01T${message.formDetails?.activityTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</span>
+        </li>
+      </>
+    )}
+
+    {message.formType === 'bookingAccepted' && (
+      <>
+        {message.formDetails?.checkInOutDates ? (
           <>
-            
-            {message.formDetails?.checkInOutDates ? (
-              <>
-                <li>
-                  <MdDateRange className="inline-block text-lg" /> 
-                  <strong> Check-in: </strong>
-                  {`${message.formDetails?.checkInOutDates?.start?.day}-${message.formDetails?.checkInOutDates?.start?.month}-${message.formDetails?.checkInOutDates?.start?.year}`}
-                </li>
-                <li>
-                  <MdDateRange className="inline-block text-lg" /> 
-                  <strong> Check-out: </strong>
-                  {`${message.formDetails?.checkInOutDates?.end?.day}-${message.formDetails?.checkInOutDates?.end?.month}-${message.formDetails?.checkInOutDates?.end?.year}`}
-                </li>
-              </>
-            ) : message.formDetails?.reservationDate ? (
-              <>
-                <li>
-                  <MdDateRange className="inline-block text-lg" /> 
-                  <strong> Reservation Date: </strong>
-                  {`${message.formDetails?.reservationDate?.day}-${message.formDetails?.reservationDate?.month}-${message.formDetails?.reservationDate?.year}`}
-                </li>
-                <li>
-                  <strong> Reservation Time: </strong>
-                  {new Date(`1970-01-01T${message.formDetails?.reservationTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
-                </li>
-              </>
-            ) : message.formDetails?.visitDate ? (
-              <>
-                <li>
-                  <MdDateRange className="inline-block text-lg" /> 
-                  <strong> Activity Date: </strong>
-                  {`${message.formDetails?.visitDate?.day}-${message.formDetails?.visitDate?.month}-${message.formDetails?.visitDate?.year}`}
-                </li>
-                <li>
-                  <strong> Activity Time: </strong>
-                  {new Date(`1970-01-01T${message.formDetails?.activityTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
-                </li>
-              </>
-            ) : null}
-            
+            <li>
+              <MdDateRange className="inline-block text-lg" /> 
+              <strong> Check-in:</strong> 
+              <span className="block sm:inline">{`${message.formDetails?.checkInOutDates?.start?.day}-${message.formDetails?.checkInOutDates?.start?.month}-${message.formDetails?.checkInOutDates?.start?.year}`}</span>
+            </li>
+            <li>
+              <MdDateRange className="inline-block text-lg" /> 
+              <strong> Check-out:</strong> 
+              <span className="block sm:inline">{`${message.formDetails?.checkInOutDates?.end?.day}-${message.formDetails?.checkInOutDates?.end?.month}-${message.formDetails?.end?.year}`}</span>
+            </li>
           </>
-        )}
-        <li><strong>Special Requests:</strong> {message.formDetails?.specialRequests || 'None'}</li>
-        <li><strong>Total Amount:</strong> {message.formDetails?.amount || '₱0'}</li>
-      </ul>
-    </div>
+        ) : message.formDetails?.reservationDate ? (
+          <>
+            <li>
+              <MdDateRange className="inline-block text-lg" /> 
+              <strong> Reservation Date:</strong> 
+              <span className="block sm:inline">{`${message.formDetails?.reservationDate?.day}-${message.formDetails?.reservationDate?.month}-${message.formDetails?.reservationDate?.year}`}</span>
+            </li>
+            <li>
+              <strong> Reservation Time:</strong> 
+              <span className="block sm:inline">{new Date(`1970-01-01T${message.formDetails?.reservationTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</span>
+            </li>
+          </>
+        ) : message.formDetails?.visitDate ? (
+          <>
+            <li>
+              <MdDateRange className="inline-block text-lg" /> 
+              <strong> Activity Date:</strong> 
+              <span className="block sm:inline">{`${message.formDetails?.visitDate?.day}-${message.formDetails?.visitDate?.month}-${message.formDetails?.visitDate?.year}`}</span>
+            </li>
+            <li>
+              <strong> Activity Time:</strong> 
+              <span className="block sm:inline">{new Date(`1970-01-01T${message.formDetails?.activityTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</span>
+            </li>
+          </>
+        ) : null}
+      </>
+    )}
+    <li>
+      <strong>Special Requests:</strong> 
+      <span className="block sm:inline">{message.formDetails?.specialRequests || 'None'}</span>
+    </li>
+    <li>
+      <strong>Total Amount:</strong> 
+      <span className="block sm:inline">{message.formDetails?.amount || '₱0'}</span>
+    </li>
+  </ul>
+</div>
+
   );
 };
 
@@ -721,7 +748,7 @@ const UserChatModal = ({ isOpen, onClose, onOpenChat }) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} hideCloseButton={true} size="full"
+    <Modal disableAnimation isOpen={isOpen} onClose={handleClose} hideCloseButton={true} size="full"
       className="bg-white transition-colors duration-300 w-full h-full">
       <ModalContent className="w-full h-full">
         <ModalHeader className="flex justify-between items-center px-6 py-4">
@@ -743,7 +770,7 @@ const UserChatModal = ({ isOpen, onClose, onOpenChat }) => {
           </div>
 
           {/* Main chat area */}
-          <div className="flex flex-col justify-between w-full lg:w-3/4 h-full bg-white rounded-md p-4 relative">
+          <div className="flex flex-col justify-between w-full lg:w-3/4 h-full bg-white rounded-md p-0 relative">
             {selectedBusiness ? (
               <>
                 <div className="flex items-center space-x-3 p-3 bg-color1 text-white rounded-t-lg">
@@ -763,7 +790,7 @@ const UserChatModal = ({ isOpen, onClose, onOpenChat }) => {
                 </div>
 
                 {/* Render messages */}
-                <div className="flex-grow overflow-y-auto relative">
+                <div className="flex-grow p-1 overflow-y-auto relative">
                   {messages && messages[selectedBusiness] ? (
                     <>
                       {renderMessages(messages[selectedBusiness])}
@@ -789,7 +816,7 @@ const UserChatModal = ({ isOpen, onClose, onOpenChat }) => {
                     onChange={(e) => setMessageInput(e.target.value)}
                     onKeyDown={handleKeyPress}
                     placeholder="Type a message..."
-                    className="w-full bg-white text-black rounded-lg border border-gray-300 focus:border-black focus:ring resize-none p-2"
+                     className="w-[13rem] h-[4rem] md:w-full bg-white text-black rounded-lg border border-gray-300 focus:border-black focus:ring resize-none p-2"
                     rows="2"
                   />
                   <input
@@ -802,7 +829,7 @@ const UserChatModal = ({ isOpen, onClose, onOpenChat }) => {
                   <label htmlFor="image-upload" className="cursor-pointer">
                     <FiImage size={24} className="text-gray-500 hover:text-black" />
                   </label>
-                  <Button onClick={handleSendMessage} color="primary" className="rounded-lg h-full max-w-[100px] w-full">
+                  <Button onClick={handleSendMessage} color="primary" className="rounded-lg h-[3.5rem]  w-32">
                     <FiSend />
                   </Button>
                 </div>

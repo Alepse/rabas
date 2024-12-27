@@ -620,6 +620,7 @@ const RestaurantSection = () => {
 
       {/* Modal for Adding/Editing Restaurant Services */}
       <Modal
+       disableAnimation
         scrollBehavior="inside"
         isOpen={modalOpen}
         onOpenChange={(open) => {

@@ -399,7 +399,7 @@ const Trip = () => {
         </motion.button>
       )}
 
-      <Modal hideCloseButton isOpen={isOpen} onClose={handleClose} className="rounded-lg shadow-lg mx-auto p-3 max-h-screen max-w-[1200px]">
+      <Modal disableAnimation hideCloseButton isOpen={isOpen} onClose={handleClose} className="rounded-lg shadow-lg mx-auto p-3 max-h-screen max-w-[1200px]">
         <ModalContent className="rounded-lg overflow-y-auto scrollbar-custom">
           <ModalHeader className="bg-primary text-white p-4 rounded-t-lg flex justify-between items-center">
             <h2 className="text-2xl font-bold">Let's create your trip in Sorsogon</h2>
@@ -555,6 +555,7 @@ const Trip = () => {
       </Modal>
       {isDetailsOpen && selectedTrip && (
           <TripDetailsModal
+              disableAnimation
               isOpen={isDetailsOpen}
               onClose={() => setIsDetailsOpen(false)}
               trip={selectedTrip}

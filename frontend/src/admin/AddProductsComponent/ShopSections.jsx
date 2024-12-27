@@ -502,6 +502,7 @@ const ShopSections = () => {
 
       {/* Modal for Adding/Editing Products */}
       <Modal
+       disableAnimation
         scrollBehavior="inside"
         isOpen={modalOpen}
         onOpenChange={(open) => {
