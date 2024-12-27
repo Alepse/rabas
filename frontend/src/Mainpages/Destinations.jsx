@@ -127,16 +127,22 @@ const Destinations = () => {
       <AnimatedSection>
         <Search />
       </AnimatedSection>
-
+        
 
       {/* Main content */}
       <div className='mt-4 mx-auto w-full container'>
-        <div className='p-4 mb-4'>
+
+         {/* Selected destination section */}
+         <div ref={destinationSectionRef}>
+          {renderDestinationSection()}
+        </div>
+      </div>
+        <div className='p-6 mb-3 container mx-auto'>
           <h1 className='font-semibold text-2xl'>Discover the Beauty of Sorsogon</h1>
         </div>
 
         {/* Municipalities grid */}
-        <div className='bg-transparent text-[11px] md:text-sm grid grid-cols-3 sm:grid-cols-2 font-font1 md:grid-cols-4 lg:grid-cols-5 gap-4'>
+        <div className=' container mx-autobg-transparent text-[11px] md:text-sm grid grid-cols-3 sm:grid-cols-2 font-font1 md:grid-cols-4 lg:grid-cols-5 gap-4'>
           {loading ? (
             Array.from({ length: 15 }).map((_, index) => (
               <AnimatedSection key={index}>
@@ -177,11 +183,7 @@ const Destinations = () => {
         </div>
      
 
-        {/* Selected destination section */}
-        <div ref={destinationSectionRef}>
-          {renderDestinationSection()}
-        </div>
-      </div>
+     
 
          {/* Emergency Hotlines Section */}
          <AnimatedSection>

@@ -162,7 +162,7 @@ const BusinessInfo = () => {
                 <div className="flex-1 p-4">
                   <h2 className="text-2xl md:text-3xl font-bold mb-4">About Our Business</h2>
                   <div className='max-w-full lg:max-w-[40rem] w-full flex flex-col justify-center items-start'>
-                    <div className="text-black mb-6 break-words whitespace-normal">
+                    <div className="text-gray-700 mb-6 break-words whitespace-normal">
                       <h1 className="text-md font-normal">
                         {businessData.aboutUs}
                       </h1>
@@ -170,10 +170,10 @@ const BusinessInfo = () => {
                   </div>
                   <div className="mb-6">
                     <h3 className="text-xl font-semibold flex items-center gap-3 mb-2">Contact Information</h3>
-                    <ul className="space-y-2">
+                    <ul className="space-y-2 ">
                       {businessData.contactInfo && businessData.contactInfo.length > 0 ? (
                         businessData.contactInfo.map((info, index) => (
-                          <li key={`${info.label}-${index}`} className="flex items-center gap-2">
+                          <li key={`${info.label}-${index}`} className="flex text-gray-700  items-center gap-2">
                             {renderIcon(info.icon)}
                             <span>
                               {info.label}{info.value ? `: ${info.value}` : ''}
