@@ -1680,7 +1680,7 @@ app.get('/getAllBusinessProduct', async (req, res) => {
 app.get('/getBusinessProduct', async (req, res) => {
   const userId = req.session?.user?.user_id;
   const category = req.query.category;
-
+  // console.log(req.session);
   if (!userId) {
     return res.status(400).json({ success: false, message: 'User not logged in or user ID missing' });
   }
@@ -2007,6 +2007,96 @@ app.delete('/delete-product', async (req, res) => {
     return res.status(500).json({ success: false, message: 'Failed to delete product' });
   }
 });
+
+app.get('/getProducts', async (req, res) => {
+  const userId = req.session?.user?.user_id;
+  if (!userId) {
+    return res.status(400).json({ success: false, message: 'User not logged in or user ID missing' });
+  }
+
+  try {
+    const [rows] = await pool.query(
+      'SELECT * FROM products WHERE user_id = ?',
+      [userId]
+    );
+
+    if (rows.length > 0) {
+      return res.json({ success: true, businessProducts: rows });
+    } else {
+      // Return an empty array instead of a 404 error
+      return res.json({ success: true, businessProducts: [] });
+    }
+  } catch (err) {
+    console.error('Error executing SQL query:', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+app.get('/getProductsWithActiveDeals', async (req, res) => {
+  const userId = req.session?.user?.user_id;
+
+  if (!userId) {
+    return res.status(400).json({ success: false, message: 'User not logged in or user ID missing' });
+  }
+
+  try {
+    const currentDate = new Date().toISOString().split('T')[0]; // Get current date in 'YYYY-MM-DD' format
+
+    // Query to fetch products with active deals
+    const [rows] = await pool.query(
+      `SELECT 
+          p.*, 
+          d.discount, 
+          d.expirationDate 
+        FROM products p
+        JOIN deals d ON p.product_id = d.product_id
+        WHERE p.user_id = ? 
+          AND d.expirationDate > ?`,
+      [userId, currentDate]
+    );
+
+    if (rows.length > 0) {
+      return res.json({ success: true, productsWithDeals: rows });
+    } else {
+      // Return an empty array if no products with active deals are found
+      return res.json({ success: true, productsWithDeals: [] });
+    }
+  } catch (err) {
+    console.error('Error executing SQL query:', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+app.get('/getMostReviewedProducts', async (req, res) => {
+  const userId = req.session?.user?.user_id;
+
+  if (!userId) {
+    return res.status(400).json({ success: false, message: 'User not logged in or user ID missing' });
+  }
+
+  try {
+    // Query to get the most reviewed products
+    const [rows] = await pool.query(
+      `SELECT p.product_id, p.name, p.description, p.price, p.pricing_unit, p.images,  AVG(r.ratings) AS rating, COUNT(r.ratings_id) AS review_count
+       FROM products p
+       LEFT JOIN product_ratings r ON p.product_id = r.product_id
+       WHERE p.user_id = ?
+       GROUP BY p.product_id
+       ORDER BY review_count DESC`,
+      [userId]
+    );
+
+    if (rows.length > 0) {
+      return res.json({ success: true, products: rows });
+    } else {
+      return res.json({ success: true, products: [] });
+    }
+  } catch (err) {
+    console.error('Error executing SQL query:', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
 
 // Endpoint to get business deals
 app.get('/getDeals', async (req, res) => {
