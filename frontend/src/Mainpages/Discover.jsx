@@ -20,6 +20,7 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 import CryptoJS from 'crypto-js';
 import { Skeleton } from "@nextui-org/skeleton";
+import { IoIosInformationCircleOutline } from 'react-icons/io';
 
 // Animation Variants
 const containerVariants = {
@@ -628,11 +629,12 @@ const Discover = () => {
                         <h3 className="text-lg sm:text-base lg:text-lg font-semibold text-gray-800 truncate">
                          {item.businessName} 
                          </h3>
-                         <Tooltip
+                         <Tooltip className='bg-color1'
                       content={
-                        <div className="max-w-[320px] p-2">
-                          <div className="text-sm md:text-base text-center break-words">
-                            {item.description}
+                        <div className="max-w-[300px] flex justify-center    p-1">
+                          <div className="text-sm flex gap-1  font-light text-white    md:text-md text-start break-words">
+      
+                          <IoIosInformationCircleOutline className='text-light text-xl'/> {item.description}
                           </div>
                         </div>
                       }
