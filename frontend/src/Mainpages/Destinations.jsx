@@ -175,8 +175,7 @@ const Destinations = () => {
             ))
           )}
         </div>
-     
-
+      
         {/* Selected destination section */}
         <div ref={destinationSectionRef}>
           {renderDestinationSection()}

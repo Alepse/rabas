@@ -7,7 +7,6 @@ import HeroAndGallery from './BusinessComponents/BusinessHero';
 import Footer from '@/components/Footer';
 import Info from '../businesspage/BusinessComponents/BuseinessInfo.jsx';
 import Search from '@/components/Search';
-import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
 import { AiOutlineLike } from "react-icons/ai";
 import { Button, Spinner } from '@nextui-org/react';
 import { IoStar, IoStarHalf, IoStarOutline } from "react-icons/io5";
@@ -15,8 +14,8 @@ import Section from './BusinessComponents/BusinessSectionDeals';
 import Allproducts from '../businesspage/BusinessComponents/BusinessAllproducts';
 import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { FiSend } from 'react-icons/fi';
 import Swal from 'sweetalert2';
+import UserChatModal from '@/user/userChatSystem/UserChatModal';
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
@@ -60,12 +59,9 @@ const BusinessPage = () => {
   const [isLiked, setIsLiked] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showButton, setShowButton] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [message, setMessage] = useState('');
   const [userData, setUserData] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  // Function to check login status
+  const [isChatModalOpen, setIsChatModalOpen] = useState(false);
   const checkLoginStatus = useCallback(async () => {
     try {
       const response = await fetch(`${BASE_URL}/check-login`, {
@@ -117,8 +113,6 @@ const BusinessPage = () => {
         const response = await axios.get(`${BASE_URL}/getAllBusinesses`);
         const business = response.data.businesses.find(b => b.business_id === parseInt(decryptedBusinessId));
         setBusinessData(business);
-        // console.log('Encrypted ID:', encryptedBusinessId);
-        // console.log('Decrypted ID:', decryptedBusinessId);
       } catch (error) {
         console.error('Error fetching business data:', error);
       } finally {
@@ -148,41 +142,18 @@ const BusinessPage = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleModalOpen = () => {
+  const openChatModal = () => {
     if (!isLoggedIn){
       return  showErrorAlert('Please login to send a message.');
     }
-    setIsModalOpen(true);
+    if(businessData){
+    setIsChatModalOpen(true);}
   };
 
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-    setMessage('');
+  const closeChatModal = () => {
+    setIsChatModalOpen(false);
   };
 
-  const handleKeyPress = (event) => {
-    if (event.key === 'Enter') {
-      handleSendMessage();
-    }
-  };
-
-  const handleSendMessage = async () => {
-    const formData = new FormData();
-    formData.append('sender_id', userData.user_id);
-    formData.append('sender_account', 'user');
-    formData.append('receiver_id', businessData.user_id);
-    formData.append('receiver_account', 'business');
-    formData.append('text', message);
-
-    try {
-      const response = await axios.post(`${BASE_URL}/sendMessage`, formData);
-      console.log(response);
-      showSuccessAlert('Message send successfully.');
-    } catch (error) {
-      console.error('Error sending message:', error);
-    }
-    handleModalClose();
-  };
 
   const fetchLikedBusinesses = async () => {
     try {
@@ -313,9 +284,9 @@ const BusinessPage = () => {
             />
             <h1 className='text-xl sm:text-2xl font-medium mr-16'>{businessData.businessName}</h1>
             <div className='flex flex-wrap items-center gap-3'>
-              <Button className='h-9 px-3 bg-slate-300 hover:text-white hover:bg-color2/90' onClick={handleModalOpen}>
+              <Button className='h-9 px-3 bg-slate-300 hover:text-white hover:bg-color2/90' onClick={openChatModal}>
                 <div className='text-sm flex items-center gap-2'>
-                  <IoChatbubbleEllipsesOutline />Message
+                  Message
                 </div>
               </Button>
               <Button
@@ -344,36 +315,6 @@ const BusinessPage = () => {
           </div>
         </AnimatedSection>
       </div>
-
-      {/* Modal for sending message */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-5 rounded-md shadow-lg w-full max-w-md mx-4 relative">
-            <button 
-              className="absolute top-2 right-2 text-gray-600 hover:text-gray-800 bg-transparent rounded-full w-8 h-8 flex items-center justify-center"
-              onClick={handleModalClose}
-            >
-              <span className="text-xl">&times;</span>
-            </button>
-            <h2 className="text-lg font-medium mb-4">Send a Message to {businessData.businessName}</h2>
-            <div className="flex flex-col space-y-2">
-              <div className="flex items-center border rounded-md p-2">
-                <input
-                  type="text"
-                  className="flex-grow p-2 outline-none"
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  onKeyDown={handleKeyPress}
-                  placeholder="Type a message..."
-                />
-                <button className="p-2 bg-color1 text-white rounded-md ml-2" onClick={handleSendMessage}>
-                  <FiSend />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Info Section with Animation */}
       <AnimatedSection>
@@ -408,6 +349,7 @@ const BusinessPage = () => {
           ↑
         </motion.button>
       )}
+      <UserChatModal isOpen={isChatModalOpen} onClose={closeChatModal} onOpenChat={businessData} />
     </div>
   );
 };

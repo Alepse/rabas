@@ -131,11 +131,11 @@ const ProductCard = ({ product }) => (
 );
 
 // User Chat Modal Component
-const UserChatModal = ({ isOpen, onClose }) => {
-  const [activeChatUser, setActiveChatUser] = useState(null);
+const UserChatModal = ({ isOpen, onClose, onOpenChat }) => {
+  const [activeChatUser, setActiveChatUser] = useState(onOpenChat || null);
   const [messageInput, setMessageInput] = useState('');
   const [messages, setMessages] = useState({});
-  const [selectedBusiness, setSelectedBusiness] = useState(null);
+  const [selectedBusiness, setSelectedBusiness] = useState(onOpenChat?.user_id || null);
   const [unreadMessages, setUnreadMessages] = useState({});
   const messageEndRef = useRef(null);
   const [image, setImage] = useState(null);
@@ -144,6 +144,12 @@ const UserChatModal = ({ isOpen, onClose }) => {
   const [businesses, setBusinesses] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showScrollToBottom, setShowScrollToBottom] = useState(false); // State for arrow visibility
+
+  useEffect(() => {
+    if (isOpen && selectedBusiness) {
+    sudoToBottom(); //sroll to bottom during startup
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     axios.get(`${BASE_URL}/check-login`, { withCredentials: true })
@@ -198,7 +204,7 @@ const UserChatModal = ({ isOpen, onClose }) => {
           });
   
           // console.log('sortedBusinessIds', sortedBusinessIds);
-  
+          
           // Fetch businesses based on the sorted business IDs
           fetchBusinesses(sortedBusinessIds);
         } catch (error) {
@@ -708,7 +714,9 @@ const UserChatModal = ({ isOpen, onClose }) => {
   };
 
   const handleClose = () => {
-    setSelectedBusiness(null); // Set selectedBusiness to null
+    if (!onOpenChat){
+      setSelectedBusiness(null); // Set selectedBusiness to null only if onOpenChat is null
+    }
     onClose(); // Call the original onClose function
   };
 
@@ -742,21 +750,27 @@ const UserChatModal = ({ isOpen, onClose }) => {
                   <img
                     src={activeChatUser.avatarUrl 
                       ? `${BASE_URL}/${activeChatUser.avatarUrl}` 
-                      : activeChatUser.image 
-                        ? activeChatUser.image 
-                        : `https://ui-avatars.com/api/?name=${activeChatUser.name}`} 
+                      : activeChatUser.businessLogo 
+                      ? `${BASE_URL}/${activeChatUser.businessLogo}` 
+                      : `https://ui-avatars.com/api/?name=${activeChatUser.name}`}                    
                     alt="User Avatar"
                     className="w-10 h-10 rounded-full"
                   />
                   <div className="flex flex-col">
-                    <span className="font-semibold">{activeChatUser.name}</span>
+                    <span className="font-semibold">{activeChatUser.name ? activeChatUser.name : activeChatUser.businessName}</span>
                     <span className="text-sm text-green-400">Active now</span>
                   </div>
                 </div>
 
                 {/* Render messages */}
                 <div className="flex-grow overflow-y-auto relative">
-                  {renderMessages(messages[selectedBusiness])}
+                  {messages && messages[selectedBusiness] ? (
+                    <>
+                      {renderMessages(messages[selectedBusiness])}
+                    </>
+                  ) : (
+                    <></>
+                  )}
                   <div ref={messageEndRef}></div>
                 </div>
 

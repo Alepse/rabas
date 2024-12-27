@@ -89,7 +89,7 @@ const ReviewModal = ({ isOpen, onClose, product, isLoggedIn }) => {
         
         if (response.data.success) {
           const reviews = response.data.reviewsAndRatings.filter(review => review.product_id === parseInt(product.product_id));
-          console.log('Filtered Reviews:', reviews);
+          // console.log('Filtered Reviews:', reviews);
           setReviews(reviews);
         } else {
           console.error('Failed to fetch reviews and ratings:', response.data.message);
@@ -589,8 +589,6 @@ const BusinessAllproducts = () => {
         if (contentType && contentType.includes("application/json")) {
           const data = await response.json();
 
-          console.log('Products: ', data);
-
           if (data.success) {
             // Filter products based on their category and decrypted business_id
             const filteredProducts = data.businessProducts.filter((product) => {
@@ -636,7 +634,7 @@ const BusinessAllproducts = () => {
   // console.log('All products', mockData);
 
   const openBookingModal = (product) => {
-    console.log('Opening booking modal for product:', product);
+    // console.log('Opening booking modal for product:', product);
     if (product.product_category === 'accommodation') {
       setActiveModal({ type: 'accommodation', product });
     } else if (product.product_category === 'restaurant') {
