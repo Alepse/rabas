@@ -599,7 +599,7 @@ const Discover = () => {
                   };
 
                   const filteredItems = filterData(mockData[category], filters);
-                  console.log(filteredItems);
+                  // console.log(filteredItems);
                   return filteredItems.map((item, index) => (
                     <motion.div
                       key={index}
