@@ -36,28 +36,17 @@ const encryptId = (id) => {
   return encodeURIComponent(ciphertext);
 };
 
-const ActivitiesTab = () => {
-  const [activities, setActivities] = useState([]);
-  const [loading, setLoading] = useState(true);
+const ActivitiesTab = ({ activitiesData, loading }) => {
+    const [activities, setActivities] = useState([]);
 
-  useEffect(() => {
-    const fetchActivities = async () => {
-      try {
-        const response = await fetch(`${BASE_URL}/getBusinessesByBusinessType/attraction`);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        setActivities(data);
-      } catch (error) {
-        console.error('Error fetching activities:', error);
-      } finally {
-        setLoading(false);
+    useEffect(() => {
+      if (!loading && activitiesData) {
+        setActivities(activitiesData);
+      } else if (loading) {
+        setActivities([]); // Clear activities while loading
       }
-    };
-
-    fetchActivities();
-  }, []);
+      // console.log(loading);
+    }, [activitiesData, loading]);
 
   // Sort activities for "Adventure Awaits" by ratings (descending)
   const adventureAwaits = [...activities].sort((a, b) => b.rating - a.rating);
@@ -120,7 +109,7 @@ const ActivitySwiper = ({ title, link, isLast, activities, loading, uniqueId }) 
   const nextClass = `custom-next-${uniqueId}`;
 
   return (
-    <div className="p-4 md:p-6">
+    <div className="p-4 md:p-6 min-h-[400px]">
       <div className="flex flex-col md:flex-row justify-between items-center">
         <h1
           className={`text-xl md:text-2xl font-bold mb-4 md:mb-6 text-center lg:text-start ${
@@ -137,7 +126,7 @@ const ActivitySwiper = ({ title, link, isLast, activities, loading, uniqueId }) 
           </Link>
         )}
       </div>
-      <div className="relative">
+      <div className="relative min-h-[400px]">
         <Swiper
           modules={[Pagination, Navigation]}
           navigation={{ nextEl: `.${nextClass}`, prevEl: `.${prevClass}` }}
@@ -153,13 +142,13 @@ const ActivitySwiper = ({ title, link, isLast, activities, loading, uniqueId }) 
             1024: { slidesPerView: 3 },
             1440: { slidesPerView: 4 },
           }}
-          className="max-w-full p-4 md:p-6"
+          className="max-w-full p-4 md:p-6 min-h-[400px]"
         >
           {loading
             ? Array.from({ length: 4 }).map((_, index) => (
-                <SwiperSlide key={index} className="flex justify-center">
+                <SwiperSlide key={index} className="flex justify-center min-h-[400px]">
                   <div
-                    className="bg-white rounded-lg shadow-lg duration-300 flex flex-col justify-between mx-auto h-full p-2 relative"
+                    className="bg-white rounded-lg shadow-lg duration-300 flex flex-col justify-between mx-auto h-full p-2 relative min-h-[400px]"
                     style={{
                       width: "100%",
                       maxWidth: "300px",

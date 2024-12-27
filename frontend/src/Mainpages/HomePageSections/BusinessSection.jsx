@@ -1,12 +1,64 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { Tabs, Tab } from '@nextui-org/react';
 import ActivitiesTab from './businessSectionContents/ActivitiesTab';
 import AccommodationsTab from './businessSectionContents/AccommodationsTab';
 import FoodPlacesTab from './businessSectionContents/FoodPlacesTab';
 import ShopsTab from './businessSectionContents/ShopsTab';
 import wave from '@/assets/wave.webp'
-
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 const BusinessSection = () => {
+  const [businessData, setBusinessData] = useState({
+    activities: [],
+    accommodations: [],
+    restaurant: [],
+    shop: []
+  });
+
+  const [businesses, setBusinesses] = useState([]);
+  // console.log(businessData);
+  const [loading, setLoading] = useState(false);
+  const businesscategories = ['activity', 'accommodation', 'restaurant', 'shop'];
+  // Fetch businesses from the backend
+  useEffect(() => {
+    const fetchBusinesses = async (businessType) => {
+      try {
+        const response = await fetch(`${BASE_URL}/getAllBusinesses?businessType=${businessType}`);
+        const contentType = response.headers.get("content-type");
+
+        if (contentType && contentType.includes("application/json")) {
+          const data = await response.json();
+          if (data.success) {
+            const filteredBusinesses = data.businesses.filter((business) => {
+              return business.businessType === businessType || (businessType === 'activity' && business.businessType === 'attraction');
+            });
+
+            const businessTypeKey = businessType === 'activity' || businessType === 'attraction' ? 'activities' :
+              businessType === 'accommodation' ? 'accommodations' :
+              businessType === 'restaurant' ? 'restaurant' : 'shop';
+
+            setBusinessData((prevData) => ({
+              ...prevData,
+              [businessTypeKey]: filteredBusinesses,
+            }));
+          } else {
+            console.error(`Failed to fetch ${businessType} data:`, data.message);
+          }
+        } else {
+          console.error(`Unexpected response format for ${businessType}:`, response);
+        }
+      } catch (error) {
+        console.error(`Error fetching ${businessType}:`, error);
+      }
+    };
+
+    const fetchAllBusinesses = async () => {
+      await Promise.all(businesscategories.map(fetchBusinesses));
+      setLoading(false); // Only set loading to false after all fetches complete
+    };
+
+    fetchAllBusinesses();
+  }, []);
+
   return (
    <div 
      className="mx-auto p-6 "
@@ -47,7 +99,7 @@ const BusinessSection = () => {
             </div>
           }
         >
-          <ActivitiesTab />
+          <ActivitiesTab activitiesData={businessData.activities} loading={loading} />
         </Tab>
         <Tab 
           key="accommodations" 
@@ -57,7 +109,7 @@ const BusinessSection = () => {
             </div>
           }
         >
-          <AccommodationsTab />
+          <AccommodationsTab accommodationsData={businessData.accommodations} loading={loading} />
         </Tab>
         <Tab 
           key="food-places" 
@@ -67,7 +119,7 @@ const BusinessSection = () => {
             </div>
           }
         >
-          <FoodPlacesTab />
+          <FoodPlacesTab foodPlacesData={businessData.restaurant} loading={loading} />
         </Tab>
         <Tab 
           key="shops" 
@@ -77,7 +129,7 @@ const BusinessSection = () => {
             </div>
           }
         >
-          <ShopsTab />
+          <ShopsTab shopsData={businessData.shop} loading={loading} />
         </Tab>
       </Tabs>
     </div>

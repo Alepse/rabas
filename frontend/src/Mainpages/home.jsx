@@ -47,7 +47,7 @@ const Home = () => {
     <div className='mx-auto min-h-screen bg-white font-sans' >
       <Nav />
 
-      <whatodoSection/>
+      <WhatodoSection/>
       
       {/* Hero Section */}
       <AnimatedSection>

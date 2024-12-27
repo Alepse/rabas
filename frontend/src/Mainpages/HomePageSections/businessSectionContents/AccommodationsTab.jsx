@@ -7,14 +7,10 @@ import { Pagination, Navigation } from 'swiper/modules';
 import { Link } from 'react-router-dom';
 import { Button } from '@nextui-org/react';
 import { GiPositionMarker } from 'react-icons/gi';
-import img from '@/assets/shop.webp';
 import { AiOutlineLike } from "react-icons/ai";
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import CryptoJS from 'crypto-js';
 import { Skeleton } from "@nextui-org/skeleton";
-
-// Use the environment variable for the base URL
-const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 const formatNumber = (num) => {
   if (num >= 1_000_000) {
@@ -37,29 +33,18 @@ const encryptId = (id) => {
   return encodeURIComponent(ciphertext);
 };
 
-const AccommodationsTab = () => {
+const AccommodationsTab = ({ accommodationsData, loading }) => {
   const [accommodations, setAccommodations] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchAccommodations = async () => {
-      try {
-        const response = await fetch(`${BASE_URL}/getBusinessesByBusinessType/accommodation`);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        setAccommodations(data);
-      } catch (error) {
-        console.error('Error fetching accommodations:', error);
-      } finally {
-        setLoading(false);
+  
+    useEffect(() => {
+      if (!loading && accommodationsData) {
+        setAccommodations(accommodationsData);
+      } else if (loading) {
+        setAccommodations([]); // Clear activities while loading
       }
-    };
-
-    fetchAccommodations();
-  }, []);
-
+      // console.log(loading);
+    }, [accommodationsData, loading]);
+  
   // Sort accommodations for "Design Meets Comfort" by ratings (descending)
   const designMeetsComfort = [...accommodations].sort((a, b) => b.rating - a.rating);
 
@@ -135,7 +120,7 @@ const AccommodationSwiper = ({ title, link, isLast, accommodations, loading, uni
           </Link>
         )}
       </div>
-      <div className="relative">
+      <div className="relative min-h-[400px]">
         <Swiper
           modules={[Pagination, Navigation]}
           navigation={{ nextEl: `.${nextClass}`, prevEl: `.${prevClass}` }}
@@ -151,7 +136,7 @@ const AccommodationSwiper = ({ title, link, isLast, accommodations, loading, uni
             1024: { slidesPerView: 3 },
             1440: { slidesPerView: 4 },
           }}
-          className="max-w-full p-4 md:p-6"
+          className="max-w-full p-4 md:p-6 min-h-[400px]"
         >
           {loading
             ? Array.from({ length: 4 }).map((_, index) => {
@@ -181,9 +166,9 @@ const AccommodationSwiper = ({ title, link, isLast, accommodations, loading, uni
                 );
               })
             : accommodations.map((accommodation, index) => (
-                <SwiperSlide key={index} className="flex justify-center">
+                <SwiperSlide key={index} className="flex justify-center min-h-[400px]">
                   <div
-                    className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between mx-auto h-full p-2 relative"
+                    className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between mx-auto h-full p-2 relative min-h-[400px]"
                     style={{ width: '100%', maxWidth: '300px', height: '400px' }}
                   >
                     {accommodation.discount > 0 && (

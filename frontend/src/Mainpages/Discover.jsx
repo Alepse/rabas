@@ -75,7 +75,7 @@ const Discover = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [showButton, setShowButton] = useState(false); // State to show/hide button
 
-  const businesscategories = ['activity', 'accommodation', 'restaurant', 'shop'];
+    
   
   const [openTooltip, setOpenTooltip] = useState(null); // Store the ID of the open tooltip
 

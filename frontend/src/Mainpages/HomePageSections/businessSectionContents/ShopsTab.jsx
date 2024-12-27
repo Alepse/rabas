@@ -35,29 +35,17 @@ const encryptId = (id) => {
   return encodeURIComponent(ciphertext);
 };
 
-const ShopsTab = () => {
+const ShopsTab = ({shopsData, loading}) => {
   const [shops, setShops] = useState([]);
-  const [loading, setLoading] = useState(true);
-
+  
   useEffect(() => {
-    const fetchShops = async () => {
-      try {
-        const response = await fetch(`${BASE_URL}/getBusinessesByBusinessType/shop`);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        setShops(data);
-      } catch (error) {
-        console.error('Error fetching shops:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchShops();
-  }, []);
-
+    if (!loading && shopsData) {
+      setShops(shopsData);
+    } else if (loading) {
+      setShops([]); // Clear activities while loading
+    }
+    // console.log(loading);
+  }, [shopsData, loading]);
   // Sort shops for "Must-Visit" by ratings (descending)
   const mustVisit = [...shops].sort((a, b) => b.rating - a.rating);
 
@@ -119,7 +107,7 @@ const ShopSwiper = ({ title, link, isLast, shops, loading, uniqueId }) => {
   const nextClass = `custom-next-${uniqueId}`;
 
   return(
-    <div className="p-4 md:p-6">
+    <div className="p-4 md:p-6 min-h-[400px]">
       <div className='flex flex-col md:flex-row justify-between items-center'>
         <h1 className={`text-xl md:text-2xl font-bold mb-4 md:mb-6 text-center lg:text-start ${isLast ? 'text-light' : ''}`}>
           {title}
@@ -132,7 +120,7 @@ const ShopSwiper = ({ title, link, isLast, shops, loading, uniqueId }) => {
           </Link>
         )}
       </div>
-      <div className="relative">
+      <div className="relative min-h-[400px]">
         <Swiper
           modules={[Pagination, Navigation]}
           navigation={{ nextEl: `.${nextClass}`, prevEl: `.${prevClass}` }}
@@ -148,7 +136,7 @@ const ShopSwiper = ({ title, link, isLast, shops, loading, uniqueId }) => {
             1024: { slidesPerView: 3 },
             1440: { slidesPerView: 4 },
           }}
-          className="max-w-full p-4 md:p-6"
+          className="max-w-full p-4 md:p-6 min-h-[400px]"
         >
           {loading
             ? Array.from({ length: 4 }).map((_, index) => {
@@ -156,11 +144,11 @@ const ShopSwiper = ({ title, link, isLast, shops, loading, uniqueId }) => {
                 return (
                   <SwiperSlide
                     key={index}
-                    className="flex justify-center"
+                    className="flex justify-center min-h-[400px]"
                     style={{ opacity }}
                   >
                     <div
-                      className="bg-white rounded-lg shadow-lg duration-300 flex flex-col justify-between mx-auto h-full p-2 relative"
+                      className="bg-white rounded-lg shadow-lg duration-300 flex flex-col justify-between mx-auto h-full p-2 relative min-h-[400px]"
                       style={{ width: '100%', maxWidth: '300px', height: '400px' }}
                     >
                       <Skeleton className="w-full h-56 md:h-64 bg-gray-200 rounded-t-lg overflow-hidden" />
@@ -178,9 +166,9 @@ const ShopSwiper = ({ title, link, isLast, shops, loading, uniqueId }) => {
                 );
               })
             : shops.map((shop, index) => (
-              <SwiperSlide key={index} className="flex justify-center">
+              <SwiperSlide key={index} className="flex justify-center min-h-[400px]">
                 <div
-                  className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between mx-auto h-full p-2 relative"
+                  className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between mx-auto h-full p-2 relative min-h-[400px]"
                   style={{ width: '100%', maxWidth: '300px', height: '400px' }}
                 >
                   {shop.discount > 0 && (
