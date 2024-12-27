@@ -177,10 +177,10 @@ const ShopSwiper = ({ title, link, isLast, shops, loading, uniqueId }) => {
                     </div>
                   )}
                   <div className="w-full h-56 md:h-64 bg-gray-200 rounded-t-lg overflow-hidden">
-                    {shop.image ? (
+                    {shop.cardImage ? (
                       <img
-                        src={`${BASE_URL}/${shop.image}`}
-                        alt={shop.name}
+                        src={`${BASE_URL}/${shop.cardImage}`}
+                        alt={shop.businessName}
                         className="w-full h-full object-cover"
                       />
                     ) : (
@@ -210,7 +210,7 @@ const ShopSwiper = ({ title, link, isLast, shops, loading, uniqueId }) => {
                       </div>
                       <div className="flex items-center gap-2 mb-2">
                         <h3 className="text-lg font-semibold text-gray-800 truncate">
-                          {shop.name}
+                          {shop.businessName}
                         </h3>
                         {shop.likes > 0 && (
                           <span className="text-xs text-gray-500 flex items-center gap-1">

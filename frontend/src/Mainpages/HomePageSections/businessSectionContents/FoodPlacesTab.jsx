@@ -179,10 +179,10 @@ const FoodPlaceSwiper = ({ title, link, isLast, foodPlaces, loading, uniqueId })
                   </div>
                 )}
                 <div className="w-full h-56 md:h-64 bg-gray-200 rounded-t-lg overflow-hidden">
-                  {foodPlace.image ? (
+                  {foodPlace.cardImage ? (
                     <img
-                      src={`${BASE_URL}/${foodPlace.image}`}
-                      alt={foodPlace.name}
+                      src={`${BASE_URL}/${foodPlace.cardImage}`}
+                      alt={foodPlace.businessName}
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -212,7 +212,7 @@ const FoodPlaceSwiper = ({ title, link, isLast, foodPlaces, loading, uniqueId })
                     </div>
                     <div className="flex items-center gap-2 mb-2">
                       <h3 className="text-lg font-semibold text-gray-800 truncate">
-                        {foodPlace.name}
+                        {foodPlace.businessName}
                       </h3>
                       {foodPlace.likes > 0 && (
                         <span className="text-xs text-gray-500 flex items-center gap-1">

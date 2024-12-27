@@ -183,10 +183,10 @@ const ActivitySwiper = ({ title, link, isLast, activities, loading, uniqueId }) 
                       </div>
                     )}
                     <div className="w-full h-56 md:h-64 bg-gray-200 rounded-t-lg overflow-hidden">
-                      {activity.image ? (
+                      {activity.cardImage ? (
                         <img
-                          src={`${BASE_URL}/${activity.image}`}
-                          alt={activity.name}
+                          src={`${BASE_URL}/${activity.cardImage}`}
+                          alt={activity.businessName}
                           className="w-full h-full object-cover"
                         />
                       ) : (
@@ -216,7 +216,7 @@ const ActivitySwiper = ({ title, link, isLast, activities, loading, uniqueId }) 
                         </div>
                         <div className="flex items-center gap-2">
                           <h3 className="flex items-center text-lg font-semibold text-gray-800 truncate">
-                            {activity.name}
+                            {activity.businessName}
                           </h3>
                           {activity.likes > 0 && (
                             <span className="text-xs text-gray-500 flex items-center gap-1">

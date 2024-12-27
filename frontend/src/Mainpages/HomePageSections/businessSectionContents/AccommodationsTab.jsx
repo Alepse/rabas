@@ -12,6 +12,9 @@ import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import CryptoJS from 'crypto-js';
 import { Skeleton } from "@nextui-org/skeleton";
 
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
+
 const formatNumber = (num) => {
   if (num >= 1_000_000) {
     return (num / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'm';
@@ -42,7 +45,7 @@ const AccommodationsTab = ({ accommodationsData, loading }) => {
       } else if (loading) {
         setAccommodations([]); // Clear activities while loading
       }
-      // console.log(loading);
+      console.log(accommodationsData);
     }, [accommodationsData, loading]);
   
   // Sort accommodations for "Design Meets Comfort" by ratings (descending)
@@ -177,10 +180,10 @@ const AccommodationSwiper = ({ title, link, isLast, accommodations, loading, uni
                       </div>
                     )}
                     <div className="w-full h-56 md:h-64 bg-gray-200 rounded-t-lg overflow-hidden">
-                      {accommodation.image ? (
+                      {accommodation.cardImage ? (
                         <img
-                          src={`${BASE_URL}/${accommodation.image}`}
-                          alt={accommodation.name}
+                          src={`${BASE_URL}/${accommodation.cardImage}`}
+                          alt={accommodation.businessName}
                           className="w-full h-full object-cover"
                         />
                       ) : (
@@ -210,7 +213,7 @@ const AccommodationSwiper = ({ title, link, isLast, accommodations, loading, uni
                         </div>                
                         <div className="flex items-center gap-2">
                           <h3 className="flex items-center text-lg font-semibold text-gray-800 truncate">
-                            {accommodation.name}
+                            {accommodation.businessName}
                           </h3>
                           {accommodation.likes > 0 && (
                             <span className="text-xs text-gray-500 flex items-center gap-1">
