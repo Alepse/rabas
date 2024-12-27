@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Logo from '../assets/rabas.png';
-import Logo2 from '../assets/Rabasorso.png';
 import { Avatar, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Badge } from "@nextui-org/react";
 import { CiSquareInfo } from "react-icons/ci";
 import { TbNotes } from "react-icons/tb";
@@ -347,7 +346,7 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
                   <NavigationMenuItem>
                     <NavigationMenuTrigger className={`cursor-pointer rounded-none text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1  ${activeLink === '/destinations' ? 'font-semibold border-b-1 border-light p-1' : ''}`}>
                       <GiPositionMarker />
-                      <a href='/destinations'> Destinations</a>
+                      <Link href='/destinations'> Destinations</Link>
                     </NavigationMenuTrigger>
                     <NavigationMenuContent>
                       <NavigationMenuLink>
