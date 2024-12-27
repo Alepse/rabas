@@ -9,7 +9,7 @@ import Surf from '@/assets/surfing.jpg';
 import Room from '@/assets/room.webp';
 import Food from '@/assets/Food.jpg';
 import Shop from '@/assets/Souvenirs.jpg';
-import { Button, Skeleton } from '@nextui-org/react';
+import { Skeleton } from '@nextui-org/react';
 
 const categories = [
   {
@@ -54,8 +54,7 @@ const WhatToDoSection = () => {
 
   // Simulate data loading
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 2000); // 2 seconds delay
-    return () => clearTimeout(timer);
+    setLoading(false);
   }, []);
 
   return (

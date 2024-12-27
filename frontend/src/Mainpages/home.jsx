@@ -23,8 +23,7 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    // Simulate data fetching
-    setTimeout(() => setLoading(false), 250);
+    setLoading(false);
 
     // Show button when scrolled down
     const handleScroll = () => {
@@ -47,8 +46,6 @@ const Home = () => {
     <div className='mx-auto min-h-screen bg-white font-sans' >
       <Nav />
 
-      <WhatodoSection/>
-      
       {/* Hero Section */}
       <AnimatedSection>
         <Hero />
