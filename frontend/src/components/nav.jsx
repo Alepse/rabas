@@ -346,7 +346,7 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
                   <NavigationMenuItem>
                     <NavigationMenuTrigger className={`cursor-pointer rounded-none text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1  ${activeLink === '/destinations' ? 'font-semibold border-b-1 border-light p-1' : ''}`}>
                       <GiPositionMarker />
-                      <Link href='/destinations'> Destinations</Link>
+                      <a href='/destinations'> Destinations</a>
                     </NavigationMenuTrigger>
                     <NavigationMenuContent>
                       <NavigationMenuLink>
