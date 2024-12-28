@@ -18,58 +18,6 @@ import { Bar } from 'react-chartjs-2';
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
-// Sample Business Listings Data
-const businessListings = {
-  activitiesAndAttractions: [
-    {
-      title: 'Beautiful Beach',
-      description: 'Relax and enjoy the scenic beach view.',
-      price: 2000,
-      imageUrl: 'https://via.placeholder.com/200',
-      rating: 5,
-      type: 'Activities',
-    },
-    {
-      title: 'Mountain Adventure',
-      description: 'Hike through the mountains and enjoy nature.',
-      price: 3000,
-      imageUrl: 'https://via.placeholder.com/200',
-      rating: 4,
-      type: 'Attractions',
-    },
-  ],
-  accommodations: [
-    {
-      title: 'Luxury Hotel',
-      description: 'A luxurious stay with world-class facilities.',
-      price: 8000,
-      imageUrl: 'https://via.placeholder.com/200',
-      rating: 5,
-      type: 'Accommodations',
-    },
-  ],
-  foodPlaces: [
-    {
-      title: 'Sample Restaurant 1',
-      description: 'A popular Filipino restaurant offering traditional dishes.',
-      price: 1500,
-      imageUrl: 'https://via.placeholder.com/200',
-      rating: 4,
-      type: 'Food',
-    },
-  ],
-  shops: [
-    {
-      title: 'Sample Souvenir Shop 1',
-      description: 'A charming shop offering unique local souvenirs.',
-      price: 1000,
-      imageUrl: 'https://via.placeholder.com/200',
-      rating: 4,
-      type: 'Shop',
-    },
-  ],
-};
-
 // Dashboard component for product counts
 const Dashboard = ({ productCounts }) => (
   <div>
