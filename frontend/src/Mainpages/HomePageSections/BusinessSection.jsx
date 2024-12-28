@@ -13,10 +13,8 @@ const BusinessSection = () => {
     restaurant: [],
     shop: []
   });
-
-  const [businesses, setBusinesses] = useState([]);
   // console.log(businessData);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const businesscategories = ['activity', 'accommodation', 'restaurant', 'shop'];
   // Fetch businesses from the backend
   useEffect(() => {
