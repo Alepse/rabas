@@ -39,31 +39,7 @@ const showErrorAlert = (message) => {
 };
 
 
-const BusinessSection = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Initialize login status
-
-   // Function to check login status
-  const checkLoginStatus = useCallback(async () => {
-    try {
-      const response = await fetch(`${BASE_URL}/check-login`, {
-        method: 'GET',
-        credentials: 'include' // Include cookies
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setIsLoggedIn(data.isLoggedIn); // Set login status
-      } else {
-        setIsLoggedIn(false);
-      }
-    } catch (error) {
-      console.error('Error checking login status:', error);
-    }
-  }, []);
-
-  useEffect(() => {
-    checkLoginStatus();
-  }, []);
-
+const BusinessSection = (isLoggedIn) => {
   const [activeModal, setActiveModal] = useState(null);
   const [mockData, setMockData] = useState({
     activities: [],

@@ -1,21 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import axios from 'axios';
-import CryptoJS from 'crypto-js';
+import React, { useState } from 'react';
 import { updateBusinessData } from '@/redux/businessSlice'; 
 import { Tabs, Tab, Card, CardBody, Textarea, Button, Avatar } from "@nextui-org/react";
 import { businessIcons } from './businessIcons';
 import DOMPurify from 'dompurify';
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
-import { FaFacebook, FaInstagram, FaPhone, FaWifi, FaCheckCircle, FaPlus, FaClipboardList, FaInfoCircle, FaConciergeBell, FaStar } from 'react-icons/fa';
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import { FaClipboardList, FaInfoCircle, FaConciergeBell, FaStar } from 'react-icons/fa';
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 const StarRating = ({ rating, onRatingChange, size = "md" }) => {
   const [hoverRating, setHoverRating] = useState(0);
   const starSize = size === "lg" ? "text-2xl md:text-3xl" : "text-lg md:text-xl";
-
-  
 
   return (
     <div className="flex">
@@ -59,43 +54,10 @@ const formatTime = (time) => {
   return `${formattedHour}:${minute} ${ampm}`;
 };
 
-const BusinessInfo = () => {
-  const { businessId: encryptedBusinessId } = useParams();
-  const [businessData, setBusinessData] = useState(null);
+const BusinessInfo = ({businessData, loading}) => {
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState("");
-  const [loading, setLoading] = useState(true);
   const [currentZoom, setCurrentZoom] = useState(10);
-
-  // Function to decrypt the business_id
-  const decryptId = (encryptedId) => {
-    const secretKey = import.meta.env.VITE_SECRET_KEY;
-    const bytes = CryptoJS.AES.decrypt(decodeURIComponent(encryptedId), secretKey);
-    return bytes.toString(CryptoJS.enc.Utf8);
-  };
-
-  useEffect(() => {
-    const fetchBusinessData = async () => {
-      try {
-        setLoading(true);
-        const decryptedBusinessId = decryptId(encryptedBusinessId);
-        const response = await axios.get(`${BASE_URL}/getAllBusinesses`);
-        const business = response.data.businesses.find(b => b.business_id === parseInt(decryptedBusinessId));
-        setBusinessData(business);
-        // console.log('Encrypted ID:', encryptedBusinessId);
-        // console.log('Decrypted ID:', decryptedBusinessId);
-      } catch (error) {
-        console.error('Error fetching business data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBusinessData();
-  }, [encryptedBusinessId]);
-
-  // log the business data
-  // console.log('Business Data:', businessData);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -123,10 +85,6 @@ const BusinessInfo = () => {
     const IconComponent = businessIcons.find(icon => icon.name === iconName)?.icon;
     return IconComponent ? <IconComponent className="inline-block mr-2" /> : null;
   };
-
-  const sanitizeHtml = (html) => ({
-    __html: DOMPurify.sanitize(html)
-  });
 
   const { pin_location } = businessData;
   const initialCenter = pin_location ? [pin_location.latitude, pin_location.longitude] : [12.9738, 123.9807];

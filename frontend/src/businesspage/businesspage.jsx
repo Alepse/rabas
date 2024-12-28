@@ -318,17 +318,17 @@ const BusinessPage = () => {
 
       {/* Info Section with Animation */}
       <AnimatedSection>
-        <Info />
+        <Info businessData={businessData} loading={loading} />
       </AnimatedSection>
 
       {/* Deals Section with Animation */}
       <AnimatedSection>
-        <Section />
+        <Section isLoggedIn={isLoggedIn}/>
       </AnimatedSection>
 
       {/* All Products Section with Animation */}
       <AnimatedSection>
-        <Allproducts />
+        <Allproducts isLoggedIn={isLoggedIn}/>
       </AnimatedSection>
 
       <Footer />

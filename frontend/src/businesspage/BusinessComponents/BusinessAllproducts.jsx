@@ -535,8 +535,7 @@ const LoadingSpinner = () => (
 );
 
 // Main Business All Products Component
-const BusinessAllproducts = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Initialize login status
+const BusinessAllproducts = (isLoggedIn) => {
   const [mockData, setMockData] = useState({
     activities: [],
     accommodations: [],
@@ -568,30 +567,7 @@ const BusinessAllproducts = () => {
   };
   const categories = ['activity', 'accommodation', 'restaurant', 'shop'];
 
-  // Function to check login status
-  const checkLoginStatus = useCallback(async () => {
-    try {
-      const response = await fetch(`${BASE_URL}/check-login`, {
-        method: 'GET',
-        credentials: 'include' // Include cookies
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setIsLoggedIn(data.isLoggedIn); // Set login status
-      } else {
-        setIsLoggedIn(false);
-      }
-    } catch (error) {
-      console.error('Error checking login status:', error);
-    }
-  }, []);
-
-  useEffect(() => {
-    checkLoginStatus();
-  }, []);
-
   // Fetch data for each category from the backend
-  
   const fetchCategoryData = async (category) => {
     try {
       const decryptedBusinessId = decryptId(encryptedBusinessId);
