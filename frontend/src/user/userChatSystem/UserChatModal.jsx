@@ -12,74 +12,29 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 const BookingDetailsCard = ({ message, isSender }) => {
   return (
     <div className="bg-white shadow-md text-black p-4 rounded-lg border border-gray-200 mt-2 max-w-md mx-auto sm:max-w-lg md:max-w-xl">
-  <h4 className="font-semibold mb-2 text-base sm:text-lg md:text-xl">Booking Details:</h4>
-  <ul className="space-y-2 text-sm sm:text-base">
-    <li>
-      <strong>Product:</strong> 
-      <span className="block sm:inline">{message.formDetails?.productName || 'No product provided'}</span>
-    </li>
-    <li>
-      <MdPeople className="inline-block text-lg" /> 
-      <strong> Guests:</strong> 
-      <span className="block sm:inline">{message.formDetails?.numberOfGuests || 'No guests provided'}</span>
-    </li>
-    <li>
-      <MdEmail className="inline-block text-lg" /> 
-      <strong> Email:</strong> 
-      <span className="break-words">{message.formDetails?.email || 'No email provided'}</span>
-    </li>
-    <li>
-      <MdPhone className="inline-block text-lg" /> 
-      <strong> Phone:</strong> 
-      <span className="block sm:inline">{message.formDetails?.phone || 'No number provided'}</span>
-    </li>
+      <h4 className="font-semibold mb-2 text-base sm:text-lg md:text-xl">Booking Details:</h4>
+      <ul className="space-y-2 text-sm sm:text-base">
+        <li>
+          <strong>Product:</strong> 
+          <span className="block sm:inline">{message.formDetails?.productName || 'No product provided'}</span>
+        </li>
+        <li>
+          <MdPeople className="inline-block text-lg" /> 
+          <strong> Guests:</strong> 
+          <span className="block sm:inline">{message.formDetails?.numberOfGuests || 'No guests provided'}</span>
+        </li>
+        <li>
+          <MdEmail className="inline-block text-lg" /> 
+          <strong> Email:</strong> 
+          <span className="break-words">{message.formDetails?.email || 'No email provided'}</span>
+        </li>
+        <li>
+          <MdPhone className="inline-block text-lg" /> 
+          <strong> Phone:</strong> 
+          <span className="block sm:inline">{message.formDetails?.phone || 'No number provided'}</span>
+        </li>
 
-    {message.formType === 'accommodationBooking' && (
-      <>
-        <li>
-          <MdDateRange className="inline-block text-lg" /> 
-          <strong> Check-in:</strong> 
-          <span className="block sm:inline">{`${message.formDetails?.checkInOutDates?.start?.day}-${message.formDetails?.checkInOutDates?.start?.month}-${message.formDetails?.checkInOutDates?.start?.year}`}</span>
-        </li>
-        <li>
-          <MdDateRange className="inline-block text-lg" /> 
-          <strong> Check-out:</strong> 
-          <span className="block sm:inline">{`${message.formDetails?.checkInOutDates?.end?.day}-${message.formDetails?.checkInOutDates?.end?.month}-${message.formDetails?.checkInOutDates?.end?.year}`}</span>
-        </li>
-      </>
-    )}
-
-    {message.formType === 'tableReservation' && (
-      <>
-        <li>
-          <MdDateRange className="inline-block text-lg" /> 
-          <strong> Reservation Date:</strong> 
-          <span className="block sm:inline">{`${message.formDetails?.reservationDate?.day}-${message.formDetails?.reservationDate?.month}-${message.formDetails?.reservationDate?.year}`}</span>
-        </li>
-        <li>
-          <strong> Reservation Time:</strong> 
-          <span className="block sm:inline">{new Date(`1970-01-01T${message.formDetails?.reservationTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</span>
-        </li>
-      </>
-    )}
-
-    {message.formType === 'activityBooking' && (
-      <>
-        <li>
-          <MdDateRange className="inline-block text-lg" /> 
-          <strong> Activity Date:</strong> 
-          <span className="block sm:inline">{`${message.formDetails?.visitDate?.day}-${message.formDetails?.visitDate?.month}-${message.formDetails?.visitDate?.year}`}</span>
-        </li>
-        <li>
-          <strong>Activity Time:</strong> 
-          <span className="block sm:inline">{new Date(`1970-01-01T${message.formDetails?.activityTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</span>
-        </li>
-      </>
-    )}
-
-    {message.formType === 'bookingAccepted' && (
-      <>
-        {message.formDetails?.checkInOutDates ? (
+        {message.formType === 'accommodationBooking' && (
           <>
             <li>
               <MdDateRange className="inline-block text-lg" /> 
@@ -89,10 +44,12 @@ const BookingDetailsCard = ({ message, isSender }) => {
             <li>
               <MdDateRange className="inline-block text-lg" /> 
               <strong> Check-out:</strong> 
-              <span className="block sm:inline">{`${message.formDetails?.checkInOutDates?.end?.day}-${message.formDetails?.checkInOutDates?.end?.month}-${message.formDetails?.end?.year}`}</span>
+              <span className="block sm:inline">{`${message.formDetails?.checkInOutDates?.end?.day}-${message.formDetails?.checkInOutDates?.end?.month}-${message.formDetails?.checkInOutDates?.end?.year}`}</span>
             </li>
           </>
-        ) : message.formDetails?.reservationDate ? (
+        )}
+
+        {message.formType === 'tableReservation' && (
           <>
             <li>
               <MdDateRange className="inline-block text-lg" /> 
@@ -104,7 +61,9 @@ const BookingDetailsCard = ({ message, isSender }) => {
               <span className="block sm:inline">{new Date(`1970-01-01T${message.formDetails?.reservationTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</span>
             </li>
           </>
-        ) : message.formDetails?.visitDate ? (
+        )}
+
+        {message.formType === 'activityBooking' && (
           <>
             <li>
               <MdDateRange className="inline-block text-lg" /> 
@@ -112,24 +71,64 @@ const BookingDetailsCard = ({ message, isSender }) => {
               <span className="block sm:inline">{`${message.formDetails?.visitDate?.day}-${message.formDetails?.visitDate?.month}-${message.formDetails?.visitDate?.year}`}</span>
             </li>
             <li>
-              <strong> Activity Time:</strong> 
+              <strong>Activity Time:</strong> 
               <span className="block sm:inline">{new Date(`1970-01-01T${message.formDetails?.activityTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</span>
             </li>
           </>
-        ) : null}
-      </>
-    )}
-    <li>
-      <strong>Special Requests:</strong> 
-      <span className="block sm:inline">{message.formDetails?.specialRequests || 'None'}</span>
-    </li>
-    <li>
-      <strong>Total Amount:</strong> 
-      <span className="block sm:inline">{message.formDetails?.amount || '₱0'}</span>
-    </li>
-  </ul>
-</div>
+        )}
 
+        {message.formType === 'bookingAccepted' && (
+          <>
+            {message.formDetails?.checkInOutDates ? (
+              <>
+                <li>
+                  <MdDateRange className="inline-block text-lg" /> 
+                  <strong> Check-in:</strong> 
+                  <span className="block sm:inline">{`${message.formDetails?.checkInOutDates?.start?.day}-${message.formDetails?.checkInOutDates?.start?.month}-${message.formDetails?.checkInOutDates?.start?.year}`}</span>
+                </li>
+                <li>
+                  <MdDateRange className="inline-block text-lg" /> 
+                  <strong> Check-out:</strong> 
+                  <span className="block sm:inline">{`${message.formDetails?.checkInOutDates?.end?.day}-${message.formDetails?.checkInOutDates?.end?.month}-${message.formDetails?.end?.year}`}</span>
+                </li>
+              </>
+            ) : message.formDetails?.reservationDate ? (
+              <>
+                <li>
+                  <MdDateRange className="inline-block text-lg" /> 
+                  <strong> Reservation Date:</strong> 
+                  <span className="block sm:inline">{`${message.formDetails?.reservationDate?.day}-${message.formDetails?.reservationDate?.month}-${message.formDetails?.reservationDate?.year}`}</span>
+                </li>
+                <li>
+                  <strong> Reservation Time:</strong> 
+                  <span className="block sm:inline">{new Date(`1970-01-01T${message.formDetails?.reservationTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</span>
+                </li>
+              </>
+            ) : message.formDetails?.visitDate ? (
+              <>
+                <li>
+                  <MdDateRange className="inline-block text-lg" /> 
+                  <strong> Activity Date:</strong> 
+                  <span className="block sm:inline">{`${message.formDetails?.visitDate?.day}-${message.formDetails?.visitDate?.month}-${message.formDetails?.visitDate?.year}`}</span>
+                </li>
+                <li>
+                  <strong> Activity Time:</strong> 
+                  <span className="block sm:inline">{new Date(`1970-01-01T${message.formDetails?.activityTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</span>
+                </li>
+              </>
+            ) : null}
+          </>
+        )}
+        <li>
+          <strong>Special Requests:</strong> 
+          <span className="block sm:inline">{message.formDetails?.specialRequests || 'None'}</span>
+        </li>
+        <li>
+          <strong>Total Amount:</strong> 
+          <span className="block sm:inline">{message.formDetails?.amount || '₱0'}</span>
+        </li>
+      </ul>
+      </div>
   );
 };
 
@@ -145,14 +144,26 @@ const UnreadBadge = ({ count }) => (
 // Add a new component for the product card
 const ProductCard = ({ product }) => (
   <div className="flex flex-col sm:flex-row items-center p-4 bg-white shadow-md rounded-lg border border-gray-200">
-    <img 
-      src={product.imageUrl} 
-      alt={product.productName} 
-      className="w-full sm:w-32 h-32 rounded-md mb-4 sm:mb-0 sm:mr-4 object-cover" 
-    />
+    {product.images && product.images.length > 0 && (
+      <img 
+        src={`${BASE_URL}/${product.images[0].path}`}  // Accessing the first image in the array
+        alt={product.images[0].title || "Product Image"}  // Using title if available, otherwise fallback to "Product Image"
+        className="w-full sm:w-32 h-32 rounded-md mb-4 sm:mb-0 sm:mr-4 object-cover" 
+      />
+    )}
     <div className="text-center sm:text-left">
-      <h4 className="font-bold text-lg">{product.productName}</h4>
+      <h4 className="font-bold text-lg">{product.name}</h4>
       <p className="text-gray-700">₱{product.price}</p>
+      <p className="text-sm text-gray-500">{product.description}</p>
+      <div className="mt-2">
+        <span className="text-yellow-500">Rating: {product.rating} ⭐</span>
+        {product.discount && (
+          <span className="ml-2 text-red-500">{product.discount}% OFF</span>
+        )}
+      </div>
+      {product.expiration && (
+        <p className="mt-2 text-xs text-gray-500">Expires on: {new Date(product.expiration).toLocaleDateString()}</p>
+      )}
     </div>
   </div>
 );
@@ -174,6 +185,7 @@ const UserChatModal = ({ isOpen, onClose, onOpenChat }) => {
 
   useEffect(() => {
     if (isOpen && selectedBusiness) {
+    fetchMessages();
     sudoToBottom(); //sroll to bottom during startup
     }
   }, [isOpen]);
@@ -204,57 +216,59 @@ const UserChatModal = ({ isOpen, onClose, onOpenChat }) => {
       });
   }, []);
   
+  
+  const fetchMessages = async () => {
+    try {
+      const { data } = await axios.get(`${BASE_URL}/userMessages/${user_id}`);
+      // console.log('data', data);
+
+      // Reduce messages into a dictionary keyed by businessId
+      const fetchedMessages = data.reduce((acc, { businessId, messages }) => {
+        acc[businessId] = messages;
+        return acc;
+      }, {});
+      setMessages(fetchedMessages);
+
+      // Extract unique business IDs and sort them based on the latest message timestamp
+      const uniqueBusinessIds = [...new Set(data.map(({ businessId }) => businessId))];
+      const sortedBusinessIds = uniqueBusinessIds.sort((a, b) => {
+        // Get the latest message timestamp for each business
+        const latestMessageA = data.find(({ businessId }) => businessId === a)?.messages.at(-1)?.time;
+        const latestMessageB = data.find(({ businessId }) => businessId === b)?.messages.at(-1)?.time;
+
+        // Sort by time in descending order (latest first)
+        return new Date(latestMessageB) - new Date(latestMessageA);
+      });
+
+      // console.log('sortedBusinessIds', sortedBusinessIds);
+      
+      // Fetch businesses based on the sorted business IDs
+      fetchBusinesses(sortedBusinessIds);
+    } catch (error) {
+      setMessages({});
+      console.error('Error fetching messages:', error.response ? error.response.data.message : 'An unknown error occurred');
+      toast.error('Failed to load messages');
+    }
+  };
+
+  const fetchBusinesses = async (businessIds) => {
+    try {
+      const businessRequests = businessIds.map((id) =>
+        axios.get(`${BASE_URL}/businessesInChat/${id}`)
+      );
+      const responses = await Promise.all(businessRequests);
+      const businessesData = responses.map((response) => response.data);
+      setBusinesses(businessesData);
+      // console.log('businesses', businessesData);
+    } catch (error) {
+      console.error('Error fetching businesses:', error.response ? error.response.data.message : 'An unknown error occurred');
+      toast.error('Failed to load businesses');
+    }
+  };
+
   useEffect(() => {
     // Only run if user_id is not null
     if (user_id) {
-      const fetchMessages = async () => {
-        try {
-          const { data } = await axios.get(`${BASE_URL}/userMessages/${user_id}`);
-          // console.log('data', data);
-  
-          // Reduce messages into a dictionary keyed by businessId
-          const fetchedMessages = data.reduce((acc, { businessId, messages }) => {
-            acc[businessId] = messages;
-            return acc;
-          }, {});
-          setMessages(fetchedMessages);
-  
-          // Extract unique business IDs and sort them based on the latest message timestamp
-          const uniqueBusinessIds = [...new Set(data.map(({ businessId }) => businessId))];
-          const sortedBusinessIds = uniqueBusinessIds.sort((a, b) => {
-            // Get the latest message timestamp for each business
-            const latestMessageA = data.find(({ businessId }) => businessId === a)?.messages.at(-1)?.time;
-            const latestMessageB = data.find(({ businessId }) => businessId === b)?.messages.at(-1)?.time;
-  
-            // Sort by time in descending order (latest first)
-            return new Date(latestMessageB) - new Date(latestMessageA);
-          });
-  
-          // console.log('sortedBusinessIds', sortedBusinessIds);
-          
-          // Fetch businesses based on the sorted business IDs
-          fetchBusinesses(sortedBusinessIds);
-        } catch (error) {
-          setMessages({});
-          console.error('Error fetching messages:', error.response ? error.response.data.message : 'An unknown error occurred');
-          toast.error('Failed to load messages');
-        }
-      };
-  
-      const fetchBusinesses = async (businessIds) => {
-        try {
-          const businessRequests = businessIds.map((id) =>
-            axios.get(`${BASE_URL}/businessesInChat/${id}`)
-          );
-          const responses = await Promise.all(businessRequests);
-          const businessesData = responses.map((response) => response.data);
-          setBusinesses(businessesData);
-          // console.log('businesses', businessesData);
-        } catch (error) {
-          console.error('Error fetching businesses:', error.response ? error.response.data.message : 'An unknown error occurred');
-          toast.error('Failed to load businesses');
-        }
-      };
   
       fetchMessages();
     }
@@ -300,21 +314,6 @@ const UserChatModal = ({ isOpen, onClose, onOpenChat }) => {
         toast.error('Failed to load messages');
       }
     };
-  
-    const fetchBusinesses = async (businessIds) => {
-      try {
-        const businessRequests = businessIds.map((id) =>
-          axios.get(`${BASE_URL}/businessesInChat/${id}`)
-        );
-        const responses = await Promise.all(businessRequests);
-        const businessesData = responses.map((response) => response.data);
-        setBusinesses(businessesData);
-      } catch (error) {
-        console.error('Error fetching businesses:', error.response ? error.response.data.message : 'An unknown error occurred');
-        toast.error('Failed to load businesses');
-      }
-    };
-  
     // Set an interval to fetch new messages every 5 seconds
     const intervalId = setInterval(fetchNewMessages, 5000);
     return () => clearInterval(intervalId); // Cleanup on unmount
@@ -471,6 +470,7 @@ const UserChatModal = ({ isOpen, onClose, onOpenChat }) => {
         toast.error('An error occurred while sending the message');
       }
     }
+    fetchMessages();
   };
 
   const resendMessage = async (failedMessage) => {
@@ -684,8 +684,16 @@ const UserChatModal = ({ isOpen, onClose, onOpenChat }) => {
               {/* Form Details Rendering */}
               {message.formDetails &&
                 Object.keys(message.formDetails).some((key) => message.formDetails[key] !== null) && (
-                  <BookingDetailsCard message={message} isSender={isSenderYou} />
-                )}
+                  <>
+                    {message.formType !== "inquire" && (
+                      <BookingDetailsCard message={message} isSender={isSenderYou} />
+                    )}
+                    {message.formType === "inquire" && (
+                      <ProductCard product={message.formDetails.selectedProduct} />
+                    )}
+                  </>
+                )
+              }
             </div>
           </div>
 

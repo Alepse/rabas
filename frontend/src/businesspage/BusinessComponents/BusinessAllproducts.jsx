@@ -31,6 +31,8 @@ import { useParams } from 'react-router-dom';
 import CryptoJS from 'crypto-js';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { FiSend } from 'react-icons/fi';
+import UserChatModal from '@/user/userChatSystem/UserChatModal';
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
@@ -244,7 +246,7 @@ const ReviewModal = ({ isOpen, onClose, product, isLoggedIn, refreshProducts }) 
 };
 
 // Product Card Component
-const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn, refreshProducts }) => {
+const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn, refreshProducts, businessData, userData }) => {
   const [isReviewModalOpen, setReviewModalOpen] = useState(false);
   const [isInclusionsModalOpen, setInclusionsModalOpen] = useState(false);
   const onModalOpen = () => {
@@ -254,7 +256,11 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn, refreshPro
   const closeInclusionsModal = () => setInclusionsModalOpen(false);
   const openReviewModal = () => setReviewModalOpen(true);
   const closeReviewModal = () => setReviewModalOpen(false);
-
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isChatModalOpen, setIsChatModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [message, setMessage] = useState('');
+  
   const discountedPrice = product.price - (product.price * (product.discount || 0) / 100);
 
   // Create a separate handler for the View Images button
@@ -294,6 +300,52 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn, refreshPro
     </Modal>
     
     );
+  };
+
+  const handleClickInquire = (product) => {
+    if (!isLoggedIn){
+      return  showErrorAlert('Please login to send a message.');
+    }
+    setSelectedProduct(product);
+    handleModalOpen();
+  };
+
+  const handleModalOpen = () => {
+    setIsModalOpen(true);
+  };
+  
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setMessage('');
+  };
+
+  const handleChatModalClose = () => {
+    setIsChatModalOpen(false);
+  };
+
+  const handleKeyPress = (event) => {
+    if (event.key === 'Enter') {
+      handleSendMessage();
+    }
+  };
+
+  const handleSendMessage = async () => {
+    const formData = new FormData();
+    formData.append('sender_id', userData.user_id);
+    formData.append('sender_account', 'user');
+    formData.append('receiver_id', businessData.user_id);
+    formData.append('receiver_account', 'business');
+    formData.append('text', message);
+    formData.append('formType', "inquire");
+    formData.append('form_details', JSON.stringify({selectedProduct}));
+    try {
+      const response = await axios.post(`${BASE_URL}/sendMessage`, formData);
+      setIsChatModalOpen(true);
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
+    handleModalClose();
   };
   
 
@@ -396,7 +448,14 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn, refreshPro
               )}
             </div>
             <div className="flex flex-wrap gap-2 justify-between mt-3 md:mt-2">
-              <Button size='sm' color="primary">Inquire</Button>
+              <Button
+                auto
+                size="sm"
+                onClick={() => handleClickInquire(product)}
+                color="primary"
+              >
+                Inquire
+              </Button>
               {product.product_category !== 'shop' && (
                 <Button
                 size='sm'
@@ -423,6 +482,43 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn, refreshPro
           </div>
         </div>
       </div>
+
+      {/* Modal for sending message */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-5 rounded-md shadow-lg w-full max-w-md mx-4 relative">
+            <button 
+              className="absolute top-2 right-2 text-gray-600 hover:text-gray-800 bg-transparent rounded-full w-8 h-8 flex items-center justify-center"
+              onClick={handleModalClose}
+            >
+              <span className="text-xl">&times;</span>
+            </button>
+            <h2 className="text-lg font-medium mb-4">Inquire About {selectedProduct.name}</h2>
+            <div className="flex flex-col space-y-2">
+              <div className="flex items-center border rounded-md p-2">
+                <input
+                  type="text"
+                  placeholder="Write your inquiry here..."
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  onKeyDown={handleKeyPress}
+                  className="w-full outline-none text-gray-800"
+                />
+              </div>
+              <Button
+                auto
+                color="primary"
+                size="sm"
+                icon={<FiSend />}
+                onClick={handleSendMessage}
+              >
+                Send
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <ReviewModal
         disableAnimation
         isOpen={isReviewModalOpen}
@@ -438,6 +534,7 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn, refreshPro
         onClose={closeInclusionsModal}
         inclusions={product.inclusions}
       />
+      <UserChatModal isOpen={isChatModalOpen} onClose={handleChatModalClose} onOpenChat={businessData} />
     </div>
   );
 };
@@ -498,7 +595,7 @@ const Filters = ({ activeTab, setSelectedType, setRatingFilter, budgetRange, set
         onChange={setRatingFilter}
         className="space-y-2"
       >
-        <Checkbox value="All" isChecked={ratingFilter.length === 0}>
+        <Checkbox value="All" checked={ratingFilter.length === 0}>
           All Ratings
         </Checkbox>
         {[5, 4, 3, 2, 1].map((star) => (
@@ -535,7 +632,7 @@ const LoadingSpinner = () => (
 );
 
 // Main Business All Products Component
-const BusinessAllproducts = (isLoggedIn) => {
+const BusinessAllproducts = ({isLoggedIn, businessData, userData}) => {
   const [mockData, setMockData] = useState({
     activities: [],
     accommodations: [],
@@ -800,6 +897,8 @@ const BusinessAllproducts = (isLoggedIn) => {
                   onOpen={onOpen} 
                   isLoggedIn={isLoggedIn} 
                   refreshProducts={() => refreshProducts(product.product_category)} 
+                  businessData={businessData}
+                  userData={userData}
                 />
               ))
             ) : (

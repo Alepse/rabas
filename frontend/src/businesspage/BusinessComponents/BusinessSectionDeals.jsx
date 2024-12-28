@@ -11,6 +11,9 @@ import AttractionActivitiesBookingForm from './bookingFormModal/AttractionActivi
 import { useParams } from 'react-router-dom';
 import CryptoJS from 'crypto-js';
 import Swal from 'sweetalert2';
+import { FiSend } from 'react-icons/fi';
+import axios from 'axios';
+import UserChatModal from '@/user/userChatSystem/UserChatModal';
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
@@ -39,7 +42,7 @@ const showErrorAlert = (message) => {
 };
 
 
-const BusinessSection = (isLoggedIn) => {
+const BusinessSection = ({isLoggedIn, businessData, userData}) => {
   const [activeModal, setActiveModal] = useState(null);
   const [mockData, setMockData] = useState({
     activities: [],
@@ -49,10 +52,13 @@ const BusinessSection = (isLoggedIn) => {
   });
   const categories = ['activity', 'accommodation', 'restaurant', 'shop'];
   const { businessId: encryptedBusinessId } = useParams();
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [message, setMessage] = useState('');
+  const [isChatModalOpen, setIsChatModalOpen] = useState(false);
   const [discountedProducts, setDiscountedProducts] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const openBookingModal = (product) => {
-    console.log('Opening booking modal for product:', product);
+    // console.log('Opening booking modal for product:', product);
     if (product.product_category === 'accommodation') {
       setActiveModal({ type: 'accommodation', product });
     } else if (product.product_category === 'restaurant') {
@@ -65,7 +71,7 @@ const BusinessSection = (isLoggedIn) => {
   };
 
   const closeBookingModal = () => {
-    console.log('Closing booking modal');
+    // console.log('Closing booking modal');
     setActiveModal(null);
   };
 
@@ -122,6 +128,53 @@ const BusinessSection = (isLoggedIn) => {
       ...mockData.shop,
     ]);
   }, [mockData.activities, mockData.accommodations, mockData.restaurant, mockData.shop]);
+
+  const handleClickInquire = (product) => {
+    if (!isLoggedIn){
+      return  showErrorAlert('Please login to send a message.');
+    }
+    setSelectedProduct(product);
+    handleModalOpen();
+    // console.log(product);
+  };
+
+  const handleModalOpen = () => {
+    setIsModalOpen(true);
+  };
+  
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setMessage('');
+  };
+
+  const handleChatModalClose = () => {
+    setIsChatModalOpen(false);
+  };
+
+  const handleKeyPress = (event) => {
+    if (event.key === 'Enter') {
+      handleSendMessage();
+    }
+  };
+
+  const handleSendMessage = async () => {
+    const formData = new FormData();
+    formData.append('sender_id', userData.user_id);
+    formData.append('sender_account', 'user');
+    formData.append('receiver_id', businessData.user_id);
+    formData.append('receiver_account', 'business');
+    formData.append('text', message);
+    formData.append('formType', "inquire");
+    formData.append('form_details', JSON.stringify({selectedProduct}));
+    try {
+      const response = await axios.post(`${BASE_URL}/sendMessage`, formData);
+      setIsChatModalOpen(true);
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
+    handleModalClose();
+  };
 
   return (
     <div className='mx-auto mt-4 container p-4 bg-white rounded-md shadow-md mb-4'>
@@ -182,7 +235,15 @@ const BusinessSection = (isLoggedIn) => {
                       </p>
                     </div>
                     <div className='flex justify-between gap-2 mt-4'>
-                      <Button auto size="sm" color="primary" className='w-full'>Inquire</Button>
+                      <Button
+                        auto
+                        size="sm"
+                        onClick={() => handleClickInquire(deal)}
+                        color="primary"
+                        className='w-full'
+                      >
+                        Inquire
+                      </Button>
                       <Button
                         auto size="sm"
                         color="success"
@@ -215,6 +276,41 @@ const BusinessSection = (isLoggedIn) => {
         )}
       </div>
 
+      {/* Modal for sending message */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-5 rounded-md shadow-lg w-full max-w-md mx-4 relative">
+            <button 
+              className="absolute top-2 right-2 text-gray-600 hover:text-gray-800 bg-transparent rounded-full w-8 h-8 flex items-center justify-center"
+              onClick={handleModalClose}
+            >
+              <span className="text-xl">&times;</span>
+            </button>
+            <h2 className="text-lg font-medium mb-4">Inquire About {selectedProduct.name}</h2>
+            <div className="flex flex-col space-y-2">
+              <div className="flex items-center border rounded-md p-2">
+                <input
+                  type="text"
+                  placeholder="Write your inquiry here..."
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  onKeyDown={handleKeyPress}
+                  className="w-full outline-none text-gray-800"
+                />
+              </div>
+              <Button
+                auto
+                color="primary"
+                size="sm"
+                icon={<FiSend />}
+                onClick={handleSendMessage}
+              >
+                Send
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
       {activeModal?.type === 'accommodation' && (
         <AccommodationBookingForm isOpen={true} onClose={closeBookingModal} product={activeModal.product} />
       )}
@@ -224,6 +320,8 @@ const BusinessSection = (isLoggedIn) => {
       {activeModal?.type === 'activities' && (
         <AttractionActivitiesBookingForm isOpen={true} onClose={closeBookingModal} product={activeModal.product} />
       )}
+
+      <UserChatModal isOpen={isChatModalOpen} onClose={handleChatModalClose} onOpenChat={businessData} />
     </div>
   );
 };
