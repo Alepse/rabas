@@ -303,6 +303,7 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn, refreshPro
         {/* Image Section */}
         <div className="relative w-full   h-[260px] md:w-[400px] md:h-[250px] flex-shrink-0">
           {product.images.length > 0 ? (
+            <>
             <div className="w-full h-full p-4">
               <img
                 src={
@@ -314,6 +315,14 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn, refreshPro
                 className="object-cover w-full h-full rounded-lg"
               />
             </div>
+            <Button
+              size='sm'
+              className="absolute bottom-5  right-5 text-xs text-white bg-color1"
+              onClick={handleViewImages}
+            >
+              View Images
+            </Button>
+            </>
           ) : (
             <div className="w-full h-full flex items-center justify-center text-gray-500 p-4">
               <div className="w-full h-full flex items-center justify-center text-gray-500 bg-gray-200 rounded-lg">
@@ -326,13 +335,6 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn, refreshPro
               {product.discount}% OFF
             </div>
           )}
-          <Button
-            size='sm'
-            className="absolute bottom-5  right-5 text-xs text-white bg-color1"
-            onClick={handleViewImages}
-          >
-            View Images
-          </Button>
         </div>
     
         {/* Content Section */}
