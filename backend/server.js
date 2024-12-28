@@ -3791,6 +3791,17 @@ app.get('/getAllBusinesses', async (req, res) => {
       b.aboutUs,
       MIN(CAST(p.price AS DECIMAL)) AS lowest_price,
       MAX(CAST(p.price AS DECIMAL)) AS highest_price,
+      (
+        SELECT COUNT(*) 
+        FROM liked_pages l 
+        WHERE l.business_id = b.business_id
+      ) AS likes,
+      AVG(r.ratings) AS rating,
+      (
+        SELECT COUNT(*) 
+        FROM business_ratings br 
+        WHERE br.business_id = b.business_id
+      ) AS rateCount,
       AVG(r.ratings) AS rating,
       JSON_ARRAYAGG(JSON_UNQUOTE(JSON_EXTRACT(b.facilities, '$[*].name'))) AS raw_amenities
     FROM 
