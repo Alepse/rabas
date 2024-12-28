@@ -146,7 +146,7 @@ const BusinessProfile = () => {
         const response = await axios.get(`${BASE_URL}/getBusinessLocation`, {
           withCredentials: 'include',
         });
-        console.log(response.data.businessLocation);
+        // console.log(response.data.businessLocation);
         if (response.data.success) {
           const { location, pin_location } = response.data.businessLocation;
           setAddress(location);
@@ -776,7 +776,7 @@ const BusinessProfile = () => {
         body: JSON.stringify({ openingHours: tempOpeningHours }), // Send updated hours
       });
 
-      console.log('Response:', response);
+      // console.log('Response:', response);
 
       const data = await response.json();
 
@@ -938,7 +938,7 @@ const BusinessProfile = () => {
       dispatch(updateContactIcon({ id, icon: iconName }));
     } else if (currentEditingField.startsWith('facilityItem-')) {
       const [facilityIndex, itemIndex] = currentEditingField.split('-').slice(1).map(Number); // Updated to parse both indices
-      console.log(currentEditingField);
+      // console.log(currentEditingField);
       dispatch(updateFacilityItemIcon({ facilityIndex, itemIndex, icon: iconName })); // Pass both indices
     }
     setIsIconModalOpen(false);
@@ -957,7 +957,7 @@ const BusinessProfile = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         // Implement API call or save logic
-        console.log('Saving business profile...', businessData);
+        // console.log('Saving business profile...', businessData);
         MySwal.fire({
           title: 'Saved!',
           text: 'Your business profile has been saved.',
@@ -1191,13 +1191,19 @@ const BusinessProfile = () => {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-                      <input
-                        type="text"
-                        value={location || ''}
-                        onChange={(e) => setLocation(e.target.value)}
-                        placeholder="Enter location"
-                        className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-color1"
-                      />
+                        <Select
+                          label="Address"
+                          placeholder="Select Address"
+                          className="flex-1"
+                          selectedKeys={new Set([location])} // Use `selectedKeys` for controlled selection
+                          onSelectionChange={(key) => setLocation(key.currentKey)} // Update state with the selected key
+                        >
+                          {municipalities.map((municipality) => (
+                            <SelectItem key={municipality} value={municipality}>
+                              {municipality}
+                            </SelectItem>
+                          ))}
+                        </Select>
                     </div>
                     <button
                       onClick={handleUpdate}
@@ -1583,7 +1589,7 @@ const BusinessProfile = () => {
                     <div className="flex gap-3">
                     <Select
                       label="Address"
-                      placeholder="Enter address"
+                      placeholder="Select address"
                       className="flex-1"
                       selectedKeys={new Set([address])} // Use `selectedKeys` for controlled selection
                       onSelectionChange={(key) => setAddress(key.currentKey)} // Update state with the selected key

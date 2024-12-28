@@ -298,7 +298,7 @@ const MostReviewedProducts = ({ products }) => {
               <h3 className="text-lg font-bold mb-1 text-gray-700 flex-grow">{product.name}</h3>
               <p className="text-sm text-gray-600 min-h-[40px] mb-2 flex-grow">{product.description}</p>
               <div className="flex items-center mb-2">
-                <span className="text-yellow-500 font-bold">{product.rating}</span>
+                <span className="text-yellow-500 font-bold">{parseFloat(product.rating).toFixed(1)}</span>
                 <AiFillStar className="text-yellow-500 ml-1" />
               </div>
               <p className="text-sm text-gray-600">Price: ₱{product.price}</p>
