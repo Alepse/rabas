@@ -355,31 +355,30 @@ const Shop = () => {
                         ))}
                       </div>
 
- <div className='flex gap-2 items-center flex-wrap'>
-                                             {/* Business Name */}
-                                             <h3 className="text-lg sm:text-base lg:text-lg font-semibold text-gray-800 truncate">{shop.businessName}</h3>
-                     
-                                            <Tooltip className='bg-color1'
-                                                                                         content={
-                                                                                           <div className="max-w-[300px] flex justify-center    p-1">
-                                                                                             <div className="text-sm flex gap-1  font-light text-white    md:text-md text-start break-words">
-                                                                         
-                                                                                             <IoInformationCircleOutline className='text-light text-xl'/> {shop.description}
-                                                                                             </div>
-                                                                                           </div>
-                                                                                         }
-                                                                                         isOpen={openTooltip === shop.id} // Only open for the active item
-                                                                                         onOpenChange={(open) => setOpenTooltip(open ? shop.id : null)} // Sync state
-                                                                                       >
-                                                                                         <button
-                                                                                           className="bg-transparent"
-                                                                                           onClick={() => toggleTooltip(shop.id)}
-                                                                                           aria-expanded={openTooltip === shop.id}
-                                                                                         >
-                                                                                           <IoInformationCircleOutline className="text-xl cursor-pointer" />
-                                                                                         </button>
-                                                                                       </Tooltip>
-                                                                 </div>
+                      <div className='flex gap-2 items-center flex-wrap'>
+                        {/* Business Name */}
+                        <h3 className="text-lg sm:text-base lg:text-lg font-semibold text-gray-800 truncate">{shop.businessName}</h3>
+                        <Tooltip className='bg-color1'
+                          content={
+                            <div className="max-w-[300px] flex justify-center    p-1">
+                              <div className="text-sm flex gap-1  font-light text-white    md:text-md text-start break-words">
+          
+                              <IoInformationCircleOutline className='text-light text-xl'/> {shop.description}
+                              </div>
+                            </div>
+                          }
+                          isOpen={openTooltip === shop.id} // Only open for the active item
+                          onOpenChange={(open) => setOpenTooltip(open ? shop.id : null)} // Sync state
+                        >
+                          <button
+                            className="bg-transparent"
+                            onClick={() => toggleTooltip(shop.id)}
+                            aria-expanded={openTooltip === shop.id}
+                          >
+                            <IoInformationCircleOutline className="text-xl cursor-pointer" />
+                          </button>
+                        </Tooltip>
+                      </div>
 
                       {/* Location */}
                       <div className="text-xs text-gray-500 mb-2 flex items-center">

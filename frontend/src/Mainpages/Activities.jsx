@@ -390,31 +390,31 @@ const Activities = () => {
                           ))}
                         </div>
 
-                      <div className='flex gap-2 items-center flex-wrap'>
-                                             {/* Business Name */}
-                                             <h3 className="text-lg sm:text-base lg:text-lg font-semibold text-gray-800 truncate">{activity.businessName}</h3>
-                     <Tooltip className='bg-color1 '
-                                                                  content={
-                                                                    <div className="max-w-[300px] flex justify-center    p-1">
-                                                                      <div className="text-sm flex gap-1  font-light text-white    md:text-md text-start break-words">
-                                                  
-                                                                      <IoInformationCircleOutline className='text-light text-xl'/> {activity.description}
-                                                                      </div>
-                                                                    </div>
-                                                                  }
-                                                                  isOpen={openTooltip === activity.id} // Only open for the active item
-                                                                  onOpenChange={(open) => setOpenTooltip(open ? activity.id : null)} // Sync state
-                                                                >
-                                                                  <button
-                                                                    className="bg-transparent z-10"
-                                                                    onClick={() => toggleTooltip(activity.id)}
-                                                                    aria-expanded={openTooltip === activity.id}
-                                                                  >
-                                                                    <IoInformationCircleOutline className="text-xl cursor-pointer" />
-                                                                  </button>
-                                                                </Tooltip>
-                                                                 </div>
-
+                        <div className='flex gap-2 items-center flex-wrap'>
+                          {/* Business Name */}
+                          <h3 className="text-lg sm:text-base lg:text-lg font-semibold text-gray-800 truncate">{activity.businessName}</h3>
+                          <Tooltip className='bg-color1 '
+                            content={
+                              <div className="max-w-[300px] flex justify-center    p-1">
+                                <div className="text-sm flex gap-1  font-light text-white    md:text-md text-start break-words">
+            
+                                <IoInformationCircleOutline className='text-light text-xl'/> {activity.description}
+                                </div>
+                              </div>
+                            }
+                            isOpen={openTooltip === activity.business_id} // Only open for the active item
+                            onOpenChange={(open) => setOpenTooltip(open ? activity.business_id : null)} // Sync state
+                          >
+                            <button
+                              className="bg-transparent z-10"
+                              onClick={() => toggleTooltip(activity.business_id)}
+                              aria-expanded={openTooltip === activity.business_id}
+                            >
+                              <IoInformationCircleOutline className="text-xl cursor-pointer" />
+                            </button>
+                          </Tooltip>
+                        </div>
+                        
                         {/* Location */}
                         <div className="text-xs text-gray-500 mb-2 flex items-center">
                           <GiPositionMarker /> {activity.destination}
