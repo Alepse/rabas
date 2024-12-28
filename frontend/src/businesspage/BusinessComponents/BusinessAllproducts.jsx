@@ -59,7 +59,7 @@ const showErrorAlert = (message) => {
 };
 
 // Review Modal Component
-const ReviewModal = ({ isOpen, onClose, product, isLoggedIn }) => {
+const ReviewModal = ({ isOpen, onClose, product, isLoggedIn, refreshProducts }) => {
   // console.log('isloggin', isLoggedIn);
   const [userData, setUserData] = useState(null);
   const [newReview, setNewReview] = useState('');
@@ -105,7 +105,7 @@ const ReviewModal = ({ isOpen, onClose, product, isLoggedIn }) => {
   }, [isOpen, product.product_id]);
 
   const handleReviewSubmit = async () => {
-    if (newReview && newRating > 0) {
+    if (newRating > 0) {
       try {
         const response = await fetch(`${BASE_URL}/addReviewsAndRatings`, {
           method: 'POST',
@@ -129,6 +129,9 @@ const ReviewModal = ({ isOpen, onClose, product, isLoggedIn }) => {
             ratings: newRating,
             comment: newReview
           }]);
+          // Refresh products in the parent component
+          refreshProducts();
+          showSuccessAlert("Review added successfully");
           clearReview();
         } else {
           showErrorAlert('Failed to submit review:', data.message);
@@ -214,20 +217,22 @@ const ReviewModal = ({ isOpen, onClose, product, isLoggedIn }) => {
         <ModalFooter className="flex justify-end">
         <Button color="danger" onClick={handleClose}>
             Close
-          </Button>
-          <Button 
-            onClick={() => {
-              if (isLoggedIn) {
-                handleReviewSubmit();
-              } else {
-                showErrorAlert('Please log in to submit a review.');
-              }
-            }} 
-            color="primary" 
-            disabled={!newReview || newRating === 0}
-          >
-            Submit Review
-          </Button>
+        </Button>
+        <Button 
+          onClick={() => {
+            if (isLoggedIn) {
+              handleReviewSubmit();
+            } else {
+              showErrorAlert('Please log in to submit a review.');
+            }
+          }} 
+          color={newRating === 0 ? "secondary" : "primary"}
+          className={newRating === 0 ? "cursor-not-allowed bg-gray-200" : "primary"}
+          // color="primary"
+          disabled={newRating === 0}
+        >
+          Submit Review
+        </Button>
          
         </ModalFooter>
       </ModalContent>
@@ -239,7 +244,7 @@ const ReviewModal = ({ isOpen, onClose, product, isLoggedIn }) => {
 };
 
 // Product Card Component
-const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn }) => {
+const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn, refreshProducts }) => {
   const [isReviewModalOpen, setReviewModalOpen] = useState(false);
   const [isInclusionsModalOpen, setInclusionsModalOpen] = useState(false);
   const onModalOpen = () => {
@@ -336,7 +341,9 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn }) => {
           <div className='flex justify-between'>
             <h3 className="font-bold text-lg mb-2">{product.name}</h3>
             <div className="flex items-center gap-2 ">
-              <span className="text-black font-semibold">{product.rating}</span>
+              {product.rating &&(
+                 <span className="text-black font-semibold">{parseFloat(product.rating).toFixed(1)}</span>
+              )}             
               <div className="flex">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <AiFillStar
@@ -415,15 +422,16 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn }) => {
         </div>
       </div>
       <ReviewModal
-      disableAnimation
+        disableAnimation
         isOpen={isReviewModalOpen}
         onClose={closeReviewModal}
         product={product}
         isLoggedIn={isLoggedIn}
+        refreshProducts={refreshProducts}
       />
     
       <InclusionsModal
-      disableAnimation
+        disableAnimation
         isOpen={isInclusionsModalOpen}
         onClose={closeInclusionsModal}
         inclusions={product.inclusions}
@@ -581,42 +589,45 @@ const BusinessAllproducts = () => {
   }, []);
 
   // Fetch data for each category from the backend
-  useEffect(() => {
-    const fetchCategoryData = async (category) => {
-      try {
-        const decryptedBusinessId = decryptId(encryptedBusinessId);
-        const response = await fetch(`${BASE_URL}/getAllBusinessProduct?category=${category}`);
-        const contentType = response.headers.get("content-type");
+  
+  const fetchCategoryData = async (category) => {
+    try {
+      const decryptedBusinessId = decryptId(encryptedBusinessId);
+      const response = await fetch(`${BASE_URL}/getAllBusinessProduct?category=${category}`);
+      const contentType = response.headers.get("content-type");
 
-        if (contentType && contentType.includes("application/json")) {
-          const data = await response.json();
+      if (contentType && contentType.includes("application/json")) {
+        const data = await response.json();
 
-          if (data.success) {
-            // Filter products based on their category and decrypted business_id
-            const filteredProducts = data.businessProducts.filter((product) => {
-              return product.product_category === category && product.business_id === parseInt(decryptedBusinessId);
-            });
+        if (data.success) {
+          // Filter products based on their category and decrypted business_id
+          const filteredProducts = data.businessProducts.filter((product) => {
+            return product.product_category === category && product.business_id === parseInt(decryptedBusinessId);
+          });
 
-            // Map backend categories to state keys
-            const categoryKey = category === 'activity' ? 'activities' :
-                                category === 'accommodation' ? 'accommodations' :
-                                category === 'restaurant' ? 'restaurant' : 'shop';
+          // Map backend categories to state keys
+          const categoryKey = category === 'activity' ? 'activities' :
+                              category === 'accommodation' ? 'accommodations' :
+                              category === 'restaurant' ? 'restaurant' : 'shop';
 
-            setMockData((prevData) => ({
-              ...prevData,
-              [categoryKey]: filteredProducts,
-            }));
-          } else {
-            console.error(`Failed to fetch ${category} data:`, data.message);
-          }
+          setMockData((prevData) => ({
+            ...prevData,
+            [categoryKey]: filteredProducts,
+          }));
         } else {
-          console.error(`Unexpected response format for ${category}:`, response);
+          console.error(`Failed to fetch ${category} data:`, data.message);
         }
-      } catch (error) {
-        console.error(`Error fetching ${category} data:`, error);
+      } else {
+        console.error(`Unexpected response format for ${category}:`, response);
       }
-    };
+    } catch (error) {
+      console.error(`Error fetching ${category} data:`, error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     // Initiate data fetching for each category
     categories.forEach((category) => {
       fetchCategoryData(category);
@@ -634,6 +645,15 @@ const BusinessAllproducts = () => {
   }, [mockData.activities, mockData.accommodations, mockData.restaurant, mockData.shop]);
 
   // console.log('All products', mockData);
+
+  const refreshProducts = (category) => {
+    if (category) {
+      fetchCategoryData(category); // Fetch only the category to refresh
+    } else {
+      // Refresh all categories if no specific category is provided
+      categories.forEach((cat) => fetchCategoryData(cat));
+    }
+  };  
 
   const openBookingModal = (product) => {
     // console.log('Opening booking modal for product:', product);
@@ -695,11 +715,6 @@ const BusinessAllproducts = () => {
     setLoading(false);
   }, [activeTab, selectedType, ratingFilter, budgetRange, allProducts]);
 
-  useEffect(() => {
-    // Simulate data fetching
-    setTimeout(() => setLoading(false), 1000);
-  }, []);
-
   const handleThumbnailClick = (index) => {
     if (selectedProduct && selectedProduct.images && selectedProduct.images[index]) {
       setPreviewImage(`${BASE_URL}/${selectedProduct.images[index].path}`);
@@ -730,10 +745,7 @@ const BusinessAllproducts = () => {
     setIsPreviewOpen(false);
   };
 
-  const onOpen = (product) => {
-    // console.log('Selected Product:', product);
-    // console.log('Product Images:', product?.images);
-    
+  const onOpen = (product) => {    
     if (product && Array.isArray(product.images)) {
       setSelectedProduct(product);
       originalOnOpen();
@@ -809,6 +821,7 @@ const BusinessAllproducts = () => {
                   openBookingModal={openBookingModal} 
                   onOpen={onOpen} 
                   isLoggedIn={isLoggedIn} 
+                  refreshProducts={() => refreshProducts(product.product_category)} 
                 />
               ))
             ) : (
