@@ -65,51 +65,60 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
       confirmButtonText: 'Yes, save it!',
     }).then((result) => {
       if (result.isConfirmed) {
+        // Function to format the date to 'YYYY-MM-DD'
         const formatDate = (dateString) => {
+          if (!dateString) return ''; // Prevent errors if no date is provided
           const date = new Date(dateString);
           return date.toISOString().split('T')[0]; // 'YYYY-MM-DD'
         };
-
+  
+        // Extract values from the itinerary and set defaults to prevent undefined errors
+        const firstItineraryItem = Object.values(originalItinerary).flat()[0] || {};
+        const { imageUrl, location} = firstItineraryItem; // Provide default empty strings if undefined
         const updatedTrip = {
           ...trip,
           ...editTripDetails,
+          imageUrl: imageUrl, // Ensure imageUrl is a string
+          destination: location, // Ensure destination is a string
           startDate: formatDate(editTripDetails.startDate),
           endDate: formatDate(editTripDetails.endDate),
         };
-
+  
+        // Send updated trip details to the backend
         axios.put(`${BASE_URL}/update-trip/${trip.tripId}`, updatedTrip, { withCredentials: true })
-        .then(response => {
-          const data = response.data; // Directly access response.data
-          if (data.success) {
-            Swal.fire({
-              title: 'Updated!',
-              text: 'Your trip details have been updated.',
-              icon: 'success',
-              confirmButtonColor: '#0BDA51',
-            });
-            onUpdateTrip(updatedTrip);
-            setIsEditing(false);
-          } else {
+          .then(response => {
+            const data = response.data; // Directly access response.data
+            if (data.success) {
+              Swal.fire({
+                title: 'Updated!',
+                text: 'Your trip details have been updated.',
+                icon: 'success',
+                confirmButtonColor: '#0BDA51',
+              });
+              onUpdateTrip(updatedTrip); // Update parent component with the new data
+              setIsEditing(false); // Switch editing mode off
+            } else {
+              Swal.fire({
+                title: 'Error!',
+                text: data.message,
+                icon: 'error',
+                confirmButtonColor: '#D33736',
+              });
+            }
+          })
+          .catch(error => {
+            console.error('Error updating trip:', error);
             Swal.fire({
               title: 'Error!',
-              text: data.message,
+              text: 'Failed to update trip.',
               icon: 'error',
               confirmButtonColor: '#D33736',
             });
-          }
-        })
-        .catch(error => {
-          console.error('Error updating trip:', error);
-          Swal.fire({
-            title: 'Error!',
-            text: 'Failed to update trip.',
-            icon: 'error',
-            confirmButtonColor: '#D33736',
           });
-        });
       }
     });
   };
+  
 
   const handleCancelEdit = () => {
     setEditTripDetails(originalTripDetails);
@@ -143,12 +152,12 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
         const updatedItinerary = { ...itinerary };
         updatedItinerary[date].splice(index, 1);
         onUpdateTrip({ ...trip, itinerary: updatedItinerary });
-        Swal.fire({
-          title: 'Deleted!',
-          text: 'Your item has been deleted.',
-          icon: 'success',
-          confirmButtonColor: '#0BDA51'
-        });
+        // Swal.fire({
+        //   title: 'Deleted!',
+        //   text: 'Your item has been deleted.',
+        //   icon: 'success',
+        //   confirmButtonColor: '#0BDA51'
+        // });
       }
     });
   };

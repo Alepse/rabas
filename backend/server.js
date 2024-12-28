@@ -2943,11 +2943,6 @@ app.put('/update-trip/:id', async (req, res) => {
     return res.status(401).json({ success: false, message: 'User not logged in' });
   }
 
-  // Validate input
-  if (!tripName || !destination || !startDate || !endDate) {
-    return res.status(400).json({ success: false, message: 'Missing required fields' });
-  }
-
   const sql = `
     UPDATE trips 
     SET tripName = ?, imageUrl = ?, destination = ?, startDate = ?, endDate = ?, itinerary = ?

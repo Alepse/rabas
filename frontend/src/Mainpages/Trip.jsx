@@ -201,8 +201,8 @@ const Trip = () => {
       
         const newTrip = {
           tripName,
-          imageUrl: imageUrl || 'defaultImageUrl.png',
-          destination: location || 'Unknown',
+          imageUrl: imageUrl,
+          destination: location,
           startDate: value.start.toString(),
           endDate: value.end.toString(),
           itinerary,
