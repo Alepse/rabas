@@ -47,11 +47,11 @@ const Accommodations = () => {
 
   const [openTooltip, setOpenTooltip] = useState(null); // Store the ID of the open tooltip
       
-        // Function to toggle a specific tooltip
-        const toggleTooltip = (id) => {
-          setOpenTooltip((prev) => (prev === id ? null : id)); // Toggle the tooltip visibility
-        };
-    
+  // Function to toggle a specific tooltip
+  const toggleTooltip = (id) => {
+    setOpenTooltip((prev) => (prev === id ? null : id)); // Toggle the tooltip visibility
+  };
+
 
   useEffect(() => {
     const fetchAccommodations = async () => {
