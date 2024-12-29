@@ -1061,7 +1061,7 @@ const BusinessProfile = () => {
     <div className="flex flex-col lg:flex-row min-h-screen mx-auto bg-gray-100 font-sans">
       <Sidebar />
 
-      <div className="flex-1 p-4 lg:p-8 max-h-screen overflow-y-auto">
+      <div className="flex-1 px-8 py-4 lg:p-8 max-h-screen overflow-y-auto">
         <div className='flex justify-between items-center mb-3'>
           <h1 className="text-2xl lg:text-3xl font-semibold text-gray-800">Business Profile</h1>
           <Button

@@ -118,7 +118,7 @@ const BusinessDashboard = () => {
           </div>
         </div>
       ) : (     
-      <div className="flex-1 p-4 md:p-6 lg:p-8 max-h-screen overflow-y-auto">
+      <div className="flex-1 px-8 py-4 md:p-6 lg:p-8 max-h-screen overflow-y-auto">
         <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-8 text-gray-800">Dashboard</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <DashboardCard title="Products" value={businessProducts.length} icon="📦" />

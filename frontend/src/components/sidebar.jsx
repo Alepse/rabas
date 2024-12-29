@@ -5,7 +5,7 @@ import { CiBoxes } from "react-icons/ci";
 import { IoPricetagsOutline } from "react-icons/io5";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from '@nextui-org/react';
-import { FaBars, FaTimes, FaCalendar } from 'react-icons/fa';
+import { FaBars, FaArrowLeft, FaArrowRight, FaCalendar } from 'react-icons/fa';
 import { CgLogOut } from "react-icons/cg";
 import { TbWorld } from "react-icons/tb";
 import CryptoJS from 'crypto-js';
@@ -69,15 +69,13 @@ const Sidebar = () => {
       {/* Mobile Toggle Button */}
       <div className="flex justify-between items-center bg-color1 p-4 lg:hidden">
         <h1 className="font-bold text-xl text-white">Business Management</h1>
-        <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-white text-3xl">
-          {sidebarOpen ? <FaTimes /> : <FaBars />}
-        </button>
       </div>
 
+      
       {/* Sidebar for desktop and mobile */}
       <div
         className={`fixed lg:flex flex-col top-0 left-0 justify-between h-full bg-color1 p-6 w-[220px] transform transition-transform duration-300 lg:translate-x-0 ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          sidebarOpen ? 'translate-x-0' : '-translate-x-[95%]'
         } lg:static z-50`}
       >
         <div>
@@ -127,6 +125,18 @@ const Sidebar = () => {
           </Link>
         </div>
       </div>
+
+      <div className={`fixed flex items-center h-full z-40 transform transition-transform duration-300 lg:translate-x-0 ${
+          sidebarOpen ? 'w-[225px] justify-end' : 'bg-color1 -translate-x-[20%] justify-center' } lg:static `}>
+        <button 
+          onClick={() => setSidebarOpen(!sidebarOpen)} 
+          className={`text-white px-1 py-2 text-2xl rounded-full  ${
+          sidebarOpen ? 'translate-x-[40%] z-50' : 'bg-color1 translate-x-[20%]' }`}
+        >
+          {!sidebarOpen && ( <FaArrowRight /> )}
+        </button>
+      </div>
+
 
       {/* Overlay for mobile when sidebar is open */}
       {sidebarOpen && (

@@ -114,7 +114,7 @@ const BusinessProducts = () => {
       <Sidebar />
 
       {/* Main content */}
-      <div className="flex-1 p-4 md:p-6 lg:p-8 max-h-screen overflow-y-auto">
+      <div className="flex-1 px-8 py-4 md:p-6 lg:p-8 max-h-screen overflow-y-auto">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-8">
           <h1 className="text-2xl md:text-3xl font-semibold text-gray-800 mb-4 md:mb-0">
