@@ -47,10 +47,10 @@ const Activities = () => {
   const [showButton, setShowButton] = useState(false); // State to show/hide button
  const [openTooltip, setOpenTooltip] = useState(null); // Store the ID of the open tooltip
   
-    // Function to toggle a specific tooltip
-    const toggleTooltip = (id) => {
-      setOpenTooltip((prev) => (prev === id ? null : id)); // Toggle the tooltip visibility
-    };
+  // Function to toggle a specific tooltip
+  const toggleTooltip = (id) => {
+    setOpenTooltip((prev) => (prev === id ? null : id)); // Toggle the tooltip visibility
+  };
 
   useEffect(() => {
     const fetchActivities = async () => {
@@ -414,7 +414,7 @@ const Activities = () => {
                             </button>
                           </Tooltip>
                         </div>
-                        
+
                         {/* Location */}
                         <div className="text-xs text-gray-500 mb-2 flex items-center">
                           <GiPositionMarker /> {activity.destination}
