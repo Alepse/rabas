@@ -75,8 +75,7 @@ const Destinations = () => {
   }, []);
 
   useEffect(() => {
-    const loadTimer = setTimeout(() => setLoading(false), 250);
-    return () => clearTimeout(loadTimer);
+    setLoading(false);
   }, []);
 
   useEffect(() => {
