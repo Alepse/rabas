@@ -14,16 +14,285 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
-import { FaHome, FaBars, FaTimes, FaSearch, FaMapMarkerAlt } from 'react-icons/fa';
+import { FaHome, FaBars, FaTimes, FaSearch, FaHiking, FaBed, FaUtensils, FaShoppingBag, FaMapMarkerAlt } from 'react-icons/fa';
 import { GiPositionMarker } from "react-icons/gi";
 import { FaRegCircleUser } from "react-icons/fa6";
 import { FaPersonWalking } from "react-icons/fa6";
 import { Modal, ModalContent, ModalBody, useDisclosure } from "@nextui-org/react";
 import { Link, useLocation } from 'react-router-dom';
 import UserChatModal from '@/user/userChatSystem/UserChatModal';
+import { Tabs, Tab } from '@nextui-org/react';
 import axios from 'axios';
 import { Skeleton } from "@nextui-org/skeleton";
+import CryptoJS from 'crypto-js';
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
+// Function to encrypt the business_id
+const encryptId = (id) => {
+  const secretKey = import.meta.env.VITE_SECRET_KEY;
+  if (!secretKey) {
+    console.error('Secret key is not defined');
+    return null;
+  }
+  const ciphertext = CryptoJS.AES.encrypt(id.toString(), secretKey).toString();
+  return encodeURIComponent(ciphertext);
+};
+
+const Search = () => {
+  const [activeTab, setActiveTab] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+
+  const [businessListings, setBusinessListings] = useState({
+    activitiesAndAttractions: [],
+    accommodations: [],
+    foodPlaces: [],
+    shops: []
+  });
+
+  const fetchBusinessListings = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/superAdmin-fetchAllBusinessListings`, {
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch business listings');
+      }
+
+      const data = await response.json();
+      
+      if (data.success) {
+        // console.log('Received business listings data:', data.businesses);
+        const categorizedBusinesses = {
+          activitiesAndAttractions: [],
+          accommodations: [],
+          foodPlaces: [],
+          shops: []
+        };
+
+        data.businesses.forEach(business => {
+          // Create a standardized business object
+          const enhancedBusiness = {
+            title: business.businessName,
+            description: business.aboutUs || 'No description available',
+            imageUrl: business.businessLogo ? `${BASE_URL}/${business.businessLogo}` : 'https://via.placeholder.com/200',
+            type: business.businessType,
+            businessInfo: {
+              id: business.business_id || [],
+              category: business.category || [],
+              facilities: business.facilities || [],
+              policies: business.policies || [],
+              contactInfo: business.contactInfo || [],
+              openingHours: business.openingHours || [],
+              businessCard: business.businessCard || {}
+            },
+            owner: {
+              name: business.owner_name || 'Unknown Owner',
+              email: business.owner_email || 'No email provided'
+            },
+            status: business.displayStatus,
+            heroImages: business.heroImages || []
+          };
+
+          // Categorize based on businessType
+          const type = (business.businessType || '').toLowerCase();
+          if (type.includes('activity') || type.includes('attraction')) {
+            categorizedBusinesses.activitiesAndAttractions.push(enhancedBusiness);
+          } else if (type.includes('accommodation') || type.includes('hotel') || type.includes('resort')) {
+            categorizedBusinesses.accommodations.push(enhancedBusiness);
+          } else if (type.includes('restaurant') || type.includes('food') || type.includes('cafe')) {
+            categorizedBusinesses.foodPlaces.push(enhancedBusiness);
+          } else if (type.includes('shop') || type.includes('store') || type.includes('souvenir')) {
+            categorizedBusinesses.shops.push(enhancedBusiness);
+          } else {
+            // Default to shops if type is unknown
+            // console.log('Uncategorized business:', business.businessName, 'Type:', type);
+            categorizedBusinesses.shops.push(enhancedBusiness);
+          }
+        });
+
+        setBusinessListings(categorizedBusinesses);
+
+      } else {
+        console.error('Failed to fetch business listings:', data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching business listings:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchBusinessListings();
+  }, []);
+
+  const locations = [
+    { name: 'Bulusan', value: "Bulusan" },
+    { name: 'Bulan', value: "Bulan" },
+    { name: 'Barcelona', value: "Barcelona" },
+    { name: 'Casiguran', value: "Casiguran" },
+    { name: 'Castilla', value: "Castilla" },
+    { name: 'Donsol', value: "Donsol" },
+    { name: 'Gubat', value: "Gubat" },
+    { name: 'Irosin', value: "Irosin" },
+    { name: 'Juban', value: "Juban" },
+    { name: 'Magallanes', value: "Magallanes" },
+    { name: 'Matnog', value: "Matnog" },
+    { name: 'Pilar', value: "Pilar" },
+    { name: 'Prieto Diaz', value: "PrietoDiaz" },
+    { name: 'Sta. Magdalena', value: "StaMagdalena" },
+    { name: 'Sorsogon', value: "Sorsogon" },
+  ];
+
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+
+    if (value.length > 0) {
+      performSearch(value);
+    } else {
+      setSearchResults([]);
+    }
+  };
+
+  const performSearch = (query) => {
+    let results = [];
+    const searchInput = query.toLowerCase();
+  
+    const matchesSearch = (str) => new RegExp(`^${searchInput}`).test(str.toLowerCase()); // Matches from the start  
+  
+    switch (activeTab) {
+      case 'all':
+        results = [
+          ...businessListings.activitiesAndAttractions.filter((activity) => 
+            matchesSearch(activity.title)
+          ),
+          ...businessListings.accommodations.filter((accommodation) => 
+            matchesSearch(accommodation.title)
+          ),
+          ...businessListings.foodPlaces.filter((food) => 
+            matchesSearch(food.title)
+          ),
+          ...businessListings.shops.filter((shop) => 
+            matchesSearch(shop.title)
+          ),
+          ...locations.filter((location) => 
+            matchesSearch(location.name)
+          ),
+        ];
+        break;
+      case 'activities':
+        results = businessListings.activitiesAndAttractions.filter((activity) =>
+          matchesSearch(activity.title)
+        );
+        break;
+      case 'accommodation':
+        results = businessListings.accommodations.filter((accommodation) =>
+          matchesSearch(accommodation.title)
+        );
+        break;
+      case 'food':
+        results = businessListings.foodPlaces.filter((food) =>
+          matchesSearch(food.title)
+        );
+        break;
+      case 'shops':
+        results = businessListings.shops.filter((shop) =>
+          matchesSearch(shop.title)
+        );
+        break;
+      default:
+        break;
+    }
+
+    setSearchResults(results);
+  };
+  
+  const clearSearchField = () => {
+    setSearchQuery('');
+    setSearchResults([]);
+  };
+
+  return (
+    <>
+      <input
+        type="text"
+        placeholder={`Search`}
+        value={searchQuery}
+        onChange={handleInputChange}
+        className="border border-gray-300 w-full rounded-full p-1 pl-8 text-sm shadow-md focus:outline-none focus:ring-2 focus:ring-color1 transition-all duration-300"
+      />
+      <FaSearch className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500" />
+      {searchQuery && (
+        <FaTimes
+          onClick={clearSearchField}
+          className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer"
+        />
+      )}
+
+      <div className="relative w-full">
+        {searchResults.length > 0 && (
+          <motion.div
+            className="absolute w-full max-h-[300px] z-50 overflow-y-auto scrollbar-custom bg-white shadow-lg rounded-lg"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {searchResults.map((result, index) => {
+              const handleClick = () => {
+                setSearchQuery(''); 
+                setSearchResults([]);
+              };
+              const content = (
+                <div className="flex p-2 hover:bg-gray-200 cursor-pointer">
+                  {result.title && (
+                    <div className="w-full flex items-center">
+                      <img
+                        src={result.imageUrl}
+                        alt={result.imageUrl}
+                        className="w-12 h-12 rounded-full mr-3 object-cover"
+                      />
+                      <h3 className="text-md font-semibold">{result.title}</h3>
+                    </div>
+                  )}
+                  {result.name && (
+                    <div className="w-full flex items-center">
+                      <FaMapMarkerAlt className="w-12 h-12 text-gray-500 mr-3" />
+                      <div>
+                        <p className="text-md font-semibold">{result.name}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+
+              return result.title ? (
+                <Link
+                  key={index}
+                  to={`/business/${encryptId(result.businessInfo.id)}`}
+                  className="block"
+                  onClick={handleClick} 
+                > 
+                  {content}
+                </Link>
+              ) : (
+                <Link
+                  key={index}
+                  to={`/destinations?name=${result.value}`}
+                  className="block"
+                  onClick={handleClick} 
+                >
+                  {content}
+                </Link>
+              );
+            })}
+          </motion.div>
+        )}
+      </div>
+    </>
+  );
+};
 
 const Nav = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -31,38 +300,10 @@ const Nav = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(null);
   const [userData, setUserData] = useState(null);
   const [isChatModalOpen, setIsChatModalOpen] = useState(false);
-  const [showSearchBar, setShowSearchBar] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
-  const [activeTab, setActiveTab] = useState('all');
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [isSearchOverlayOpen, setIsSearchOverlayOpen] = useState(false);
   const [activeLink, setActiveLink] = useState('');
   const location = useLocation();
   const [loading, setLoading] = useState(true);
-  // Use the environment variable for the base URL
-const BASE_URL = import.meta.env.VITE_BASE_URL; 
-
-  const sampleData = {
-    activities: [
-      { name: 'Hiking Adventure', destination: 'Bulusan', image: 'https://via.placeholder.com/50' },
-    ],
-    accommodations: [
-      { name: 'Luxury Hotel', destination: 'Sorsogon City', image: 'https://via.placeholder.com/50' },
-    ],
-    foodPlaces: [
-      { name: 'Mountain View Dining', destination: 'Sorsogon City', image: 'https://via.placeholder.com/50' },
-    ],
-    shops: [
-      { name: 'Sample Souvenir Shop', destination: 'Sorsogon City', image: 'https://via.placeholder.com/50' },
-    ],
-    locations: [
-      { name: 'Bulusan' },
-      { name: 'Bulan' },
-      { name: 'Barcelona' },
-    ],
-  };
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -81,6 +322,10 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
   };
 
   useEffect(() => {
+      setIsMenuOpen(false);
+  }, [isMobile]);
+
+  useEffect(() => {
     window.addEventListener('scroll', handleScroll);
     window.addEventListener('resize', handleResize);
     return () => {
@@ -88,72 +333,6 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
       window.removeEventListener('resize', handleResize);
     };
   }, []);
-
-  const handleInputChange = (e) => {
-    const value = e.target.value;
-    setSearchQuery(value);
-
-    if (value.length > 0) {
-      performSearch(value);
-    } else {
-      setSearchResults([]);
-    }
-  };
-
-  const performSearch = (query) => {
-    let results = [];
-    const firstLetter = query.charAt(0).toLowerCase();
-
-    const matchesFirstLetter = (str) => str.charAt(0).toLowerCase() === firstLetter;
-
-    switch (activeTab) {
-      case 'all':
-        results = [
-          ...sampleData.activities.filter((activity) => matchesFirstLetter(activity.name)),
-          ...sampleData.accommodations.filter((accommodation) => matchesFirstLetter(accommodation.name)),
-          ...sampleData.foodPlaces.filter((food) => matchesFirstLetter(food.name)),
-          ...sampleData.shops.filter((shop) => matchesFirstLetter(shop.name)),
-          ...sampleData.locations.filter((location) => matchesFirstLetter(location.name)),
-        ];
-        break;
-      case 'activities':
-        results = sampleData.activities.filter((activity) => matchesFirstLetter(activity.name));
-        break;
-      case 'accommodation':
-        results = sampleData.accommodations.filter((accommodation) => matchesFirstLetter(accommodation.name));
-        break;
-      case 'food':
-        results = sampleData.foodPlaces.filter((food) => matchesFirstLetter(food.name));
-        break;
-      case 'shops':
-        results = sampleData.shops.filter((shop) => matchesFirstLetter(shop.name));
-        break;
-      default:
-        break;
-    }
-
-    setSearchResults(results);
-  };
-
-  const clearSearchField = () => {
-    setSearchQuery('');
-    setSearchResults([]);
-  };
-
-  const handleTabChange = (key) => {
-    setActiveTab(key);
-    setSearchQuery('');
-    setSearchResults([]);
-  };
-
-  const openSearch = () => {
-    setIsSearchOpen(true);
-  };
-
-  const closeSearch = () => {
-    setIsSearchOpen(false);
-    clearSearchField();
-  };
 
   const handleLogout = (e) => {
     e.preventDefault();
@@ -210,15 +389,6 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 
   const closeChatModal = () => {
     setIsChatModalOpen(false);
-  };
-
-  const openSearchOverlay = () => {
-    setIsSearchOverlayOpen(true);
-  };
-
-  const closeSearchOverlay = () => {
-    setIsSearchOverlayOpen(false);
-    clearSearchField();
   };
 
   const handleLinkClick = (link) => {
@@ -317,22 +487,8 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 
           <div className="hidden xl:flex items-center gap-6">
             <div className="flex space-x-8 items-center text-color1">
-            <div className="relative">
-                <input
-                  type="text"
-                  placeholder={`Search for ${activeTab}`}
-                  value={searchQuery}
-                  onFocus={openSearchOverlay}
-                  onChange={handleInputChange}
-                  className="border border-gray-300 rounded-full p-1 pl-8 text-sm shadow-md focus:outline-none focus:ring-2 focus:ring-color1 transition-all duration-300"
-                />
-                <FaSearch className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500" />
-                {searchQuery && (
-                  <FaTimes
-                    onClick={clearSearchField}
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer"
-                  />
-                )}
+              <div className="relative">
+                <Search />
               </div>
               <div
                 className={`cursor-pointer text text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1 ${activeLink === '/' ? ' border-light border-b-1 p-1 font-semibold  ' : ''}`}
@@ -463,92 +619,12 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
         </div>
       )}
 
-      {/* Search Results Popup for Desktop */}
-      {!isMobile && searchResults.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className="absolute top-[8rem] left-0 right-0 bg-white shadow-lg p-4 z-50 max-h-[300px] overflow-y-auto rounded-lg mx-4"
-        >
-          {searchResults.map((result, index) => (
-            <div key={index} className="flex items-center p-2 hover:bg-gray-200 cursor-pointer">
-              {result.image ? (
-                <img src={result.image} alt={result.name} className="w-12 h-12 rounded-full mr-3" />
-              ) : (
-                <FaMapMarkerAlt className="w-12 h-12 text-gray-500 mr-3" />
-              )}
-              <div>
-                <h3 className="text-md font-semibold">{result.name}</h3>
-                {result.destination && <p className="text-sm text-gray-500">{result.destination}</p>}
-              </div>
-            </div>
-          ))}
-        </motion.div>
-      )}
-
-      {/* Full-Screen Search Overlay */}
-      {isSearchOverlayOpen && (
-        <div className="fixed inset-0 bg-white z-50 flex flex-col p-4">
-          <div className="flex items-center justify-between mb-4">
-            <input
-              type="text"
-              placeholder={`Search for ${activeTab}`}
-              value={searchQuery}
-              onChange={handleInputChange}
-              className="w-full border border-gray-300 rounded-full p-2 pl-10 text-sm shadow-md focus:outline-none focus:ring-2 focus:ring-color1 transition-all duration-300"
-            />
-                <FaSearch className="absolute left-8 top-[2.2rem]  transform -translate-y-1/2 text-gray-500" />
-            <FaTimes
-              onClick={closeSearchOverlay}
-              className="text-gray-500 cursor-pointer ml-2"
-            />
-          </div>
-
-          {searchResults.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className="flex-grow overflow-y-auto"
-            >
-              {searchResults.map((result, index) => (
-                <div key={index} className="flex items-center p-2 hover:bg-gray-200 cursor-pointer">
-                  {result.image ? (
-                    <img src={result.image} alt={result.name} className="w-12 h-12 rounded-full mr-3" />
-                  ) : (
-                    <FaMapMarkerAlt className="w-12 h-12 text-gray-500 mr-3" />
-                  )}
-                  <div>
-                    <h3 className="text-md font-semibold">{result.name}</h3>
-                    {result.destination && <p className="text-sm text-gray-500">{result.destination}</p>}
-                  </div>
-                </div>
-              ))}
-            </motion.div>
-          )}
-        </div>
-      )}
-
       {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="xl:hidden fixed right-0 w-auto h-auto bg-light z-40 flex flex-col items-center p-4 m-2 rounded-large">
           <div className="flex flex-col space-y-1 w-full m-4">
             <div className="relative w-full mt-4 max-w-md mb-4">
-              <input
-                type="text"
-                placeholder={`Search for ${activeTab}`}
-                value={searchQuery}
-                onFocus={openSearchOverlay}
-                className="w-full border border-gray-300 rounded-full p-2 pl-10 text-sm shadow-md focus:outline-none focus:ring-2 focus:ring-color1 transition-all duration-300"
-              />
-              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
-              {searchQuery && (
-                <FaTimes
-                  onClick={clearSearchField}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer"
-                />
-              )}
+              <Search />
             </div>
             <div className="hover:text-gray-700 hover:bg-gray-300 cursor-pointer duration-100 text-lg font-light flex items-center gap-2 p-1 rounded-large">
               <FaHome className='m-2' /> <a href='/' className='m-2'>Home</a>

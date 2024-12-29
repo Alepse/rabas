@@ -21,14 +21,6 @@ const Search = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
-  // console.log(searchResults);
-  const [products, setProducts] = useState([]);
-  const [businessProducts, setBusinessProducts] = useState({
-    activities: [],
-    accommodations: [],
-    restaurant: [],
-    shop: []
-  });
 
   const [businessListings, setBusinessListings] = useState({
     activitiesAndAttractions: [],
@@ -36,96 +28,6 @@ const Search = () => {
     foodPlaces: [],
     shops: []
   });
-
-  // console.log(businessListings.foodPlaces);
-  const fetchBusinessProducts = async () => {
-    try {
-      const response = await fetch(`${BASE_URL}/superAdmin-fetchAllBusinessProducts`, {
-        credentials: 'include'
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch products');
-      }
-
-      const data = await response.json();
-      
-      if (data.success) {
-        // console.log('Received products data:', data.products);
-
-        // Categorize products
-        const categorizedProducts = {
-          activities: [],
-          accommodations: [],
-          restaurant: [],
-          shop: []
-        };
-
-        // Create enhanced products array
-        const enhancedProducts = data.products.map(product => {
-          // Parse JSON fields
-          const images = typeof product.images === 'string' ? JSON.parse(product.images) : product.images;
-          const inclusions = typeof product.inclusions === 'string' ? JSON.parse(product.inclusions) : product.inclusions;
-          const terms = typeof product.termsAndConditions === 'string' ? JSON.parse(product.termsAndConditions) : product.termsAndConditions;
-
-          return {
-            ...product,
-            title: product.name || 'Untitled Product',
-            description: product.description || 'No description available',
-            price: parseFloat(product.price) || 0,
-            imageUrl: images && images.length > 0 ?  `${BASE_URL}/${images[0].path}` : 'https://via.placeholder.com/200',
-            rating: product.rating || 0,
-            type: product.type || 'Uncategorized',
-            businessName: product.businessName || 'Unknown Business',
-            ownerName: product.owner_name || 'Unknown Owner',
-            discount: product.discount || 0,
-            expirationDate: product.expiration || 'No Expiration',
-            inclusions: inclusions || [],
-            termsAndConditions: terms || [],
-            images: images || [],
-            pricingUnit: product.pricing_unit || 'per item'
-          };
-        });
-
-        // Categorize the enhanced products
-        enhancedProducts.forEach(product => {
-          const category = (product.product_category || '').toLowerCase();
-          
-          if (category.includes('activit') || category.includes('attract')) {
-            categorizedProducts.activities.push(product);
-          } else if (category.includes('accommodat') || category.includes('hotel') || category.includes('resort')) {
-            categorizedProducts.accommodations.push(product);
-          } else if (category.includes('restaurant') || category.includes('food')) {
-            categorizedProducts.restaurant.push(product);
-          } else if (category.includes('shop') || category.includes('souvenir')) {
-            categorizedProducts.shop.push(product);
-          } else {
-            // console.log('Uncategorized product:', product.name, 'Category:', category);
-            categorizedProducts.shop.push(product);
-          }
-        });
-
-        setBusinessProducts(categorizedProducts);
-        
-        // Update product counts
-        // setProductCounts({
-        //   activities: categorizedProducts.activities.length,
-        //   accommodations: categorizedProducts.accommodations.length,
-        //   foods: categorizedProducts.restaurant.length,
-        //   shops: categorizedProducts.shop.length,
-        //   total: enhancedProducts.length
-        // });
-
-        // Update the products state
-        setProducts(enhancedProducts);
-
-      } else {
-        console.error('Failed to fetch products:', data.message);
-      }
-    } catch (error) {
-      console.error('Error fetching products:', error);
-    }
-  };
 
   const fetchBusinessListings = async () => {
     try {
@@ -200,7 +102,6 @@ const Search = () => {
   };
 
   useEffect(() => {
-    fetchBusinessProducts();
     fetchBusinessListings();
   }, []);
 
@@ -237,8 +138,8 @@ const Search = () => {
   let results = [];
   const searchInput = query.toLowerCase();
 
-  const matchesSearch = (str) => str.toLowerCase().includes(searchInput);
-  
+  const matchesSearch = (str) => new RegExp(`^${searchInput}`).test(str.toLowerCase()); // Matches from the start  
+
     switch (activeTab) {
       case 'all':
         results = [
@@ -387,7 +288,7 @@ const Search = () => {
                     <div className="w-full flex items-center">
                       <FaMapMarkerAlt className="w-12 h-12 text-gray-500 mr-3" />
                       <div>
-                        <p className="text-sm text-gray-500">{result.name}</p>
+                        <p className="text-md font-semibold">{result.name}</p>
                       </div>
                     </div>
                   )}
