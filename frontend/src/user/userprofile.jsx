@@ -68,7 +68,16 @@ const renderLikedPages = (likedPages, handleUnlikePage) => {
             <GiPositionMarker /> {item.destination}
           </div>
           <p className='text-sm text-gray-600 mb-2'>{item.description}</p>
-          <p className='font-semibold text-md mb-2'>₱{item.lowest_price} - ₱{item.highest_price}</p>
+          {/* Price Range Section */}
+          <div className="text-md sm:text-sm font-semibold text-black">
+            {item.lowest_price && item.highest_price ? (
+              `₱${item.lowest_price} - ₱${item.highest_price}`
+            ) : (
+              <span className="text-gray-400 italic text-[12px] sm:text-sm">
+                Price Range Not Available
+              </span>
+            )}
+          </div>
           <div className='flex items-center justify-between'>
             <Link to={`/business/${encryptId(item.business_id)}`}>
               <Button className='bg-color1 text-white hover:bg-color2'>Visit</Button>
