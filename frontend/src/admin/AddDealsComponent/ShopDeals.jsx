@@ -44,14 +44,6 @@ const ShopDeals = () => {
     dispatch(fetchDeals()).then(() => setLoading(false));
   }, [dispatch]);
 
-  if (loading) {
-    return <div>Loading shops...</div>;
-  }
-
-  if (status === 'loading') {
-    return <div>Loading shops...</div>;
-  }
-
   if (status === 'failed') {
     return <div>Error: {error}</div>;
   }

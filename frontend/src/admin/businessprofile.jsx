@@ -34,6 +34,7 @@ import {
   removeFacilityItem,
 } from '../redux/businessSlice';
 import axios from 'axios';
+import { Skeleton } from "@nextui-org/skeleton";
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
@@ -45,6 +46,7 @@ const municipalities = [
 
 const BusinessProfile = () => {
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(true);
   const businessData = useSelector((state) => state.business);
   const businessCard = useSelector((state) => state.business.businessCard);
 
@@ -132,6 +134,8 @@ const BusinessProfile = () => {
       }
     } catch (error) {
       console.error('Error fetching business data:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -1069,385 +1073,353 @@ const BusinessProfile = () => {
           </Button>
         </div>
 
-        <Tabs aria-label="Business Profile Sections" className="w-full">
-          <Tab key="general" title="General Info">
-            <Card>
-              <CardBody>
-                <h3 className="text-lg font-bold mb-4 p-5">Update Business Logo and Name</h3>
-                <div className='flex flex-col lg:flex-row items-center mb-6 shadow-lg p-3 rounded-sm shadow-slate-400'>
-                  <div className='relative w-24 h-24 lg:mr-6 mb-4 lg:mb-0'>
+        {loading ?
+        (
+          <div className="w-full">
+            <div className="py-8">
+              <Skeleton className="rounded-lg mb-4 p-5"/>
+              <Skeleton className="flex flex-col h-[600px] lg:flex-row items-center mb-6 shadow-lg p-3 rounded-sm shadow-slate-400" />
+            </div>
+          </div>
+        ) : ( 
+          <Tabs aria-label="Business Profile Sections" className="w-full">
+            <Tab key="general" title="General Info">
+              <Card>
+                <CardBody>
+                  <h3 className="text-lg font-bold mb-4 p-5">Update Business Logo and Name</h3>
+                  <div className='flex flex-col lg:flex-row items-center mb-6 shadow-lg p-3 rounded-sm shadow-slate-400'>
+                    <div className='relative w-24 h-24 lg:mr-6 mb-4 lg:mb-0'>
 
-                    {businessData.businessLogo ? (
-                      <img
-                        src={businessData.businessLogo.startsWith('uploads')
-                          ? `${BASE_URL}/${businessData.businessLogo}`
-                          : businessData.businessLogo
-                        }
-                        alt="Business Logo"
-                        className='w-full h-full object-cover rounded-full'
+                      {businessData.businessLogo ? (
+                        <img
+                          src={businessData.businessLogo.startsWith('uploads')
+                            ? `${BASE_URL}/${businessData.businessLogo}`
+                            : businessData.businessLogo
+                          }
+                          alt="Business Logo"
+                          className='w-full h-full object-cover rounded-full'
+                        />
+                      ) : (
+                        <div className='w-full h-full bg-gray-200 rounded-full flex items-center justify-center'>
+                          <FaUpload className='text-gray-400 text-2xl' />
+                        </div>
+                      )}
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleLogoUpload}
+                        className='hidden'
+                        accept='image/*'
                       />
+                      <button
+                        onClick={() => fileInputRef.current.click()}
+                        className='absolute bottom-0 right-0 bg-color1 text-white p-2 rounded-full hover:bg-color2'
+                      >
+                        <FaUpload />
+                      </button>
+                    </div>
+                    {isEditingName ? (
+                      // Editing mode
+                      <>
+                        <Input
+                          type="text"
+                          value={tempBusinessName}
+                          onChange={(e) => setTempBusinessName(e.target.value)}
+                          placeholder="Enter Business Name"
+                          className="text-xl lg:text-2xl font-semibold w-full"
+                        />
+                        <AiOutlineCheck
+                          onClick={handleSaveName}
+                          className="cursor-pointer text-green-600 ml-2 text-md text-2xl"
+                        />
+                        <AiOutlineClose
+                          onClick={handleCancelEdit}
+                          className="cursor-pointer text-red-600 ml-2 text-2xl"
+                        />
+                      </>
                     ) : (
-                      <div className='w-full h-full bg-gray-200 rounded-full flex items-center justify-center'>
-                        <FaUpload className='text-gray-400 text-2xl' />
-                      </div>
+                      // Viewing mode
+                      <>
+                        <p className="text-xl lg:text-2xl font-semibold w-full">
+                          {businessData.businessName || 'No Business Name'}
+                        </p>
+                        <AiOutlineEdit
+                          onClick={handleEditName}
+                          className="cursor-pointer text-gray-600 ml-2 text-2xl"
+                        />
+                      </>
                     )}
-                    <input
-                      type="file"
-                      ref={fileInputRef}
-                      onChange={handleLogoUpload}
-                      className='hidden'
-                      accept='image/*'
-                    />
-                    <button
-                      onClick={() => fileInputRef.current.click()}
-                      className='absolute bottom-0 right-0 bg-color1 text-white p-2 rounded-full hover:bg-color2'
-                    >
-                      <FaUpload />
-                    </button>
                   </div>
-                  {isEditingName ? (
-                    // Editing mode
-                    <>
+
+                  <div className="mb-6 shadow-md rounded-md p-6 shadow-slate-400 ">
+                    <h3 className="text-lg font-bold mb-4">Update Business Card</h3>
+                    <div className="space-y-4">
+                      <div className="mb-6">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Card Image</label>
+
+                        {/* Display the uploaded image preview if available */}
+                        {cardImage ? (
+                          <div className="relative w-full h-48 mb-3">
+                            <img
+                              src={`${BASE_URL}/${cardImage}`
+                              }
+                              alt="Card Preview"
+                              className="w-full h-full object-cover rounded-md shadow-md"
+                            />
+                            <button
+                              onClick={() => handleRemoveCardImage()}  // Updated function to remove the image
+                              className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition"
+                            >
+                              <FaTrash size={14} />
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="border-2 border-dashed border-gray-300 rounded-md p-4 flex justify-center items-center">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleCardImageUpload}
+                              className="hidden"
+                              id="cardImageUpload"
+                            />
+                            <label
+                              htmlFor="cardImageUpload"
+                              className="cursor-pointer bg-color1 text-white px-4 py-2 rounded-md hover:bg-color2 transition"
+                            >
+                              <FaUpload className="inline mr-2" />
+                              Upload Image
+                            </label>
+                          </div>
+                        )}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                        <textarea
+                          value={description || ''}
+                          onChange={(e) => setDescription(e.target.value)}
+                          placeholder="Enter description"
+                          className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-color1"
+                          rows="3"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                          <Select
+                            label="Address"
+                            placeholder="Select Address"
+                            className="flex-1"
+                            selectedKeys={new Set([location])} // Use `selectedKeys` for controlled selection
+                            onSelectionChange={(key) => setLocation(key.currentKey)} // Update state with the selected key
+                          >
+                            {municipalities.map((municipality) => (
+                              <SelectItem key={municipality} value={municipality}>
+                                {municipality}
+                              </SelectItem>
+                            ))}
+                          </Select>
+                      </div>
+                      <button
+                        onClick={handleUpdate}
+                        className="mt-4 w-full bg-color1 text-white p-2 rounded-md hover:bg-color2 transition"
+                      >
+                        Update Business Card
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="mb-6">
+                    <h3 className="text-lg font-bold mb-4">Business Card Preview</h3>
+                    <div className="border border-gray-300 rounded-md p-4">
+                      {cardImage && (
+                        <img
+                          src={cardImage.startsWith('uploads')
+                            ? `${BASE_URL}/${cardImage}`
+                            : cardImage
+                          }
+                          alt="Business Card"
+                          className="w-full h-48 object-cover rounded-md mb-4"
+                        />
+                      )}
+                      <p><strong>Business Name:</strong> {businessData.businessName}</p>
+                      <p><strong>Description:</strong> {description}</p>
+                      <p><strong>Location:</strong> {location}</p>
+                    </div>
+                  </div>
+                </CardBody>
+              </Card>
+            </Tab>
+
+            <Tab key="hero" title="Cover Photo">
+              <Card>
+                <CardBody>
+                  <h2 className="text-lg lg:text-xl font-semibold mb-4 text-gray-700">Cover Photo</h2>
+                  <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4'>
+                    {/* Rendering the hero images with delete button */}
+                    {businessData.heroImages && Array.isArray(businessData.heroImages) && businessData.heroImages.map((image) => (
+                      <div key={image.id} className="relative">
+                        <img
+                          src={`${BASE_URL}/${image.path}`}  // Apply the base URL to the image
+                          alt={`Cover Photo ${image.title}`}
+                          className="w-full h-40 object-cover rounded-lg"
+                        />
+                        <div className='flex flex-col lg:flex-row items-center mt-2'>
+                        {editingImageTitles[image.id] ? (
+                          <>
+                            <Input
+                              type="text"
+                              value={tempImageTitles[image.id] || ''}
+                              onChange={(e) => setTempImageTitles((prev) => ({ ...prev, [image.id]: e.target.value }))}
+                              placeholder="Enter image title"
+                              className="mt-2"
+                            />
+                            <AiOutlineCheck
+                              onClick={() => handleSaveImageTitle(image.id)}
+                              className="cursor-pointer text-green-600 ml-2 text-2xl"
+                            />
+                            <AiOutlineClose
+                              onClick={() => handleCancelImageTitleEdit(image.id)}
+                              className="cursor-pointer text-red-600 ml-2 text-2xl"
+                            />
+                          </>
+                        ) : (
+                          <>
+                            <Input 
+                              type="text"
+                              value = {image.title || 'No Title'}
+                              className="mt-2"
+                              disabled
+                            />
+                            <AiOutlineEdit
+                              onClick={() => handleEditImageTitle(image.id)}
+                              className="cursor-pointer text-gray-600 ml-2 text-2xl"
+                            />
+                          </>
+                        )}
+                        </div>
+                        <Button
+                          onClick={() => handleRemoveHeroImage(image.id, image.path)}
+                          className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full"
+                        >
+                          <FaTrash size={12} />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                  <input
+                    type="file"
+                    ref={heroImagesInputRef}
+                    onChange={handleHeroImagesUpload}
+                    className='hidden'
+                    accept='image/*'
+                    multiple
+                  />
+                  <Button
+                    onClick={() => heroImagesInputRef.current.click()}
+                    className='bg-color1 text-white hover:bg-color2 transition'
+                  >
+                    Upload Images
+                  </Button>
+                </CardBody>
+              </Card>
+            </Tab>
+
+            <Tab key="about" title="About Us">
+              <Card>
+                <CardBody className='overflow-x-auto'>
+                  <h2 className="text-lg lg:text-xl font-semibold mb-4 text-gray-700">About Us</h2>
+                  <div className='flex flex-col lg:flex-row items-center mb-6 shadow-lg p-3 rounded-sm shadow-slate-400'>
+                    {isEditingAboutUs ? (
+                      <>
+                        <textarea
+                          value={tempAboutUs}
+                          onChange={(e) => setTempAboutUs(e.target.value)}
+                          placeholder="Enter information about your business"
+                          className="w-full p-2 border border-gray-300 rounded-lg mb-4"
+                        />
+                        <AiOutlineCheck
+                          onClick={handleSaveAboutUs}
+                          className="cursor-pointer text-green-600 ml-2 text-md text-2xl"
+                        />
+                        <AiOutlineClose
+                          onClick={handleCancelEditAboutUs}
+                          className="cursor-pointer text-red-600 ml-2 text-2xl"
+                        />
+                      </>
+                    ) : (
+                      // Viewing mode
+                      <>
+                        <p className="w-full p-2 border border-gray-300 rounded-lg mb-4">
+                          {businessData.aboutUs || 'No information provided'}
+                        </p>
+                        <AiOutlineEdit
+                          onClick={handleEditAboutUs}
+                          className="cursor-pointer text-gray-600 ml-2 text-2xl"
+                        />
+                      </>
+                    )}
+                  </div>
+
+                  <h3 className="text-md lg:text-lg font-semibold mt-4 mb-2 flex items-center justify-between">
+                    <span>Contact Information</span>
+                  
+                  </h3>
+                  {businessData.contactInfo && Array.isArray(businessData.contactInfo) && businessData.contactInfo.map((info) => (
+                    <div key={info.id} className='flex flex-col lg:flex-row items-center gap-2 mb-2'>
+                      <Button onClick={() => openIconModal(`contact-${info.id}`)} className="min-w-[40px] h-[40px] p-0">
+                        {React.createElement(businessIcons.find(icon => icon.name === info.icon)?.icon || FaPlus, { size: 20 })}
+                      </Button>
                       <Input
                         type="text"
-                        value={tempBusinessName}
-                        onChange={(e) => setTempBusinessName(e.target.value)}
-                        placeholder="Enter Business Name"
-                        className="text-xl lg:text-2xl font-semibold w-full"
+                        value={info.label}
+                        onChange={(e) => dispatch(updateContactInfo({ id: info.id, field: 'label', value: e.target.value }))} // Update label
+                        placeholder="Label (e.g. Email, Phone, Facebook)"
+                        className='flex-grow'
                       />
-                      <AiOutlineCheck
-                        onClick={handleSaveName}
-                        className="cursor-pointer text-green-600 ml-2 text-md text-2xl"
+                      <Input
+                        type="text"
+                        value={info.value}
+                        onChange={(e) => dispatch(updateContactInfo({ id: info.id, field: 'value', value: e.target.value }))} // Update value
+                        placeholder="Url if needed"
+                        className='flex-grow'
                       />
-                      <AiOutlineClose
-                        onClick={handleCancelEdit}
-                        className="cursor-pointer text-red-600 ml-2 text-2xl"
-                      />
-                    </>
-                  ) : (
-                    // Viewing mode
-                    <>
-                      <p className="text-xl lg:text-2xl font-semibold w-full">
-                        {businessData.businessName || 'No Business Name'}
-                      </p>
-                      <AiOutlineEdit
-                        onClick={handleEditName}
-                        className="cursor-pointer text-gray-600 ml-2 text-2xl"
-                      />
-                    </>
-                  )}
-                </div>
-
-                <div className="mb-6 shadow-md rounded-md p-6 shadow-slate-400 ">
-                  <h3 className="text-lg font-bold mb-4">Update Business Card</h3>
-                  <div className="space-y-4">
-                    <div className="mb-6">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Card Image</label>
-
-                      {/* Display the uploaded image preview if available */}
-                      {cardImage ? (
-                        <div className="relative w-full h-48 mb-3">
-                          <img
-                            src={`${BASE_URL}/${cardImage}`
-                            }
-                            alt="Card Preview"
-                            className="w-full h-full object-cover rounded-md shadow-md"
-                          />
-                          <button
-                            onClick={() => handleRemoveCardImage()}  // Updated function to remove the image
-                            className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition"
-                          >
-                            <FaTrash size={14} />
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="border-2 border-dashed border-gray-300 rounded-md p-4 flex justify-center items-center">
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleCardImageUpload}
-                            className="hidden"
-                            id="cardImageUpload"
-                          />
-                          <label
-                            htmlFor="cardImageUpload"
-                            className="cursor-pointer bg-color1 text-white px-4 py-2 rounded-md hover:bg-color2 transition"
-                          >
-                            <FaUpload className="inline mr-2" />
-                            Upload Image
-                          </label>
-                        </div>
-                      )}
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                      <textarea
-                        value={description || ''}
-                        onChange={(e) => setDescription(e.target.value)}
-                        placeholder="Enter description"
-                        className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-color1"
-                        rows="3"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-                        <Select
-                          label="Address"
-                          placeholder="Select Address"
-                          className="flex-1"
-                          selectedKeys={new Set([location])} // Use `selectedKeys` for controlled selection
-                          onSelectionChange={(key) => setLocation(key.currentKey)} // Update state with the selected key
-                        >
-                          {municipalities.map((municipality) => (
-                            <SelectItem key={municipality} value={municipality}>
-                              {municipality}
-                            </SelectItem>
-                          ))}
-                        </Select>
-                    </div>
-                    <button
-                      onClick={handleUpdate}
-                      className="mt-4 w-full bg-color1 text-white p-2 rounded-md hover:bg-color2 transition"
-                    >
-                      Update Business Card
-                    </button>
-                  </div>
-                </div>
-
-                <div className="mb-6">
-                  <h3 className="text-lg font-bold mb-4">Business Card Preview</h3>
-                  <div className="border border-gray-300 rounded-md p-4">
-                    {cardImage && (
-                      <img
-                        src={cardImage.startsWith('uploads')
-                          ? `${BASE_URL}/${cardImage}`
-                          : cardImage
-                        }
-                        alt="Business Card"
-                        className="w-full h-48 object-cover rounded-md mb-4"
-                      />
-                    )}
-                    <p><strong>Business Name:</strong> {businessData.businessName}</p>
-                    <p><strong>Description:</strong> {description}</p>
-                    <p><strong>Location:</strong> {location}</p>
-                  </div>
-                </div>
-              </CardBody>
-            </Card>
-          </Tab>
-
-          <Tab key="hero" title="Cover Photo">
-            <Card>
-              <CardBody>
-                <h2 className="text-lg lg:text-xl font-semibold mb-4 text-gray-700">Cover Photo</h2>
-                <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4'>
-                  {/* Rendering the hero images with delete button */}
-                  {businessData.heroImages && Array.isArray(businessData.heroImages) && businessData.heroImages.map((image) => (
-                    <div key={image.id} className="relative">
-                      <img
-                        src={`${BASE_URL}/${image.path}`}  // Apply the base URL to the image
-                        alt={`Cover Photo ${image.title}`}
-                        className="w-full h-40 object-cover rounded-lg"
-                      />
-                      <div className='flex flex-col lg:flex-row items-center mt-2'>
-                      {editingImageTitles[image.id] ? (
-                        <>
-                          <Input
-                            type="text"
-                            value={tempImageTitles[image.id] || ''}
-                            onChange={(e) => setTempImageTitles((prev) => ({ ...prev, [image.id]: e.target.value }))}
-                            placeholder="Enter image title"
-                            className="mt-2"
-                          />
-                          <AiOutlineCheck
-                            onClick={() => handleSaveImageTitle(image.id)}
-                            className="cursor-pointer text-green-600 ml-2 text-2xl"
-                          />
-                          <AiOutlineClose
-                            onClick={() => handleCancelImageTitleEdit(image.id)}
-                            className="cursor-pointer text-red-600 ml-2 text-2xl"
-                          />
-                        </>
-                      ) : (
-                        <>
-                          <Input 
-                            type="text"
-                            value = {image.title || 'No Title'}
-                            className="mt-2"
-                            disabled
-                          />
-                          <AiOutlineEdit
-                            onClick={() => handleEditImageTitle(image.id)}
-                            className="cursor-pointer text-gray-600 ml-2 text-2xl"
-                          />
-                        </>
-                      )}
-                      </div>
-                      <Button
-                        onClick={() => handleRemoveHeroImage(image.id, image.path)}
-                        className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full"
-                      >
-                        <FaTrash size={12} />
+                      <Button onClick={() => handleRemoveContactInfo(info.id)} className="bg-red-500 text-white p-2">
+                        <FaTrash size={16} />
                       </Button>
                     </div>
                   ))}
-                </div>
-                <input
-                  type="file"
-                  ref={heroImagesInputRef}
-                  onChange={handleHeroImagesUpload}
-                  className='hidden'
-                  accept='image/*'
-                  multiple
-                />
-                <Button
-                  onClick={() => heroImagesInputRef.current.click()}
-                  className='bg-color1 text-white hover:bg-color2 transition'
-                >
-                  Upload Images
-                </Button>
-              </CardBody>
-            </Card>
-          </Tab>
 
-          <Tab key="about" title="About Us">
-            <Card>
-              <CardBody className='overflow-x-auto'>
-                <h2 className="text-lg lg:text-xl font-semibold mb-4 text-gray-700">About Us</h2>
-                <div className='flex flex-col lg:flex-row items-center mb-6 shadow-lg p-3 rounded-sm shadow-slate-400'>
-                  {isEditingAboutUs ? (
-                    <>
-                      <textarea
-                        value={tempAboutUs}
-                        onChange={(e) => setTempAboutUs(e.target.value)}
-                        placeholder="Enter information about your business"
-                        className="w-full p-2 border border-gray-300 rounded-lg mb-4"
-                      />
-                      <AiOutlineCheck
-                        onClick={handleSaveAboutUs}
-                        className="cursor-pointer text-green-600 ml-2 text-md text-2xl"
-                      />
-                      <AiOutlineClose
-                        onClick={handleCancelEditAboutUs}
-                        className="cursor-pointer text-red-600 ml-2 text-2xl"
-                      />
-                    </>
-                  ) : (
-                    // Viewing mode
-                    <>
-                      <p className="w-full p-2 border border-gray-300 rounded-lg mb-4">
-                        {businessData.aboutUs || 'No information provided'}
-                      </p>
+                  <Button onClick={() => dispatch(addContactInfo())} className="mt-2 bg-color1 text-white hover:bg-color2 transition">
+                    Add Contact Info
+                  </Button>
+                  <Button className="mt-2 bg-color1 text-white hover:bg-color2 transition" onClick={handleSaveContact}>
+                      Save
+                    </Button>
+
+
+                  <h3 className="text-md lg:text-lg font-semibold mt-4 mb-2 flex items-center justify-between">
+                    <span>Opening Hours</span>
+                    {!isEditingHours && (
                       <AiOutlineEdit
-                        onClick={handleEditAboutUs}
+                        onClick={handleEditHours}
                         className="cursor-pointer text-gray-600 ml-2 text-2xl"
                       />
-                    </>
-                  )}
-                </div>
+                    )}
+                    {isEditingHours && (
+                      <div className="flex items-center">
+                        <AiOutlineCheck
+                          onClick={handleSaveHours}
+                          className="cursor-pointer text-green-600 mr-2 text-2xl"
+                        />
+                        <AiOutlineClose
+                          onClick={handleCancelEditHours}
+                          className="cursor-pointer text-red-600 text-2xl"
+                        />
+                      </div>
+                    )}
+                  </h3>
 
-                <h3 className="text-md lg:text-lg font-semibold mt-4 mb-2 flex items-center justify-between">
-                  <span>Contact Information</span>
-                 
-                </h3>
-                {businessData.contactInfo && Array.isArray(businessData.contactInfo) && businessData.contactInfo.map((info) => (
-                  <div key={info.id} className='flex flex-col lg:flex-row items-center gap-2 mb-2'>
-                    <Button onClick={() => openIconModal(`contact-${info.id}`)} className="min-w-[40px] h-[40px] p-0">
-                      {React.createElement(businessIcons.find(icon => icon.name === info.icon)?.icon || FaPlus, { size: 20 })}
-                    </Button>
-                    <Input
-                      type="text"
-                      value={info.label}
-                      onChange={(e) => dispatch(updateContactInfo({ id: info.id, field: 'label', value: e.target.value }))} // Update label
-                      placeholder="Label (e.g. Email, Phone, Facebook)"
-                      className='flex-grow'
-                    />
-                    <Input
-                      type="text"
-                      value={info.value}
-                      onChange={(e) => dispatch(updateContactInfo({ id: info.id, field: 'value', value: e.target.value }))} // Update value
-                      placeholder="Url if needed"
-                      className='flex-grow'
-                    />
-                    <Button onClick={() => handleRemoveContactInfo(info.id)} className="bg-red-500 text-white p-2">
-                      <FaTrash size={16} />
-                    </Button>
-                  </div>
-                ))}
-
-                <Button onClick={() => dispatch(addContactInfo())} className="mt-2 bg-color1 text-white hover:bg-color2 transition">
-                  Add Contact Info
-                </Button>
-                <Button className="mt-2 bg-color1 text-white hover:bg-color2 transition" onClick={handleSaveContact}>
-                    Save
-                  </Button>
-
-
-                <h3 className="text-md lg:text-lg font-semibold mt-4 mb-2 flex items-center justify-between">
-                  <span>Opening Hours</span>
-                  {!isEditingHours && (
-                    <AiOutlineEdit
-                      onClick={handleEditHours}
-                      className="cursor-pointer text-gray-600 ml-2 text-2xl"
-                    />
-                  )}
-                  {isEditingHours && (
-                    <div className="flex items-center">
-                      <AiOutlineCheck
-                        onClick={handleSaveHours}
-                        className="cursor-pointer text-green-600 mr-2 text-2xl"
-                      />
-                      <AiOutlineClose
-                        onClick={handleCancelEditHours}
-                        className="cursor-pointer text-red-600 text-2xl"
-                      />
-                    </div>
-                  )}
-                </h3>
-
-                {isEditingHours ? (
-                  tempOpeningHours.map((hours, index) => (
-                    <div key={index} className='flex flex-col lg:flex-row items-center gap-2 mb-2'>
-                      <Input
-                        type="text"
-                        value={hours.day}
-                        readOnly
-                        className='w-full lg:w-1/4'
-                      />
-
-                      <Input
-                        type="time"
-                        value={hours.open}
-                        onChange={(e) => handleTimeChange(index, 'open', e.target.value)}
-                        disabled={hours.open === "Closed"}
-                        className='w-full lg:w-1/4'
-                      />
-
-                      <Input
-                        type="time"
-                        value={hours.close}
-                        onChange={(e) => handleTimeChange(index, 'close', e.target.value)}
-                        disabled={hours.close === "Closed"}
-                        className='w-full lg:w-1/4'
-                      />
-
-                      <Switch
-                        color='success'
-                        isSelected={hours.open !== "Closed"}
-                        onChange={(e) => {
-                          const newOpenTime = e.target.checked ? "08:00" : "Closed";
-                          const newCloseTime = e.target.checked ? "17:00" : "Closed";
-                          handleTimeChange(index, 'open', newOpenTime);
-                          handleTimeChange(index, 'close', newCloseTime);
-                        }}
-                      >
-                        <span className='font-semibold text-md'>{hours.open === "Closed" ? "Closed" : "Open"}</span>
-                      </Switch>
-                    </div>
-                  ))
-                ) : (
-                  <>
-                    {businessData.openingHours && Array.isArray(businessData.openingHours) && businessData.openingHours.map((hours, index) => (
+                  {isEditingHours ? (
+                    tempOpeningHours.map((hours, index) => (
                       <div key={index} className='flex flex-col lg:flex-row items-center gap-2 mb-2'>
                         <Input
                           type="text"
@@ -1459,176 +1431,220 @@ const BusinessProfile = () => {
                         <Input
                           type="time"
                           value={hours.open}
-                          readOnly
+                          onChange={(e) => handleTimeChange(index, 'open', e.target.value)}
+                          disabled={hours.open === "Closed"}
                           className='w-full lg:w-1/4'
                         />
 
                         <Input
                           type="time"
                           value={hours.close}
-                          readOnly
+                          onChange={(e) => handleTimeChange(index, 'close', e.target.value)}
+                          disabled={hours.close === "Closed"}
                           className='w-full lg:w-1/4'
                         />
 
-                        <span className='font-semibold text-md'>{hours.open === "Closed" ? "Closed" : "Open"}</span>
+                        <Switch
+                          color='success'
+                          isSelected={hours.open !== "Closed"}
+                          onChange={(e) => {
+                            const newOpenTime = e.target.checked ? "08:00" : "Closed";
+                            const newCloseTime = e.target.checked ? "17:00" : "Closed";
+                            handleTimeChange(index, 'open', newOpenTime);
+                            handleTimeChange(index, 'close', newCloseTime);
+                          }}
+                        >
+                          <span className='font-semibold text-md'>{hours.open === "Closed" ? "Closed" : "Open"}</span>
+                        </Switch>
                       </div>
-                    ))}
-                  </>
-                )}
-              </CardBody>
-            </Card>
-          </Tab>
-
-          <Tab key="facilities" title="Facilities & Amenities">
-            <Card>
-              <CardBody className='max-h-[300px] overflow-y-auto scrollbar-custom'>
-                <h2 className="text-lg lg:text-xl font-semibold mb-4 text-gray-700">Facilities & Amenities</h2>
-                <div className='flex justify-start flex-wrap gap-3'>
-                  {businessData.facilities && Array.isArray(businessData.facilities) && businessData.facilities.map((facility, facilityIndex) => (
-                    <div key={facilityIndex} className='mb-4'>
-                      <div className='flex lg:flex-row items-center gap-2 mb-2'>
-                        <Input
-                          type="text"
-                          value={facility.name}
-                          onChange={(e) => dispatch(updateFacility({ index: facilityIndex, field: 'name', value: e.target.value }))}
-                          placeholder="Facility name"
-                          className='w-[15rem]'
-                        />
-                        <Button onClick={() => handleRemoveFacility(facilityIndex)} className="bg-red-500 text-white p-2">
-                          <FaTrash size={16} />
-                        </Button>
-                      </div>
-                      {facility.items && Array.isArray(facility.items) && facility.items.map((item, itemIndex) => (
-                        <div key={itemIndex} className='flex flex-col lg:flex-row items-center gap-2 mb-2'>
-                          <Button onClick={() => openIconModal(`facilityItem-${facilityIndex}-${itemIndex}`)} className="min-w-[40px] h-[40px] p-0">
-                            {item.icon ? React.createElement(businessIcons.find(icon => icon.name === item.icon)?.icon, { size: 20 }) : <FaPlus size={20} />}
-                          </Button>
+                    ))
+                  ) : (
+                    <>
+                      {businessData.openingHours && Array.isArray(businessData.openingHours) && businessData.openingHours.map((hours, index) => (
+                        <div key={index} className='flex flex-col lg:flex-row items-center gap-2 mb-2'>
                           <Input
                             type="text"
-                            value={item.name}
-                            onChange={(e) => dispatch(updateFacilityItem({ facilityIndex, itemIndex, field: 'name', value: e.target.value }))}
-                            placeholder="Facility item"
+                            value={hours.day}
+                            readOnly
+                            className='w-full lg:w-1/4'
+                          />
+
+                          <Input
+                            type="time"
+                            value={hours.open}
+                            readOnly
+                            className='w-full lg:w-1/4'
+                          />
+
+                          <Input
+                            type="time"
+                            value={hours.close}
+                            readOnly
+                            className='w-full lg:w-1/4'
+                          />
+
+                          <span className='font-semibold text-md'>{hours.open === "Closed" ? "Closed" : "Open"}</span>
+                        </div>
+                      ))}
+                    </>
+                  )}
+                </CardBody>
+              </Card>
+            </Tab>
+
+            <Tab key="facilities" title="Facilities & Amenities">
+              <Card>
+                <CardBody className='max-h-[300px] overflow-y-auto scrollbar-custom'>
+                  <h2 className="text-lg lg:text-xl font-semibold mb-4 text-gray-700">Facilities & Amenities</h2>
+                  <div className='flex justify-start flex-wrap gap-3'>
+                    {businessData.facilities && Array.isArray(businessData.facilities) && businessData.facilities.map((facility, facilityIndex) => (
+                      <div key={facilityIndex} className='mb-4'>
+                        <div className='flex lg:flex-row items-center gap-2 mb-2'>
+                          <Input
+                            type="text"
+                            value={facility.name}
+                            onChange={(e) => dispatch(updateFacility({ index: facilityIndex, field: 'name', value: e.target.value }))}
+                            placeholder="Facility name"
+                            className='w-[15rem]'
+                          />
+                          <Button onClick={() => handleRemoveFacility(facilityIndex)} className="bg-red-500 text-white p-2">
+                            <FaTrash size={16} />
+                          </Button>
+                        </div>
+                        {facility.items && Array.isArray(facility.items) && facility.items.map((item, itemIndex) => (
+                          <div key={itemIndex} className='flex flex-col lg:flex-row items-center gap-2 mb-2'>
+                            <Button onClick={() => openIconModal(`facilityItem-${facilityIndex}-${itemIndex}`)} className="min-w-[40px] h-[40px] p-0">
+                              {item.icon ? React.createElement(businessIcons.find(icon => icon.name === item.icon)?.icon, { size: 20 }) : <FaPlus size={20} />}
+                            </Button>
+                            <Input
+                              type="text"
+                              value={item.name}
+                              onChange={(e) => dispatch(updateFacilityItem({ facilityIndex, itemIndex, field: 'name', value: e.target.value }))}
+                              placeholder="Facility item"
+                              className='flex-grow'
+                            />
+                            <Button onClick={() => dispatch(removeFacilityItem({ facilityIndex, itemIndex }))} className="bg-red-500 text-white p-2">
+                              <FaTrash size={16} />
+                            </Button>
+                          </div>
+                        ))}
+                        <Button color='primary' onClick={() => dispatch(addFacilityItem({ facilityIndex }))} className="mr-2">Add Item</Button>
+                      </div>
+                    ))}
+                  </div>
+                </CardBody>
+              </Card>
+              <div className='flex gap-2'>
+                <Button onClick={() => dispatch(addFacility())} className="mt-2 bg-color1 text-white hover:bg-color2 transition">Add Facility</Button>
+                <Button onClick={() => handleSaveFacilities()} className="mt-2 bg-color1 text-white hover:bg-color2 transition">
+                  Save
+                </Button>
+              </div>   
+            </Tab>
+
+            <Tab key="policies" title="Policies">
+              <Card>
+                <CardBody>
+                  <h2 className="text-lg lg:text-xl font-semibold mb-4 text-gray-700">Policies</h2>
+                  {businessData.policies && Array.isArray(businessData.policies) && businessData.policies.map((policy, policyIndex) => (
+                    <div key={policyIndex} className='mb-4'>
+                      <Input
+                        type="text"
+                        value={policy.title}
+                        onChange={(e) => dispatch(updatePolicy({ index: policyIndex, field: 'title', value: e.target.value }))}
+                        placeholder="Policy title"
+                        className='mb-2'
+                      />
+                      {policy.items.map((item, itemIndex) => (
+                        <div key={itemIndex} className='flex flex-col lg:flex-row items-center gap-2 mb-2'>
+                          <Input
+                            type="text"
+                            value={item}
+                            onChange={(e) => dispatch(updatePolicyItem({ policyIndex, itemIndex, value: e.target.value }))}
+                            placeholder="Policy item"
                             className='flex-grow'
                           />
-                          <Button onClick={() => dispatch(removeFacilityItem({ facilityIndex, itemIndex }))} className="bg-red-500 text-white p-2">
+                          <Button onClick={() => handleRemovePolicyItem(policyIndex, itemIndex)} className="bg-red-500 text-white p-2">
                             <FaTrash size={16} />
                           </Button>
                         </div>
                       ))}
-                      <Button color='primary' onClick={() => dispatch(addFacilityItem({ facilityIndex }))} className="mr-2">Add Item</Button>
+                      <Button color='primary' onClick={() => dispatch(addPolicyItem({ policyIndex }))} className="mr-2">Add Item</Button>
+                      <Button onClick={() => handleRemovePolicy(policyIndex)} className="bg-red-500 text-white">Remove Policy</Button>
                     </div>
                   ))}
-                </div>
-              </CardBody>
-            </Card>
-            <div className='flex gap-2'>
-              <Button onClick={() => dispatch(addFacility())} className="mt-2 bg-color1 text-white hover:bg-color2 transition">Add Facility</Button>
-              <Button onClick={() => handleSaveFacilities()} className="mt-2 bg-color1 text-white hover:bg-color2 transition">
-                Save
-              </Button>
-            </div>   
-          </Tab>
+                  <Button onClick={() => dispatch(addPolicy())} className="mt-2 bg-color1 text-white hover:bg-color2 transition">Add Policy</Button>
+                  <Button onClick={() => handleSavePolicies()} className="mt-2 bg-color1 text-white hover:bg-color2 transition">
+                    Save
+                  </Button>
+                </CardBody>
+                
+              </Card>
+            </Tab>
 
-          <Tab key="policies" title="Policies">
-            <Card>
-              <CardBody>
-                <h2 className="text-lg lg:text-xl font-semibold mb-4 text-gray-700">Policies</h2>
-                {businessData.policies && Array.isArray(businessData.policies) && businessData.policies.map((policy, policyIndex) => (
-                  <div key={policyIndex} className='mb-4'>
-                    <Input
-                      type="text"
-                      value={policy.title}
-                      onChange={(e) => dispatch(updatePolicy({ index: policyIndex, field: 'title', value: e.target.value }))}
-                      placeholder="Policy title"
-                      className='mb-2'
-                    />
-                    {policy.items.map((item, itemIndex) => (
-                      <div key={itemIndex} className='flex flex-col lg:flex-row items-center gap-2 mb-2'>
-                        <Input
-                          type="text"
-                          value={item}
-                          onChange={(e) => dispatch(updatePolicyItem({ policyIndex, itemIndex, value: e.target.value }))}
-                          placeholder="Policy item"
-                          className='flex-grow'
+            <Tab key="Location" title="Location">
+              <Card>
+                <CardBody>
+                  <div className="flex flex-col gap-4">
+                    <h2 className="text-lg lg:text-xl font-semibold text-gray-700">Business Location</h2>
+                    
+                    {/* Map Container */}
+                    <div className="w-full h-full rounded-lg">
+                      {/* Placeholder for the actual map implementation */}
+                        <MapPicker
+                          setLatitude={handleLatitudeChange}
+                          setLongitude={handleLongitudeChange}
                         />
-                        <Button onClick={() => handleRemovePolicyItem(policyIndex, itemIndex)} className="bg-red-500 text-white p-2">
-                          <FaTrash size={16} />
+                    </div>
+
+                    {/* Location Controls */}
+                    <div className="flex flex-col gap-3">
+                      <div className="flex gap-3">
+                      <Select
+                        label="Address"
+                        placeholder="Select address"
+                        className="flex-1"
+                        selectedKeys={new Set([address])} // Use `selectedKeys` for controlled selection
+                        onSelectionChange={(key) => setAddress(key.currentKey)} // Update state with the selected key
+                      >
+                        {municipalities.map((municipality) => (
+                          <SelectItem key={municipality} value={municipality}>
+                            {municipality}
+                          </SelectItem>
+                        ))}
+                      </Select>
+                      </div>
+                      
+                      <div className="flex gap-3">
+                        <Button 
+                          className="flex-1 bg-color1 text-white hover:bg-color2 transition"
+                          onClick={() => handleSaveLocation()}
+                        >
+                          Save Location
                         </Button>
                       </div>
-                    ))}
-                    <Button color='primary' onClick={() => dispatch(addPolicyItem({ policyIndex }))} className="mr-2">Add Item</Button>
-                    <Button onClick={() => handleRemovePolicy(policyIndex)} className="bg-red-500 text-white">Remove Policy</Button>
-                  </div>
-                ))}
-                <Button onClick={() => dispatch(addPolicy())} className="mt-2 bg-color1 text-white hover:bg-color2 transition">Add Policy</Button>
-                <Button onClick={() => handleSavePolicies()} className="mt-2 bg-color1 text-white hover:bg-color2 transition">
-                  Save
-                </Button>
-              </CardBody>
-              
-            </Card>
-          </Tab>
-
-          <Tab key="Location" title="Location">
-            <Card>
-              <CardBody>
-                <div className="flex flex-col gap-4">
-                  <h2 className="text-lg lg:text-xl font-semibold text-gray-700">Business Location</h2>
-                  
-                  {/* Map Container */}
-                  <div className="w-full h-full rounded-lg">
-                    {/* Placeholder for the actual map implementation */}
-                      <MapPicker
-                        setLatitude={handleLatitudeChange}
-                        setLongitude={handleLongitudeChange}
-                      />
-                  </div>
-
-                  {/* Location Controls */}
-                  <div className="flex flex-col gap-3">
-                    <div className="flex gap-3">
-                    <Select
-                      label="Address"
-                      placeholder="Select address"
-                      className="flex-1"
-                      selectedKeys={new Set([address])} // Use `selectedKeys` for controlled selection
-                      onSelectionChange={(key) => setAddress(key.currentKey)} // Update state with the selected key
-                    >
-                      {municipalities.map((municipality) => (
-                        <SelectItem key={municipality} value={municipality}>
-                          {municipality}
-                        </SelectItem>
-                      ))}
-                    </Select>
                     </div>
-                    
-                    <div className="flex gap-3">
-                      <Button 
-                        className="flex-1 bg-color1 text-white hover:bg-color2 transition"
-                        onClick={() => handleSaveLocation()}
-                      >
-                        Save Location
-                      </Button>
+
+                    {/* Location Preview */}
+                    <div className="mt-4">
+                      <h3 className="text-md font-semibold mb-2">Current Coordinate Location</h3>
+                      <div className="p-3 bg-gray-50 rounded-lg">
+                        <p className="text-sm text-gray-600">
+                          Latitude: {latitude}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          Longitude: {longitude}
+                        </p>
+                      </div>
                     </div>
                   </div>
+                </CardBody>
+              </Card>
+            </Tab>
+          </Tabs>
+          
+        )}
 
-                  {/* Location Preview */}
-                  <div className="mt-4">
-                    <h3 className="text-md font-semibold mb-2">Current Coordinate Location</h3>
-                    <div className="p-3 bg-gray-50 rounded-lg">
-                      <p className="text-sm text-gray-600">
-                        Latitude: {latitude}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        Longitude: {longitude}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </CardBody>
-            </Card>
-          </Tab>
-        </Tabs>
       </div>
 
       <Modal 

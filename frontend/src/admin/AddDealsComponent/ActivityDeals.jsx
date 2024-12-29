@@ -44,14 +44,6 @@ const ActivityDeals = () => {
     dispatch(fetchDeals()).then(() => setLoading(false));
   }, [dispatch]);
 
-  if (loading) {
-    return <div>Loading activities...</div>;
-  }
-
-  if (status === 'loading') {
-    return <div>Loading activities...</div>;
-  }
-
   if (status === 'failed') {
     return <div>Error: {error}</div>;
   }

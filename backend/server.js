@@ -1717,17 +1717,20 @@ app.get('/getAllBusinessProduct', async (req, res) => {
   const sql = `
     SELECT 
         products.*, 
-        MAX(COALESCE(deals.discount, 0)) AS discount, 
-        MAX(COALESCE(deals.expirationDate, 'No Expiration')) AS expiration,
+        MAX(deals.discount) AS discount, 
+        MAX(deals.expirationDate) AS expiration,
         AVG(r.ratings) AS rating
     FROM 
         products
     LEFT JOIN 
         deals 
     ON 
-        products.product_id = deals.product_id
+        products.product_id = deals.product_id 
+        AND (deals.expirationDate IS NULL OR deals.expirationDate > NOW())
     LEFT JOIN
-        product_ratings r ON products.product_id = r.product_id
+        product_ratings r 
+    ON 
+        products.product_id = r.product_id
     GROUP BY 
         products.product_id
     ORDER BY 

@@ -128,10 +128,6 @@ const AccommodationSection = () => {
     dispatch(fetchBusinessProducts());
   }, [dispatch]);
 
-  if (status === 'loading') {
-    return <div>Loading accommodations...</div>;
-  }
-
   if (status === 'failed') {
     return <div>Error: {error}</div>;
   }

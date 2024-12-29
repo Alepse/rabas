@@ -24,6 +24,7 @@ import { today, getLocalTimeZone } from '@internationalized/date';
 import { MdPeople, MdEmail, MdPhone, MdDateRange, MdHotel, MdRestaurant, MdDirectionsRun, MdCheck, MdDone, MdClose } from 'react-icons/md';
 import Swal from 'sweetalert2';
 import axios from 'axios';
+import { Skeleton } from "@nextui-org/skeleton";
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
@@ -584,6 +585,7 @@ const BookingForm = ({ isOpen, onClose, title, products, onSubmit, type }) => {
 
 // Main business booking component
 const BusinessBooking = () => {
+  const [loading, setLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(true);
   // Function to check login status
   const checkLoginStatus = useCallback(async () => {
@@ -612,7 +614,7 @@ const BusinessBooking = () => {
   }, [checkLoginStatus]);
 
   const dispatch = useDispatch();
-  const [isLoading, setIsLoading] = useState(false);
+  const bookingIsLoading = useSelector(state => state.bookings.loading);
   const pendingBookings = useSelector(state => state.bookings.pendingBookings);
   const activeBookings = useSelector(state => state.bookings.activeBookings);
   const declinedBookings = useSelector(state => state.bookings.declinedBookings);
@@ -718,7 +720,6 @@ const BusinessBooking = () => {
 
   const handleAcceptBooking = async (bookingId) => {
     try {
-      setIsLoading(true);
   
       // Fetch user data to get the user_id
       const userResponse = await axios.get(`${BASE_URL}/get-userData`, { withCredentials: true });
@@ -776,7 +777,6 @@ const BusinessBooking = () => {
 
   const handleMarkAsCompleted = async (bookingId) => {
     try {
-      setIsLoading(true);
       const response = await fetch(`${BASE_URL}/update-booking-status/${bookingId}`, {
         method: 'PUT',
         credentials: 'include',
@@ -855,95 +855,104 @@ const BusinessBooking = () => {
         </button></div>
         </div>
 
-        <div className="overflow-x-auto scrollbar-custom">
-        
-          <Tabs keepMounted variant="solid" className="sticky top-0 z-10 bg-gray-50 flex flex-wrap">
-         
-            <Tab title="Pending Bookings" className="flex-1 min-w-[150px]">
+        {bookingIsLoading ?
+        (
+          <div className="py-8">
+              <Skeleton className="rounded-lg mb-4 p-4 w-[40%]" />
+              <Skeleton className="rounded-lg mb-4 p-4 w-[60%]" />
+            <div className="max-h-[820px] w-full h-full rounded-xl shadow-gray-400 shadow-lg bg-white">
+              <Skeleton className="w-full h-[480px] md:h-[600] rounded-t-lg overflow-hidden" />
+            </div>
+          </div>
+        ) : (
+        <>
+          <div className="overflow-x-auto scrollbar-custom">
           
-              <BookingSection
-                title="New Bookings"
-                bookings={pendingBookings}
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-                openChatModal={openChatModal}
-                filteredBookingsByType={filteredBookingsByType}
-                onAcceptBooking={handleAcceptBooking}
-              />
-              
-            </Tab>
-
-            <Tab title="Active Bookings" className="flex-1 min-w-[150px]">
-              <BookingSection
-                title="Current Bookings"
-                bookings={activeBookings}
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-                openChatModal={openChatModal}
-                onMarkAsCompleted={handleMarkAsCompleted}
-                filteredBookingsByType={filteredBookingsByType}
-              />
-            </Tab>
-
-            <Tab title="Declined Bookings" className="flex-1 min-w-[150px]">
-              <BookingSection
-                title="Current Bookings"
-                bookings={declinedBookings}
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-                openChatModal={openChatModal}
-                onMarkAsCompleted={handleMarkAsCompleted}
-                filteredBookingsByType={filteredBookingsByType}
-              />
-            </Tab>
-
-            <Tab title="Booking History" className="flex-1 min-w-[150px]">
-              <BookingSection
-                title="Completed Bookings"
-                bookings={bookingHistory}
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-                openChatModal={openChatModal}
-                filteredBookingsByType={filteredBookingsByType}
-              />
-              {walkInHistory && (
-                <>
-                  <WalkInHistorySection
-                    title="Walk-In Accommodation History"
-                    history={walkInHistory}
-                    type="Accommodation"
-                    searchQuery={walkInSearchQuery}
-                  />
-                  <WalkInHistorySection
-                    title="Walk-In Table Reservation History"
-                    history={walkInHistory}
-                    type="Table Reservation"
-                    searchQuery={walkInSearchQuery}
-                  />
-                  <WalkInHistorySection
-                    title="Walk-In Attraction History"
-                    history={walkInHistory}
-                    type="Attraction"
-                    searchQuery={walkInSearchQuery}
-                  />
-                </>
-              )}
-            </Tab>
-
-            <Tab title="Walk In Customers" className="flex-1 min-w-[150px]">
-              <WalkInCustomersSection
-                setAccommodationFormOpen={setAccommodationFormOpen}
-                setTableReservationFormOpen={setTableReservationFormOpen}
-                setAttractionActivitiesFormOpen={setAttractionActivitiesFormOpen}
-              />
-            </Tab>
-          </Tabs>
+            <Tabs keepMounted variant="solid" className="sticky top-0 z-10 bg-gray-50 flex flex-wrap">
           
-        </div>
+              <Tab title="Pending Bookings" className="flex-1 min-w-[150px]">
+            
+                <BookingSection
+                  title="New Bookings"
+                  bookings={pendingBookings}
+                  searchQuery={searchQuery}
+                  setSearchQuery={setSearchQuery}
+                  openChatModal={openChatModal}
+                  filteredBookingsByType={filteredBookingsByType}
+                  onAcceptBooking={handleAcceptBooking}
+                />
+                
+              </Tab>
 
-       
-       
+              <Tab title="Active Bookings" className="flex-1 min-w-[150px]">
+                <BookingSection
+                  title="Current Bookings"
+                  bookings={activeBookings}
+                  searchQuery={searchQuery}
+                  setSearchQuery={setSearchQuery}
+                  openChatModal={openChatModal}
+                  onMarkAsCompleted={handleMarkAsCompleted}
+                  filteredBookingsByType={filteredBookingsByType}
+                />
+              </Tab>
 
+              <Tab title="Declined Bookings" className="flex-1 min-w-[150px]">
+                <BookingSection
+                  title="Current Bookings"
+                  bookings={declinedBookings}
+                  searchQuery={searchQuery}
+                  setSearchQuery={setSearchQuery}
+                  openChatModal={openChatModal}
+                  onMarkAsCompleted={handleMarkAsCompleted}
+                  filteredBookingsByType={filteredBookingsByType}
+                />
+              </Tab>
+
+              <Tab title="Booking History" className="flex-1 min-w-[150px]">
+                <BookingSection
+                  title="Completed Bookings"
+                  bookings={bookingHistory}
+                  searchQuery={searchQuery}
+                  setSearchQuery={setSearchQuery}
+                  openChatModal={openChatModal}
+                  filteredBookingsByType={filteredBookingsByType}
+                />
+                {walkInHistory && (
+                  <>
+                    <WalkInHistorySection
+                      title="Walk-In Accommodation History"
+                      history={walkInHistory}
+                      type="Accommodation"
+                      searchQuery={walkInSearchQuery}
+                    />
+                    <WalkInHistorySection
+                      title="Walk-In Table Reservation History"
+                      history={walkInHistory}
+                      type="Table Reservation"
+                      searchQuery={walkInSearchQuery}
+                    />
+                    <WalkInHistorySection
+                      title="Walk-In Attraction History"
+                      history={walkInHistory}
+                      type="Attraction"
+                      searchQuery={walkInSearchQuery}
+                    />
+                  </>
+                )}
+              </Tab>
+
+              <Tab title="Walk In Customers" className="flex-1 min-w-[150px]">
+                <WalkInCustomersSection
+                  setAccommodationFormOpen={setAccommodationFormOpen}
+                  setTableReservationFormOpen={setTableReservationFormOpen}
+                  setAttractionActivitiesFormOpen={setAttractionActivitiesFormOpen}
+                />
+              </Tab>
+            </Tabs>
+            
+          </div>
+        </>
+        )}
         <ChatModal
         disableAnimation
           isOpen={isChatModalVisible}

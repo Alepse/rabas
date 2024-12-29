@@ -132,10 +132,6 @@ const RestaurantSection = () => {
     dispatch(fetchBusinessProducts());
   }, [dispatch]);
 
-  if (status === 'loading') {
-    return <div>Loading restaurants...</div>;
-  }
-
   if (status === 'failed') {
     return <div>Error: {error}</div>;
   }

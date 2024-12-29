@@ -311,10 +311,8 @@ const Nav = () => {
 
   const handleScroll = () => {
     if (window.scrollY > 500) {
-      setShowSearchBar(true);
-    } else {
-      setShowSearchBar(false);
-    }
+      setIsMenuOpen(false);
+    } 
   };
 
   const handleResize = () => {

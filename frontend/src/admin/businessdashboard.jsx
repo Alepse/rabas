@@ -6,6 +6,7 @@ import { AiFillStar } from 'react-icons/ai';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+import { Skeleton } from "@nextui-org/skeleton";
 import axios from 'axios';
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
@@ -28,6 +29,7 @@ const reviewData = [
 ];
 
 const BusinessDashboard = () => {
+  const [loading, setLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [businessProducts, setBusinessProducts] = useState([]);
   const [productsWithActiveDeals, setProductsWithActiveDeals] = useState([]);
@@ -51,63 +53,43 @@ const BusinessDashboard = () => {
     return averageRating;
   };
 
-  // Fetching business products
   useEffect(() => {
-    const fetchBusinessProducts = async () => {
+    const fetchAllData = async () => {
       if (isLoggedIn) {
         try {
-          const response = await axios.get(`${BASE_URL}/getProducts`, {
-            withCredentials: true,
-          });
-          const products = await response.data.businessProducts;
-          setBusinessProducts(products);         
-        } catch (error) {
-          console.error('Error fetching business data:', error);
-        }
-      }
-    };
-    fetchBusinessProducts();
-  }, [isLoggedIn]);
-
-  // Fetching products with active deals
-  useEffect(() => {
-    const fetchProductsWithActiveDeals = async () => {
-      if (isLoggedIn) {
-        try {
-          const response = await axios.get(`${BASE_URL}/getProductsWithActiveDeals`, {
-            withCredentials: true,
-          });
-          const data = await response.data.productsWithDeals;
-          setProductsWithActiveDeals(data);         
-        } catch (error) {
-          console.error('Error fetching business data:', error);
-        }
-      }
-    };
-    fetchProductsWithActiveDeals();
-  }, [isLoggedIn]);
-
-  // Fetching most reviewed products and calculating average rating
-  useEffect(() => {
-    const fetchMostReviewedProducts = async () => {
-      if (isLoggedIn) {
-        try {
-          const response = await axios.get(`${BASE_URL}/getMostReviewedProducts`, {
-            withCredentials: true,
-          });
-          const data = await response.data.products;
-          setMostReviewedProducts(data);
-
+  
+          // Execute all fetch operations concurrently
+          const [productsResponse, activeDealsResponse, mostReviewedResponse] = await Promise.all([
+            axios.get(`${BASE_URL}/getProducts`, { withCredentials: true }),
+            axios.get(`${BASE_URL}/getProductsWithActiveDeals`, { withCredentials: true }),
+            axios.get(`${BASE_URL}/getMostReviewedProducts`, { withCredentials: true }),
+          ]);
+  
+          // Process the fetched data
+          const products = productsResponse.data.businessProducts;
+          const activeDeals = activeDealsResponse.data.productsWithDeals;
+          const mostReviewed = mostReviewedResponse.data.products;
+          // console.log(products);
+          // Update state with the fetched data
+          setBusinessProducts(products);
+          setProductsWithActiveDeals(activeDeals);
+          setMostReviewedProducts(mostReviewed);
+  
           // Calculate and set average rating for most reviewed products
-          const avgRating = calculateAverageRating(data);
-          setAverageRating(avgRating);         
+          const avgRating = calculateAverageRating(mostReviewed);
+          setAverageRating(avgRating);
         } catch (error) {
           console.error('Error fetching business data:', error);
+        } finally {
+          // Ensure loading state is updated regardless of success or failure
+          setLoading(false);
         }
       }
     };
-    fetchMostReviewedProducts();
+  
+    fetchAllData();
   }, [isLoggedIn]);
+  
 
   // console.log("produysss", businessProducts);
 
@@ -119,6 +101,23 @@ const BusinessDashboard = () => {
   return (
     <div className="flex max-lg:flex-col min-h-screen bg-gray-50 font-sans">
       <Sidebar />
+      {loading ?
+      (
+        <div className="flex-1 p-4 md:p-6 lg:p-8 max-h-screen overflow-y-auto">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-8 text-gray-800">Dashboard</h1>
+          <div className="py-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              <Skeleton className="rounded-lg h-40 "/>
+              <Skeleton className="rounded-lg h-40 "/>
+              <Skeleton className="rounded-lg h-40 "/>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <Skeleton className="rounded-lg h-[400px] md:h-[500px] w-full "/>
+            <Skeleton className="rounded-lg h-[400px] md:h-[500px] w-full "/>
+            </div>
+          </div>
+        </div>
+      ) : (     
       <div className="flex-1 p-4 md:p-6 lg:p-8 max-h-screen overflow-y-auto">
         <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-8 text-gray-800">Dashboard</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
@@ -200,6 +199,8 @@ const BusinessDashboard = () => {
           <AllProducts products={businessProducts} />
         </div>
       </div>
+      )
+    }
     </div>
   );
 };
@@ -315,7 +316,7 @@ const MostReviewedProducts = ({ products }) => {
 const OngoingDeals = ({ deals }) => {
   const settings = {
     dots: true,
-    infinite: deals.length >1 ,
+    infinite: deals.length > 1 ,
     speed: 500,
     slidesToShow: Math.min(3, deals.length),
     slidesToScroll: Math.min(3, deals.length),

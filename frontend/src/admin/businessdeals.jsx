@@ -7,11 +7,13 @@ import RestaurantDeals from '@/admin/AddDealsComponent/RestaurantDeals';
 import ShopDeals from '@/admin/AddDealsComponent/ShopDeals';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { Skeleton } from "@nextui-org/skeleton";
 
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const BusinessDeals = () => {
+  const [loading, setLoading] = useState(true);
   const [showActivities, setShowActivities] = useState(false);
   const [showAccommodation, setShowAccommodation] = useState(false);
   const [showRestaurantServices, setShowRestaurantServices] = useState(false);
@@ -90,6 +92,8 @@ const BusinessDeals = () => {
           }
         } catch (error) {
           console.error('Error fetching business data:', error);
+        } finally {
+          setLoading(false);
         }
       }
     };
@@ -116,72 +120,85 @@ const BusinessDeals = () => {
           </h1>
         </div>
 
-        {/* Deals Toggle */}
-        <div className="mb-6">
-          <h2 className="text-lg font-semibold text-gray-700 mb-4">Switch on Deals to Add Your Deals:</h2>
-          <div className="flex flex-col sm:flex-row gap-4">
-            {/* Activity Deals Switch */}
-            <Switch
-              color="success"
-              isSelected={showActivities}
-              onChange={(e) =>
-                businessType === 'attraction'
-                  ? setShowActivities(e.target.checked)
-                  : showWarningPopup('Activity')
-              }
-            >
-              <span className="font-semibold text-md">Activity Deals</span>
-            </Switch>
-
-            {/* Accommodation Deals Switch */}
-            <Switch
-              color="success"
-              isSelected={showAccommodation}
-              onChange={(e) =>
-                businessType === 'accommodation'
-                  ? setShowAccommodation(e.target.checked)
-                  : showWarningPopup('Accommodation')
-              }
-            >
-              <span className="font-semibold text-md">Accommodation Deals</span>
-            </Switch>
-
-            {/* Restaurant Deals Switch */}
-            <Switch
-              color="success"
-              isSelected={showRestaurantServices}
-              onChange={(e) =>
-                businessType === 'restaurant'
-                  ? setShowRestaurantServices(e.target.checked)
-                  : showWarningPopup('Restaurant')
-              }
-            >
-              <span className="font-semibold text-md">Restaurant Deals</span>
-            </Switch>
-
-            {/* Shop Deals Switch */}
-            <Switch
-              color="success"
-              isSelected={showShop}
-              onChange={(e) =>
-                businessType === 'shop'
-                  ? setShowShop(e.target.checked)
-                  : showWarningPopup('Shop')
-              }
-            >
-              <span className="font-semibold text-md">Shop Deals</span>
-            </Switch>
+        {loading ?
+        (
+          <div className="py-8">
+            <Skeleton className="rounded-lg mb-4 p-4 w-[40%]" />
+            <Skeleton className="rounded-lg mb-4 p-4 w-[60%]" />
+            <div className="max-h-[820px] w-full h-full rounded-xl shadow-gray-400 shadow-lg bg-white">
+              <Skeleton className="w-full h-[480px] md:h-[600] rounded-t-lg overflow-hidden" />
+            </div>
           </div>
-        </div>
+        ) : (
+        <>
+          {/* Deals Toggle */}
+          <div className="mb-6">
+            <h2 className="text-lg font-semibold text-gray-700 mb-4">Switch on Deals to Add Your Deals:</h2>
+            <div className="flex flex-col sm:flex-row gap-4">
+              {/* Activity Deals Switch */}
+              <Switch
+                color="success"
+                isSelected={showActivities}
+                onChange={(e) =>
+                  businessType === 'attraction'
+                    ? setShowActivities(e.target.checked)
+                    : showWarningPopup('Activity')
+                }
+              >
+                <span className="font-semibold text-md">Activity Deals</span>
+              </Switch>
 
-        {/* Deals of business products and services */}
-        <div className="w-full flex flex-wrap gap-6">
-          {/* Conditionally render deal components based on toggle states */}
-          {showActivities && <ActivityDeals />}
-          {showAccommodation && <AccommodationDeals />}
-          {showRestaurantServices && <RestaurantDeals />}
-          {showShop && <ShopDeals />}
-        </div>
+              {/* Accommodation Deals Switch */}
+              <Switch
+                color="success"
+                isSelected={showAccommodation}
+                onChange={(e) =>
+                  businessType === 'accommodation'
+                    ? setShowAccommodation(e.target.checked)
+                    : showWarningPopup('Accommodation')
+                }
+              >
+                <span className="font-semibold text-md">Accommodation Deals</span>
+              </Switch>
+
+              {/* Restaurant Deals Switch */}
+              <Switch
+                color="success"
+                isSelected={showRestaurantServices}
+                onChange={(e) =>
+                  businessType === 'restaurant'
+                    ? setShowRestaurantServices(e.target.checked)
+                    : showWarningPopup('Restaurant')
+                }
+              >
+                <span className="font-semibold text-md">Restaurant Deals</span>
+              </Switch>
+
+              {/* Shop Deals Switch */}
+              <Switch
+                color="success"
+                isSelected={showShop}
+                onChange={(e) =>
+                  businessType === 'shop'
+                    ? setShowShop(e.target.checked)
+                    : showWarningPopup('Shop')
+                }
+              >
+                <span className="font-semibold text-md">Shop Deals</span>
+              </Switch>
+            </div>
+          </div>
+
+          {/* Deals of business products and services */}
+          <div className="w-full flex flex-wrap gap-6">
+            {/* Conditionally render deal components based on toggle states */}
+            {showActivities && <ActivityDeals />}
+            {showAccommodation && <AccommodationDeals />}
+            {showRestaurantServices && <RestaurantDeals />}
+            {showShop && <ShopDeals />}
+          </div>
+        </>
+        )}
       </div>
     </div>
   );

@@ -129,10 +129,6 @@ const ShopSections = () => {
     dispatch(fetchBusinessProducts());
   }, [dispatch]);
 
-  if (status === 'loading') {
-    return <div>Loading shop products...</div>;
-  }
-
   if (status === 'failed') {
     return <div>Error: {error}</div>;
   }

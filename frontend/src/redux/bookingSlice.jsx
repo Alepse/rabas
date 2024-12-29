@@ -10,7 +10,7 @@ const initialState = {
   chatMessages: [],
   activeWalkInCustomers: [],
   walkInHistory: [],
-  loading: false,
+  loading: true,
   error: null
 };
 

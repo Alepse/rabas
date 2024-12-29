@@ -7,11 +7,13 @@ import RestaurantServicesSection from './AddProductsComponent/RestaurantServices
 import ShopSections from './AddProductsComponent/ShopSections';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { Skeleton } from "@nextui-org/skeleton";
 
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const BusinessProducts = () => {
+  const [loading, setLoading] = useState(true);
   const [showActivities, setShowActivities] = useState(false);
   const [showAccommodation, setShowAccommodation] = useState(false);
   const [showRestaurantServices, setShowRestaurantServices] = useState(false);
@@ -90,6 +92,8 @@ const BusinessProducts = () => {
           }
         } catch (error) {
           console.error('Error fetching business data:', error);
+        } finally {
+          setLoading(false);
         }
       }
     };
@@ -118,67 +122,80 @@ const BusinessProducts = () => {
           </h1>
         </div>
 
-        {/* Sections Toggle */}
-        <div className="mb-6">
-          <h2 className="text-md font-semibold text-gray-700 mb-4">Switch on Sections to Add Products and Services:</h2>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Switch
-              color="success"
-              isSelected={showActivities}
-              onChange={(e) =>
-                businessType === 'attraction'
-                  ? setShowActivities(e.target.checked)
-                  : showWarningPopup('Activity')
-              }
-            >
-              <span className="font-semibold text-md">Activities</span>
-            </Switch>
-
-            <Switch
-              color='success'
-              isSelected={showAccommodation}
-              onChange={(e) =>
-                businessType === 'accommodation'
-                  ? setShowAccommodation(e.target.checked)
-                  : showWarningPopup('Accommodation')
-              }
-            >
-              <span className="font-semibold text-md">Accommodation</span>
-            </Switch>
-
-            <Switch
-              color='success'
-              isSelected={showRestaurantServices}
-              onChange={(e) =>
-                businessType === 'restaurant'
-                  ? setShowRestaurantServices(e.target.checked)
-                  : showWarningPopup('Restaurant')
-              }
-            >
-              <span className="font-semibold text-md">Restaurant Services</span>
-            </Switch>
-
-            <Switch
-              color='success'
-              isSelected={showShop}
-              onChange={(e) =>
-                businessType === 'shop'
-                  ? setShowShop(e.target.checked)
-                  : showWarningPopup('Shop')
-              }
-            >
-              <span className="font-semibold text-md">Shop</span>
-            </Switch>
+        {loading ?
+        (
+          <div className="py-8">
+             <Skeleton className="rounded-lg mb-4 p-4 w-[40%]" />
+             <Skeleton className="rounded-lg mb-4 p-4 w-[60%]" />
+            <div className="max-h-[820px] w-full h-full rounded-xl shadow-gray-400 shadow-lg bg-white">
+              <Skeleton className="w-full h-[480px] md:h-[600] rounded-t-lg overflow-hidden" />
+            </div>
           </div>
-        </div>
+        ) : (
+        <>
+          {/* Sections Toggle */}
+          <div className="mb-6">
+            <h2 className="text-md font-semibold text-gray-700 mb-4">Switch on Sections to Add Products and Services:</h2>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Switch
+                color="success"
+                isSelected={showActivities}
+                onChange={(e) =>
+                  businessType === 'attraction'
+                    ? setShowActivities(e.target.checked)
+                    : showWarningPopup('Activity')
+                }
+              >
+                <span className="font-semibold text-md">Activities</span>
+              </Switch>
 
-        {/* Sections of business products and services */}
-        <div className="w-full flex flex-wrap gap-6">
-          {showActivities && <ActivitySections />}
-          {showAccommodation && <AccommodationSection />}
-          {showRestaurantServices && <RestaurantServicesSection />}
-          {showShop && <ShopSections />}
-        </div>
+              <Switch
+                color='success'
+                isSelected={showAccommodation}
+                onChange={(e) =>
+                  businessType === 'accommodation'
+                    ? setShowAccommodation(e.target.checked)
+                    : showWarningPopup('Accommodation')
+                }
+              >
+                <span className="font-semibold text-md">Accommodation</span>
+              </Switch>
+
+              <Switch
+                color='success'
+                isSelected={showRestaurantServices}
+                onChange={(e) =>
+                  businessType === 'restaurant'
+                    ? setShowRestaurantServices(e.target.checked)
+                    : showWarningPopup('Restaurant')
+                }
+              >
+                <span className="font-semibold text-md">Restaurant Services</span>
+              </Switch>
+
+              <Switch
+                color='success'
+                isSelected={showShop}
+                onChange={(e) =>
+                  businessType === 'shop'
+                    ? setShowShop(e.target.checked)
+                    : showWarningPopup('Shop')
+                }
+              >
+                <span className="font-semibold text-md">Shop</span>
+              </Switch>
+            </div>
+          </div>
+
+          {/* Sections of business products and services */}
+          <div className="w-full flex flex-wrap gap-6">
+            {showActivities && <ActivitySections />}
+            {showAccommodation && <AccommodationSection />}
+            {showRestaurantServices && <RestaurantServicesSection />}
+            {showShop && <ShopSections />}
+          </div>
+        </>
+        )}
       </div>
     </div>
   );
