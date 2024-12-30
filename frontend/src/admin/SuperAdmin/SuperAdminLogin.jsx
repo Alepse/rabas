@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Input, Button } from '@nextui-org/react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import Logo2 from '../../assets/rabas.png';
@@ -8,10 +8,37 @@ import { useNavigate } from 'react-router-dom';
 const BASE_URL = import.meta.env.VITE_BASE_URL; // Base API URL
 
 const SuperAdminLogin = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [identifier, setIdentifier] = useState(''); // Username/Email
   const [password, setPassword] = useState(''); // Password
   const [showPassword, setShowPassword] = useState(false); // Toggle password visibility
   const navigate = useNavigate();
+
+  // Function to check login status
+  const checkLoginStatus = useCallback(async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/superadmin/check-login`, {
+        method: 'GET',
+        credentials: 'include', // Include cookies
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setIsLoggedIn(data.isLoggedIn); // Set login status
+
+        if (data.isLoggedIn) {
+          window.location.href = '/superadmindashboard';
+        } 
+      } else {
+        setIsLoggedIn(false);
+      }
+    } catch (error) {
+      console.error('Error checking login status:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    checkLoginStatus();
+  }, []);  
 
   const handleLogin = async (event) => {
     event.preventDefault();

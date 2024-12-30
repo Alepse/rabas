@@ -5,6 +5,12 @@ import { RiUserLine } from 'react-icons/ri';
 import { FaBox, FaCar, FaBars, FaTimes } from 'react-icons/fa';
 import { MdDomainVerification } from "react-icons/md";
 import { TbReport } from "react-icons/tb";
+import { Button } from '@nextui-org/react';
+import { CgLogOut } from "react-icons/cg";
+import axios from 'axios';
+
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 const SuperAdminSidebar = () => {
   const [activeNav, setActiveNav] = useState('Dashboard');
@@ -28,6 +34,22 @@ const SuperAdminSidebar = () => {
       setActiveNav(currentItem.label);
     }
   }, [location]);
+
+  const handleLogout = (e) => {
+    e.preventDefault();
+    axios.post(`${BASE_URL}/superadmin/logout`, {}, { withCredentials: true })
+      .then(response => {
+        if (response.status === 200) {
+          console.log('Logout successful');
+          window.location.href = '/superadminlogin';
+        } else {
+          console.error('Logout failed');
+        }
+      })
+      .catch(error => {
+        console.error('Error logging out:', error.response ? error.response.data.message : 'An unknown error occurred');
+      });
+  };
 
   return (
     <div className="">
@@ -77,6 +99,15 @@ const SuperAdminSidebar = () => {
               ))}
             </ul>
           </nav>
+        </div>
+
+        <div className="flex flex-col gap-2 mt-9 items-center">
+          <Button 
+            className="bg-red-500 text-white font-medium w-full flex items-center justify-center gap-2"
+            onClick={handleLogout}
+          >
+            <CgLogOut /> Logout
+          </Button>
         </div>
 
       

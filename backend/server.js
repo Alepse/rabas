@@ -224,6 +224,22 @@ app.get('/superadmin/check-login', async (req, res) => {
   }
 });
 
+// Endpoint for admin logout
+app.post('/superadmin/logout', (req, res) => {
+  if (req.session && req.session.admin) {
+    delete req.session.admin; // Remove only the admin data from the session
+
+    req.session.save((err) => {
+      if (err) {
+        return res.status(500).json({ success: false, message: 'Could not log out the admin session' });
+      }
+      res.json({ success: true, message: 'Admin logout successful' });
+    });
+  } else {
+    res.status(400).json({ success: false, message: 'No admin session found to log out' });
+  }
+});
+
 // User Login Endpoint
 app.post('/login', async (req, res) => {
   const { identifier, password } = req.body; // Use 'identifier' to accept either username or email
@@ -967,13 +983,18 @@ app.post('/reset-password/:token', async (req, res) => {
 
 // Endpoint for user logout
 app.post('/logout', (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      return res.status(500).json({ success: false, message: 'Could not log out' });
-    }
-    res.clearCookie('connect.sid'); // Clear the cookie
-    res.json({ success: true, message: 'Logout successful' });
-  });
+  if (req.session && req.session.user) {
+    delete req.session.user; // Remove only the user data from the session
+
+    req.session.save((err) => {
+      if (err) {
+        return res.status(500).json({ success: false, message: 'Could not log out the user session' });
+      }
+      res.json({ success: true, message: 'User logout successful' });
+    });
+  } else {
+    res.status(400).json({ success: false, message: 'No user session found to log out' });
+  }
 });
 
 // Admin Login Endpoint
