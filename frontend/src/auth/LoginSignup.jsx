@@ -58,23 +58,13 @@ const LoginSignup = () => {
       });
       const data = await response.json();
       if (data.success) {
-        Swal.fire({
-          title: 'Login Successful!',
-          text: ' ',
-          icon: 'success',
-          showConfirmButton: false,
-          timer: 1500,
-        }).then(() => {         
-          window.location.href = '/'; // Redirect to home page after the alert is closed
-        });
+        setOtpSession(data.sessionId); // Save OTP session ID
+        console.log('OtpSession saved', data);
+        setView("loginotp"); // Redirect to OTP view
+        Swal.fire('OTP Sent!', 'Check your email for the OTP.', 'success');
+        setIsOtpSent(true); //
       } else {
-        Swal.fire({
-          title: 'Login Failed!',
-          text: 'Invalid username or password',
-          icon: 'error',
-          showConfirmButton: false,
-          timer: 2000,
-        });
+        Swal.fire('Login Failed!', data.error, 'error');
       }
     } catch (error) {
       console.error('Error:', error); 
@@ -126,12 +116,36 @@ const LoginSignup = () => {
     }
   };
 
+  const handleLoginOtpVerification = async (event) => {
+    event.preventDefault();
+    try {
+      const response = await fetch(`${BASE_URL}/login-verify-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ otp, sessionId: otpSession })
+      });
+      const data = await response.json();
+      if (data.success) {
+        Swal.fire('Verification Successful!', 'You are now signed up.', 'success').then(() => {
+          window.location.href = '/';
+        });
+      } else {
+        Swal.fire('Verification Failed!', data.error, 'error');
+      }
+    } catch (error) {
+      console.error(error);
+      Swal.fire('Error!', 'An error occurred. Please try again.', 'error');
+    }
+  };
+
   const handleOtpVerification = async (event) => {
     event.preventDefault();
     try {
       const response = await fetch(`${BASE_URL}/verify-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ otp, sessionId: otpSession })
       });
       const data = await response.json();
@@ -435,6 +449,39 @@ const LoginSignup = () => {
     </div>
   );
 
+  // Render OTP form
+  const renderLoginOtpForm = () => (
+    <div className="flex flex-col gap-4">
+      <h1 className="font-font1 text-center text-2xl mb-4">Enter OTP</h1>
+      <form onSubmit={handleLoginOtpVerification} className="flex flex-col gap-4">
+        <Input
+          label="OTP"
+          type="text"
+          value={otp}
+          onChange={(e) => setOtp(e.target.value)}
+          required
+        />
+        <Button type="submit" color="primary" className="hover:bg-color2" fullWidth>
+          Verify OTP
+        </Button>
+      </form>
+
+      {/* Resend OTP button */}
+      {isOtpSent && (
+        <div className="mt-4 text-center">
+          <Button 
+            onClick={handleLogin} 
+            color="secondary" 
+            className="hover:bg-color2"
+            fullWidth
+          >
+            Resend OTP
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+
   const renderForgotPasswordForm = () => (
     <div className="flex flex-col gap-4">
       <button
@@ -464,6 +511,8 @@ const LoginSignup = () => {
     <div className="container mx-auto flex justify-center items-center min-h-screen">
       {view === "otp" ? (
         renderOtpForm()
+      ) : view === "loginotp" ? (
+        renderLoginOtpForm()
       ) : view === "signup" ? (
         renderSignupForm()
       ) : view === "login" ? (

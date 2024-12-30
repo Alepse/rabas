@@ -266,9 +266,41 @@ app.post('/login', async (req, res) => {
       // Compare the provided password with the hashed password from the database
       const passwordMatch = await bcrypt.compare(password, user.password);
       if (passwordMatch) {
+
+        // Generate OTP and session ID
+        const otp = Math.floor(100000 + Math.random() * 900000); // 6-digit OTP
+        const sessionId = crypto.randomBytes(16).toString('hex'); // Unique session ID
+
+        // Save all user data along with OTP and session ID to the `otp_sessions` table
+        const otpSql = `
+          INSERT INTO otp_sessions (session_id, user_id, email, otp, expires_at)
+          VALUES (?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 10 MINUTE))
+        `;
+        await pool.query(otpSql, [sessionId, user.user_id, user.email, otp]);
+
+        // Send OTP to the user's email
+        const transporter = nodemailer.createTransport({
+          service: 'Gmail', // Replace with your email service provider
+          auth: {
+            user: process.env.GMAIL_USER, // Your email address
+            pass: process.env.GMAIL_PASS  // Your email password
+          }
+        });
+
+        await transporter.sendMail({
+          from: '"RabaSorsogon Support" <support@rabasorsogon.com>',
+          to: user.email,
+          subject: 'Your OTP Code for Login',
+          text: `Your OTP code is ${otp}. It will expire in 10 minutes.`
+        });
+
         // Set the user session
-        req.session.user = { user_id: user.user_id };
-        return res.json({ success: true, message: 'Login successful' });
+        // req.session.user = { user_id: user.user_id };
+        return res.json({ 
+          success: true, 
+          message: 'Login successful. Please verify your OTP.',
+          sessionId: sessionId
+        });
       } else {
         return res.status(401).json({ success: false, message: 'Invalid password' });
       }
@@ -281,9 +313,59 @@ app.post('/login', async (req, res) => {
   }
 });
 
+// Verify OTP Endpoint
+app.post('/login-verify-otp', async (req, res) => {
+  const { otp, sessionId } = req.body;
+
+  // Validate input
+  if (!otp) {
+    return res.status(400).json({ success: false, error: 'OTP are required' });
+  }
+  if (!sessionId) {
+    return res.status(400).json({ success: false, error: 'Session ID are required' });
+  }
+
+  try {
+    // Query to validate OTP and session ID
+    const otpSql = `
+      SELECT * 
+      FROM otp_sessions 
+      WHERE session_id = ? 
+        AND otp = ? 
+        AND expires_at > NOW()
+    `;
+    const [results] = await pool.query(otpSql, [sessionId, otp]);
+
+    // Check if OTP is valid and not expired
+    if (results.length === 0) {
+      return res.status(400).json({ success: false, error: 'Invalid or expired OTP' });
+    }
+
+    const user = results[0];
+
+    // Remove OTP session after verification
+    const deleteOtpSql = 'DELETE FROM otp_sessions WHERE session_id = ?';
+    await pool.query(deleteOtpSql, [sessionId]);
+
+    // Initialize session if not already initialized
+    if (!req.session) {
+      req.session = {};
+    }
+
+    // Save user ID to session
+    req.session.user = { user_id: user.user_id };
+    console.log(req.session);
+
+    return res.json({ success: true, message: 'OTP verified successfully' });
+  } catch (err) {
+    console.error('Error verifying OTP:', err.message || err);
+    return res.status(500).json({ success: false, error: 'Internal server error' });
+  }
+});
+
 // Endpoint for checking login status
 app.get('/check-login', async (req, res) => {
-  // console.log('Current session:', req.session); // Log the session object
+  console.log('Current session:', req.session); // Log the session object
   try {
     // Query the sessions table to retrieve session data using the session ID
     const [results] = await pool.query(
@@ -698,6 +780,8 @@ app.post('/verify-otp', async (req, res) => {
       user.phone // phone from otp_sessions
     ]);
 
+    req.session.user = { user_id: userInsertResult.insertId };
+    console.log(req.session);
     return res.json({ success: true, message: 'OTP verified and user registered successfully' });
   } catch (err) {
     console.error('Error verifying OTP:', err);
