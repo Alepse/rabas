@@ -3817,7 +3817,7 @@ app.get('/getAllBusinesses', async (req, res) => {
       b.business_id, b.businessName, b.businessType, b.businessLogo, 
       b.location, b.businessCard, b.aboutUs
     ORDER BY 
-      b.business_id;
+      b.dateOrigin DESC;
   `;
 
   try {
