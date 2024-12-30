@@ -53,6 +53,8 @@ const FoodPlacesTab = ({foodPlacesData, loading}) => {
   // Sort food places for "Taste-Tested" by number of likes (descending)
   const tasteTested = [...foodPlaces].sort((a, b) => b.likes - a.likes);
 
+  const recent = [...foodPlaces].sort((a, b) => new Date(b.dateOrigin) - new Date(a.dateOrigin));
+
   return (
     <div className='lg:container'>
       <FoodPlaceSwiper 
@@ -72,7 +74,7 @@ const FoodPlacesTab = ({foodPlacesData, loading}) => {
       <FoodPlaceSwiper 
         title="Taste the Adventure: Explore Exciting New Dining Spots!" 
         isLast 
-        foodPlaces={foodPlaces} 
+        foodPlaces={recent} 
         loading={loading} 
         uniqueId="foodPlaces"
       />
