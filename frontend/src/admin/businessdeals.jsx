@@ -87,7 +87,7 @@ const BusinessDeals = () => {
             // Enable the corresponding deal section based on businessType
             setShowActivities(type === 'attraction');
             setShowAccommodation(type === 'accommodation');
-            setShowRestaurantServices(type === 'food');
+            setShowRestaurantServices(type === 'restaurant');
             setShowShop(type === 'shop');
           }
         } catch (error) {
@@ -166,9 +166,9 @@ const BusinessDeals = () => {
                 color="success"
                 isSelected={showRestaurantServices}
                 onChange={(e) =>
-                  businessType === 'food'
+                  businessType === 'restaurant'
                     ? setShowRestaurantServices(e.target.checked)
-                    : showWarningPopup('Food')
+                    : showWarningPopup('Restaurant')
                 }
               >
                 <span className="font-semibold text-md">Restaurant Deals</span>
