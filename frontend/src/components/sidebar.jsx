@@ -6,6 +6,7 @@ import { IoPricetagsOutline } from "react-icons/io5";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from '@nextui-org/react';
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import { FaCalendar } from 'react-icons/fa';
 import { CgLogOut } from "react-icons/cg";
 import { TbWorld } from "react-icons/tb";
 import CryptoJS from 'crypto-js';
