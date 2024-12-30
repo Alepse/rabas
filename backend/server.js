@@ -582,52 +582,55 @@ app.put('/update-password', async (req, res) => {
   }
 });
 
-// Signup Endpoint
+// Signup Endpoint with OTP Integration
 app.post('/signup', async (req, res) => {
   const { username, firstName, lastName, email, address, phone, password, confirmPassword } = req.body;
 
   console.log('Received signup request:', req.body);
 
-  // Check if password and confirmPassword are equal
   if (password !== confirmPassword) {
     return res.status(400).json({ error: "Password and confirm password do not match or are empty" });
   }
 
   try {
-    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
+    const otp = Math.floor(100000 + Math.random() * 900000); // 6-digit OTP
+    const sessionId = crypto.randomBytes(16).toString('hex'); // Unique session ID
 
-    // Insert user data into the database
-    const sql = 'INSERT INTO users (username, password, Fname, Lname, address, email, contact) VALUES (?, ?, ?, ?, ?, ?, ?)';
+    // Save user data temporarily in `temp_users` table
+    const tempUserSql = `
+      INSERT INTO temp_users (session_id, username, password, firstName, lastName, address, email, phone, otp, expires_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 10 MINUTE))
+    `;
+    await pool.query(tempUserSql, [sessionId, username, hashedPassword, firstName, lastName, address, email, phone, otp]);
 
-    const [results] = await pool.query(sql, [username, hashedPassword, firstName, lastName, address, email, phone]);
-
-    // Get the newly created user's ID
-    const userId = results.insertId;
-
-    // Set up user session
-    req.session.user = {
-      user_id: userId
-    };
-
-    console.log('Signup and auto-login successful. User ID:', userId);
-
-    // Return a success response with session info
-    return res.json({
-      success: true,
-      message: 'Signup successful and automatically logged in',
-      user: {
-        user_id: userId,
-        username: username,
-        email: email
+    // Send OTP email
+    const transporter = nodemailer.createTransport({
+      service: 'Gmail',
+      auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_PASS
       }
+    });
+
+    await transporter.sendMail({
+      from: '"RabaSorsogon Support" <support@rabasorsogon.com>',
+      to: email,
+      subject: 'Your OTP Code for Signup',
+      text: `Your OTP code is ${otp}. It will expire in 10 minutes.`
+    });
+
+    console.log('OTP sent to:', email);
+
+    res.json({
+      success: true,
+      message: 'Signup successful. Please verify your OTP.',
+      sessionId: sessionId
     });
   } catch (err) {
     console.error('Error executing SQL query:', err);
 
-    // Check if the error is a duplicate entry error
     if (err.code === 'ER_DUP_ENTRY') {
-      // Customize the message based on the field that caused the duplication
       if (err.message.includes('username_UNIQUE')) {
         return res.status(400).json({ success: false, error: 'Username is already taken' });
       } else if (err.message.includes('email_UNIQUE')) {
@@ -635,9 +638,55 @@ app.post('/signup', async (req, res) => {
       }
     }
 
-    return res.status(500).json({ success: false, message: 'Internal server error', error: err.message });
+    res.status(500).json({ success: false, message: 'Internal server error', error: err.message });
   }
 });
+
+
+// Verify OTP Endpoint
+app.post('/verify-otp', async (req, res) => {
+  const { otp, sessionId } = req.body;
+
+  try {
+    // Check if the OTP and session ID are valid
+    const tempUserSql = `
+      SELECT * FROM temp_users
+      WHERE session_id = ? AND otp = ? AND expires_at > NOW()
+    `;
+    const [results] = await pool.query(tempUserSql, [sessionId, otp]);
+
+    if (results.length === 0) {
+      return res.status(400).json({ success: false, error: 'Invalid or expired OTP' });
+    }
+
+    const user = results[0];
+
+    // Insert user data into the `users` table
+    const userSql = `
+      INSERT INTO users (username, password, Fname, Lname, address, email, contact)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+    await pool.query(userSql, [
+      user.username,
+      user.password,
+      user.firstName,
+      user.lastName,
+      user.address,
+      user.email,
+      user.phone
+    ]);
+
+    // Remove the temporary user record
+    const deleteTempUserSql = 'DELETE FROM temp_users WHERE session_id = ?';
+    await pool.query(deleteTempUserSql, [sessionId]);
+
+    res.json({ success: true, message: 'OTP verified and user registered successfully' });
+  } catch (err) {
+    console.error('Error verifying OTP:', err);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
 
 // Passport setup
 app.use(passport.initialize());
