@@ -209,13 +209,13 @@ const LoginSignup = () => {
   };
 
   const renderInitialView = () => (
-    <div className="flex flex-col h-full items-center justify-center gap-4">
+    <div className="flex flex-col h-full items-center justify-center gap-6 px-5 py-20">
       <img className="w-[11rem]" src={Logo2} />
-      <h1 className="text-center font-semibold font-font1 text-2xl mb-9">
+      <h1 className="text-center font-semibold font-font1 text-2xl mb-9 py-10">
         Sign in to explore more in RabaSorsogon
       </h1>
       <Button
-        className="flex items-center justify-center border-2 py-2 hover:bg-color2 hover:text-white transition rounded-full"
+        className="flex items-center justify-center border-2 py-2 hover:bg-color2 hover:text-white transition rounded-lg"
         onClick={handleGoogleLogin}
         fullWidth
       >
@@ -224,16 +224,17 @@ const LoginSignup = () => {
 
 
       <Button
-        className="flex items-center justify-center border-2 py-2 hover:bg-gray-100 transition rounded-full"
+        color="primary"
+        className="hover:bg-color2 rounded-lg"
         onClick={() => setView("login")}
         fullWidth
       >
-        <FaEnvelope className="mr-2" /> Login
+        Login
       </Button>
 
       <Button 
         color="primary"
-        className="hover:bg-color2"
+        className="hover:bg-color2 rounded-lg"
         onClick={() => setView("signup")}
         fullWidth
       >
@@ -244,15 +245,15 @@ const LoginSignup = () => {
   );
 
   const renderLoginForm = () => (
-    <div className="flex flex-col h-full items-center justify-center gap-4">
+    <div className="flex flex-col h-full items-center justify-center gap-6 px-5 py-20">
+    <button
+    className="absolute top-5 left-5 flex items-center text-gray-500 hover:text-black transition-all mb-4"
+    onClick={() => setView("initial")}
+    >
+      <FaArrowLeft className="mr-2" /> Back
+    </button>
       <img className="w-[11rem]" src={Logo2} />
-      <button
-        className="flex items-center text-gray-500 hover:text-black transition-all mb-4"
-        onClick={() => setView("initial")}
-      >
-        <FaArrowLeft className="mr-2" /> Back
-      </button>
-          <h1 className='font-font1 text-center text-2xl mb-2'>Login!</h1>
+        <h1 className="text-center font-semibold font-font1 text-2xl mb-9 py-5">Login!</h1>
           <form onSubmit={handleLogin} className="flex flex-col gap-4  ">
             <Input
               label="Email/username"
@@ -307,17 +308,18 @@ const LoginSignup = () => {
 
     </div>
   );
+  
   const renderSignupForm = () => (
-    <div className="flex flex-col gap-4 ">
+    <div className="flex flex-col h-full items-center justify-center gap-6 px-5 py-20">
       <img className="w-[11rem]" src={Logo2} />
       <button
-        className="flex items-center text-gray-500 hover:text-black transition-all mb-4"
+        className="absolute top-5 left-5 flex items-center text-gray-500 hover:text-black transition-all mb-4"
         onClick={() => setView("initial")}
       >
         <FaArrowLeft className="mr-2" /> Back
       </button>
         <h1 className='font-font1 text-center text-2xl mb-2'>Signup!</h1>
-          <form onSubmit={handleSignup} className="flex flex-col gap-4">
+          <form onSubmit={handleSignup} className="flex flex-col min-w-[260px] w-auto gap-4">
             <Input
               label="First Name"
               type="text"
@@ -451,8 +453,15 @@ const LoginSignup = () => {
 
   // Render OTP form
   const renderLoginOtpForm = () => (
-    <div className="flex flex-col gap-4">
-      <h1 className="font-font1 text-center text-2xl mb-4">Enter OTP</h1>
+    <div className="flex flex-col h-full items-center justify-center gap-6 px-5 py-20">
+      <button
+      className="absolute top-5 left-5 flex items-center text-gray-500 hover:text-black transition-all mb-4"
+      onClick={() => setView("initial")}
+      >
+        <FaArrowLeft className="mr-2" /> Back
+      </button>
+      <img className="w-[11rem]" src={Logo2} />
+      <h1 className="font-font1 text-center text-2xl mb-4 px-20 py-5">Enter OTP</h1>
       <form onSubmit={handleLoginOtpVerification} className="flex flex-col gap-4">
         <Input
           label="OTP"
@@ -508,7 +517,7 @@ const LoginSignup = () => {
   );
 
   return (
-    <div className="container mx-auto flex justify-center items-center min-h-screen">
+    <div className="container mx-auto flex justify-center items-center">
       {view === "otp" ? (
         renderOtpForm()
       ) : view === "loginotp" ? (
