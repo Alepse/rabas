@@ -134,7 +134,7 @@ const Sidebar = () => {
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className={`absolute top-1/2 left-0 transform -translate-y-1/2 z-50 py-[100%] ${
               sidebarOpen ? 'left-[88%]' : 'left-[88%]'
-            } text-white p-2 rounded-r-md text-2xl transition-all duration-300`}
+            } text-white p-2 rounded-r-md text-2xl transition-all duration-300 lg:hidden`}
           >
           {sidebarOpen ? <IoIosArrowBack  /> : <IoIosArrowForward  />}
           </button>
