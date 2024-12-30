@@ -125,8 +125,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
   const validateStep = (currentStep) => {
     switch (currentStep) {
       case 1:
-        return formData.firstName && formData.lastName && formData.businessName && 
-               formData.businessTerritory && formData.certificateNo && formData.businessScope;
+        return formData.firstName && formData.lastName && formData.businessName && formData.certificateNo && formData.businessScope;
       case 2:
         return formData.businessType && formData.category;
       case 3:
@@ -186,18 +185,6 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
               name="businessName"
               placeholder="Enter Business Name"
               value={formData.businessName}
-              onChange={handleInputChange}
-              className="mt-4"
-              required
-            />
-            <Input
-              clearable
-              bordered
-              fullWidth
-              label={<span className="font-bold">Business Territory (Province)</span>}
-              name="businessTerritory"
-              placeholder="Enter Business Territory"
-              value={formData.businessTerritory}
               onChange={handleInputChange}
               className="mt-4"
               required
