@@ -80,7 +80,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
   const businessTypeOptions = [
     { label: "Activities", value: "attraction" },
     { label: "Accommodations", value: "accommodation" },
-    { label: "Food Places", value: "food" },
+    { label: "Food Places", value: "restaurant" },
     { label: "Shops", value: "shop" },
   ];
 
