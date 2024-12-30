@@ -54,6 +54,9 @@ const ActivitiesTab = ({ activitiesData, loading }) => {
   // Sort activities for "Things To Do" by number of likes (descending)
   const thingsToDo = [...activities].sort((a, b) => b.likes - a.likes);
 
+  const recent = [...activities].sort((a, b) => new Date(b.dateOrigin) - new Date(a.dateOrigin));
+
+
   return (
     <div className='lg:container'>
       <ActivitySwiper 
@@ -73,7 +76,7 @@ const ActivitiesTab = ({ activitiesData, loading }) => {
       <ActivitySwiper 
         title="Explore New Adventures: Latest Activities" 
         isLast 
-        activities={activities} 
+        activities={recent} 
         loading={loading} 
         uniqueId="exploreNewAdventures"
       />

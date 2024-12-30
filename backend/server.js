@@ -3773,6 +3773,7 @@ app.get('/getAllBusinesses', async (req, res) => {
       b.openingHours,
       b.facilities,
       b.policies,
+      b.dateOrigin,
       IF(
         JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.description')) IS NULL OR 
         JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.description')) = '', 
@@ -3817,7 +3818,7 @@ app.get('/getAllBusinesses', async (req, res) => {
       b.business_id, b.businessName, b.businessType, b.businessLogo, 
       b.location, b.businessCard, b.aboutUs
     ORDER BY 
-      b.dateOrigin DESC;
+      b.business_id;
   `;
 
   try {
