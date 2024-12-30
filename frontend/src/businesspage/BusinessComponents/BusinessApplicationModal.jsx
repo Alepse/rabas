@@ -18,12 +18,11 @@ const municipalities = [
 ];
 
 const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userData }) => {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(1)
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     businessName: "",
-    businessTerritory: "",
     certificateNo: "",
     businessScope: "",
     businessType: "",

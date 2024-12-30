@@ -1069,7 +1069,6 @@ app.post('/submitBusinessApplication', async (req, res) => {
     firstName,
     lastName,
     businessName,
-    businessTerritory,
     certificateNo,
     businessScope,
     businessType,
@@ -1081,7 +1080,7 @@ app.post('/submitBusinessApplication', async (req, res) => {
 
   // Input validation (ensure all fields are provided)
   if (
-    !user_id || !firstName || !lastName || !businessName || !businessTerritory ||
+    !user_id || !firstName || !lastName || !businessName ||
     !certificateNo || !businessScope || !businessType || !category
   ) {
     return res.status(400).json({ error: 'Please fill in all required fields' });
@@ -1128,7 +1127,7 @@ app.post('/submitBusinessApplication', async (req, res) => {
     // Execute the SQL query
     const [results] = await pool.query(
       sql, 
-      [application_id, user_id, firstName, lastName, businessName, businessTerritory, certificateNo, businessScope, businessType, categoryJSON, completeAddress, pinLocationJSON]
+      [application_id, user_id, firstName, lastName, businessName, businessScope, certificateNo, businessScope, businessType, categoryJSON, completeAddress, pinLocationJSON]
     );
 
     console.log('Business application submitted successfully. Affected rows:', results.affectedRows);
