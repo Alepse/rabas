@@ -19,6 +19,7 @@ const LoginSignup = () => {
   const [email, setEmail] = useState(''); // Add state to manage email for forgot password
   const [otp, setOtp] = useState(''); // OTP state
   const [otpSession, setOtpSession] = useState(null); // Track OTP session
+  const [isOtpSent, setIsOtpSent] = useState(false);
 
   useEffect(() => {
     document.title = 'Login/Signup';
@@ -115,6 +116,7 @@ const LoginSignup = () => {
         setOtpSession(data.sessionId); // Save OTP session ID
         setView("otp"); // Redirect to OTP view
         Swal.fire('OTP Sent!', 'Check your email for the OTP.', 'success');
+        setIsOtpSent(true); //
       } else {
         Swal.fire('Signup Failed!', data.error, 'error');
       }
@@ -400,7 +402,7 @@ const LoginSignup = () => {
     </div>
   );
 
-
+  // Render OTP form
   const renderOtpForm = () => (
     <div className="flex flex-col gap-4">
       <h1 className="font-font1 text-center text-2xl mb-4">Enter OTP</h1>
@@ -416,6 +418,20 @@ const LoginSignup = () => {
           Verify OTP
         </Button>
       </form>
+
+      {/* Resend OTP button */}
+      {isOtpSent && (
+        <div className="mt-4 text-center">
+          <Button 
+            onClick={handleSignup} 
+            color="secondary" 
+            className="hover:bg-color2"
+            fullWidth
+          >
+            Resend OTP
+          </Button>
+        </div>
+      )}
     </div>
   );
 

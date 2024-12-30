@@ -588,28 +588,32 @@ app.post('/signup', async (req, res) => {
 
   console.log('Received signup request:', req.body);
 
+  // Check if password and confirmPassword are equal
   if (password !== confirmPassword) {
     return res.status(400).json({ error: "Password and confirm password do not match or are empty" });
   }
 
   try {
+    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Generate OTP and session ID
     const otp = Math.floor(100000 + Math.random() * 900000); // 6-digit OTP
     const sessionId = crypto.randomBytes(16).toString('hex'); // Unique session ID
 
-    // Save user data temporarily in `temp_users` table
-    const tempUserSql = `
-      INSERT INTO temp_users (session_id, username, password, firstName, lastName, address, email, phone, otp, expires_at)
+    // Save all user data along with OTP and session ID to the `otp_sessions` table
+    const otpSql = `
+      INSERT INTO otp_sessions (session_id, username, first_name, last_name, email, address, phone, password, otp, expires_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 10 MINUTE))
     `;
-    await pool.query(tempUserSql, [sessionId, username, hashedPassword, firstName, lastName, address, email, phone, otp]);
+    await pool.query(otpSql, [sessionId, username, firstName, lastName, email, address, phone, hashedPassword, otp]);
 
-    // Send OTP email
+    // Send OTP to the user's email
     const transporter = nodemailer.createTransport({
-      service: 'Gmail',
+      service: 'Gmail', // Replace with your email service provider
       auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_PASS
+        user: process.env.GMAIL_USER, // Your email address
+        pass: process.env.GMAIL_PASS  // Your email password
       }
     });
 
@@ -622,14 +626,16 @@ app.post('/signup', async (req, res) => {
 
     console.log('OTP sent to:', email);
 
-    res.json({
+    // Return a success response with session info
+    return res.json({
       success: true,
       message: 'Signup successful. Please verify your OTP.',
-      sessionId: sessionId
+      sessionId: sessionId // Return session ID for client-side OTP verification
     });
   } catch (err) {
     console.error('Error executing SQL query:', err);
 
+    // Check if the error is a duplicate entry error
     if (err.code === 'ER_DUP_ENTRY') {
       if (err.message.includes('username_UNIQUE')) {
         return res.status(400).json({ success: false, error: 'Username is already taken' });
@@ -638,22 +644,18 @@ app.post('/signup', async (req, res) => {
       }
     }
 
-    res.status(500).json({ success: false, message: 'Internal server error', error: err.message });
+    return res.status(500).json({ success: false, message: 'Internal server error', error: err.message });
   }
 });
-
 
 // Verify OTP Endpoint
 app.post('/verify-otp', async (req, res) => {
   const { otp, sessionId } = req.body;
 
   try {
-    // Check if the OTP and session ID are valid
-    const tempUserSql = `
-      SELECT * FROM temp_users
-      WHERE session_id = ? AND otp = ? AND expires_at > NOW()
-    `;
-    const [results] = await pool.query(tempUserSql, [sessionId, otp]);
+    // Check if the OTP and session ID are valid and not expired
+    const otpSql = 'SELECT * FROM otp_sessions WHERE session_id = ? AND otp = ? AND expires_at > NOW()';
+    const [results] = await pool.query(otpSql, [sessionId, otp]);
 
     if (results.length === 0) {
       return res.status(400).json({ success: false, error: 'Invalid or expired OTP' });
@@ -661,29 +663,29 @@ app.post('/verify-otp', async (req, res) => {
 
     const user = results[0];
 
-    // Insert user data into the `users` table
+    // Remove OTP session after verification
+    const deleteOtpSql = 'DELETE FROM otp_sessions WHERE session_id = ?';
+    await pool.query(deleteOtpSql, [sessionId]);
+
+    // Insert user data into the database after successful OTP verification
     const userSql = `
       INSERT INTO users (username, password, Fname, Lname, address, email, contact)
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
-    await pool.query(userSql, [
-      user.username,
-      user.password,
-      user.firstName,
-      user.lastName,
-      user.address,
-      user.email,
-      user.phone
+    const [userInsertResult] = await pool.query(userSql, [
+      user.username, // username from otp_sessions
+      user.password, // hashed password from otp_sessions
+      user.first_name, // first_name from otp_sessions
+      user.last_name, // last_name from otp_sessions
+      user.address, // address from otp_sessions
+      user.email, // email from otp_sessions
+      user.phone // phone from otp_sessions
     ]);
 
-    // Remove the temporary user record
-    const deleteTempUserSql = 'DELETE FROM temp_users WHERE session_id = ?';
-    await pool.query(deleteTempUserSql, [sessionId]);
-
-    res.json({ success: true, message: 'OTP verified and user registered successfully' });
+    return res.json({ success: true, message: 'OTP verified and user registered successfully' });
   } catch (err) {
     console.error('Error verifying OTP:', err);
-    res.status(500).json({ success: false, message: 'Internal server error' });
+    return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 });
 
