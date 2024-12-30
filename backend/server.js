@@ -112,6 +112,118 @@ app.use((req, res, next) => {
   next();
 });
 
+// Super Admin Login Endpoint
+app.post('/superadmin/login', async (req, res) => {
+  const { identifier, password } = req.body; // Use 'identifier' for username or email
+
+  // Validate input
+  if (!identifier || !password) {
+    return res.status(400).json({
+      success: false,
+      message: 'Username or email and password are required',
+    });
+  }
+
+  try {
+    // Query the database for the admin using identifier
+    const [rows] = await pool.query(
+      'SELECT * FROM admin WHERE username = ? OR email = ?',
+      [identifier, identifier] // Check both username and email
+    );
+
+    if (rows.length === 0) {
+      return res.status(401).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    const user = rows[0];
+
+    // Check if the user registered using Google
+    if (!user.password) {
+      return res.status(401).json({
+        success: false,
+        message: 'Please log in using Google',
+      });
+    }
+
+    // Compare the provided password with the hashed password from the database
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    if (!passwordMatch) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid password',
+      });
+    }
+
+    // Set the user session
+    req.session.admin = { admin_id: user.admin_id }; // Fixed admin reference
+    return res.json({
+      success: true,
+      message: 'Login successful',
+    });
+  } catch (err) {
+    console.error('Database query error:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+    });
+  }
+});
+
+// Endpoint for checking superadmin login status
+app.get('/superadmin/check-login', async (req, res) => {
+  try {
+    // Query the sessions table to retrieve session data using the session ID
+    const [results] = await pool.query(
+      'SELECT data FROM sessions WHERE session_id = ?',
+      [req.sessionID]
+    );
+
+    if (results.length === 0) {
+      // Session not found
+      return res.status(200).json({
+        isLoggedIn: false,
+        message: 'Session not found',
+      });
+    }
+
+    // Parse the session data from the database
+    let session;
+    try {
+      session = JSON.parse(results[0].data);
+    } catch (parseError) {
+      console.error('Error parsing session data:', parseError);
+      return res.status(500).json({
+        isLoggedIn: false,
+        error: 'Failed to parse session data',
+      });
+    }
+
+    // Check if the session contains admin data
+    if (session && session.admin) {
+      return res.status(200).json({
+        isLoggedIn: true,
+        admin: session.admin,
+      });
+    } else {
+      // Session exists but no admin data
+      return res.status(200).json({
+        isLoggedIn: false,
+        message: 'Admin data not found in session',
+      });
+    }
+  } catch (err) {
+    console.error('Error fetching session data from database:', err);
+    return res.status(500).json({
+      isLoggedIn: false,
+      error: 'Internal server error',
+    });
+  }
+});
+
 // User Login Endpoint
 app.post('/login', async (req, res) => {
   const { identifier, password } = req.body; // Use 'identifier' to accept either username or email

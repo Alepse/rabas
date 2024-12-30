@@ -297,7 +297,7 @@ const Search = () => {
 const Nav = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [isLoggedIn, setIsLoggedIn] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState(null);
   const [isChatModalOpen, setIsChatModalOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -358,10 +358,13 @@ const Nav = () => {
           return axios.get(`${BASE_URL}/get-userData`, { withCredentials: true });
         } else {
           setIsLoggedIn(false);
+          return null; // Explicitly return null to avoid undefined
         }
       })
       .then(response => {
-        setUserData(response.data.userData);
+        if (response) {
+          setUserData(response.data.userData);
+        }
       })
       .catch(error => {
         console.error(
@@ -372,7 +375,7 @@ const Nav = () => {
       .finally(() => {
         setLoading(false);
       });
-  };
+  };  
   
   useEffect(() => {
     fetchUserData();

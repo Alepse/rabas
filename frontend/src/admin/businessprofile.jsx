@@ -1064,13 +1064,6 @@ const BusinessProfile = () => {
       <div className="flex-1 px-8 py-4 lg:p-8 max-h-screen overflow-y-auto">
         <div className='flex justify-between items-center mb-3'>
           <h1 className="text-2xl lg:text-3xl font-semibold text-gray-800">Business Profile</h1>
-          <Button
-            onClick={handleSave}
-            className='bg-green-500 text-white hover:bg-green-600 transition flex items-center'
-          >
-            <FaSave className='mr-2' />
-            Save Profile
-          </Button>
         </div>
 
         {loading ?

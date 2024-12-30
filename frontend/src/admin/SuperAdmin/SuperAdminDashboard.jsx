@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import SuperAdminSidebar from './superadmincomponents/superadminsidebar';
@@ -15,8 +15,16 @@ const getKeyValue = (obj, key) => {
 };
 
 const SuperAdminDashboard = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const chartRef = useRef(null);
-
+  const [page, setPage] = React.useState(1);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [pendingVerifications, setPendingVerifications] = useState(0);
+  const [businessOwners, setBusinessOwners] = useState(0);
+  const [tourists, setTourists] = useState(0);
+  const [reports, setReports] = useState(0);
+  const [tableData, setTableData] = React.useState([]);  // Updated data for the table
+  
   // Sample data for the charts
   const businessOwnersData = {
     labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
@@ -67,9 +75,7 @@ const SuperAdminDashboard = () => {
     };
   }, []);
 
-  const [page, setPage] = React.useState(1);
-  const [isLoading, setIsLoading] = React.useState(true);
-
+  
   let list = useAsyncList({
     async load({ signal, cursor }) {
       if (cursor) {
@@ -92,38 +98,58 @@ const SuperAdminDashboard = () => {
 
   const hasMore = page < 9;
 
-  // Updated data for the table
-  const [tableData, setTableData] = React.useState([]);
+  // Function to check login status
+  const checkLoginStatus = useCallback(async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/superadmin/check-login`, {
+        method: 'GET',
+        credentials: 'include', // Include cookies
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setIsLoggedIn(data.isLoggedIn); // Set login status
+
+        if (!data.isLoggedIn) {
+          window.location.href = '/superadminlogin';
+        }
+      } else {
+        setIsLoggedIn(false);
+      }
+    } catch (error) {
+      console.error('Error checking login status:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    checkLoginStatus();
+  }, [checkLoginStatus]);  
 
   useEffect(() => {
     const fetchBusinessOwners = async () => {
-      try {
-        const response = await fetch(`${BASE_URL}/superAdmin-fetchAllBusinessOwners`, {
-          credentials: 'include'
-        });
+      if(isLoggedIn){
+        try {
+          const response = await fetch(`${BASE_URL}/superAdmin-fetchAllBusinessOwners`, {
+            credentials: 'include'
+          });
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch business owners');
-        }
+          if (!response.ok) {
+            throw new Error('Failed to fetch business owners');
+          }
 
-        const data = await response.json();
-        if (data.success) {
-          setTableData(data.data);
-        } else {
-          console.error('Failed to fetch business owners:', data.message);
+          const data = await response.json();
+          if (data.success) {
+            setTableData(data.data);
+          } else {
+            console.error('Failed to fetch business owners:', data.message);
+          }
+        } catch (error) {
+          console.error('Error fetching business owners:', error);
         }
-      } catch (error) {
-        console.error('Error fetching business owners:', error);
-      }
-    };
+      };
+    }
 
     fetchBusinessOwners();
-  }, []);
-
-  const [pendingVerifications, setPendingVerifications] = useState(0);
-  const [businessOwners, setBusinessOwners] = useState(0);
-  const [tourists, setTourists] = useState(0);
-  const [reports, setReports] = useState(0);
+  }, [isLoggedIn]);
 
   useEffect(() => {
     const fetchData = async () => {

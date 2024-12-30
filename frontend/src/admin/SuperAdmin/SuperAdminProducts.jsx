@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Card,
   CardBody,
@@ -153,6 +153,7 @@ const Highlight = ({ content, match }) => {
 };
 
 const SuperAdminProducts = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [products, setProducts] = useState([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -193,9 +194,37 @@ const SuperAdminProducts = () => {
   });
 
   useEffect(() => {
-    fetchBusinessProducts();
-    fetchBusinessListings();
+    if(isLoggedIn) {
+      fetchBusinessProducts();
+      fetchBusinessListings();
+    }
+  }, [isLoggedIn]);
+
+  // Function to check login status
+  const checkLoginStatus = useCallback(async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/superadmin/check-login`, {
+        method: 'GET',
+        credentials: 'include', // Include cookies
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setIsLoggedIn(data.isLoggedIn); // Set login status
+
+        if (!data.isLoggedIn) {
+          window.location.href = '/superadminlogin';
+        }
+      } else {
+        setIsLoggedIn(false);
+      }
+    } catch (error) {
+      console.error('Error checking login status:', error);
+    }
   }, []);
+
+  useEffect(() => {
+    checkLoginStatus();
+  }, [checkLoginStatus]);  
 
   const fetchBusinessProducts = async () => {
     try {

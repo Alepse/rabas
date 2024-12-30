@@ -30,7 +30,7 @@ const reviewData = [
 
 const BusinessDashboard = () => {
   const [loading, setLoading] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [businessProducts, setBusinessProducts] = useState([]);
   const [productsWithActiveDeals, setProductsWithActiveDeals] = useState([]);
   const [mostReviewedProducts, setMostReviewedProducts] = useState([]);
@@ -52,6 +52,32 @@ const BusinessDashboard = () => {
 
     return averageRating;
   };
+
+  // Function to check login status
+  const checkLoginStatus = useCallback(async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/check-login`, {
+        method: 'GET',
+        credentials: 'include', // Include cookies
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setIsLoggedIn(data.isLoggedIn); // Set login status
+
+        if (!data.isLoggedIn) {
+          window.location.href = '/';
+        }
+      } else {
+        setIsLoggedIn(false);
+      }
+    } catch (error) {
+      console.error('Error checking login status:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    checkLoginStatus();
+  }, [checkLoginStatus]);
 
   useEffect(() => {
     const fetchAllData = async () => {
@@ -123,6 +149,7 @@ const BusinessDashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <DashboardCard title="Products" value={businessProducts.length} icon="📦" />
           <DashboardCard title="Active Deals" value={productsWithActiveDeals.length} icon="💼" />
+          {/* udi na averageRating ang naga cause error */}
           <DashboardCard title="Products Average Rate" value={averageRating.toFixed(1)} icon="⭐" /> {/* Display average rating */}
         </div>
         
