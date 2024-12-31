@@ -43,7 +43,7 @@ const SuperAdminDashboard = () => {
     labels: [],
     datasets: [
       {
-        label: 'Active Users',
+        label: 'User Registration',
         data: [],
         backgroundColor: 'rgba(255, 206, 86, 0.2)',
         borderColor: 'rgba(255, 206, 86, 1)',
@@ -106,7 +106,7 @@ const SuperAdminDashboard = () => {
             labels: allMonths,
             datasets: [
               {
-                label: 'User Registrations Report',
+                label: 'User Registrations',
                 data: activeUsersData,
                 backgroundColor: 'rgba(255, 206, 86, 0.2)',
                 borderColor: 'rgba(255, 206, 86, 1)',
@@ -325,7 +325,7 @@ const SuperAdminDashboard = () => {
             </div>
           </div>
           <div className="bg-white shadow-md rounded-lg p-4 md:p-6">
-            <h2 className="text-lg md:text-xl font-semibold mb-4 text-center">Active Users Reports</h2>
+            <h2 className="text-lg md:text-xl font-semibold mb-4 text-center">User Registration Reports</h2>
             <div className="h-[400px] md:h-[500px] w-full">
               <Bar 
                 data={activeUsersData} 
