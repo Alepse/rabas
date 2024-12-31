@@ -6,7 +6,8 @@ const Footer = () => {
   return (
     <footer className="bg-gradient-to-r from-color1 to-color2 mt-2 text-color3  py-10 h-full ">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="flex flex-wrap md:justify-between gap-8 justify-center">
+        
           {/* Left Column */}
           <div>
             <ul className="space-y-2 text-sm">
@@ -31,7 +32,7 @@ const Footer = () => {
           </div>
 
           {/* Right Column */}
-          <div>
+          <div className=' '>
             <h2 className="text-lg font-bold mb-4">Reach Us Out Here</h2>
             <form className="flex mb-4">
               <input
