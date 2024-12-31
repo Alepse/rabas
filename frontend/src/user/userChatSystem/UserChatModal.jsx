@@ -818,29 +818,47 @@ const UserChatModal = ({ isOpen, onClose, onOpenChat }) => {
                     </div>
                   )}
 
-                <div className="flex items-center space-x-2 mt-4 justify-between">
-                  <Textarea
-                    value={messageInput}
-                    onChange={(e) => setMessageInput(e.target.value)}
-                    onKeyDown={handleKeyPress}
-                    placeholder="Type a message..."
-                     className="w-[13rem] h-[4rem] md:w-full bg-white text-black rounded-lg border border-gray-300 focus:border-black focus:ring resize-none p-2"
-                    rows="2"
-                  />
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="hidden"
-                    id="image-upload"
-                  />
-                  <label htmlFor="image-upload" className="cursor-pointer">
-                    <FiImage size={24} className="text-gray-500 hover:text-black" />
-                  </label>
-                  <Button onClick={handleSendMessage} color="primary" className="rounded-lg h-[3.5rem]  w-32">
-                    <FiSend />
-                  </Button>
-                </div>
+                  <div className="flex items-center space-x-2 p-2 mt-2 h-14 rounded-lg  shadow-sm">
+  {/* Message Input */}
+  <textarea
+  value={messageInput}
+  onChange={(e) => setMessageInput(e.target.value)}
+  onKeyDown={handleKeyPress}
+  placeholder="Type a message..."
+  rows="1"
+  className="flex-grow text-sm h-full border border-gray-300 rounded-full px-4 py-1 focus:outline-none focus:ring-2 focus:ring-primary placeholder-gray-500 resize-none"
+/>
+
+
+  {/* Image Upload */}
+  <div className="flex items-center">
+    <input
+      type="file"
+      accept="image/*"
+      onChange={handleImageChange}
+      className="hidden"
+      id="image-upload"
+    />
+    <label
+      htmlFor="image-upload"
+      className="cursor-pointer w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 transition"
+    >
+      <FiImage size={20} className="text-gray-500 hover:text-gray-700" />
+    </label>
+  </div>
+
+  {/* Send Button */}
+  <Button
+    color="primary"
+    onClick={handleSendMessage}
+    size="sm"
+    className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white hover:bg-primary-dark transition"
+  >
+    <FiSend size={18} />
+  </Button>
+</div>
+
+
                 {imagePreview && (
                   <div className="mt-2 relative">
                     <img
