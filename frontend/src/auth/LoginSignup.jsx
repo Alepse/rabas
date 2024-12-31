@@ -282,9 +282,9 @@ const LoginSignup = () => {
                 </button>
               }
             />
-            <div className="flex justify-between text-small">
+            <div className="flex w-full justify-between gap-24 text-xs">
               <Link
-                className="cursor-pointer hover:text-color2"
+                className="cursor-pointer hover:underline text-color2"
                 size="sm"
                 onClick={() => setView("forgotpassword")}
               >
@@ -293,7 +293,7 @@ const LoginSignup = () => {
               <p>
                 Need an account?{" "}
                 <Link
-                  className="cursor-pointer hover:text-color2"
+                  className="cursor-pointer hover:underline text-color2"
                   size="sm"
                   onClick={() => setView("signup")}
                 >
