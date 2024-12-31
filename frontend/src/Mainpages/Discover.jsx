@@ -785,7 +785,7 @@ const Discover = () => {
       )}
 
       {/* Modal for displaying all tags */}
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal disableAnimation isOpen={isOpen} onClose={onClose}>
         <ModalContent>
           <ModalHeader>
             <h2>All Tags</h2>
@@ -807,7 +807,7 @@ const Discover = () => {
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button auto flat onClick={onClose}>
+            <Button color='danger' auto flat onClick={onClose}>
               Close
             </Button>
           </ModalFooter>

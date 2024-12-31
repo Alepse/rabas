@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import Nav from '../components/nav';
 import Hero from '../components/heroshop';
 import Footer from '@/components/Footer';
-import { Button, Spinner } from "@nextui-org/react";
+import { Button, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/react";
 import { Checkbox, CheckboxGroup, Select, SelectItem, Slider ,Tooltip} from "@nextui-org/react";
 import { GiPositionMarker } from "react-icons/gi";
 import { Link } from 'react-router-dom';
@@ -44,6 +44,30 @@ const Shop = () => {
   const [showButton, setShowButton] = useState(false);
 
   const [openTooltip, setOpenTooltip] = useState(null); // Store the ID of the open tooltip
+
+   const { isOpen, onOpen, onClose } = useDisclosure();
+    const [selectedTags, setSelectedTags] = useState([]);
+    const [highlightedTags, setHighlightedTags] = useState([]);
+    const [isFilteringByTags, setIsFilteringByTags] = useState(false);
+  
+   const handleSeeMoreTags = (tags) => {
+    setSelectedTags(tags);
+    onOpen();
+  };
+  
+  const handleTagClick = (tag) => {
+    setHighlightedTags(prev => 
+      prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+    );
+  };
+  
+  const toggleTagFiltering = () => {
+    setIsFilteringByTags(!isFilteringByTags);
+    if (isFilteringByTags) {
+      setHighlightedTags([]);
+    }
+  };
+  
     
   // Function to toggle a specific tooltip
   const toggleTooltip = (id) => {
@@ -317,11 +341,11 @@ const Shop = () => {
                 filteredShops.map((shop, index) => (
                   <motion.div
                     key={index}
-                    className="bg-white rounded-lg shadow-lg p-2 hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between w-full mx-auto h-[400px]"
+                    className="bg-white rounded-lg shadow-lg p-2 hover:shadow-slate-500 hover:scale-105 h-[400px]  duration-300 flex flex-col justify-between"
                     variants={cardVariants}
                   >
                     {/* Card Image */}
-                    <div className="w-full h-48 bg-gray-200 rounded-t-lg overflow-hidden">
+                    <div className="w-full h-40 border bg-gray-200 rounded-t-lg mb-2 overflow-hidden">
                       {shop.cardImage ? (
                         <img
                           src={`${BASE_URL}/${shop.cardImage}`}
@@ -336,25 +360,34 @@ const Shop = () => {
                     </div>
 
                     {/* Card Content */}
-                    <div className="p-4 flex-grow">
+                    <div className="p-2 ">
                       {/* Tags */}
-                      <div className="flex flex-wrap gap-2 mb-2">
-                        {shop.category.map((cat, index) => (
-                          <span
-                            key={index}
-                            className={`text-xs px-2 py-1 rounded-full ${
-                              selectedCategories
-                                .map((c) => c.toLowerCase())
-                                .includes(cat.toLowerCase())
-                                ? 'bg-color2 text-white'
-                                : 'bg-gray-200 text-gray-700'
-                            }`}
-                          >
-                            {cat}
-                          </span>
-                        ))}
-                      </div>
-
+                      <div className="flex justify-between  items-center mb-2">  
+                        <div className="flex flex-wrap gap-2"> 
+                       {shop.category.slice(0, 3).map((tag, index) => (
+                       <span
+                              key={index}
+                              className={`text-xs px-2 py-1 rounded-full ${
+                                selectedCategories
+                                  .map((a) => a.toLowerCase())
+                                  .includes(tag.toLowerCase().replace(/s$/, ''))
+                                  ? 'bg-color2 text-white'
+                                  : 'bg-gray-200 text-gray-700'
+                              }`}
+                            >
+                              {tag}
+                            </span>
+                    ))}
+                    {shop.category.length > 3 && (
+                      <button
+                        onClick={() => handleSeeMoreTags(shop.category)}
+                        className="text-xs underline cursor-pointer text-color2"
+                      >
+                        See More
+                      </button>
+                    )}
+                  </div>
+                  </div>
                       <div className='flex gap-2 items-center flex-wrap'>
                         {/* Business Name */}
                         <h3 className="text-lg sm:text-base lg:text-lg font-semibold text-gray-800 truncate">{shop.businessName}</h3>
@@ -381,16 +414,16 @@ const Shop = () => {
                       </div>
 
                       {/* Location */}
-                      <div className="text-xs text-gray-500 mb-2 flex items-center">
-                        <GiPositionMarker /> {shop.destination}
-                      </div>
+                      <div className="text-sm text-gray-500  flex items-center">
+                                               <GiPositionMarker className="mr-1" /> {shop.destination}
+                                             </div>
+                     
 
                     </div>
 
                         {/* Ratings & Price */}
-                        <div className="flex justify-between items-center mb-2 p-2 gap-2">
-                        <div className="flex items-center gap-2">
-                          <div className="flex items-center gap-1">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-2">                       
+                        <div className="flex items-center gap-1 mb-2 sm:mb-0">
                             {shop.rating ? (
                               <>
                                 <span className="text-black text-[12px]">{shop.rating}</span>
@@ -400,11 +433,11 @@ const Shop = () => {
                                 </span>
                               </>
                             ) : (
-                              <span className="text-gray-500 text-[12px]">No ratings</span>
+                              <span className="text-gray-500 text-[12px] sm:text-sm">No ratings</span>
                             )}
                           </div>
-                        </div>
-                        <p className="font-semibold text-md">
+                        
+                          <p className="text-md sm:text-sm font-semibold text-black">
                           {shop.lowest_price && shop.highest_price ? (
                             `₱${shop.lowest_price} - ₱${shop.highest_price}`
                           ) : (
@@ -448,7 +481,36 @@ const Shop = () => {
           ↑
         </motion.button>
       )}
-
+     
+      {/* Modal for displaying all tags */}
+           <Modal disableAnimation isOpen={isOpen} onClose={onClose}>
+             <ModalContent>
+               <ModalHeader>All Tags</ModalHeader>
+               <ModalBody>
+                 <div className="flex gap-2 flex-wrap">
+                   {selectedTags.map((tag, index) => (
+                     <span
+                           key={index}
+                                   className={`text-xs px-2 py-1 rounded-full ${
+                                     selectedActivities
+                                       .map((a) => a.toLowerCase())
+                                       .includes(tag.toLowerCase().replace(/s$/, ''))
+                                       ? 'bg-color2 text-white'
+                                       : 'bg-gray-200 text-gray-700'
+                                   }`}
+                                 >
+                                   {tag}
+                                 </span>
+                   ))}
+                 </div>
+               </ModalBody>
+               <ModalFooter>
+                 <Button color="danger" onPress={onClose}>
+                   Close
+                 </Button>
+               </ModalFooter>
+             </ModalContent>
+           </Modal>
     </div>
   );
 };

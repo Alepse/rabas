@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import Nav from '../components/nav';
 import Hero from '../components/herofood';
 import Footer from '@/components/Footer';
-import { Button, Spinner } from "@nextui-org/react";
+import { Button, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/react";
 import { Checkbox, CheckboxGroup, Select, SelectItem, Slider, Tooltip } from "@nextui-org/react";
 import { GiPositionMarker } from "react-icons/gi";
 import { Link } from 'react-router-dom';
@@ -45,6 +45,32 @@ const Foods = () => {
   const [showButton, setShowButton] = useState(false);
 
   const [openTooltip, setOpenTooltip] = useState(null); // Store the ID of the open tooltip
+
+   const { isOpen, onOpen, onClose } = useDisclosure();
+    const [selectedTags, setSelectedTags] = useState([]);
+    const [highlightedTags, setHighlightedTags] = useState([]);
+    const [isFilteringByTags, setIsFilteringByTags] = useState(false);
+
+    
+ const handleSeeMoreTags = (tags) => {
+  setSelectedTags(tags);
+  onOpen();
+};
+
+const handleTagClick = (tag) => {
+  setHighlightedTags(prev => 
+    prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+  );
+};
+
+const toggleTagFiltering = () => {
+  setIsFilteringByTags(!isFilteringByTags);
+  if (isFilteringByTags) {
+    setHighlightedTags([]);
+  }
+};
+
+  
 
   // Function to toggle a specific tooltip
   const toggleTooltip = (id) => {
@@ -156,8 +182,9 @@ const Foods = () => {
     const maxPrice = parseFloat(food.highest_price) || Infinity;
     const matchesBudget = minPrice <= budgetRange[1] && maxPrice >= budgetRange[0];
 
-    return matchesCuisines && matchesAmenities && matchesRating && matchesDestination && matchesBudget;
-  });
+    return matchesCuisines && matchesAmenities && matchesRating && matchesDestination && matchesBudget;});
+
+  
 
   // Dropdown Options
   const destinations = [
@@ -341,11 +368,11 @@ const Foods = () => {
                   filteredFoods.map((food, index) => (
                     <motion.div
                       key={index}
-                      className="bg-white rounded-lg p-2 shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between w-full mx-auto h-[400px]"
+                      className="bg-white rounded-lg shadow-lg p-2 hover:shadow-slate-500 hover:scale-105 h-[400px]  duration-300 flex flex-col justify-between"
                       variants={cardVariants}
                     >
                       {/* Card Image */}
-                      <div className="w-full h-48 bg-gray-200 border rounded-t-lg overflow-hidden">
+                      <div className="w-full h-40 border bg-gray-200 rounded-t-lg mb-2 overflow-hidden">
                         {food.cardImage ? (
                           <img
                             src={`${BASE_URL}/${food.cardImage}`}
@@ -360,24 +387,34 @@ const Foods = () => {
                       </div>
 
                       {/* Card Content */}
-                      <div className="p-4 flex-grow">
+                      <div className="p-2 ">
                         {/* Tags */}
-                        <div className="flex flex-wrap gap-2 mb-2">
-                          {food.category.map((tag, index) => (
-                            <span
+                        <div className="flex justify-between  items-center mb-2">  
+                        <div className="flex flex-wrap gap-2"> 
+                       {food.category.slice(0, 3).map((tag, index) => (
+                       <span
                               key={index}
                               className={`text-xs px-2 py-1 rounded-full ${
                                 selectedCuisines
-                                  .map((c) => c.toLowerCase())
-                                  .includes(tag.toLowerCase())
+                                  .map((a) => a.toLowerCase())
+                                  .includes(tag.toLowerCase().replace(/s$/, ''))
                                   ? 'bg-color2 text-white'
                                   : 'bg-gray-200 text-gray-700'
                               }`}
                             >
                               {tag}
                             </span>
-                          ))}
-                        </div>
+                    ))}
+                    {food.category.length > 3 && (
+                      <button
+                        onClick={() => handleSeeMoreTags(food.category)}
+                        className="text-xs underline cursor-pointer text-color2"
+                      >
+                        See More
+                      </button>
+                    )}
+                  </div>
+                  </div>
                         <div className='flex gap-2 items-center flex-wrap'>
                           {/* Business Name */}
                           <h3 className="text-lg sm:text-base lg:text-lg font-semibold text-gray-800 truncate">{food.businessName}</h3>
@@ -404,15 +441,15 @@ const Foods = () => {
                           </Tooltip>
                         </div>
                         {/* Location */}
-                        <div className="text-xs text-gray-500 mb-2 flex items-center">
-                          <GiPositionMarker /> {food.destination}
+                        <div className="text-sm text-gray-500  flex items-center">
+                           <GiPositionMarker className="mr-1" />{food.destination}
                         </div>
 
                       </div>
                         {/* Ratings & Price */}
-                        <div className="flex justify-between items-center mb-2 p-2 gap-2">
-                          <div className="flex items-center gap-2">
-                            <div className="flex items-center gap-1">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-2">   
+                          
+                           <div className="flex items-center gap-1 mb-2 sm:mb-0">
                               {food.rating ? (
                                 <>
                                   <span className="text-black text-[12px]">{food.rating.toFixed(1)}</span>
@@ -422,21 +459,21 @@ const Foods = () => {
                                   </span>
                                 </>
                               ) : (
-                                <span className="text-gray-500 text-[12px]">No ratings</span>
+                                <span className="text-gray-500 text-[12px] sm:text-sm">No ratings</span>
                               )}
                             </div>
-                          </div>
-                          <p className="font-semibold text-md">
+                          
+                            <p className="text-md sm:text-sm font-semibold text-black">
                             {food.lowest_price && food.highest_price ? (
                               `₱${food.lowest_price} - ₱${food.highest_price}`
                             ) : (
-                              <span className="text-gray-400 italic">Price Range Not available</span>
+                              <span className="text-gray-400 italic text-[12px] sm:text-sm">Price Range Not available</span>
                             )}
                           </p>
                         </div>
                       {/* Explore More Button */}
                       <Link to={`/business/${encryptId(food.business_id)}`} target="_blank">
-                        <Button className="w-full rounded-md bg-color1 text-color3 hover:bg-color2">
+                        <Button className="w-full bg-color1 text-color3 rounded-md hover:bg-color2">
                           Explore More
                         </Button>
                       </Link>
@@ -470,6 +507,37 @@ const Foods = () => {
           ↑
         </motion.button>
       )}
+
+      
+            {/* Modal for displaying all tags */}
+            <Modal disableAnimation isOpen={isOpen} onClose={onClose}>
+              <ModalContent>
+                <ModalHeader>All Tags</ModalHeader>
+                <ModalBody>
+                  <div className="flex gap-2 flex-wrap">
+                    {selectedTags.map((tag, index) => (
+                      <span
+                            key={index}
+                                    className={`text-xs px-2 py-1 rounded-full ${
+                                      selectedActivities
+                                        .map((a) => a.toLowerCase())
+                                        .includes(tag.toLowerCase().replace(/s$/, ''))
+                                        ? 'bg-color2 text-white'
+                                        : 'bg-gray-200 text-gray-700'
+                                    }`}
+                                  >
+                                    {tag}
+                                  </span>
+                    ))}
+                  </div>
+                </ModalBody>
+                <ModalFooter>
+                  <Button color="danger" onPress={onClose}>
+                    Close
+                  </Button>
+                </ModalFooter>
+              </ModalContent>
+            </Modal>
 
     </div>
   );

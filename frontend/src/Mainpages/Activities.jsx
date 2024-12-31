@@ -5,7 +5,7 @@ import Nav from '../components/nav';
 import Hero from '../components/heroactivity';
 import Footer from '@/components/Footer';
 import pic1 from '../assets/donsol.jpg';
-import { Button, Spinner } from "@nextui-org/react";
+import { Button, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/react";
 import { Checkbox, CheckboxGroup, Select, SelectItem, Slider , Tooltip} from "@nextui-org/react";
 import { GiPositionMarker } from "react-icons/gi";
 import { Link } from 'react-router-dom';
@@ -46,7 +46,30 @@ const Activities = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [showButton, setShowButton] = useState(false); // State to show/hide button
  const [openTooltip, setOpenTooltip] = useState(null); // Store the ID of the open tooltip
-  
+
+ const { isOpen, onOpen, onClose } = useDisclosure();
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [highlightedTags, setHighlightedTags] = useState([]);
+  const [isFilteringByTags, setIsFilteringByTags] = useState(false);
+
+ const handleSeeMoreTags = (tags) => {
+  setSelectedTags(tags);
+  onOpen();
+};
+
+const handleTagClick = (tag) => {
+  setHighlightedTags(prev => 
+    prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+  );
+};
+
+const toggleTagFiltering = () => {
+  setIsFilteringByTags(!isFilteringByTags);
+  if (isFilteringByTags) {
+    setHighlightedTags([]);
+  }
+};
+
   // Function to toggle a specific tooltip
   const toggleTooltip = (id) => {
     setOpenTooltip((prev) => (prev === id ? null : id)); // Toggle the tooltip visibility
@@ -167,6 +190,7 @@ const Activities = () => {
     const matchesBudget = minBudget <= budgetRange[1] && maxBudget >= budgetRange[0];
 
     return matchesActivityType && matchesAmenities && matchesRating && matchesDestination && matchesCategory && matchesBudget;
+
   });
 
   // Dropdown Options
@@ -352,11 +376,11 @@ const Activities = () => {
                   filteredActivities.map((activity, index) => (
                     <motion.div
                       key={index}
-                      className="bg-white rounded-lg shadow-lg p-2 hover:shadow-slate-500 hover:scale-105 duration-300 flex flex-col justify-between w-full mx-auto h-[400px]"
+                      className="bg-white rounded-lg shadow-lg p-2 hover:shadow-slate-500 hover:scale-105 h-[400px]  duration-300 flex flex-col justify-between"
                       variants={cardVariants}
                     >
                       {/* Card Image */}
-                      <div className="w-full h-48 border bg-gray-200 rounded-t-lg overflow-hidden">
+                      <div className="w-full h-40 border bg-gray-200 rounded-t-lg mb-2 overflow-hidden">
                         {activity.cardImage ? (
                           <img
                             src={activity.cardImage ? `${BASE_URL}/${activity.cardImage}` : `${BASE_URL}/${activity.businessLogo}`}
@@ -371,24 +395,34 @@ const Activities = () => {
                       </div>
 
                       {/* Card Content */}
-                      <div className="p-4 flex-grow">
+                      <div className="p-2 ">
                         {/* Tags */}
-                        <div className="flex flex-wrap gap-2 mb-2">
-                          {activity.category.map((cat, index) => (
-                            <span
+                        <div className="flex justify-between  items-center mb-2">  
+                        <div className="flex flex-wrap gap-2"> 
+                       {activity.category.slice(0, 3).map((tag, index) => (
+                       <span
                               key={index}
                               className={`text-xs px-2 py-1 rounded-full ${
                                 selectedActivities
                                   .map((a) => a.toLowerCase())
-                                  .includes(cat.toLowerCase().replace(/s$/, ''))
+                                  .includes(tag.toLowerCase().replace(/s$/, ''))
                                   ? 'bg-color2 text-white'
                                   : 'bg-gray-200 text-gray-700'
                               }`}
                             >
-                              {cat}
+                              {tag}
                             </span>
-                          ))}
-                        </div>
+                    ))}
+                    {activity.category.length > 3 && (
+                      <button
+                        onClick={() => handleSeeMoreTags(activity.category)}
+                        className="text-xs underline cursor-pointer text-color2"
+                      >
+                        See More
+                      </button>
+                    )}
+                  </div>
+                  </div>
 
                         <div className='flex gap-2 items-center flex-wrap'>
                           {/* Business Name */}
@@ -416,16 +450,15 @@ const Activities = () => {
                         </div>
 
                         {/* Location */}
-                        <div className="text-xs text-gray-500 mb-2 flex items-center">
-                          <GiPositionMarker /> {activity.destination}
+                        <div className="text-sm text-gray-500  flex items-center">
+                          <GiPositionMarker className="mr-1" /> {activity.destination}
                         </div>
 
                       </div>
                       
                         {/* Ratings & Price */}
-                        <div className="flex justify-between items-center p-2 mb-2 gap-2">
-                          <div className="flex items-center gap-2">
-                            <div className="flex items-center gap-1">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-2">                       
+                          <div className="flex items-center gap-1 mb-2 sm:mb-0">
                               {activity.rating ? (
                                 <>
                                   <span className="text-black text-[12px]">{activity.rating}</span>
@@ -435,22 +468,22 @@ const Activities = () => {
                                   </span>
                                 </>
                               ) : (
-                                <span className="text-gray-500 text-[12px]">No ratings</span>
+                                <span className="text-gray-500 text-[12px] sm:text-sm">No ratings</span>
                               )}
                             </div>
-                          </div>
+                         
 
-                          <p className="font-semibold text-md">
+                            <p className="text-md sm:text-sm font-semibold text-black">
                             {activity.lowest_price && activity.highest_price ? (
                               `₱${activity.lowest_price} - ₱${activity.highest_price}`
                             ) : (
-                              <span className="text-gray-400 italic text-[12px]">Price Range Not available</span>
+                              <span className="text-gray-400 italic text-[12px] sm:text-sm">Price Range Not available</span>
                             )}
                           </p>
                         </div>
                       {/* Explore More Button */}
                       <Link to={`/business/${encryptId(activity.business_id)}`} target="_blank">
-                        <Button className="w-full rounded-md bg-color1 text-color3 hover:bg-color2">
+                          <Button className="w-full bg-color1 text-color3 rounded-md hover:bg-color2">
                           Explore More
                         </Button>
                       </Link>
@@ -484,7 +517,36 @@ const Activities = () => {
           ↑
         </motion.button>
       )}
-
+    
+      {/* Modal for displaying all tags */}
+      <Modal disableAnimation isOpen={isOpen} onClose={onClose}>
+        <ModalContent>
+          <ModalHeader>All Tags</ModalHeader>
+          <ModalBody>
+            <div className="flex gap-2 flex-wrap">
+              {selectedTags.map((tag, index) => (
+                <span
+                      key={index}
+                              className={`text-xs px-2 py-1 rounded-full ${
+                                selectedActivities
+                                  .map((a) => a.toLowerCase())
+                                  .includes(tag.toLowerCase().replace(/s$/, ''))
+                                  ? 'bg-color2 text-white'
+                                  : 'bg-gray-200 text-gray-700'
+                              }`}
+                            >
+                              {tag}
+                            </span>
+              ))}
+            </div>
+          </ModalBody>
+          <ModalFooter>
+            <Button color="danger" onPress={onClose}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 };
