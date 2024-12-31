@@ -3342,17 +3342,47 @@ app.get('/activities', async (req, res) => {
 
 //para sa pag display ng mga amenities
 // Endpoint to fetch amenities
-app.get('/amenities', async (req, res) => {
+app.get('/getAmenities', async (req, res) => {
   const sql = `
-    SELECT * FROM amenities
+    SELECT 
+      b.business_id,
+      b.facilities,
+      JSON_ARRAYAGG(JSON_UNQUOTE(JSON_EXTRACT(b.facilities, '$[*].name'))) AS raw_amenities
+    FROM 
+      businesses b
+    GROUP BY 
+      b.business_id
+    ORDER BY 
+      b.business_id;
   `;
 
   try {
-    // Use the pool to execute the query
+    // Use pooled connection to query the database
     const [results] = await pool.query(sql);
 
-    // Send the list of amenities as the response
-    return res.json({ success: true, amenities: results });
+    // Post-process the results to clean up the unique_amenities
+    const cleanedResults = results.map(business => {
+      const uniqueAmenitiesSet = new Set();
+
+      // Parse each raw_amenity entry and add unique items to the set
+      business.raw_amenities.forEach(amenity => {
+        if (amenity) {
+          try {
+            const amenitiesArray = JSON.parse(amenity);
+            amenitiesArray.forEach(item => uniqueAmenitiesSet.add(item));
+          } catch (e) {
+            console.error('Error parsing amenity:', e);
+          }
+        }
+      });
+
+      return {
+        ...business,
+        amenities: Array.from(uniqueAmenitiesSet)
+      };
+    });
+
+    return res.json({ success: true, businesses: cleanedResults });
   } catch (err) {
     console.error('Error executing SQL query:', err);
     return res.status(500).json({ success: false, message: 'Internal server error' });
@@ -4201,7 +4231,7 @@ app.get('/getBusinessesByLocation/:location', async (req, res) => {
     LEFT JOIN products p ON b.business_id = p.business_id
     LEFT JOIN business_ratings r ON b.business_id = r.business_id
     WHERE REPLACE(LOWER(b.location), ' ', '') = ?
-    GROUP BY b.business_id, b.businessName, b.businessType, b.businessLogo, 
+    GROUP BY b.business_id, b.businessName, b.businessType, b.facilities, b.businessLogo, 
       b.location, b.contactInfo, b.openingHours, b.facilities, 
       b.policies, b.aboutUs
   `;

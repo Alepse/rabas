@@ -50,7 +50,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
       { label: "Condominium", value: "condominium" },
       { label: "Add Category", value: "others" },
     ],
-    food: [
+    restaurant: [
       { label: "Restaurant", value: "restaurant" },
       { label: "Bar", value: "bar" },
       { label: "Café", value: "cafe" },
