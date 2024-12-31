@@ -365,7 +365,7 @@ app.post('/login-verify-otp', async (req, res) => {
 
 // Endpoint for checking login status
 app.get('/check-login', async (req, res) => {
-  console.log('Current session:', req.session); // Log the session object
+  // console.log('Current session:', req.session); // Log the session object
   try {
     // Query the sessions table to retrieve session data using the session ID
     const [results] = await pool.query(
