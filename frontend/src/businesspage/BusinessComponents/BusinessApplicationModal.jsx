@@ -18,12 +18,11 @@ const municipalities = [
 ];
 
 const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userData }) => {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(1)
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     businessName: "",
-    businessTerritory: "",
     certificateNo: "",
     businessScope: "",
     businessType: "",
@@ -51,7 +50,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
       { label: "Condominium", value: "condominium" },
       { label: "Add Category", value: "others" },
     ],
-    food: [
+    restaurant: [
       { label: "Restaurant", value: "restaurant" },
       { label: "Bar", value: "bar" },
       { label: "Café", value: "cafe" },
@@ -80,7 +79,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
   const businessTypeOptions = [
     { label: "Activities", value: "attraction" },
     { label: "Accommodations", value: "accommodation" },
-    { label: "Food Places", value: "food" },
+    { label: "Food Places", value: "restaurant" },
     { label: "Shops", value: "shop" },
   ];
 
@@ -125,8 +124,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
   const validateStep = (currentStep) => {
     switch (currentStep) {
       case 1:
-        return formData.firstName && formData.lastName && formData.businessName && 
-               formData.businessTerritory && formData.certificateNo && formData.businessScope;
+        return formData.firstName && formData.lastName && formData.businessName && formData.certificateNo && formData.businessScope;
       case 2:
         return formData.businessType && formData.category;
       case 3:
@@ -186,18 +184,6 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
               name="businessName"
               placeholder="Enter Business Name"
               value={formData.businessName}
-              onChange={handleInputChange}
-              className="mt-4"
-              required
-            />
-            <Input
-              clearable
-              bordered
-              fullWidth
-              label={<span className="font-bold">Business Territory (Province)</span>}
-              name="businessTerritory"
-              placeholder="Enter Business Territory"
-              value={formData.businessTerritory}
               onChange={handleInputChange}
               className="mt-4"
               required

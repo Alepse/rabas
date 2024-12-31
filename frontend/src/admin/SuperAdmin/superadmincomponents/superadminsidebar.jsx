@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { TbWorld } from 'react-icons/tb';
-import { CgLogOut } from 'react-icons/cg';
 import { MdDashboard } from 'react-icons/md';
 import { RiUserLine } from 'react-icons/ri';
-import { IoMdRibbon } from 'react-icons/io';
 import { FaBox, FaCar, FaBars, FaTimes } from 'react-icons/fa';
-import { Button } from '@nextui-org/react';
 import { MdDomainVerification } from "react-icons/md";
 import { TbReport } from "react-icons/tb";
+import { Button } from '@nextui-org/react';
+import { CgLogOut } from "react-icons/cg";
+import axios from 'axios';
+
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 const SuperAdminSidebar = () => {
   const [activeNav, setActiveNav] = useState('Dashboard');
@@ -19,7 +21,7 @@ const SuperAdminSidebar = () => {
   const navItems = [
     { icon: <MdDashboard className="text-2xl" />, label: 'Dashboard', path: '/superadmindashboard' },
     { icon: <RiUserLine className="text-2xl" />, label: 'Users', path: '/superadminusers' },
-    { icon: <FaBox className="text-2xl" />, label: 'Products', path: '/superadminproducts' },
+    { icon: <FaBox className="text-2xl" />, label: 'Products & Businesses', path: '/superadminproducts' },
     { icon: <FaCar className="text-2xl" />, label: 'Transportation', path: '/superadmintransportation' },
     { icon: <MdDomainVerification  className="text-2xl" />, label: 'Verification', path: '/superadminverification' },
     { icon: <TbReport className="text-2xl" />, label: 'Reports', path: '/superadminreports' },
@@ -32,6 +34,22 @@ const SuperAdminSidebar = () => {
       setActiveNav(currentItem.label);
     }
   }, [location]);
+
+  const handleLogout = (e) => {
+    e.preventDefault();
+    axios.post(`${BASE_URL}/superadmin/logout`, {}, { withCredentials: true })
+      .then(response => {
+        if (response.status === 200) {
+          console.log('Logout successful');
+          window.location.href = '/superadminlogin';
+        } else {
+          console.error('Logout failed');
+        }
+      })
+      .catch(error => {
+        console.error('Error logging out:', error.response ? error.response.data.message : 'An unknown error occurred');
+      });
+  };
 
   return (
     <div className="">
@@ -81,6 +99,15 @@ const SuperAdminSidebar = () => {
               ))}
             </ul>
           </nav>
+        </div>
+
+        <div className="flex flex-col gap-2 mt-9 items-center">
+          <Button 
+            className="bg-red-500 text-white font-medium w-full flex items-center justify-center gap-2"
+            onClick={handleLogout}
+          >
+            <CgLogOut /> Logout
+          </Button>
         </div>
 
       

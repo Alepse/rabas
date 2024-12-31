@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Modal, ModalBody, ModalFooter, ModalHeader, Button, Tooltip, ModalContent, useDisclosure } from '@nextui-org/react';
 import Swal from 'sweetalert2';
 import { FaEye, FaCheck, FaTimes } from 'react-icons/fa';
@@ -326,6 +326,7 @@ const VerificationTable = ({ data, title, onUpdateStatus, searchTerm }) => {
 };
 
 const SuperAdminVerification = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [verificationData, setVerificationData] = useState([]);
   const [searchTermAll, setSearchTermAll] = useState('');
   const [searchTermPending, setSearchTermPending] = useState('');
@@ -338,6 +339,32 @@ const SuperAdminVerification = () => {
     setSelectedItem(item);
     onOpen();
   };
+
+  // Function to check login status
+  const checkLoginStatus = useCallback(async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/superadmin/check-login`, {
+        method: 'GET',
+        credentials: 'include', // Include cookies
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setIsLoggedIn(data.isLoggedIn); // Set login status
+
+        if (!data.isLoggedIn) {
+          window.location.href = '/superadminlogin';
+        }
+      } else {
+        setIsLoggedIn(false);
+      }
+    } catch (error) {
+      console.error('Error checking login status:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    checkLoginStatus();
+  }, [checkLoginStatus]);  
   
     // Simulate data fetching
   const fetchData = async () => {
@@ -359,8 +386,10 @@ const SuperAdminVerification = () => {
   };
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    if (isLoggedIn) {
+      fetchData();
+    }
+  }, [isLoggedIn]);
 
   const updateStatus = (item, newStatus) => {
     setVerificationData((prevData) =>

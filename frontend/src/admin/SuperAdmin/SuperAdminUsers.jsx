@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import SuperAdminSidebar from './superadmincomponents/superadminsidebar';
 import { Tabs, Tab, Card, CardBody } from '@nextui-org/react';
 import SearchBar from './superadmincomponents/SearchBar'; // Import the SearchBar component
@@ -52,12 +52,41 @@ const showErrorAlert = (message) => {
 };
 
 const SuperAdminUsers = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [users, setUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
 
-  useEffect(() => {
-    fetchUsers();
+  // Function to check login status
+  const checkLoginStatus = useCallback(async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/superadmin/check-login`, {
+        method: 'GET',
+        credentials: 'include', // Include cookies
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setIsLoggedIn(data.isLoggedIn); // Set login status
+
+        if (!data.isLoggedIn) {
+          window.location.href = '/superadminlogin';
+        }
+      } else {
+        setIsLoggedIn(false);
+      }
+    } catch (error) {
+      console.error('Error checking login status:', error);
+    }
   }, []);
+
+  useEffect(() => {
+    checkLoginStatus();
+  }, [checkLoginStatus]);  
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      fetchUsers();
+    }
+  }, [isLoggedIn]);
 
   const fetchUsers = async () => {
     try {

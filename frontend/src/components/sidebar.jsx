@@ -5,7 +5,8 @@ import { CiBoxes } from "react-icons/ci";
 import { IoPricetagsOutline } from "react-icons/io5";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from '@nextui-org/react';
-import { FaBars, FaArrowLeft, FaArrowRight, FaCalendar } from 'react-icons/fa';
+import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import { FaCalendar } from 'react-icons/fa';
 import { CgLogOut } from "react-icons/cg";
 import { TbWorld } from "react-icons/tb";
 import CryptoJS from 'crypto-js';
@@ -65,29 +66,24 @@ const Sidebar = () => {
   }, []);
 
   return (
-    <div className=''>
-      {/* Mobile Toggle Button */}
-      <div className="flex justify-between items-center bg-color1 p-4 lg:hidden">
-        <h1 className="font-bold text-xl text-white">Business Management</h1>
-      </div>
-
-      
-      {/* Sidebar for desktop and mobile */}
+    <div className="relative">
+      {/* Sidebar */}
       <div
-        className={`fixed lg:flex flex-col top-0 left-0 justify-between h-full bg-color1 p-6 w-[220px] transform transition-transform duration-300 lg:translate-x-0 ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-[95%]'
-        } lg:static z-50`}
+        className={`fixed lg:flex flex-col top-0 left-0 justify-between h-full bg-color1 py-6 px-12 w-[280px] transform transition-transform duration-300 lg:translate-x-0 ${
+          sidebarOpen ? 'translate-x-0 z-50' : '-translate-x-[90%] z-50'
+        } lg:static`}
       >
+        {/* Sidebar Content */}
         <div>
-          {/* Logo and title */}
           <div className="flex flex-col items-center mt-3">
-            <h1 className="font-bold text-2xl lg:text-3xl text-white text-center">Business Management</h1>
+            <h1 className="font-bold text-2xl lg:text-3xl text-white text-center">
+              Business Management
+            </h1>
             <div className="w-full flex justify-center mt-3">
               <div className="w-[150px] lg:w-[200px] mt-3 bg-slate-600 h-[2px]"></div>
             </div>
           </div>
-
-          {/* Nav Items */}
+    
           <nav className="mt-12 text-sm">
             <ul className="flex flex-col gap-4">
               {navItems.map((item) => (
@@ -100,7 +96,7 @@ const Sidebar = () => {
                     } transition-transform duration-300`}
                     onClick={() => {
                       setActiveNav(item.label);
-                      setSidebarOpen(false); // Close sidebar on mobile when a nav item is clicked
+                      setSidebarOpen(false);
                     }}
                   >
                     {item.icon}
@@ -111,34 +107,42 @@ const Sidebar = () => {
             </ul>
           </nav>
         </div>
-        {/* Buttons */}
-        <div className="flex flex-col gap-2 mt-9 items-center ">
-          <Link to={businessID ? `/business/${encryptId(businessID)}` : '#'} target='_blank'>
-            <Button className="bg-color3 text-black font-medium w-full flex items-center justify-center gap-2" disabled={!businessID}>
+    
+        <div className="flex flex-col gap-2 mt-9 items-center">
+          <Link
+            to={businessID ? `/business/${encryptId(businessID)}` : '#'}
+            target="_blank"
+          >
+            <Button
+              className="bg-color3 text-black font-medium w-full flex items-center justify-center gap-2"
+              disabled={!businessID}
+            >
               <TbWorld /> Go to Business Page
             </Button>
           </Link>
-          <Link to='/userprofile'>
+          <Link to="/userprofile">
             <Button className="bg-red-500 text-white font-medium w-full flex items-center justify-center gap-2">
               <CgLogOut /> Logout
             </Button>
           </Link>
         </div>
+
+        
+        {/* Sidebar Toggle Button */}
+       
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className={`absolute top-1/2 left-0 transform -translate-y-1/2 z-50 py-[100%] ${
+              sidebarOpen ? 'left-[88%]' : 'left-[88%]'
+            } text-white p-2 rounded-r-md text-2xl transition-all duration-300 lg:hidden`}
+          >
+          {sidebarOpen ? <IoIosArrowBack  /> : <IoIosArrowForward  />}
+          </button>
+    
       </div>
-
-      <div className={`fixed flex items-center h-full z-40 transform transition-transform duration-300 lg:translate-x-0 ${
-          sidebarOpen ? 'w-[225px] justify-end' : 'bg-color1 -translate-x-[20%] justify-center' } lg:static `}>
-        <button 
-          onClick={() => setSidebarOpen(!sidebarOpen)} 
-          className={`text-white px-1 py-2 text-2xl rounded-full  ${
-          sidebarOpen ? 'translate-x-[40%] z-50' : 'bg-color1 translate-x-[20%]' }`}
-        >
-          {!sidebarOpen && ( <FaArrowRight /> )}
-        </button>
-      </div>
-
-
-      {/* Overlay for mobile when sidebar is open */}
+  
+    
+      {/* Overlay */}
       {sidebarOpen && (
         <div
           className="fixed inset-0 bg-black opacity-50 z-40 lg:hidden"

@@ -1,12 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import SuperAdminSidebar from './superadmincomponents/superadminsidebar';
 import {
   Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Card, CardBody, useDisclosure,
 } from '@nextui-org/react';
 import { FaEdit, FaPlus, FaTrashAlt } from 'react-icons/fa';
 import Swal from 'sweetalert2'; // Import SweetAlert2
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 const SuperAdminTransportation = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [transportData, setTransportData] = useState([
     {
       terminal: 'Legazpi Terminal',
@@ -93,6 +96,32 @@ const SuperAdminTransportation = () => {
       cancelButtonColor: '#D33736',
     });
   };
+
+  // Function to check login status
+  const checkLoginStatus = useCallback(async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/superadmin/check-login`, {
+        method: 'GET',
+        credentials: 'include', // Include cookies
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setIsLoggedIn(data.isLoggedIn); // Set login status
+
+        if (!data.isLoggedIn) {
+          window.location.href = '/superadminlogin';
+        }
+      } else {
+        setIsLoggedIn(false);
+      }
+    } catch (error) {
+      console.error('Error checking login status:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    checkLoginStatus();
+  }, [checkLoginStatus]);  
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen font-sans">

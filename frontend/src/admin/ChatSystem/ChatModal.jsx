@@ -313,6 +313,32 @@ const BookingDetailsCard = ({ message, onCheckAvailability, isSenderYou }) => {
   );
 };
 
+const ProductCard = ({ product }) => (
+  <div className="flex flex-col sm:flex-row items-center p-4 bg-white shadow-md rounded-lg border border-gray-200">
+    {product.images && product.images.length > 0 && (
+      <img 
+        src={`${BASE_URL}/${product.images[0].path}`}  // Accessing the first image in the array
+        alt={product.images[0].title || "Product Image"}  // Using title if available, otherwise fallback to "Product Image"
+        className="w-full sm:w-32 h-32 rounded-md mb-4 sm:mb-0 sm:mr-4 object-cover" 
+      />
+    )}
+    <div className="text-center sm:text-left">
+      <h4 className="font-bold text-lg">{product.name}</h4>
+      <p className="text-gray-700">₱{product.price}</p>
+      <p className="text-sm text-gray-500">{product.description}</p>
+      <div className="mt-2">
+        <span className="text-yellow-500">Rating: {product.rating} ⭐</span>
+        {product.discount && (
+          <span className="ml-2 text-red-500">{product.discount}% OFF</span>
+        )}
+      </div>
+      {product.expiration && (
+        <p className="mt-2 text-xs text-gray-500">Expires on: {new Date(product.expiration).toLocaleDateString()}</p>
+      )}
+    </div>
+  </div>
+);
+
 // Custom red badge for unread messages positioned inside the avatar
 const UnreadBadge = ({ count }) => (
   count > 0 ? (
@@ -995,7 +1021,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
   const renderMessages = (messages) => {
     let lastMessageTime = null;
     const lastMessage = messages && messages[messages.length - 1]; // Get the last message
-  
+    console.log(messages);
     return messages?.map((message, index) => {
       const isSenderYou = ((message.senderId === user_id) && (message.senderAccount === 'business'));
       const imageUrl = message.image
@@ -1021,50 +1047,49 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
           )}
           <div className={`flex ${isSenderYou ? 'justify-end' : 'justify-start'} mb-4`}>
             <div className={`p-4 rounded-lg max-w-[70%] ${isSenderYou ? 'bg-gray-200 text-black' : 'bg-color1 text-white'} shadow-md`}>
-              {message.formType ? (
-                <BookingDetailsCard
-                  message={message}
-                  onCheckAvailability={handleCheckAvailability}
-                  isSenderYou={isSenderYou}
+           
+            {message.text && <p className="break-words mb-2">{message.text}</p>}
+            {imageUrl && (
+              <div className="relative">
+                <img
+                  src={imageUrl}
+                  alt="Sent"
+                  className="mt-2 rounded-md max-w-full cursor-pointer"
+                  style={{ maxHeight: '400px', objectFit: 'cover' }}
+                  onClick={() => handleImageClick(imageUrl)}
                 />
-              ) : (
+                <button
+                  onClick={() => handleImageDownload(imageUrl)}
+                  className="absolute top-2 right-2 bg-white p-1 rounded-full shadow-md"
+                >
+                  <FiDownload size={16} className="text-black" />
+                </button>
+              </div>
+            )}
+            {message.additionalInfo && (
+              <p className="text-sm text-gray-300 mb-2">{message.additionalInfo}</p>
+            )}
+            {message.messageNote && (
+              <p className="text-sm text-gray-300 mb-2">
+                <strong>Message:</strong> {message.messageNote}
+              </p>
+            )}
+            {message.formDetails &&
+              Object.keys(message.formDetails).some((key) => message.formDetails[key] !== null) && (
                 <>
-                  {message.text && <p className="break-words mb-2">{message.text}</p>}
-                  {imageUrl && (
-                    <div className="relative">
-                      <img
-                        src={imageUrl}
-                        alt="Sent"
-                        className="mt-2 rounded-md max-w-full cursor-pointer"
-                        style={{ maxHeight: '400px', objectFit: 'cover' }}
-                        onClick={() => handleImageClick(imageUrl)}
-                      />
-                      <button
-                        onClick={() => handleImageDownload(imageUrl)}
-                        className="absolute top-2 right-2 bg-white p-1 rounded-full shadow-md"
-                      >
-                        <FiDownload size={16} className="text-black" />
-                      </button>
-                    </div>
+                  {message.formType !== "inquire" && (
+                    <BookingDetailsCard
+                      message={message}
+                      isSender={isSenderYou}
+                      onCheckAvailability={handleCheckAvailability}
+                    />
                   )}
-                  {message.additionalInfo && (
-                    <p className="text-sm text-gray-300 mb-2">{message.additionalInfo}</p>
+                  {message.formType === "inquire" && (
+                    <ProductCard product={message.formDetails.selectedProduct} />
                   )}
-                  {message.messageNote && (
-                    <p className="text-sm text-gray-300 mb-2">
-                      <strong>Message:</strong> {message.messageNote}
-                    </p>
-                  )}
-                  {message.formDetails &&
-                    Object.keys(message.formDetails).some((key) => message.formDetails[key] !== null) && (
-                      <BookingDetailsCard
-                        message={message}
-                        isSender={isSenderYou}
-                        onCheckAvailability={handleCheckAvailability}
-                      />
-                    )}
                 </>
-              )}
+              )
+            }
             </div>
           </div>
           <div className={`flex ${isSenderYou ? 'justify-end' : 'justify-start'}`}>

@@ -35,7 +35,7 @@ const ShopSections = () => {
   const sliderRefs = useRef({});
 
   const [options, setOptions] = useState([
-    { value: 'souvenir', label: 'Souver' },
+    { value: 'souvenir', label: 'Souvenir' },
     { value: 'clothing', label: 'Clothing' },
     { value: 'grocery', label: 'Grocery' },
     { value: 'elctronics', label: 'Electronic' },

@@ -112,6 +112,134 @@ app.use((req, res, next) => {
   next();
 });
 
+// Super Admin Login Endpoint
+app.post('/superadmin/login', async (req, res) => {
+  const { identifier, password } = req.body; // Use 'identifier' for username or email
+
+  // Validate input
+  if (!identifier || !password) {
+    return res.status(400).json({
+      success: false,
+      message: 'Username or email and password are required',
+    });
+  }
+
+  try {
+    // Query the database for the admin using identifier
+    const [rows] = await pool.query(
+      'SELECT * FROM admin WHERE username = ? OR email = ?',
+      [identifier, identifier] // Check both username and email
+    );
+
+    if (rows.length === 0) {
+      return res.status(401).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    const user = rows[0];
+
+    // Check if the user registered using Google
+    if (!user.password) {
+      return res.status(401).json({
+        success: false,
+        message: 'Please log in using Google',
+      });
+    }
+
+    // Compare the provided password with the hashed password from the database
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    if (!passwordMatch) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid password',
+      });
+    }
+
+    // Set the user session
+    req.session.admin = { admin_id: user.admin_id }; // Fixed admin reference
+    return res.json({
+      success: true,
+      message: 'Login successful',
+    });
+  } catch (err) {
+    console.error('Database query error:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+    });
+  }
+});
+
+// Endpoint for checking superadmin login status
+app.get('/superadmin/check-login', async (req, res) => {
+  try {
+    // Query the sessions table to retrieve session data using the session ID
+    const [results] = await pool.query(
+      'SELECT data FROM sessions WHERE session_id = ?',
+      [req.sessionID]
+    );
+
+    if (results.length === 0) {
+      // Session not found
+      return res.status(200).json({
+        isLoggedIn: false,
+        message: 'Session not found',
+      });
+    }
+
+    // Parse the session data from the database
+    let session;
+    try {
+      session = JSON.parse(results[0].data);
+    } catch (parseError) {
+      console.error('Error parsing session data:', parseError);
+      return res.status(500).json({
+        isLoggedIn: false,
+        error: 'Failed to parse session data',
+      });
+    }
+
+    // Check if the session contains admin data
+    if (session && session.admin) {
+      return res.status(200).json({
+        isLoggedIn: true,
+        admin: session.admin,
+      });
+    } else {
+      // Session exists but no admin data
+      return res.status(200).json({
+        isLoggedIn: false,
+        message: 'Admin data not found in session',
+      });
+    }
+  } catch (err) {
+    console.error('Error fetching session data from database:', err);
+    return res.status(500).json({
+      isLoggedIn: false,
+      error: 'Internal server error',
+    });
+  }
+});
+
+// Endpoint for admin logout
+app.post('/superadmin/logout', (req, res) => {
+  if (req.session && req.session.admin) {
+    delete req.session.admin; // Remove only the admin data from the session
+
+    req.session.save((err) => {
+      if (err) {
+        return res.status(500).json({ success: false, message: 'Could not log out the admin session' });
+      }
+      res.json({ success: true, message: 'Admin logout successful' });
+    });
+  } else {
+    res.status(400).json({ success: false, message: 'No admin session found to log out' });
+  }
+});
+
 // User Login Endpoint
 app.post('/login', async (req, res) => {
   const { identifier, password } = req.body; // Use 'identifier' to accept either username or email
@@ -138,9 +266,41 @@ app.post('/login', async (req, res) => {
       // Compare the provided password with the hashed password from the database
       const passwordMatch = await bcrypt.compare(password, user.password);
       if (passwordMatch) {
+
+        // Generate OTP and session ID
+        const otp = Math.floor(100000 + Math.random() * 900000); // 6-digit OTP
+        const sessionId = crypto.randomBytes(16).toString('hex'); // Unique session ID
+
+        // Save all user data along with OTP and session ID to the `otp_sessions` table
+        const otpSql = `
+          INSERT INTO otp_sessions (session_id, user_id, email, otp, expires_at)
+          VALUES (?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 10 MINUTE))
+        `;
+        await pool.query(otpSql, [sessionId, user.user_id, user.email, otp]);
+
+        // Send OTP to the user's email
+        const transporter = nodemailer.createTransport({
+          service: 'Gmail', // Replace with your email service provider
+          auth: {
+            user: process.env.GMAIL_USER, // Your email address
+            pass: process.env.GMAIL_PASS  // Your email password
+          }
+        });
+
+        await transporter.sendMail({
+          from: '"RabaSorsogon Support" <support@rabasorsogon.com>',
+          to: user.email,
+          subject: 'Your OTP Code for Login',
+          text: `Your OTP code is ${otp}. It will expire in 10 minutes.`
+        });
+
         // Set the user session
-        req.session.user = { user_id: user.user_id };
-        return res.json({ success: true, message: 'Login successful' });
+        // req.session.user = { user_id: user.user_id };
+        return res.json({ 
+          success: true, 
+          message: 'Login successful. Please verify your OTP.',
+          sessionId: sessionId
+        });
       } else {
         return res.status(401).json({ success: false, message: 'Invalid password' });
       }
@@ -150,6 +310,56 @@ app.post('/login', async (req, res) => {
   } catch (err) {
     console.error('Database query error:', err);
     return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+// Verify OTP Endpoint
+app.post('/login-verify-otp', async (req, res) => {
+  const { otp, sessionId } = req.body;
+
+  // Validate input
+  if (!otp) {
+    return res.status(400).json({ success: false, error: 'OTP are required' });
+  }
+  if (!sessionId) {
+    return res.status(400).json({ success: false, error: 'Session ID are required' });
+  }
+
+  try {
+    // Query to validate OTP and session ID
+    const otpSql = `
+      SELECT * 
+      FROM otp_sessions 
+      WHERE session_id = ? 
+        AND otp = ? 
+        AND expires_at > NOW()
+    `;
+    const [results] = await pool.query(otpSql, [sessionId, otp]);
+
+    // Check if OTP is valid and not expired
+    if (results.length === 0) {
+      return res.status(400).json({ success: false, error: 'Invalid or expired OTP' });
+    }
+
+    const user = results[0];
+
+    // Remove OTP session after verification
+    const deleteOtpSql = 'DELETE FROM otp_sessions WHERE session_id = ?';
+    await pool.query(deleteOtpSql, [sessionId]);
+
+    // Initialize session if not already initialized
+    if (!req.session) {
+      req.session = {};
+    }
+
+    // Save user ID to session
+    req.session.user = { user_id: user.user_id };
+    console.log(req.session);
+
+    return res.json({ success: true, message: 'OTP verified successfully' });
+  } catch (err) {
+    console.error('Error verifying OTP:', err.message || err);
+    return res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
 
@@ -470,7 +680,7 @@ app.put('/update-password', async (req, res) => {
   }
 });
 
-// Signup Endpoint
+// Signup Endpoint with OTP Integration
 app.post('/signup', async (req, res) => {
   const { username, firstName, lastName, email, address, phone, password, confirmPassword } = req.body;
 
@@ -485,37 +695,46 @@ app.post('/signup', async (req, res) => {
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Insert user data into the database
-    const sql = 'INSERT INTO users (username, password, Fname, Lname, address, email, contact) VALUES (?, ?, ?, ?, ?, ?, ?)';
+    // Generate OTP and session ID
+    const otp = Math.floor(100000 + Math.random() * 900000); // 6-digit OTP
+    const sessionId = crypto.randomBytes(16).toString('hex'); // Unique session ID
 
-    const [results] = await pool.query(sql, [username, hashedPassword, firstName, lastName, address, email, phone]);
+    // Save all user data along with OTP and session ID to the `otp_sessions` table
+    const otpSql = `
+      INSERT INTO otp_sessions (session_id, username, first_name, last_name, email, address, phone, password, otp, expires_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 10 MINUTE))
+    `;
+    await pool.query(otpSql, [sessionId, username, firstName, lastName, email, address, phone, hashedPassword, otp]);
 
-    // Get the newly created user's ID
-    const userId = results.insertId;
+    // Send OTP to the user's email
+    const transporter = nodemailer.createTransport({
+      service: 'Gmail', // Replace with your email service provider
+      auth: {
+        user: process.env.GMAIL_USER, // Your email address
+        pass: process.env.GMAIL_PASS  // Your email password
+      }
+    });
 
-    // Set up user session
-    req.session.user = {
-      user_id: userId
-    };
+    await transporter.sendMail({
+      from: '"RabaSorsogon Support" <support@rabasorsogon.com>',
+      to: email,
+      subject: 'Your OTP Code for Signup',
+      text: `Your OTP code is ${otp}. It will expire in 10 minutes.`
+    });
 
-    console.log('Signup and auto-login successful. User ID:', userId);
+    console.log('OTP sent to:', email);
 
     // Return a success response with session info
     return res.json({
       success: true,
-      message: 'Signup successful and automatically logged in',
-      user: {
-        user_id: userId,
-        username: username,
-        email: email
-      }
+      message: 'Signup successful. Please verify your OTP.',
+      sessionId: sessionId // Return session ID for client-side OTP verification
     });
   } catch (err) {
     console.error('Error executing SQL query:', err);
 
     // Check if the error is a duplicate entry error
     if (err.code === 'ER_DUP_ENTRY') {
-      // Customize the message based on the field that caused the duplication
       if (err.message.includes('username_UNIQUE')) {
         return res.status(400).json({ success: false, error: 'Username is already taken' });
       } else if (err.message.includes('email_UNIQUE')) {
@@ -526,6 +745,50 @@ app.post('/signup', async (req, res) => {
     return res.status(500).json({ success: false, message: 'Internal server error', error: err.message });
   }
 });
+
+// Verify OTP Endpoint
+app.post('/verify-otp', async (req, res) => {
+  const { otp, sessionId } = req.body;
+
+  try {
+    // Check if the OTP and session ID are valid and not expired
+    const otpSql = 'SELECT * FROM otp_sessions WHERE session_id = ? AND otp = ? AND expires_at > NOW()';
+    const [results] = await pool.query(otpSql, [sessionId, otp]);
+
+    if (results.length === 0) {
+      return res.status(400).json({ success: false, error: 'Invalid or expired OTP' });
+    }
+
+    const user = results[0];
+
+    // Remove OTP session after verification
+    const deleteOtpSql = 'DELETE FROM otp_sessions WHERE session_id = ?';
+    await pool.query(deleteOtpSql, [sessionId]);
+
+    // Insert user data into the database after successful OTP verification
+    const userSql = `
+      INSERT INTO users (username, password, Fname, Lname, address, email, contact)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+    const [userInsertResult] = await pool.query(userSql, [
+      user.username, // username from otp_sessions
+      user.password, // hashed password from otp_sessions
+      user.first_name, // first_name from otp_sessions
+      user.last_name, // last_name from otp_sessions
+      user.address, // address from otp_sessions
+      user.email, // email from otp_sessions
+      user.phone // phone from otp_sessions
+    ]);
+
+    req.session.user = { user_id: userInsertResult.insertId };
+    console.log(req.session);
+    return res.json({ success: true, message: 'OTP verified and user registered successfully' });
+  } catch (err) {
+    console.error('Error verifying OTP:', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
 
 // Passport setup
 app.use(passport.initialize());
@@ -804,13 +1067,18 @@ app.post('/reset-password/:token', async (req, res) => {
 
 // Endpoint for user logout
 app.post('/logout', (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      return res.status(500).json({ success: false, message: 'Could not log out' });
-    }
-    res.clearCookie('connect.sid'); // Clear the cookie
-    res.json({ success: true, message: 'Logout successful' });
-  });
+  if (req.session && req.session.user) {
+    delete req.session.user; // Remove only the user data from the session
+
+    req.session.save((err) => {
+      if (err) {
+        return res.status(500).json({ success: false, message: 'Could not log out the user session' });
+      }
+      res.json({ success: true, message: 'User logout successful' });
+    });
+  } else {
+    res.status(400).json({ success: false, message: 'No user session found to log out' });
+  }
 });
 
 // Admin Login Endpoint
@@ -957,7 +1225,6 @@ app.post('/submitBusinessApplication', async (req, res) => {
     firstName,
     lastName,
     businessName,
-    businessTerritory,
     certificateNo,
     businessScope,
     businessType,
@@ -969,7 +1236,7 @@ app.post('/submitBusinessApplication', async (req, res) => {
 
   // Input validation (ensure all fields are provided)
   if (
-    !user_id || !firstName || !lastName || !businessName || !businessTerritory ||
+    !user_id || !firstName || !lastName || !businessName ||
     !certificateNo || !businessScope || !businessType || !category
   ) {
     return res.status(400).json({ error: 'Please fill in all required fields' });
@@ -1016,7 +1283,7 @@ app.post('/submitBusinessApplication', async (req, res) => {
     // Execute the SQL query
     const [results] = await pool.query(
       sql, 
-      [application_id, user_id, firstName, lastName, businessName, businessTerritory, certificateNo, businessScope, businessType, categoryJSON, completeAddress, pinLocationJSON]
+      [application_id, user_id, firstName, lastName, businessName, businessScope, certificateNo, businessScope, businessType, categoryJSON, completeAddress, pinLocationJSON]
     );
 
     console.log('Business application submitted successfully. Affected rows:', results.affectedRows);
@@ -3075,17 +3342,47 @@ app.get('/activities', async (req, res) => {
 
 //para sa pag display ng mga amenities
 // Endpoint to fetch amenities
-app.get('/amenities', async (req, res) => {
+app.get('/getAmenities', async (req, res) => {
   const sql = `
-    SELECT * FROM amenities
+    SELECT 
+      b.business_id,
+      b.facilities,
+      JSON_ARRAYAGG(JSON_UNQUOTE(JSON_EXTRACT(b.facilities, '$[*].name'))) AS raw_amenities
+    FROM 
+      businesses b
+    GROUP BY 
+      b.business_id
+    ORDER BY 
+      b.business_id;
   `;
 
   try {
-    // Use the pool to execute the query
+    // Use pooled connection to query the database
     const [results] = await pool.query(sql);
 
-    // Send the list of amenities as the response
-    return res.json({ success: true, amenities: results });
+    // Post-process the results to clean up the unique_amenities
+    const cleanedResults = results.map(business => {
+      const uniqueAmenitiesSet = new Set();
+
+      // Parse each raw_amenity entry and add unique items to the set
+      business.raw_amenities.forEach(amenity => {
+        if (amenity) {
+          try {
+            const amenitiesArray = JSON.parse(amenity);
+            amenitiesArray.forEach(item => uniqueAmenitiesSet.add(item));
+          } catch (e) {
+            console.error('Error parsing amenity:', e);
+          }
+        }
+      });
+
+      return {
+        ...business,
+        amenities: Array.from(uniqueAmenitiesSet)
+      };
+    });
+
+    return res.json({ success: true, businesses: cleanedResults });
   } catch (err) {
     console.error('Error executing SQL query:', err);
     return res.status(500).json({ success: false, message: 'Internal server error' });
@@ -3433,6 +3730,86 @@ app.get('/superAdmin-businessApplications', async (req, res) => {
   }
 });
 
+// Backend: /superAdmin-businessApplications endpoint
+app.get('/superAdmin-applicationReports', async (req, res) => {
+  const sql = `
+    SELECT 
+      MONTH(application_date) AS month,
+      COUNT(*) AS applicationsCount
+    FROM business_applications
+    WHERE status = 1
+    GROUP BY month
+    ORDER BY month
+  `;
+
+  try {
+    const [results] = await pool.query(sql);
+
+    // Map results to the required chart format
+    const businessOwnersData = {
+      labels: results.map(row => {
+        // Convert month number (1-12) to month name
+        const date = new Date(0);
+        date.setMonth(row.month - 1);
+        return date.toLocaleString('default', { month: 'long' });
+      }),
+      datasets: [
+        {
+          label: 'Business Owners Applications',
+          data: results.map(row => row.applicationsCount),
+          backgroundColor: 'rgba(54, 162, 235, 0.2)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 1,
+        },
+      ],
+    };
+
+    return res.json({ success: true, businessOwnersData });
+  } catch (err) {
+    console.error('Error executing SQL query:', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+app.get('/superAdmin-userReports', async (req, res) => {
+  const sql = `
+    SELECT 
+      MONTH(created_at) AS month, 
+      COUNT(*) AS activeUsersCount
+    FROM users 
+    GROUP BY month
+    ORDER BY month
+  `;
+
+  try {
+    const [results] = await pool.query(sql);
+
+    // Map results to the required chart format
+    const activeUsersData = {
+      labels: results.map(row => {
+        // Convert month number (1-12) to month name
+        const date = new Date(0);
+        date.setMonth(row.month - 1); // Adjust to zero-based month
+        return date.toLocaleString('default', { month: 'long' }); // Get the month name
+      }),
+      datasets: [
+        {
+          label: 'User Registration',
+          data: results.map(row => row.activeUsersCount),
+          backgroundColor: 'rgba(255, 206, 86, 0.2)',  // A color for the chart background
+          borderColor: 'rgba(255, 206, 86, 1)',  // A color for the chart border
+          borderWidth: 1,
+        },
+      ],
+    };
+
+    return res.json({ success: true, activeUsersData });
+  } catch (err) {
+    console.error('Error executing SQL query:', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
 // Endpoint to update the business application status
 app.put('/updateStatus-businessApplications/:id', async (req, res) => {
   const { id } = req.params; // Get the application ID from the URL
@@ -3773,6 +4150,7 @@ app.get('/getAllBusinesses', async (req, res) => {
       b.openingHours,
       b.facilities,
       b.policies,
+      b.dateOrigin,
       IF(
         JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.description')) IS NULL OR 
         JSON_UNQUOTE(JSON_EXTRACT(b.businessCard, '$.description')) = '', 
@@ -3933,7 +4311,7 @@ app.get('/getBusinessesByLocation/:location', async (req, res) => {
     LEFT JOIN products p ON b.business_id = p.business_id
     LEFT JOIN business_ratings r ON b.business_id = r.business_id
     WHERE REPLACE(LOWER(b.location), ' ', '') = ?
-    GROUP BY b.business_id, b.businessName, b.businessType, b.businessLogo, 
+    GROUP BY b.business_id, b.businessName, b.businessType, b.facilities, b.businessLogo, 
       b.location, b.contactInfo, b.openingHours, b.facilities, 
       b.policies, b.aboutUs
   `;

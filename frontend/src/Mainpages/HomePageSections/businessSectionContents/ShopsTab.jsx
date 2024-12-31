@@ -52,6 +52,8 @@ const ShopsTab = ({shopsData, loading}) => {
   // Sort shops for "Shopper's Picks" by number of likes (descending)
   const shoppersPicks = [...shops].sort((a, b) => b.likes - a.likes);
 
+  const recent = [...shops].sort((a, b) => new Date(b.dateOrigin) - new Date(a.dateOrigin));
+
   return (
     <div className='lg:container'>
       <ShopSwiper 
@@ -71,7 +73,7 @@ const ShopsTab = ({shopsData, loading}) => {
       <ShopSwiper 
         title="Shop Local: Explore the Latest Additions to Our Shops!" 
         isLast 
-        shops={shops} 
+        shops={recent} 
         loading={loading} 
         uniqueId="shops"
       />

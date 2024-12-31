@@ -1,8 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import SuperAdminSidebar from './superadmincomponents/superadminsidebar';
 import { useAsyncList } from '@react-stately/data';
+import axios from 'axios';
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
@@ -15,34 +16,114 @@ const getKeyValue = (obj, key) => {
 };
 
 const SuperAdminDashboard = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const chartRef = useRef(null);
-
-  // Sample data for the charts
-  const businessOwnersData = {
-    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+  const [page, setPage] = React.useState(1);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [pendingVerifications, setPendingVerifications] = useState(0);
+  const [businessOwners, setBusinessOwners] = useState(0);
+  const [tourists, setTourists] = useState(0);
+  const [reports, setReports] = useState(0);
+  const [tableData, setTableData] = React.useState([]);  // Updated data for the table
+  
+  const [businessOwnersData, setBusinessOwnersData] = useState({
+    labels: [],
     datasets: [
       {
         label: 'Business Owners Applications',
-        data: [10, 25, 30, 40, 50, 60, 70],
+        data: [],
         backgroundColor: 'rgba(54, 162, 235, 0.2)',
         borderColor: 'rgba(54, 162, 235, 1)',
         borderWidth: 1,
       },
     ],
-  };
-
-  const activeUsersData = {
-    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+  });
+  
+  const [activeUsersData, setActiveUsersData] = useState({
+    labels: [],
     datasets: [
       {
-        label: 'Active Users',
-        data: [45, 60, 70, 80, 90, 100, 110],
+        label: 'User Registration',
+        data: [],
         backgroundColor: 'rgba(255, 206, 86, 0.2)',
         borderColor: 'rgba(255, 206, 86, 1)',
         borderWidth: 1,
       },
     ],
-  };
+  });
+
+  // Fetching data from both APIs: business owners and active users
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetching business owners data
+        const businessOwnersResponse = await axios.get(`${BASE_URL}/superAdmin-applicationReports`);
+        if (businessOwnersResponse.data.success) {
+          const allMonths = [
+            "January", "February", "March", "April", "May", "June", "July", 
+            "August", "September", "October", "November", "December"
+          ];
+          
+          const businessOwnersData = new Array(12).fill(0);
+          businessOwnersResponse.data.businessOwnersData.labels.forEach((month, index) => {
+            const monthIndex = allMonths.indexOf(month);
+            if (monthIndex !== -1) {
+              businessOwnersData[monthIndex] = businessOwnersResponse.data.businessOwnersData.datasets[0].data[index];
+            }
+          });
+
+          setBusinessOwnersData({
+            labels: allMonths,
+            datasets: [
+              {
+                label: 'Business Owners Applications',
+                data: businessOwnersData,
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1,
+              },
+            ],
+          });
+        }
+
+        // Fetching active users data
+        const activeUsersResponse = await axios.get(`${BASE_URL}/superAdmin-userReports`);
+        if (activeUsersResponse.data.success) {
+          const allMonths = [
+            "January", "February", "March", "April", "May", "June", "July", 
+            "August", "September", "October", "November", "December"
+          ];
+          
+          const activeUsersData = new Array(12).fill(0);
+          activeUsersResponse.data.activeUsersData.labels.forEach((month, index) => {
+            const monthIndex = allMonths.indexOf(month);
+            if (monthIndex !== -1) {
+              activeUsersData[monthIndex] = activeUsersResponse.data.activeUsersData.datasets[0].data[index];
+            }
+          });
+
+          setActiveUsersData({
+            labels: allMonths,
+            datasets: [
+              {
+                label: 'User Registrations',
+                data: activeUsersData,
+                backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                borderColor: 'rgba(255, 206, 86, 1)',
+                borderWidth: 1,
+              },
+            ],
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []); // Empty dependency array ensures it runs only once when component mounts
 
   const options = {
     responsive: true,
@@ -67,9 +148,7 @@ const SuperAdminDashboard = () => {
     };
   }, []);
 
-  const [page, setPage] = React.useState(1);
-  const [isLoading, setIsLoading] = React.useState(true);
-
+  
   let list = useAsyncList({
     async load({ signal, cursor }) {
       if (cursor) {
@@ -92,38 +171,58 @@ const SuperAdminDashboard = () => {
 
   const hasMore = page < 9;
 
-  // Updated data for the table
-  const [tableData, setTableData] = React.useState([]);
+  // Function to check login status
+  const checkLoginStatus = useCallback(async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/superadmin/check-login`, {
+        method: 'GET',
+        credentials: 'include', // Include cookies
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setIsLoggedIn(data.isLoggedIn); // Set login status
+
+        if (!data.isLoggedIn) {
+          window.location.href = '/superadminlogin';
+        }
+      } else {
+        setIsLoggedIn(false);
+      }
+    } catch (error) {
+      console.error('Error checking login status:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    checkLoginStatus();
+  }, [checkLoginStatus]);  
 
   useEffect(() => {
     const fetchBusinessOwners = async () => {
-      try {
-        const response = await fetch(`${BASE_URL}/superAdmin-fetchAllBusinessOwners`, {
-          credentials: 'include'
-        });
+      if(isLoggedIn){
+        try {
+          const response = await fetch(`${BASE_URL}/superAdmin-fetchAllBusinessOwners`, {
+            credentials: 'include'
+          });
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch business owners');
-        }
+          if (!response.ok) {
+            throw new Error('Failed to fetch business owners');
+          }
 
-        const data = await response.json();
-        if (data.success) {
-          setTableData(data.data);
-        } else {
-          console.error('Failed to fetch business owners:', data.message);
+          const data = await response.json();
+          if (data.success) {
+            setTableData(data.data);
+          } else {
+            console.error('Failed to fetch business owners:', data.message);
+          }
+        } catch (error) {
+          console.error('Error fetching business owners:', error);
         }
-      } catch (error) {
-        console.error('Error fetching business owners:', error);
-      }
-    };
+      };
+    }
 
     fetchBusinessOwners();
-  }, []);
-
-  const [pendingVerifications, setPendingVerifications] = useState(0);
-  const [businessOwners, setBusinessOwners] = useState(0);
-  const [tourists, setTourists] = useState(0);
-  const [reports, setReports] = useState(0);
+  }, [isLoggedIn]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -226,7 +325,7 @@ const SuperAdminDashboard = () => {
             </div>
           </div>
           <div className="bg-white shadow-md rounded-lg p-4 md:p-6">
-            <h2 className="text-lg md:text-xl font-semibold mb-4 text-center">Active Users Reports</h2>
+            <h2 className="text-lg md:text-xl font-semibold mb-4 text-center">User Registration Reports</h2>
             <div className="h-[400px] md:h-[500px] w-full">
               <Bar 
                 data={activeUsersData} 

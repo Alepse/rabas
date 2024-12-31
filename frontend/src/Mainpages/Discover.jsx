@@ -92,7 +92,6 @@ const Discover = () => {
 
         if (contentType && contentType.includes("application/json")) {
           const data = await response.json();
-          // console.log('Data:', data);
           if (data.success) {
             // console.log(`Fetching data for businessType: ${businessType}`);
 
@@ -158,13 +157,69 @@ const Discover = () => {
     'All', 'Bulusan', 'Bulan', 'Barcelona', 'Casiguran', 'Castilla', 'Donsol', 'Gubat', 'Irosin', 'Juban', 'Magallanes', 'Matnog', 'Pilar', 'Prieto Diaz', 'Sta. Magdalena', 'Sorsogon City'
   ];
 
-  const activityTypes = ['Hiking', 'Water Sports', 'Relaxation', 'Adventure', 'Attraction'];
-  const accommodationTypes = ['Cabins', 'Resorts', 'Hotels', 'Hostels'];
-  const foodTypes = ['Restaurant', 'Bar', 'Cafe'];
-  const cuisines = ['Filipino', 'International', 'Chinese', 'Japanese', 'Italian', 'cafe'];
-  const amenitiesList = ['WiFi', 'Outdoor Seating', 'Live Music', 'Happy Hour', 'Family-Friendly', 'Vegan Options'];
-  const shopTypes = ['Souvenir Shop', 'Clothing Store', 'Grocery Store', 'Electronics Store', 'Bookstore'];
-  const categories = ['Souvenir Shop', 'Handicrafts', 'Fashion', 'Food', 'Electronics', 'Books', 'Home Decor'];
+  // Extract and combine all activity types
+  // Capitalize each word
+  const capitalizeWords = (str) =>
+    str
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+
+  // Extract, combine, and capitalize all activity types
+  const activityTypes = mockData.activities
+    .flatMap((activity) => activity.category)
+    .filter((type, index, self) => self.indexOf(type) === index) // Remove duplicates
+    .map(capitalizeWords); // Capitalize each type
+
+  // Extract, combine, and capitalize all accommodation types
+  const accommodationTypes = mockData.accommodations
+    .flatMap((accommodation) => accommodation.category)
+    .filter((type, index, self) => self.indexOf(type) === index) // Remove duplicates
+    .map(capitalizeWords); // Capitalize each type
+
+  // Extract, combine, and capitalize all shop types
+  const shopTypes = mockData.shop
+    .flatMap((shop) => shop.category)
+    .filter((type, index, self) => self.indexOf(type) === index) // Remove duplicates
+    .map(capitalizeWords); // Capitalize each type
+
+  // Extract, combine, and capitalize all food types
+  const foodTypes = mockData.restaurant
+    .flatMap((restaurant) => restaurant.category)
+    .filter((type, index, self) => self.indexOf(type) === index) // Remove duplicates
+    .map(capitalizeWords); // Capitalize each type
+    
+  // Extract, combine, and capitalize all food types
+  const cuisines = mockData.restaurant
+    .flatMap((restaurant) => restaurant.category)
+    .filter((type, index, self) => self.indexOf(type) === index) // Remove duplicates
+    .map(capitalizeWords); // Capitalize each type
+
+  // Extract, combine, and capitalize all shop types
+  const categories = mockData.shop
+    .flatMap((shop) => shop.category)
+    .filter((type, index, self) => self.indexOf(type) === index) // Remove duplicates
+    .map(capitalizeWords); // Capitalize each type
+  
+  
+  // Extract, combine, and capitalize all amenity items from the entire mockData
+  const amenitiesList = Object.values(mockData) // Get all category arrays
+    .flatMap((category) =>
+      category.flatMap((data) =>
+        data.facilities?.flatMap((facility) =>
+          facility.items.map((item) => item.name)
+        ) || []
+      )
+    )
+    .filter(
+      (item, index, self) =>
+        self.findIndex((i) => i.toLowerCase() === item.toLowerCase()) === index
+    ) // Remove duplicates case-insensitively
+    .map((item) =>
+      item
+        .toLowerCase()
+        .replace(/(^\w|\s\w)/g, (match) => match.toUpperCase()) // Capitalize each word
+    );
 
   const handleRatingClick = (rating, setFilters) => {
     setFilters((prevFilters) => {
@@ -199,12 +254,18 @@ const Discover = () => {
 
       // console.log('selectedCuisine', filters.selectedCuisine);
       // console.log('item.category', item.category);
-
-      const matchesAmenities = filters.selectedAmenities.length === 0 || 
-        filters.selectedAmenities.every(amenity => 
-          item.amenities.map(a => a.toLowerCase().replace(/s$/, '')).includes(amenity.toLowerCase().replace(/s$/, ''))
+      // console.log(item.facilities);
+      
+      const matchesAmenities =
+        filters.selectedAmenities.length === 0 ||
+        filters.selectedAmenities.every((amenity) =>
+          item.facilities
+            ?.flatMap((facility) =>
+              facility.items.map((a) => a.name.toLowerCase().replace(/s$/, '')) // Normalize item facilities
+            )
+            .includes(amenity.toLowerCase().replace(/s$/, '')) // Normalize selected amenities
         );
-
+      
       const matchesRatings = filters.selectedRatings.length === 0 || 
         filters.selectedRatings.includes(Math.floor(item.rating || 0));
 

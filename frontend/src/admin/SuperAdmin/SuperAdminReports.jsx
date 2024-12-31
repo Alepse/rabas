@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import SuperAdminSidebar from './superadmincomponents/superadminsidebar';
 import SearchBar from './superadmincomponents/SearchBar';
 import { Bar } from 'react-chartjs-2';
 import Swal from 'sweetalert2';
 import { Modal, ModalBody, ModalFooter, ModalHeader, Button, Tooltip, ModalContent, useDisclosure } from '@nextui-org/react';
 import { FaEye, FaTrashAlt } from 'react-icons/fa';
-
+// Use the environment variable for the base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 // Summary Card Component
 const SummaryCard = ({ title, count, color }) => (
   <div className={`${color} text-white p-4 md:p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow`}>
@@ -67,6 +68,7 @@ const Table = ({ title, headers, data, requestSort, handleSearch, onViewDetails,
 
 // Super Admin Reports Component
 const SuperAdminReports = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -182,6 +184,32 @@ const SuperAdminReports = () => {
       }
     });
   };
+
+  // Function to check login status
+  const checkLoginStatus = useCallback(async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/superadmin/check-login`, {
+        method: 'GET',
+        credentials: 'include', // Include cookies
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setIsLoggedIn(data.isLoggedIn); // Set login status
+
+        if (!data.isLoggedIn) {
+          window.location.href = '/superadminlogin';
+        }
+      } else {
+        setIsLoggedIn(false);
+      }
+    } catch (error) {
+      console.error('Error checking login status:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    checkLoginStatus();
+  }, [checkLoginStatus]);  
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gray-100"> 

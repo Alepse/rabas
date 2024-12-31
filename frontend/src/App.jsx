@@ -25,7 +25,7 @@ import Trip from './Mainpages/Trip';
 import Transportation from './Mainpages/Transportation';
 import About from './Mainpages/About'
 import ResetPW from './auth/ResetLink/ResetPW';
-
+import AdminLogin from '@/admin/SuperAdmin/SuperAdminLogin'
 
 
 function App() {
@@ -58,6 +58,7 @@ function App() {
           <Route path='/transportation' element={<Transportation/>}/>
           <Route path='/about' element={<About/>}/>
           <Route path='/resetpassword' element={<ResetPW/>}/>
+          <Route path='/superadminlogin' element={<AdminLogin/>}/>
         
   
     

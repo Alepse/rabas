@@ -54,6 +54,9 @@ const AccommodationsTab = ({ accommodationsData, loading }) => {
   // Sort accommodations for "Traveler's Choice" by number of likes (descending)
   const travelersChoice = [...accommodations].sort((a, b) => b.likes - a.likes);
 
+  // Sort accommodations for "Experience Comfort: Recent Additions to Our Accommodations" by date creation desc
+  const recent = [...accommodations].sort((a, b) => new Date(b.dateOrigin) - new Date(a.dateOrigin));
+
   return (
     <div className='lg:container'>
       <AccommodationSwiper 
@@ -73,7 +76,7 @@ const AccommodationsTab = ({ accommodationsData, loading }) => {
       <AccommodationSwiper 
         title="Experience Comfort: Recent Additions to Our Accommodations" 
         isLast 
-        accommodations={accommodations} 
+        accommodations={recent} 
         loading={loading} 
         uniqueId="accomodations"
       />

@@ -17,6 +17,9 @@ const LoginSignup = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Add state to track login status
 
   const [email, setEmail] = useState(''); // Add state to manage email for forgot password
+  const [otp, setOtp] = useState(''); // OTP state
+  const [otpSession, setOtpSession] = useState(null); // Track OTP session
+  const [isOtpSent, setIsOtpSent] = useState(false);
 
   useEffect(() => {
     document.title = 'Login/Signup';
@@ -55,23 +58,13 @@ const LoginSignup = () => {
       });
       const data = await response.json();
       if (data.success) {
-        Swal.fire({
-          title: 'Login Successful!',
-          text: ' ',
-          icon: 'success',
-          showConfirmButton: false,
-          timer: 1500,
-        }).then(() => {         
-          window.location.href = '/'; // Redirect to home page after the alert is closed
-        });
+        setOtpSession(data.sessionId); // Save OTP session ID
+        console.log('OtpSession saved', data);
+        setView("loginotp"); // Redirect to OTP view
+        Swal.fire('OTP Sent!', 'Check your email for the OTP.', 'success');
+        setIsOtpSent(true); //
       } else {
-        Swal.fire({
-          title: 'Login Failed!',
-          text: 'Invalid username or password',
-          icon: 'error',
-          showConfirmButton: false,
-          timer: 2000,
-        });
+        Swal.fire('Login Failed!', data.error, 'error');
       }
     } catch (error) {
       console.error('Error:', error); 
@@ -105,39 +98,69 @@ const LoginSignup = () => {
     try {
       const response = await fetch(`${BASE_URL}/signup`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include', 
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(signupData)
       });
       const data = await response.json();
-      console.log(data);
-      if(data.success){
-        Swal.fire({
-          title: 'Signup Successful!',
-          text: ' ',
-          icon: 'success',
-          showConfirmButton: false,
-          timer: 1500,
-        }).then(() => {          
-          window.location.href = '/'; // Redirect to home page after the alert is closed
-        });
-      }
-      else{
-        Swal.fire({
-          title: 'Signup Failed!',
-          text: data.error,
-          icon: 'error',
-          showConfirmButton: false,
-          timer: 2000,
-        });
+      if (data.success) {
+        setOtpSession(data.sessionId); // Save OTP session ID
+        setView("otp"); // Redirect to OTP view
+        Swal.fire('OTP Sent!', 'Check your email for the OTP.', 'success');
+        setIsOtpSent(true); //
+      } else {
+        Swal.fire('Signup Failed!', data.error, 'error');
       }
     } catch (error) {
-      console.error('Error:', error);      
-      alert('An error occurred while signing up. Please try again later.'); // Display a generic error message to the user
+      console.error(error);
+      Swal.fire('Error!', 'An error occurred. Please try again.', 'error');
     }
-  }
+  };
+
+  const handleLoginOtpVerification = async (event) => {
+    event.preventDefault();
+    try {
+      const response = await fetch(`${BASE_URL}/login-verify-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ otp, sessionId: otpSession })
+      });
+      const data = await response.json();
+      if (data.success) {
+        Swal.fire('Verification Successful!', 'You are now signed up.', 'success').then(() => {
+          window.location.href = '/';
+        });
+      } else {
+        Swal.fire('Verification Failed!', data.error, 'error');
+      }
+    } catch (error) {
+      console.error(error);
+      Swal.fire('Error!', 'An error occurred. Please try again.', 'error');
+    }
+  };
+
+  const handleOtpVerification = async (event) => {
+    event.preventDefault();
+    try {
+      const response = await fetch(`${BASE_URL}/verify-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ otp, sessionId: otpSession })
+      });
+      const data = await response.json();
+      if (data.success) {
+        Swal.fire('Verification Successful!', 'You are now signed up.', 'success').then(() => {
+          window.location.href = '/';
+        });
+      } else {
+        Swal.fire('Verification Failed!', data.error, 'error');
+      }
+    } catch (error) {
+      console.error(error);
+      Swal.fire('Error!', 'An error occurred. Please try again.', 'error');
+    }
+  };
 
   const handleGoogleLogin = () => {
     window.location.href = `${BASE_URL}/auth/google`;
@@ -186,47 +209,52 @@ const LoginSignup = () => {
   };
 
   const renderInitialView = () => (
-    <div className="flex flex-col h-full items-center justify-center gap-4">
+    <div className="flex flex-col h-full items-center justify-center gap-6 px-5 py-20">
       <img className="w-[11rem]" src={Logo2} />
-      <h1 className="text-center font-semibold font-font1 text-2xl mb-9">
+      <h1 className="text-center font-semibold font-font1 text-2xl mb-9 py-10">
         Sign in to explore more in RabaSorsogon
       </h1>
       <Button
-        className="flex items-center justify-center border-2 py-2 hover:bg-color2 hover:text-white transition rounded-full"
+        className="flex items-center justify-center border-2 py-2 hover:bg-color2 hover:text-white transition rounded-lg"
         onClick={handleGoogleLogin}
         fullWidth
       >
         <FaGoogle className="mr-2" /> Continue with Google
       </Button>
+
+
       <Button
-        className="flex items-center justify-center border-2 py-2 hover:bg-gray-100 transition rounded-full"
-        onClick={() => setView("email")}
+        color="primary"
+        className="hover:bg-color2 rounded-lg"
+        onClick={() => setView("login")}
         fullWidth
       >
-        <FaEnvelope className="mr-2" /> Continue with Email
+        Login
       </Button>
+
+      <Button 
+        color="primary"
+        className="hover:bg-color2 rounded-lg"
+        onClick={() => setView("signup")}
+        fullWidth
+      >
+        Sign Up
+      </Button>
+      
     </div>
   );
 
-  const renderEmailForm = () => (
-    <div className="flex flex-col gap-4 ">
-      <button
-        className="flex items-center text-gray-500 hover:text-black transition-all mb-4"
-        onClick={() => setView("initial")}
-      >
-        <FaArrowLeft className="mr-2" /> Back
-      </button>
-      <Tabs
-        fullWidth
-        aria-label="Login or Signup"
-        selectedKey={selected}
-        onSelectionChange={setSelected}
-      
-      
-      >
-        <Tab key="login" title="Login">
+  const renderLoginForm = () => (
+    <div className="flex flex-col h-full items-center justify-center gap-6 px-5 py-20">
+    <button
+    className="absolute top-5 left-5 flex items-center text-gray-500 hover:text-black transition-all mb-4"
+    onClick={() => setView("initial")}
+    >
+      <FaArrowLeft className="mr-2" /> Back
+    </button>
+      <img className="w-[11rem]" src={Logo2} />
+        <h1 className="text-center font-semibold font-font1 text-2xl mb-9 py-5">Login!</h1>
           <form onSubmit={handleLogin} className="flex flex-col gap-4  ">
-          <h1 className='font-font1 text-center text-2xl mb-2'>Tara, Rabas kita sa Sorsogon !</h1>
             <Input
               label="Email/username"
               type="text"
@@ -258,7 +286,7 @@ const LoginSignup = () => {
               <Link
                 className="cursor-pointer hover:text-color2"
                 size="sm"
-                onClick={() => setView("forgotPassword")}
+                onClick={() => setView("forgotpassword")}
               >
                 Forgot Password?
               </Link>
@@ -267,7 +295,7 @@ const LoginSignup = () => {
                 <Link
                   className="cursor-pointer hover:text-color2"
                   size="sm"
-                  onClick={() => setSelected("signup")}
+                  onClick={() => setView("signup")}
                 >
                   Sign up
                 </Link>
@@ -277,10 +305,21 @@ const LoginSignup = () => {
               Login
             </Button>
           </form>
-        </Tab>
 
-        <Tab key="signup" title="Sign Up">
-          <form onSubmit={handleSignup} className="flex flex-col gap-4">
+    </div>
+  );
+  
+  const renderSignupForm = () => (
+    <div className="flex flex-col h-full items-center justify-center gap-6 px-5 py-20">
+      <img className="w-[11rem]" src={Logo2} />
+      <button
+        className="absolute top-5 left-5 flex items-center text-gray-500 hover:text-black transition-all mb-4"
+        onClick={() => setView("initial")}
+      >
+        <FaArrowLeft className="mr-2" /> Back
+      </button>
+        <h1 className='font-font1 text-center text-2xl mb-2'>Signup!</h1>
+          <form onSubmit={handleSignup} className="flex flex-col min-w-[260px] w-auto gap-4">
             <Input
               label="First Name"
               type="text"
@@ -376,8 +415,79 @@ const LoginSignup = () => {
               Sign Up
             </Button>
           </form>
-        </Tab>
-      </Tabs>
+    </div>
+  );
+
+  // Render OTP form
+  const renderOtpForm = () => (
+    <div className="flex flex-col gap-4">
+      <h1 className="font-font1 text-center text-2xl mb-4">Enter OTP</h1>
+      <form onSubmit={handleOtpVerification} className="flex flex-col gap-4">
+        <Input
+          label="OTP"
+          type="text"
+          value={otp}
+          onChange={(e) => setOtp(e.target.value)}
+          required
+        />
+        <Button type="submit" color="primary" className="hover:bg-color2" fullWidth>
+          Verify OTP
+        </Button>
+      </form>
+
+      {/* Resend OTP button */}
+      {isOtpSent && (
+        <div className="mt-4 text-center">
+          <Button 
+            onClick={handleSignup} 
+            color="secondary" 
+            className="hover:bg-color2"
+            fullWidth
+          >
+            Resend OTP
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+
+  // Render OTP form
+  const renderLoginOtpForm = () => (
+    <div className="flex flex-col h-full items-center justify-center gap-6 px-5 py-20">
+      <button
+      className="absolute top-5 left-5 flex items-center text-gray-500 hover:text-black transition-all mb-4"
+      onClick={() => setView("initial")}
+      >
+        <FaArrowLeft className="mr-2" /> Back
+      </button>
+      <img className="w-[11rem]" src={Logo2} />
+      <h1 className="font-font1 text-center text-2xl mb-4 px-20 py-5">Enter OTP</h1>
+      <form onSubmit={handleLoginOtpVerification} className="flex flex-col gap-4">
+        <Input
+          label="OTP"
+          type="text"
+          value={otp}
+          onChange={(e) => setOtp(e.target.value)}
+          required
+        />
+        <Button type="submit" color="primary" className="hover:bg-color2" fullWidth>
+          Verify OTP
+        </Button>
+      </form>
+
+      {/* Resend OTP button */}
+      {isOtpSent && (
+        <div className="mt-4 text-center">
+          <Button 
+            onClick={handleLogin} 
+            color="secondary" 
+            className="hover:bg-color2"
+            fullWidth
+          >
+            Resend OTP
+          </Button>
+        </div>
+      )}
     </div>
   );
 
@@ -407,12 +517,20 @@ const LoginSignup = () => {
   );
 
   return (
-    <div className="flex flex-col w-full p-4 h-full">
-      {view === "initial"
-        ? renderInitialView()
-        : view === "forgotPassword"
-        ? renderForgotPasswordForm()
-        : renderEmailForm()}
+    <div className="container mx-auto flex justify-center items-center">
+      {view === "otp" ? (
+        renderOtpForm()
+      ) : view === "loginotp" ? (
+        renderLoginOtpForm()
+      ) : view === "signup" ? (
+        renderSignupForm()
+      ) : view === "login" ? (
+        renderLoginForm()
+      ) : view === "forgotpassword" ? (
+        renderForgotPasswordForm()
+      ) : (
+        renderInitialView()
+      )}
     </div>
   );
 };

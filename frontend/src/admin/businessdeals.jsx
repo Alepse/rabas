@@ -18,7 +18,7 @@ const BusinessDeals = () => {
   const [showAccommodation, setShowAccommodation] = useState(false);
   const [showRestaurantServices, setShowRestaurantServices] = useState(false);
   const [showShop, setShowShop] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [businessType, setBusinessType] = useState(null);
 
   // Function to show admin request popup
