@@ -3,6 +3,7 @@ import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import SuperAdminSidebar from './superadmincomponents/superadminsidebar';
 import { useAsyncList } from '@react-stately/data';
+import axios from 'axios';
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
@@ -25,32 +26,104 @@ const SuperAdminDashboard = () => {
   const [reports, setReports] = useState(0);
   const [tableData, setTableData] = React.useState([]);  // Updated data for the table
   
-  // Sample data for the charts
-  const businessOwnersData = {
-    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+  const [businessOwnersData, setBusinessOwnersData] = useState({
+    labels: [],
     datasets: [
       {
         label: 'Business Owners Applications',
-        data: [10, 25, 30, 40, 50, 60, 70],
+        data: [],
         backgroundColor: 'rgba(54, 162, 235, 0.2)',
         borderColor: 'rgba(54, 162, 235, 1)',
         borderWidth: 1,
       },
     ],
-  };
-
-  const activeUsersData = {
-    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+  });
+  
+  const [activeUsersData, setActiveUsersData] = useState({
+    labels: [],
     datasets: [
       {
         label: 'Active Users',
-        data: [45, 60, 70, 80, 90, 100, 110],
+        data: [],
         backgroundColor: 'rgba(255, 206, 86, 0.2)',
         borderColor: 'rgba(255, 206, 86, 1)',
         borderWidth: 1,
       },
     ],
-  };
+  });
+
+  // Fetching data from both APIs: business owners and active users
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetching business owners data
+        const businessOwnersResponse = await axios.get(`${BASE_URL}/superAdmin-applicationReports`);
+        if (businessOwnersResponse.data.success) {
+          const allMonths = [
+            "January", "February", "March", "April", "May", "June", "July", 
+            "August", "September", "October", "November", "December"
+          ];
+          
+          const businessOwnersData = new Array(12).fill(0);
+          businessOwnersResponse.data.businessOwnersData.labels.forEach((month, index) => {
+            const monthIndex = allMonths.indexOf(month);
+            if (monthIndex !== -1) {
+              businessOwnersData[monthIndex] = businessOwnersResponse.data.businessOwnersData.datasets[0].data[index];
+            }
+          });
+
+          setBusinessOwnersData({
+            labels: allMonths,
+            datasets: [
+              {
+                label: 'Business Owners Applications',
+                data: businessOwnersData,
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1,
+              },
+            ],
+          });
+        }
+
+        // Fetching active users data
+        const activeUsersResponse = await axios.get(`${BASE_URL}/superAdmin-userReports`);
+        if (activeUsersResponse.data.success) {
+          const allMonths = [
+            "January", "February", "March", "April", "May", "June", "July", 
+            "August", "September", "October", "November", "December"
+          ];
+          
+          const activeUsersData = new Array(12).fill(0);
+          activeUsersResponse.data.activeUsersData.labels.forEach((month, index) => {
+            const monthIndex = allMonths.indexOf(month);
+            if (monthIndex !== -1) {
+              activeUsersData[monthIndex] = activeUsersResponse.data.activeUsersData.datasets[0].data[index];
+            }
+          });
+
+          setActiveUsersData({
+            labels: allMonths,
+            datasets: [
+              {
+                label: 'User Registrations Report',
+                data: activeUsersData,
+                backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                borderColor: 'rgba(255, 206, 86, 1)',
+                borderWidth: 1,
+              },
+            ],
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []); // Empty dependency array ensures it runs only once when component mounts
 
   const options = {
     responsive: true,

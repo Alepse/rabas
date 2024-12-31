@@ -3730,6 +3730,86 @@ app.get('/superAdmin-businessApplications', async (req, res) => {
   }
 });
 
+// Backend: /superAdmin-businessApplications endpoint
+app.get('/superAdmin-applicationReports', async (req, res) => {
+  const sql = `
+    SELECT 
+      MONTH(application_date) AS month,
+      COUNT(*) AS applicationsCount
+    FROM business_applications
+    WHERE status = 1
+    GROUP BY month
+    ORDER BY month
+  `;
+
+  try {
+    const [results] = await pool.query(sql);
+
+    // Map results to the required chart format
+    const businessOwnersData = {
+      labels: results.map(row => {
+        // Convert month number (1-12) to month name
+        const date = new Date(0);
+        date.setMonth(row.month - 1);
+        return date.toLocaleString('default', { month: 'long' });
+      }),
+      datasets: [
+        {
+          label: 'Business Owners Applications',
+          data: results.map(row => row.applicationsCount),
+          backgroundColor: 'rgba(54, 162, 235, 0.2)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 1,
+        },
+      ],
+    };
+
+    return res.json({ success: true, businessOwnersData });
+  } catch (err) {
+    console.error('Error executing SQL query:', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+app.get('/superAdmin-userReports', async (req, res) => {
+  const sql = `
+    SELECT 
+      MONTH(created_at) AS month, 
+      COUNT(*) AS activeUsersCount
+    FROM users 
+    GROUP BY month
+    ORDER BY month
+  `;
+
+  try {
+    const [results] = await pool.query(sql);
+
+    // Map results to the required chart format
+    const activeUsersData = {
+      labels: results.map(row => {
+        // Convert month number (1-12) to month name
+        const date = new Date(0);
+        date.setMonth(row.month - 1); // Adjust to zero-based month
+        return date.toLocaleString('default', { month: 'long' }); // Get the month name
+      }),
+      datasets: [
+        {
+          label: 'User Registration',
+          data: results.map(row => row.activeUsersCount),
+          backgroundColor: 'rgba(255, 206, 86, 0.2)',  // A color for the chart background
+          borderColor: 'rgba(255, 206, 86, 1)',  // A color for the chart border
+          borderWidth: 1,
+        },
+      ],
+    };
+
+    return res.json({ success: true, activeUsersData });
+  } catch (err) {
+    console.error('Error executing SQL query:', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
 // Endpoint to update the business application status
 app.put('/updateStatus-businessApplications/:id', async (req, res) => {
   const { id } = req.params; // Get the application ID from the URL

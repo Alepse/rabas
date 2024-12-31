@@ -21,7 +21,7 @@ const SuperAdminSidebar = () => {
   const navItems = [
     { icon: <MdDashboard className="text-2xl" />, label: 'Dashboard', path: '/superadmindashboard' },
     { icon: <RiUserLine className="text-2xl" />, label: 'Users', path: '/superadminusers' },
-    { icon: <FaBox className="text-2xl" />, label: 'Products', path: '/superadminproducts' },
+    { icon: <FaBox className="text-2xl" />, label: 'Products & Businesses', path: '/superadminproducts' },
     { icon: <FaCar className="text-2xl" />, label: 'Transportation', path: '/superadmintransportation' },
     { icon: <MdDomainVerification  className="text-2xl" />, label: 'Verification', path: '/superadminverification' },
     { icon: <TbReport className="text-2xl" />, label: 'Reports', path: '/superadminreports' },
