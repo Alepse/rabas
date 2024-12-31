@@ -711,6 +711,7 @@ const Nav = () => {
       )}
 
       <Modal
+       disableAnimation
         backdrop="opaque"
         isOpen={isOpen}
         onOpenChange={onOpenChange}
