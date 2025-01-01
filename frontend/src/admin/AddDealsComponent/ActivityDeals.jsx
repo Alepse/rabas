@@ -291,7 +291,7 @@ const ActivityDeals = () => {
                   <div className="flex justify-between items-center">
                     <h4 className="font-semibold text-lg">{activity?.activityName}</h4>
                     <div className="flex space-x-2">
-                      <Button onClick={() => handleEditDeal(deal, false)} className="rounded-md bg-color2 hover:bg-color3 text-white">Edit</Button>
+                      <Button onClick={() => handleEditDeal(deal, false)} className="rounded-md bg-color2 hover:bg-color1 text-white">Edit</Button>
                       <Button onClick={() => handleDeleteDeal(deal.id)} className="rounded-md bg-red-500 hover:bg-red-600 text-white">Delete</Button>
                     </div>
                   </div>
@@ -312,7 +312,7 @@ const ActivityDeals = () => {
                   <div className="flex justify-between items-center">
                     <h4 className="font-semibold text-lg">{activity?.activityName}</h4>
                     <div className="flex space-x-2">
-                      <Button onClick={() => handleEditDeal(deal, true)} className="rounded-md bg-color2 hover:bg-color3 text-white">Edit</Button>
+                      <Button onClick={() => handleEditDeal(deal, true)} className="rounded-md bg-color2 hover:bg-color1 text-white">Edit</Button>
                       <Button onClick={() => handleDeleteDeal(deal.id)} className="rounded-md bg-red-500 hover:bg-red-600 text-white">Delete</Button>
                     </div>
                   </div>
