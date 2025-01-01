@@ -4490,6 +4490,33 @@ app.get('/business-getAllReviewsAndRatings', async (req, res) => {
   }
 });
 
+// Endpoint to add reviews and reatings to the buisness in business profile
+app.post('/business-addReviewsAndRatings', async (req, res) => {
+  const { business_id, user_id, rating, comment } = req.body;
+
+  // Validate the input
+  if (!business_id || !user_id || !rating) {
+    return res.status(400).json({ success: false, message: 'Business ID, User ID, and Rating are required' });
+  }
+
+  try {
+    // SQL query to insert the review and rating
+    const sql = `
+      INSERT INTO business_ratings (business_id, user_id, ratings, comment)
+      VALUES (?, ?, ?, ?)
+    `;
+    
+    // Use pool.query to interact with the database
+    const [results] = await pool.query(sql, [business_id, user_id, rating, comment || '']);
+
+    return res.json({ success: true, message: 'Review and rating added successfully' });
+  } catch (err) {
+    console.error('Error adding review and rating:', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+
 // Endpoint to edit reviews and ratings
 app.put('/business-editReviewAndRating', async (req, res) => {
   const { ratings_id, rating, comment } = req.body;
@@ -4522,31 +4549,6 @@ app.put('/business-editReviewAndRating', async (req, res) => {
   }
 });
 
-// Endpoint to add reviews and reatings to the buisness in business profile
-app.post('/business-addReviewsAndRatings', async (req, res) => {
-  const { business_id, user_id, rating, comment } = req.body;
-
-  // Validate the input
-  if (!business_id || !user_id || !rating) {
-    return res.status(400).json({ success: false, message: 'Business ID, User ID, and Rating are required' });
-  }
-
-  try {
-    // SQL query to insert the review and rating
-    const sql = `
-      INSERT INTO business_ratings (business_id, user_id, ratings, comment)
-      VALUES (?, ?, ?, ?)
-    `;
-    
-    // Use pool.query to interact with the database
-    const [results] = await pool.query(sql, [business_id, user_id, rating, comment || '']);
-
-    return res.json({ success: true, message: 'Review and rating added successfully' });
-  } catch (err) {
-    console.error('Error adding review and rating:', err);
-    return res.status(500).json({ success: false, message: 'Internal server error' });
-  }
-});
 
 // Middleware for headers and logging
 app.use((req, res, next) => {

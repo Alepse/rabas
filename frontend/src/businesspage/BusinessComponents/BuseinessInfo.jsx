@@ -112,17 +112,20 @@ const BusinessInfo = ({businessData, loading, userData, isLoggedIn}) => {
   const [newRating, setNewRating] = useState(0);
   const [currentZoom, setCurrentZoom] = useState(10);
   const [isReviewed, setIsReviewed] = useState(false);
+  const [myReview, setMyReview] = useState('');
   if (loading) {
     return <div>Loading...</div>;
-  }
+  };
 
   if (!businessData) {
     return <div>No data available</div>;
-  }
+  };
 
-  // console.log(isReviewed);
-
-
+  const clearReview = () => {
+    setNewReview('');
+    setNewRating(0);
+  };
+  
   const fetchReviewsAndRatings = async () => {
     try {
       const response = await axios.get(`${BASE_URL}/business-getAllReviewsAndRatings`);
@@ -132,9 +135,10 @@ const BusinessInfo = ({businessData, loading, userData, isLoggedIn}) => {
         const reviews = response.data.reviewsAndRatings.filter(review => review.business_id === parseInt(businessData.business_id));
         // console.log('Filtered Reviews:', reviews);
 
-        const is_reviewed = response.data.reviewsAndRatings.filter(review => review.user_id === parseInt(userData.user_id) && review.business_id === parseInt(businessData.business_id));
+        const myReview = response.data.reviewsAndRatings.filter(review => review.user_id === parseInt(userData.user_id) && review.business_id === parseInt(businessData.business_id));
         // console.log('Is reviewed:', is_reviewed);
-        setIsReviewed(is_reviewed.length > 0);
+        setMyReview(myReview);
+        setIsReviewed(myReview.length > 0);
         setReviews(reviews);
       } else {
         console.error('Failed to fetch reviews and ratings:', response.data.message);
@@ -174,10 +178,8 @@ const BusinessInfo = ({businessData, loading, userData, isLoggedIn}) => {
             ratings: newRating,
             comment: newReview
           }]);
-    fetchReviewsAndRatings();
-
-          // Refresh products in the parent component
-          // refreshProducts();
+          
+          fetchReviewsAndRatings();
           showSuccessAlert("Review added successfully");
           clearReview();
         } else {
@@ -191,9 +193,32 @@ const BusinessInfo = ({businessData, loading, userData, isLoggedIn}) => {
     }
   };
 
-  const clearReview = () => {
-    setNewReview('');
-    setNewRating(0);
+
+  const handleEditReview = async (ratings_id, rating, comment) => {
+    // Validate the input
+    if (!ratings_id || !rating) {
+      Swal.fire('Error', 'Rating ID and Rating are required', 'error');
+      return;
+    }
+
+    try {
+      // Make a PUT request to the backend
+      const response = await axios.put('https://api.rabasorsogon.com/business-editReviewAndRating', {
+        ratings_id,
+        rating,
+        comment, // Optional, can be empty
+      });
+
+      // Handle the response
+      if (response.data.success) {
+        Swal.fire('Success', 'Review and rating updated successfully', 'success');
+      } else {
+        Swal.fire('Error', response.data.message || 'Failed to update review and rating', 'error');
+      }
+    } catch (error) {
+      console.error('Error updating review and rating:', error);
+      Swal.fire('Error', 'Internal server error. Please try again later.', 'error');
+    }
   };
 
   const renderIcon = (iconName) => {
@@ -217,7 +242,7 @@ const BusinessInfo = ({businessData, loading, userData, isLoggedIn}) => {
 
   return (
     <div className='container mx-auto mt-4 px-4'>
-         <Tabs 
+      <Tabs 
         aria-label="Business Information" 
         className="max-w-full overflow-x-auto" 
         variant="underlined"  
@@ -229,143 +254,143 @@ const BusinessInfo = ({businessData, loading, userData, isLoggedIn}) => {
         }}
       >
         <Tab key="about-location" title={<><FaInfoCircle className="mr-2" />About Us</>}>
-  <Card className="p-4">
-    <CardBody>
-      <div className="space-y-8 h-auto lg:h-[47em] overflow-y-auto scrollbar-custom">
-        {/* About Us Section */}
-        <div className='border border-gray-200 rounded-md shadow-sm p-4'>
-          <h2 className="text-2xl md:text-3xl font-bold mb-4">About Our Business</h2>
-          <div className="text-gray-700 mb-6 break-words whitespace-normal">
-            <p className="text-md font-normal">{businessData.aboutUs}</p>
-          </div>
-        </div>
-
-        {/* Contact Information and Opening Hours */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Contact Information */}
-          <div className="p-4 border border-gray-200 rounded-md shadow-sm">
-            <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-               Contact Information
-            </h3>
-            <ul className="space-y-3">
-              {businessData.contactInfo && businessData.contactInfo.length > 0 ? (
-                businessData.contactInfo.map((info, index) => (
-                  <li
-                    key={`${info.label}-${index}`}
-                    className="text-gray-700 flex items-center gap-3"
-                  >
-                    {renderIcon(info.icon)}
-                    <span>
-                      {info.label}
-                      {info.value ? `: ${info.value}` : ''}
-                    </span>
-                  </li>
-                ))
-              ) : (
-                <li className="italic text-gray-500">
-                  No contact information available
-                </li>
-              )}
-            </ul>
-          </div>
-
-          {/* Opening Hours */}
-          <div className="p-4 border border-gray-200 rounded-md shadow-sm">
-            <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-              <FaClock /> Opening Hours
-            </h3>
-            <ul className="space-y-2">
-              {businessData.openingHours && businessData.openingHours.length > 0 ? (
-                businessData.openingHours.map((hours, index) => (
-                  <li
-                    key={index}
-                    className="flex justify-between items-center py-1 border-b last:border-none text-gray-700"
-                  >
-                    <span>{hours.day}</span>
-                    <span>
-                      {hours.open === "Closed" && hours.close === "Closed"
-                        ? "Closed"
-                        : `${formatTime(hours.open)} - ${formatTime(hours.close)}`}
-                    </span>
-                  </li>
-                ))
-              ) : (
-                <li className="italic text-gray-500">
-                  No opening hours available
-                </li>
-              )}
-            </ul>
-          </div>
-        </div>
-
-        {/* Location Section */}
-<div className="relative">
-  <h2 className="text-2xl md:text-3xl font-bold mb-4 flex items-center gap-2">
-    <FaMapMarkerAlt /> Location
-  </h2>
-  <p className="mb-4 text-gray-600">{businessData.completeAddress}</p>
-  <div className="w-full h-96 rounded-md shadow-lg overflow-hidden relative z-10">
-    <MapContainer
-      center={
-        initialCenter && initialCenter.lat != null && initialCenter.lng != null
-          ? [initialCenter.lat, initialCenter.lng]
-          : defaultCenter
-      }
-      zoom={currentZoom}
-      className="w-full h-full"
-      style={{ zIndex: 0 }} // Ensures the map stays at the correct level
-    >
-      <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      />
-      <MapEvents setCurrentZoom={setCurrentZoom} />
-
-      {pin_location && pin_location.latitude != null && pin_location.longitude != null ? (
-        (() => {
-          const { businessName, businessLogo } = businessData;
-          const position = [pin_location.latitude, pin_location.longitude];
-          const showLogo = currentZoom >= 10; // Set zoom level to show/hide logo
-
-          const customDivIcon = L.divIcon({
-            className: 'custom-icon',
-            html: `
-              <div class="custom-popup flex items-center whitespace-nowrap font-bold text-color1">
-                ${showLogo ? `
-                  <div class="pin-container">
-                    <div class="pin-head">
-                      <img src="${BASE_URL}/${businessLogo}" alt="${businessName}" class="pin-logo" />
-                    </div>
-                    <div class="pin-point"></div>
+          <Card className="p-4">
+            <CardBody>
+              <div className="space-y-8 h-auto lg:h-[47em] overflow-y-auto scrollbar-custom">
+                {/* About Us Section */}
+                <div className='border border-gray-200 rounded-md shadow-sm p-4'>
+                  <h2 className="text-2xl md:text-3xl font-bold mb-4">About Our Business</h2>
+                  <div className="text-gray-700 mb-6 break-words whitespace-normal">
+                    <p className="text-md font-normal">{businessData.aboutUs}</p>
                   </div>
-                  <span>${businessName}</span>
-                ` : `<div class="business-name">${businessName}</div>`}
+                </div>
+
+                {/* Contact Information and Opening Hours */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Contact Information */}
+                  <div className="p-4 border border-gray-200 rounded-md shadow-sm">
+                    <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                      Contact Information
+                    </h3>
+                    <ul className="space-y-3">
+                      {businessData.contactInfo && businessData.contactInfo.length > 0 ? (
+                        businessData.contactInfo.map((info, index) => (
+                          <li
+                            key={`${info.label}-${index}`}
+                            className="text-gray-700 flex items-center gap-3"
+                          >
+                            {renderIcon(info.icon)}
+                            <span>
+                              {info.label}
+                              {info.value ? `: ${info.value}` : ''}
+                            </span>
+                          </li>
+                        ))
+                      ) : (
+                        <li className="italic text-gray-500">
+                          No contact information available
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+
+                  {/* Opening Hours */}
+                  <div className="p-4 border border-gray-200 rounded-md shadow-sm">
+                    <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                      <FaClock /> Opening Hours
+                    </h3>
+                    <ul className="space-y-2">
+                      {businessData.openingHours && businessData.openingHours.length > 0 ? (
+                        businessData.openingHours.map((hours, index) => (
+                          <li
+                            key={index}
+                            className="flex justify-between items-center py-1 border-b last:border-none text-gray-700"
+                          >
+                            <span>{hours.day}</span>
+                            <span>
+                              {hours.open === "Closed" && hours.close === "Closed"
+                                ? "Closed"
+                                : `${formatTime(hours.open)} - ${formatTime(hours.close)}`}
+                            </span>
+                          </li>
+                        ))
+                      ) : (
+                        <li className="italic text-gray-500">
+                          No opening hours available
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Location Section */}
+                <div className="relative">
+                  <h2 className="text-2xl md:text-3xl font-bold mb-4 flex items-center gap-2">
+                    <FaMapMarkerAlt /> Location
+                  </h2>
+                  <p className="mb-4 text-gray-600">{businessData.completeAddress}</p>
+                  <div className="w-full h-96 rounded-md shadow-lg overflow-hidden relative z-10">
+                    <MapContainer
+                      center={
+                        initialCenter && initialCenter.lat != null && initialCenter.lng != null
+                          ? [initialCenter.lat, initialCenter.lng]
+                          : defaultCenter
+                      }
+                      zoom={currentZoom}
+                      className="w-full h-full"
+                      style={{ zIndex: 0 }} // Ensures the map stays at the correct level
+                    >
+                      <TileLayer
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                      />
+                      <MapEvents setCurrentZoom={setCurrentZoom} />
+
+                      {pin_location && pin_location.latitude != null && pin_location.longitude != null ? (
+                        (() => {
+                          const { businessName, businessLogo } = businessData;
+                          const position = [pin_location.latitude, pin_location.longitude];
+                          const showLogo = currentZoom >= 10; // Set zoom level to show/hide logo
+
+                          const customDivIcon = L.divIcon({
+                            className: 'custom-icon',
+                            html: `
+                              <div class="custom-popup flex items-center whitespace-nowrap font-bold text-color1">
+                                ${showLogo ? `
+                                  <div class="pin-container">
+                                    <div class="pin-head">
+                                      <img src="${BASE_URL}/${businessLogo}" alt="${businessName}" class="pin-logo" />
+                                    </div>
+                                    <div class="pin-point"></div>
+                                  </div>
+                                  <span>${businessName}</span>
+                                ` : `<div class="business-name">${businessName}</div>`}
+                              </div>
+                            `,
+                            iconSize: [50, 70],
+                            iconAnchor: [25, 70],
+                          });
+
+                          return <Marker key={businessData.business_id} position={position} icon={customDivIcon} />;
+                        })()
+                      ) : (
+                        <div className="text-center text-gray-500 mt-4">No valid pin location available for this business.</div>
+                      )}
+                    </MapContainer>
+                  </div>
+                  <Button
+                    color="primary"
+                    className="w-full mt-6 hover:bg-color2/90 relative z-10"
+                    onClick={handleGetDirections}
+                  >
+                    Get Directions
+                  </Button>
+                </div>
+
               </div>
-            `,
-            iconSize: [50, 70],
-            iconAnchor: [25, 70],
-          });
-
-          return <Marker key={businessData.business_id} position={position} icon={customDivIcon} />;
-        })()
-      ) : (
-        <div className="text-center text-gray-500 mt-4">No valid pin location available for this business.</div>
-      )}
-    </MapContainer>
-  </div>
-  <Button
-    color="primary"
-    className="w-full mt-6 hover:bg-color2/90 relative z-10"
-    onClick={handleGetDirections}
-  >
-    Get Directions
-  </Button>
-</div>
-
-      </div>
-    </CardBody>
-  </Card>
-</Tab>
+            </CardBody>
+          </Card>
+        </Tab>
 
         <Tab key="facilities" title={<><FaConciergeBell className="mr-2" />Facilities & Amenities</>}>
           <Card>
