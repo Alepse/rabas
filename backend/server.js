@@ -354,7 +354,7 @@ app.post('/login-verify-otp', async (req, res) => {
 
     // Save user ID to session
     req.session.user = { user_id: user.user_id };
-    console.log(req.session);
+    // console.log(req.session);
 
     return res.json({ success: true, message: 'OTP verified successfully' });
   } catch (err) {
@@ -791,7 +791,7 @@ app.post('/verify-otp', async (req, res) => {
     ]);
 
     req.session.user = { user_id: userInsertResult.insertId };
-    console.log(req.session);
+    // console.log(req.session);
     return res.json({ success: true, message: 'OTP verified and user registered successfully' });
   } catch (err) {
     console.error('Error verifying OTP:', err);
