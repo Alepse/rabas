@@ -662,7 +662,8 @@ const BusinessAllproducts = ({isLoggedIn, businessData, userData}) => {
     const bytes = CryptoJS.AES.decrypt(decodeURIComponent(encryptedId), secretKey);
     return bytes.toString(CryptoJS.enc.Utf8);
   };
-  const categories = ['activity', 'accommodation', 'restaurant', 'shop'];
+
+  const categories = [businessData.businessType];
 
   // Fetch data for each category from the backend
   const fetchCategoryData = async (category) => {
@@ -852,7 +853,8 @@ const BusinessAllproducts = ({isLoggedIn, businessData, userData}) => {
 
         {/* Main Content Area */}
         <div className="flex max-h-screen flex-col w-full  p-5 rounded-lg ">
-          {/* Tabs */}
+        {/* Tabs */}
+        {categories.length > 0 && (
           <Tabs
             aria-label="Business Offerings"
             variant="underlined"
@@ -866,12 +868,13 @@ const BusinessAllproducts = ({isLoggedIn, businessData, userData}) => {
               tabContent: "text-color1"
             }}
           >
-            <Tab key="all" title="All Products" />
-            <Tab key="activities" title="Activities" />
-            <Tab key="accommodations" title="Accommodations" />
-            <Tab key="restaurant" title="Restaurant Service" />
-            <Tab key="shop" title="Shop" />
+            {categories.length > 1 && <Tab key="all" title="All Products" />}
+            {categories.includes("activities") && <Tab key="activities" title="Activities" />}
+            {categories.includes("accommodations") && <Tab key="accommodations" title="Accommodations" />}
+            {categories.includes("restaurant") && <Tab key="restaurant" title="Food Service" />}
+            {categories.includes("shop") && <Tab key="shop" title="Shop" />}
           </Tabs>
+        )}
 
           {/* Content */}
           <div className="p-2 max-h-screen overflow-y-auto scrollbar-custom">
