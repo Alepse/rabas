@@ -663,8 +663,10 @@ const BusinessAllproducts = ({isLoggedIn, businessData, userData}) => {
     return bytes.toString(CryptoJS.enc.Utf8);
   };
 
-  const categories = [businessData.businessType];
-
+  const categories = ['activity', 'accommodation', 'restaurant', 'shop'];
+  // const businessType = ['attraction', 'accommodation', 'restaurant', 'shop'];
+  const businessType = [businessData.businessType];
+  
   // Fetch data for each category from the backend
   const fetchCategoryData = async (category) => {
     try {
@@ -853,28 +855,29 @@ const BusinessAllproducts = ({isLoggedIn, businessData, userData}) => {
 
         {/* Main Content Area */}
         <div className="flex max-h-screen flex-col w-full  p-5 rounded-lg ">
-        {/* Tabs */}
-        {categories.length > 0 && (
-          <Tabs
-            aria-label="Business Offerings"
-            variant="underlined"
-            className="mb-4"
-            onSelectionChange={(key) => setActiveTab(key)}
-            selectedKey={activeTab}
-            classNames={{
-              base: "w-full mb-4",
-              tabList: "gap-6 w-full p-4 container",
-              tab: "max-w-fit px-0 h-12",
-              tabContent: "text-color1"
-            }}
-          >
-            {categories.length > 1 && <Tab key="all" title="All Products" />}
-            {categories.includes("activities") && <Tab key="activities" title="Activities" />}
-            {categories.includes("accommodations") && <Tab key="accommodations" title="Accommodations" />}
-            {categories.includes("restaurant") && <Tab key="restaurant" title="Food Service" />}
-            {categories.includes("shop") && <Tab key="shop" title="Shop" />}
-          </Tabs>
-        )}
+          {/* Tabs */}
+          {businessType.length > 0 && (
+            <Tabs
+              aria-label="Business Offerings"
+              variant="underlined"
+              className="mb-4"
+              onSelectionChange={(key) => setActiveTab(key)}
+              selectedKey={activeTab}
+              classNames={{
+                base: "w-full mb-4",
+                tabList: "gap-6 w-full p-4 container",
+                tab: "max-w-fit px-0 h-12",
+                tabContent: "text-color1"
+              }}
+            >
+              {businessType.length > 1 && <Tab key="all" title="All Products" />}
+              {businessType.includes("attraction") && <Tab key="activities" title="Activities" />}
+              {businessType.includes("accommodation") && <Tab key="accommodations" title="Accommodations" />}
+              {businessType.includes("restaurant") && <Tab key="restaurant" title="Restaurant Service" />}
+              {businessType.includes("shop") && <Tab key="shop" title="Shop" />}
+            </Tabs>
+          )}
+
 
           {/* Content */}
           <div className="p-2 max-h-screen overflow-y-auto scrollbar-custom">
