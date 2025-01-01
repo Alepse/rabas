@@ -55,13 +55,47 @@ const StarRating = ({ rating, onRatingChange, size = "md" }) => {
   );
 };
 
-const ReviewCard = ({ name, rating, comment, avatar, date, isMyReview }) => {
+const ReviewCard = ({ reviewId, name, rating, comment, avatar, date, isMyReview, refreshReview }) => {
+  const [editRating, setEditRating] = useState(rating);
+  const [editComment, setEditComment] = useState(comment);
+  const [isEditing, setIsEditing] = useState(false);
+
+  const handleEditReview = async () => {
+    // Validate the input
+    if (!reviewId || !editRating) {
+      Swal.fire('Error', 'Rating ID and Rating are required', 'error');
+      return;
+    }
+
+    try {
+      // Make a PUT request to the backend
+      const response = await axios.put(`${BASE_URL}/business-editReviewAndRating`, {
+        ratings_id: reviewId,
+        rating: editRating,
+        comment: editComment, // Optional, can be empty
+      });
+
+      // Handle the response
+      if (response.data.success) {
+        Swal.fire('Success', 'Review and rating updated successfully', 'success');
+        setIsEditing(false);
+        refreshReview();
+      } else {
+        Swal.fire('Error', response.data.message || 'Failed to update review and rating', 'error');
+      }
+    } catch (error) {
+      console.error('Error updating review and rating:', error);
+      Swal.fire('Error', 'Internal server error. Please try again later.', 'error');
+    }
+  };
+
   return (
     <div className="h-full">
       <Card className="w-full px-2 relative">
         {isMyReview && (
           <AiOutlineEdit
-            className="absolute top-2 right-2 cursor-pointer text-gray-600 text-2xl"
+            className="absolute top-2 right-2 z-40 cursor-pointer text-gray-600 text-2xl"
+            onClick={() => setIsEditing(true)}
           />
         )}
         <CardBody className="flex flex-col sm:flex-row items-start space-y-4 sm:space-y-0 sm:space-x-4">
@@ -79,7 +113,7 @@ const ReviewCard = ({ name, rating, comment, avatar, date, isMyReview }) => {
                 />
               </div>
               <div className="flex items-center max-w-[70%]">
-                <h3 className="sm:text-sm md:text-lg lg:text-lg font-semibold flex items-center px-2 gap-3 break-all">
+                <h3 className="text-sm md:text-lg lg:text-lg font-semibold flex items-center px-2 gap-3 break-all">
                   {name}
                 </h3>
               </div>
@@ -94,7 +128,6 @@ const ReviewCard = ({ name, rating, comment, avatar, date, isMyReview }) => {
                 })}
               </p>
             </div>
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2"></div>
             <div
               className="text-gray-600 py-4"
               dangerouslySetInnerHTML={{
@@ -104,6 +137,40 @@ const ReviewCard = ({ name, rating, comment, avatar, date, isMyReview }) => {
           </div>
         </CardBody>
       </Card>
+
+      {isEditing && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded shadow-lg w-96">
+            <h2 className="text-xl font-semibold mb-4">Edit Review</h2>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Rating</label>
+              <StarRating rating={editRating} onRatingChange={setEditRating} />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Comment</label>
+              <textarea
+                className="w-full p-2 border rounded"
+                value={editComment}
+                onChange={(e) => setEditComment(e.target.value)}
+              />
+            </div>
+            <div className="flex justify-end space-x-2">
+              <button
+                className="px-4 py-2 bg-gray-300 rounded"
+                onClick={() => setIsEditing(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 bg-blue-500 text-white rounded"
+                onClick={handleEditReview}
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -215,7 +282,7 @@ const BusinessInfo = ({businessData, loading, userData, isLoggedIn}) => {
 
     try {
       // Make a PUT request to the backend
-      const response = await axios.put('https://api.rabasorsogon.com/business-editReviewAndRating', {
+      const response = await axios.put(`${BASE_URL}/business-editReviewAndRating`, {
         ratings_id,
         rating,
         comment, // Optional, can be empty
@@ -442,7 +509,7 @@ const BusinessInfo = ({businessData, loading, userData, isLoggedIn}) => {
           <Card>
             <CardBody>
               <h2 className="text-2xl font-bold py-4 px-8 mb-6">Ratings and reviews</h2>
-              {myReview.length > 0 && reviews.length > 1 ? (
+              {myReview.length == 0 && reviews.length == 0 ? (
                 <div className="w-full h-full flex items-center justify-center rounded-t-lg text-gray-500">
                   <p className="text-slate-500 px-8">No reviews available.</p>
                 </div>
@@ -453,12 +520,14 @@ const BusinessInfo = ({businessData, loading, userData, isLoggedIn}) => {
                     myReview.map((review, index) => (
                       <ReviewCard
                         key={`${review.ratings_id}-${index}`}
+                        reviewId={review.ratings_id}
                         name={review.username || "Deleted account"}
                         rating={review.ratings}
-                        comment={review.comment || "No comment provided."}
+                        comment={review.comment}
                         avatar={review.image_path || review.image}
                         date={(review.create_at)} 
                         isMyReview={true}
+                        refreshReview={() => fetchReviewsAndRatings()}
                       />
                     ))
                   )}
@@ -468,12 +537,14 @@ const BusinessInfo = ({businessData, loading, userData, isLoggedIn}) => {
                     reviews.map((review, index) => (
                       <ReviewCard
                         key={`${review.ratings_id}-${index}`}
+                        reviewId={review.ratings_id}
                         name={review.username || "Deleted account"}
                         rating={review.ratings}
-                        comment={review.comment || "No comment provided."}
+                        comment={review.comment}
                         avatar={review.image_path || review.image}
                         date={(review.create_at)} 
                         isMyReview={false}
+                        refreshReview={() => fetchReviewsAndRatings()}
                       />
                     ))
                   )}
