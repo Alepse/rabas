@@ -489,7 +489,7 @@ const Shop = () => {
                       </div>
 
                     {/* Explore More Button */}
-                    <Link to={`/business/${encryptId(shop.business_id)}`} target="_blank">
+                    <Link to={`/business/${encryptId(shop.business_id)}`} >
                       <Button className="w-full rounded-md bg-color1 text-color3 hover:bg-color2">
                         Explore More
                       </Button>
