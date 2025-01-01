@@ -436,43 +436,50 @@ const BusinessInfo = ({businessData, loading, userData, isLoggedIn}) => {
             </CardBody>
           </Card>
         </Tab>
+
+        {/* Reviews */}
         <Tab key="reviews" title={<><FaStar className="mr-2" />Reviews</>}>
           <Card>
             <CardBody>
               <h2 className="text-2xl font-bold py-4 px-8 mb-6">Ratings and reviews</h2>
-              <div className="space-y-4 px-4 mb-8">
-                
-                {Array.isArray(myReview) && (
-                  myReview.map((review, index) => (
-                    <ReviewCard
-                      key={`${review.ratings_id}-${index}`}
-                      name={review.username || "Deleted account"}
-                      rating={review.ratings}
-                      comment={review.comment || "No comment provided."}
-                      avatar={review.image_path || review.image}
-                      date={(review.create_at)} 
-                      isMyReview={true}
-                    />
-                  ))
-                )}
-              </div>
-              <div className="space-y-4 px-4 mb-8">
-                {Array.isArray(reviews) && reviews.length > 0 ? (
-                  reviews.map((review, index) => (
-                    <ReviewCard
-                      key={`${review.ratings_id}-${index}`}
-                      name={review.username || "Deleted account"}
-                      rating={review.ratings}
-                      comment={review.comment || "No comment provided."}
-                      avatar={review.image_path || review.image}
-                      date={(review.create_at)} 
-                      isMyReview={false}
-                    />
-                  ))
-                ) : (
-                  <p className="text-slate-500">No reviews available.</p>
-                )}
-              </div>
+              {myReview.length > 0 && reviews.length > 1 ? (
+                <div className="w-full h-full flex items-center justify-center rounded-t-lg text-gray-500">
+                  <p className="text-slate-500 px-8">No reviews available.</p>
+                </div>
+              ) : (
+                <>
+                <div className="space-y-4 px-4 mb-8">  
+                  {Array.isArray(myReview) && (
+                    myReview.map((review, index) => (
+                      <ReviewCard
+                        key={`${review.ratings_id}-${index}`}
+                        name={review.username || "Deleted account"}
+                        rating={review.ratings}
+                        comment={review.comment || "No comment provided."}
+                        avatar={review.image_path || review.image}
+                        date={(review.create_at)} 
+                        isMyReview={true}
+                      />
+                    ))
+                  )}
+                </div>
+                <div className="space-y-4 px-4 mb-8">
+                  {Array.isArray(reviews) && (
+                    reviews.map((review, index) => (
+                      <ReviewCard
+                        key={`${review.ratings_id}-${index}`}
+                        name={review.username || "Deleted account"}
+                        rating={review.ratings}
+                        comment={review.comment || "No comment provided."}
+                        avatar={review.image_path || review.image}
+                        date={(review.create_at)} 
+                        isMyReview={false}
+                      />
+                    ))
+                  )}
+                </div>
+                </>
+              )}
               <div className="py-4 px-8">
                 {!isReviewed && (
                   <Card className="bg-gray-50">
