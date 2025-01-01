@@ -540,6 +540,16 @@ app.delete('/unlike-business/:business_id', async (req, res) => {
   res.json({ success: results.affectedRows > 0, message: results.affectedRows > 0 ? 'Page unliked successfully' : 'Page not found' });
 });
 
+// Endpoint to unlike pages
+app.delete('/unlike-businessInProfile/:id', async (req, res) => {
+  const { id } = req.params;
+  const userId = req.session.user.user_id;
+  const sql = 'DELETE FROM liked_pages WHERE id = ? AND user_id = ?';
+  const [results] = await pool.query(sql, [id, userId]);
+  res.json({ success: results.affectedRows > 0, message: results.affectedRows > 0 ? 'Page unliked successfully' : 'Page not found' });
+});
+
+
 // Endpoint to set business_id in session
 app.post('/set-business-id', (req, res) => {
   const { businessId } = req.body;

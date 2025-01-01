@@ -22,102 +22,124 @@ const encryptId = (id) => {
   console.log('Encrypting ID:', id); // Debugging log
   const secretKey = import.meta.env.VITE_SECRET_KEY;
   if (!secretKey) {
-    console.error('Secret key is not defined');
+    // console.error('Secret key is not defined');
     return null;
   }
   if (!id) {
-    console.error('ID is null or undefined');
+    // console.error('ID is null or undefined');
     return null;
   }
   const ciphertext = CryptoJS.AES.encrypt(id.toString(), secretKey).toString();
   return encodeURIComponent(ciphertext);
 };
-
-// Function to render liked pages
 const renderLikedPages = (likedPages, handleUnlikePage) => {
   return likedPages.length === 0 ? (
     <p className="text-slate-500">You haven't liked any pages yet.</p>
   ) : (
     <div className="flex flex-col gap-4 w-full">
-      {likedPages.map((item, index) => (
+      {likedPages.map((item) => (
         <div
-          key={item.id || index}
+          key={item.id || item.business_id} // Use a fallback if business_id is unavailable
           className="flex flex-col sm:flex-row items-start bg-white w-full rounded-lg shadow-lg hover:shadow-slate-500 duration-300 mb-4"
         >
-          {/* Image Section */}
-          <img
-            src={`${BASE_URL}/${item.image}`}
-            alt={item.name}
-            className="w-full sm:w-48 h-[10.6rem] object-cover rounded-t-lg sm:rounded-none sm:rounded-l-lg"
-          />
+          {item.business_id ? (
+            <>
+              {/* Image Section */}
+              <img
+                src={`${BASE_URL}/${item.image}`}
+                alt={item.name}
+                className="w-full sm:w-48 h-[10.6rem] object-cover rounded-t-lg sm:rounded-none sm:rounded-l-lg"
+              />
 
-          {/* Content Section */}
-          <div className="flex-1 p-4">
-            {/* Category and Ratings */}
-            <div className="flex items-center justify-between gap-2 mb-2">
-            
-
-             
-              <div className="flex items-center gap-1">
-                {item.rating ? (
-                  <>
-                    <span className="text-black text-[12px]">
-                      {parseFloat(item.rating).toFixed(1)}
-                    </span>
-                    <span className="text-yellow-500">
-                      {'★'.repeat(item.rating)}{'☆'.repeat(5 - item.rating)}
-                    </span>
-                  </>
-                ) : (
-                  <span className="text-black text-[12px]">No ratings</span>
-                )}
-              </div>
-            </div>
-
-            {/* Title and Description */}
-            <h3 className="font-semibold text-md text-color1 mb-1">{item.name}</h3>
-            <div className="text-xs text-gray-500 mb-1 flex items-center">
-              <GiPositionMarker /> {item.destination}
-            </div>
-            <p className="text-sm text-gray-600 mb-2 line-clamp-2">{item.description}</p>
-           <div className='flex gap-4 justify-between items-center' >
-            {/* Price Range */}
-            <div className="text-sm  font-semibold text-black ">
-              {item.lowest_price && item.highest_price ? (
-                `₱${item.lowest_price} - ₱${item.highest_price}`
-              ) : (
-                <span className="text-gray-400 italic">
-                  Price Range Not Available
-                </span>
-              )}
-
-            </div>
-          
-            </div>
-               {/* Actions */}
-               <div className="flex items-center mt-2 md:justify-end justify-between gap-2">
-              <Link to={`/business/${encryptId(item.business_id)}`}>
-                <Button size='sm' className="bg-color1 text-white hover:bg-color2 text-sm">Visit</Button>
-              </Link>
-              <Button
-                className="h-8 px-3 bg-color2 text-white text-sm"
-                onClick={() => handleUnlikePage(item.business_id)}
-              >
-                <div className="flex items-center gap-1">
-                  <AiOutlineLike />
-                  Unlike
+              {/* Content Section */}
+              <div className="flex-1 p-4">
+                {/* Category and Ratings */}
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <div className="flex items-center gap-1">
+                    {item.rating ? (
+                      <>
+                        <span className="text-black text-[12px]">
+                          {parseFloat(item.rating).toFixed(1)}
+                        </span>
+                        <span className="text-yellow-500">
+                          {'★'.repeat(item.rating)}{'☆'.repeat(5 - item.rating)}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-black text-[12px]">No ratings</span>
+                    )}
+                  </div>
                 </div>
-              </Button>
-            </div>
 
-          </div>
+                {/* Title and Description */}
+                <h3 className="font-semibold text-md text-color1 mb-1">
+                  {item.name}
+                </h3>
+                <div className="text-xs text-gray-500 mb-1 flex items-center">
+                  <GiPositionMarker /> {item.destination}
+                </div>
+                <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+                  {item.description}
+                </p>
+
+                <div className="flex gap-4 justify-between items-center">
+                  {/* Price Range */}
+                  <div className="text-sm font-semibold text-black">
+                    {item.lowest_price && item.highest_price ? (
+                      `₱${item.lowest_price} - ₱${item.highest_price}`
+                    ) : (
+                      <span className="text-gray-400 italic">
+                        Price Range Not Available
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center mt-2 md:justify-end justify-between gap-2">
+                  <Link to={`/business/${encryptId(item.business_id)}`}>
+                    <Button
+                      size="sm"
+                      className="bg-color1 text-white hover:bg-color2 text-sm"
+                    >
+                      Visit
+                    </Button>
+                  </Link>
+                  <Button
+                    className="h-8 px-3 bg-color2 text-white text-sm"
+                    onClick={() => handleUnlikePage(item.id)}
+                  >
+                    <div className="flex items-center gap-1">
+                      <AiOutlineLike />
+                      Unlike
+                    </div>
+                  </Button>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="flex-1 p-4">
+              <div className="w-full sm:w-48 h-[10.6rem] flex items-center justify-center p-4 bg-gray-300">
+                <p className="text-gray-500 italic">Business is deleted or unavailable.</p>
+              </div>
+              {/* Actions */}
+              <div className="flex items-center mt-2 md:justify-end justify-between gap-2">
+                  <Button
+                    className="h-8 px-3 bg-color2 text-white text-sm"
+                    onClick={() => handleUnlikePage(item.id)}
+                  >
+                    <div className="flex items-center gap-1">
+                      Remove
+                    </div>
+                  </Button>
+                </div>
+            </div>
+          )}
         </div>
       ))}
     </div>
   );
 };
-
-
 
 
 // Simplified component for the "My Booking" tab
@@ -533,7 +555,7 @@ const UserProfile = ({ activities = [] }) => {
     }
   };
 
-  const handleUnlikePage = async (businessId) => {
+  const handleUnlikePage = async (id) => {
     Swal.fire({
       title: 'Are you sure?',
       text: "Do you want to unlike this page?",
@@ -545,11 +567,11 @@ const UserProfile = ({ activities = [] }) => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await axios.delete(`${BASE_URL}/unlike-business/${businessId}`, { withCredentials: true });
+          const response = await axios.delete(`${BASE_URL}/unlike-businessInProfile/${id}`, { withCredentials: true });
           if (response.data.success) {
             setLikedPages((prevLikedPages) => {
               // Filter out the page with the specified businessId
-              const updatedPages = prevLikedPages.filter(page => page.business_id !== businessId);
+              const updatedPages = prevLikedPages.filter(page => page.id !== id);
               return updatedPages;
             });
             Swal.fire({
@@ -774,33 +796,31 @@ const UserProfile = ({ activities = [] }) => {
               </CardBody>
             </Card>
           </Tab>
-{/* Liked Pages Tab */}
-<Tab key="likedPages" title="Liked Pages">
-  <Card >
-    <CardBody className="p-4 sm:p-6 ">
-      {/* Header */}
-      <h1 className="text-2xl sm:text-3xl font-bold mb-4 text-center sm:text-left">
-        Liked Pages
-      </h1>
-      <div className="bg-gray-300 w-full h-[1px] mb-6"></div>
+          {/* Liked Pages Tab */}
+          <Tab key="likedPages" title="Liked Pages">
+            <Card >
+              <CardBody className="p-4 sm:p-6 ">
+                {/* Header */}
+                <h1 className="text-2xl sm:text-3xl font-bold mb-4 text-center sm:text-left">
+                  Liked Pages
+                </h1>
+                <div className="bg-gray-300 w-full h-[1px] mb-6"></div>
 
-      {/* Content Container */}
-      <div className="overflow-y-auto  max-h-[600px] p-4 scrollbar-custom">
-        {likedPages.length > 0 ? (
-          <div className="flex flex-col gap-4 items-center">
-            {renderLikedPages(likedPages, handleUnlikePage)}
-          </div>
-        ) : (
-          <p className="text-slate-500 text-center mt-4">
-            You haven't liked any pages yet.
-          </p>
-        )}
-      </div>
-    </CardBody>
-  </Card>
-</Tab>
-
-
+                {/* Content Container */}
+                <div className="overflow-y-auto  max-h-[600px] p-4 scrollbar-custom">
+                  {likedPages.length > 0 ? (
+                    <div className="flex flex-col gap-4 items-center">
+                      {renderLikedPages(likedPages, handleUnlikePage)}
+                    </div>
+                  ) : (
+                    <p className="text-slate-500 text-center mt-4">
+                      You haven't liked any pages yet.
+                    </p>
+                  )}
+                </div>
+              </CardBody>
+            </Card>
+          </Tab>
 
           {/* My Booking Tab */}
           <Tab key="myBookings" title="My Bookings">
