@@ -87,7 +87,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
     if (formData.customCategory && formData.businessType) {
       const newCategory = {
         label: formData.customCategory,
-        value: formData.customCategory.toLowerCase().replace(/\s+/g, '_'),
+        value: formData.customCategory.toLowerCase().replace(/\s+/g, ' '),
       };
       setCategoryOptions(prevOptions => ({
         ...prevOptions,
