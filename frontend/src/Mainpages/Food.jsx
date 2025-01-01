@@ -549,7 +549,7 @@ const toggleTagFiltering = () => {
                       <span
                             key={index}
                                     className={`text-xs px-2 py-1 rounded-full ${
-                                      selectedActivities
+                                      selectedFoodType
                                         .map((a) => a.toLowerCase())
                                         .includes(tag.toLowerCase().replace(/s$/, ''))
                                         ? 'bg-color2 text-white'
