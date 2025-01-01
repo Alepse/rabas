@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,10 +10,14 @@ import Kayak from '@/assets/kayak.jpg';
 import View from '@/assets/view.jpg';
 import Surf from '@/assets/surf.jpg';
 import Dive from '@/assets/dive.jpg';
+import { Modal, ModalContent, ModalBody, useDisclosure } from "@nextui-org/react";
+import LoginSignup from '@/auth/LoginSignup';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL; // Ensure you have the base URL
 
-export default function PlanTripSection() {
+const PlanTripSection = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const images = [
     { src: View, alt: "Scenic view", className: "col-span-4 row-span-2 rounded-lg" },
     { src: Kayak, alt: "Kayaking" },
@@ -31,21 +35,21 @@ export default function PlanTripSection() {
         const data = await response.json();
         if (!data.isLoggedIn) {
           // Show alert if not logged in
-          await Swal.fire({
-            icon: 'warning',
-            title: 'Not Logged In',
-            text: 'You need to log in to access this page.',
-            confirmButtonText: 'OK',
-            confirmButtonColor: '#0BDA51'
-          });
-          return false; // Not logged in
+          // await Swal.fire({
+          //   icon: 'warning',
+          //   title: 'Not Logged In',
+          //   text: 'You need to log in to access this page.',
+          //   confirmButtonText: 'OK',
+          //   confirmButtonColor: '#0BDA51'
+          // });
+          return onOpen(); // Not logged in
         }
         return true; // Logged in
       }
     } catch (error) {
       console.error('Error checking login status:', error);
     }
-    return false; // Default to not logged in on error
+    return onOpen(); // Default to not logged in on error
   }, []);
 
   const handlePlanAdventureClick = async () => {
@@ -101,6 +105,27 @@ export default function PlanTripSection() {
           </div>
         </div>
       </div>
+      <Modal
+       disableAnimation
+        backdrop="opaque"
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        isDismissable={false}
+        className='max-h-full  w-full max-w-[600px] overflow-auto scrollbar-custom'
+      >
+        <ModalContent>
+          {() => (
+            <>
+              <ModalBody>
+                <LoginSignup />
+              </ModalBody>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
     </section>
   );
-}
+};
+
+export default PlanTripSection;
