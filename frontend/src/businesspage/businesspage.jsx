@@ -264,42 +264,43 @@ const BusinessPage = () => {
     
 
       {/* Business Header Section */}
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto  ">
         <AnimatedSection>
           {/* Breadcrumbs */}
-      <div className="container px-4 mx-auto mb-4">
-        <nav className="text-sm text-gray-500">
-          <ol className="list-none p-0 inline-flex">
-            <li className="flex items-center">
-              <Link to="/home" className="hover:text-color1">Home</Link>
-              <span className="mx-2"><MdOutlineKeyboardArrowRight/></span>
-            </li>
-            <li className="flex items-center">
-              <Link to="/activities" className="hover:text-color1">Activities</Link>
-              <span className="mx-2"><MdOutlineKeyboardArrowRight/></span>
-            </li>
-            <li className="flex items-center">
-              <Link to="/accommodations" className="hover:text-color1">Accommodations</Link>
-              <span className="mx-2"><MdOutlineKeyboardArrowRight/></span>
-            </li>
-            <li className="flex items-center">
-              <Link to="/foodplaces" className="hover:text-color1">Food Places</Link>
-              <span className="mx-2"><MdOutlineKeyboardArrowRight/></span>
-            </li>
-            <li className="flex items-center">
-              <Link to="/shops" className="hover:text-color1">Shops</Link>
-              <span className="mx-2"><MdOutlineKeyboardArrowRight/></span>
-            </li>
-            <li className="flex items-center">
-              <Link to="/discover" className="hover:text-color1">Discover</Link>
-              <span className="mx-2"><MdOutlineKeyboardArrowRight/></span>
-            </li>
-            <li className="flex items-center text-gray-700">
-              <p>{businessData.businessName}</p>
-            </li>
-          </ol>
-        </nav>
-      </div>
+          <div className="container w-full flex justify-start mx-auto overflow-x-auto scrollbar-custom scrollbar-hide mb-4">
+  <nav className="text-sm text-gray-500 whitespace-nowrap">
+    <ol className="list-none p-0 inline-flex">
+      <li className="flex items-center">
+        <Link to="/home" className="hover:text-color1 truncate">Home</Link>
+        <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
+      </li>
+      <li className="flex items-center">
+        <Link to="/activities" className="hover:text-color1 truncate">Activities</Link>
+        <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
+      </li>
+      <li className="flex items-center">
+        <Link to="/accommodations" className="hover:text-color1 truncate">Accommodations</Link>
+        <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
+      </li>
+      <li className="flex items-center">
+        <Link to="/foodplaces" className="hover:text-color1 truncate">Food Places</Link>
+        <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
+      </li>
+      <li className="flex items-center">
+        <Link to="/shops" className="hover:text-color1 truncate">Shops</Link>
+        <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
+      </li>
+      <li className="flex items-center">
+        <Link to="/discover" className="hover:text-color1 truncate">Discover</Link>
+        <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
+      </li>
+      <li className="flex items-center text-gray-700 truncate">
+        <p className="truncate">{businessData.businessName}</p>
+      </li>
+    </ol>
+  </nav>
+</div>
+
           <div className="flex flex-wrap items-center gap-4 py-4">
             <img
               className="w-16 h-16 sm:w-24 sm:h-24 rounded-full object-cover object-center border shadow-gray-400"

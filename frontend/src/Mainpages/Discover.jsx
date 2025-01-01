@@ -18,9 +18,11 @@ import { IoInformationCircleOutline } from "react-icons/io5";
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 
+
 import CryptoJS from 'crypto-js';
 import { Skeleton } from "@nextui-org/skeleton";
 import { IoIosInformationCircleOutline } from 'react-icons/io';
+import { MdOutlineKeyboardArrowRight } from 'react-icons/md';
 
 // Animation Variants
 const containerVariants = {
@@ -523,6 +525,36 @@ const Discover = () => {
       <Nav />
       <Hero />
       <Search/>
+
+        <div className="container w-full flex justify-start mx-auto overflow-x-auto scrollbar-custom scrollbar-hide mb-4">
+        <nav className="text-sm text-gray-500 whitespace-nowrap">
+          <ol className="list-none p-0 inline-flex">
+            <li className="flex items-center">
+              <Link to="/home" className="hover:text-color1 truncate">Home</Link>
+              <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
+            </li>
+            <li className="flex items-center">
+              <Link to="/activities" className="hover:text-color1 truncate">Activities</Link>
+              <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
+            </li>
+            <li className="flex items-center">
+              <Link to="/accommodations" className="hover:text-color1 truncate">Accommodations</Link>
+              <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
+            </li>
+            <li className="flex items-center">
+              <Link to="/foodplaces" className="hover:text-color1 truncate">Food Places</Link>
+              <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
+            </li>
+            <li className="flex items-center">
+              <Link to="/shops" className="hover:text-color1 truncate">Shops</Link>
+              <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
+            </li>
+            <li className="flex items-center text-gray-700 truncate">
+              <p className="truncate">Discover</p>
+            </li>
+          </ol>
+        </nav>
+      </div>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
         <h1 className="font-semibold text-3xl text-color1 mb-8">
           What To Discover in Sorsogon

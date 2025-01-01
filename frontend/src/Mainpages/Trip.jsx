@@ -26,6 +26,9 @@ import Swal from 'sweetalert2';
 import TripDetailsModal from './PlanATripComponents/TripDetailsModal';
 import wave from '@/assets/wave2.webp'
 import axios from 'axios';
+import { MdOutlineKeyboardArrowRight } from 'react-icons/md';
+import { Link } from 'react-router-dom';
+
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
@@ -317,6 +320,39 @@ const Trip = () => {
       <Nav />
       <div className="mt-[3rem] flex justify-center w-full px-4">
         <Search />
+      </div>
+        <div className="container w-full flex justify-start mx-auto overflow-x-auto scrollbar-custom scrollbar-hide mb-4">
+        <nav className="text-sm text-gray-500 whitespace-nowrap">
+          <ol className="list-none p-0 inline-flex">
+            <li className="flex items-center">
+              <Link to="/home" className="hover:text-color1 truncate">Home</Link>
+              <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
+            </li>
+            <li className="flex items-center">
+              <Link to="/activities" className="hover:text-color1 truncate">Activities</Link>
+              <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
+            </li>
+            <li className="flex items-center">
+              <Link to="/accommodations" className="hover:text-color1 truncate">Accommodations</Link>
+              <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
+            </li>
+            <li className="flex items-center">
+              <Link to="/foodplaces" className="hover:text-color1 truncate">Food Places</Link>
+              <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
+            </li>
+            <li className="flex items-center">
+              <Link to="/shops" className="hover:text-color1 truncate">Shops</Link>
+              <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
+            </li>
+            <li className="flex items-center">
+              <Link to="/discover" className="hover:text-color1 truncate">Discover</Link>
+              <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
+            </li>
+            <li className="flex items-center text-gray-700 truncate">
+              <p className="truncate">Trip</p>
+            </li>
+          </ol>
+        </nav>
       </div>
       <div className='p-6'>
       <div className="container mx-auto flex justify-center bg-color1 p-4 mb-4 items-center shadow-lg rounded-xl shadow-color1 m-4">
