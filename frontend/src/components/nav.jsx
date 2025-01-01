@@ -716,7 +716,7 @@ const Nav = () => {
         isOpen={isOpen}
         onOpenChange={onOpenChange}
         isDismissable={false}
-        className='max-h-full w-full max-w-[600px] overflow-auto scrollbar-custom'
+        className='max-h-full  w-full max-w-[600px] overflow-auto scrollbar-custom'
       >
         <ModalContent>
           {() => (
