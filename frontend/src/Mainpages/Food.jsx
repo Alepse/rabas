@@ -285,96 +285,96 @@ const toggleTagFiltering = () => {
                 
                 {/* Destination Dropdown */}
                 <div className='mb-6'>
-                    <h3 className='text-sm font-medium text-gray-700 mb-2'>Destination</h3>
-                    <Select
-                        placeholder="Select Destination"
-                        selectedKeys={[selectedDestination]}
-                        onSelectionChange={(value) => handleDestinationChange(value.currentKey)}
-                    >
-                        {destinations.map((destination) => (
-                            <SelectItem key={destination} value={destination}>
-                                {destination}
-                            </SelectItem>
-                        ))}
-                    </Select>
+                  <h3 className='text-sm font-medium text-gray-700 mb-2'>Destination</h3>
+                  <Select
+                    placeholder="Select Destination"
+                    selectedKeys={[selectedDestination]}
+                    onSelectionChange={(value) => handleDestinationChange(value.currentKey)}
+                  >
+                    {destinations.map((destination) => (
+                      <SelectItem key={destination} value={destination}>
+                        {destination}
+                      </SelectItem>
+                    ))}
+                  </Select>
                 </div>
 
                 {/* Food place Type Filter */}
                 <div className='mb-6 max-h-[230px] overflow-auto scrollbar-custom'>
-                    <h3 className='text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2'>Food Place Type</h3>
-                    <CheckboxGroup
-                        value={selectedFoodType}
-                        onChange={handleCuisineChange}
-                    >
-                        {foodType.map((type) => (
-                            <Checkbox key={type} value={type}>
-                                {type}
-                            </Checkbox>
-                        ))}
-                    </CheckboxGroup>
+                  <h3 className='text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2'>Food Place Type</h3>
+                  <CheckboxGroup
+                    value={selectedFoodType}
+                    onChange={handleCuisineChange}
+                  >
+                    {foodType.map((type) => (
+                      <Checkbox key={type} value={type}>
+                          {type}
+                      </Checkbox>
+                    ))}
+                  </CheckboxGroup>
                 </div>
 
                 {/* Amenities Filter */}
                 <div className='mb-6 max-h-[230px] overflow-auto scrollbar-custom'>
-                    <h3 className='text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2'>Amenities</h3>
-                    <CheckboxGroup
-                        value={selectedAmenities}
-                        onChange={handleAmenitiesChange}
-                    >
-                        {amenitiesList.map((amenity) => (
-                            <Checkbox key={amenity} value={amenity}>
-                                {amenity}
-                            </Checkbox>
-                        ))}
-                    </CheckboxGroup>
+                  <h3 className='text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2'>Amenities</h3>
+                  <CheckboxGroup
+                    value={selectedAmenities}
+                    onChange={handleAmenitiesChange}
+                >
+                    {amenitiesList.map((amenity) => (
+                      <Checkbox key={amenity} value={amenity}>
+                          {amenity}
+                      </Checkbox>
+                    ))}
+                  </CheckboxGroup>
                 </div>
 
                 {/* Budget Range Filter */}
                 <div className='mb-6'>
-                    <h3 className='text-sm font-medium text-gray-700 mb-2'>Budget Range (PHP)</h3>
-                    <Slider
-                        step={100}
-                        minValue={0}
-                        maxValue={10000}
-                        value={budgetRange}
-                        onChange={setBudgetRange}
-                        formatOptions={{ style: 'currency', currency: 'PHP' }}
-                        className="max-w-md flex"
-                    />
-                    <div className='flex justify-between text-xs'>
-                        <span>₱{budgetRange[0]}</span>
-                        <span>₱{budgetRange[1]}+</span>
-                    </div>
+                  <h3 className='text-sm font-medium text-gray-700 mb-2'>Budget Range (PHP)</h3>
+                  <Slider
+                    step={100}
+                    minValue={0}
+                    maxValue={10000}
+                    value={budgetRange}
+                    onChange={setBudgetRange}
+                    formatOptions={{ style: 'currency', currency: 'PHP' }}
+                    className="max-w-md flex"
+                  />
+                  <div className='flex justify-between text-xs'>
+                    <span>₱{budgetRange[0]}</span>
+                    <span>₱{budgetRange[1]}+</span>
+                  </div>
                 </div>
 
                 {/* Ratings Filter */}
                 <div>
-                    <h3 className='text-sm font-medium text-gray-700 mb-2'>Ratings</h3>
-                    <div className='space-y-2'>
-                        <label className='flex items-center'>
-                            <input
-                                type='checkbox'
-                                onChange={() => handleRatingClick('All')}
-                                checked={selectedRatings.length === 0}
-                                className='form-checkbox text-color2'
-                            />
-                            <span className='ml-2 text-sm'>All Ratings</span>
-                        </label>
-                        {[5, 4, 3, 2, 1].map((star) => (
-                            <label key={star} className='flex items-center'>
-                                <input
-                                    type='checkbox'
-                                    onChange={() => handleRatingClick(star)}
-                                    checked={selectedRatings.includes(star)}
-                                    className='form-checkbox text-color2'
-                                />
-                                <span className='ml-2 text-sm flex items-center'>
-                                    {'★'.repeat(star)}{'☆'.repeat(5 - star)}
-                                    <span className='ml-1'>{star} Star{star > 1 ? 's' : ''}</span>
-                                </span>
-                            </label>
-                        ))}
-                    </div>
+                  <h3 className='text-sm font-medium text-gray-700 mb-2'>Ratings</h3>
+                  <div className='space-y-2'>
+                    <label className='flex items-center'>
+                      <input
+                        type='checkbox'
+                        onChange={() => handleRatingClick('All')}
+                        checked={selectedRatings.length === 0}
+                        className='form-checkbox text-color2'
+                      />
+                      <span className='ml-2 text-sm'>All Ratings</span>
+                    </label>
+                    {[5, 4, 3, 2, 1].map((star) => (
+                      <label key={star} className='flex items-center'>
+                        <input
+                          type='checkbox'
+                          onChange={() => handleRatingClick(star)}
+                          checked={selectedRatings.includes(star)}
+                          className='form-checkbox text-color2'
+                        />
+                        <span className='ml-2 text-sm flex items-center'>
+                          {'★'.repeat(star)}{'☆'.repeat(5 - star)}
+                          <span className='ml-1'>{star} Star{star > 1 ? 's' : ''}</span>
+                        </span>
+                      </label>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -435,31 +435,31 @@ const toggleTagFiltering = () => {
                       <div className="p-2 ">
                         {/* Tags */}
                         <div className="flex justify-between  items-center mb-2">  
-                        <div className="flex flex-wrap gap-2"> 
-                       {food.category.slice(0, 3).map((tag, index) => (
-                       <span
-                              key={index}
-                              className={`text-xs px-2 py-1 rounded-full ${
-                                selectedFoodType
-                                  .map((a) => a.toLowerCase())
-                                  .includes(tag.toLowerCase().replace(/s$/, ''))
-                                  ? 'bg-color2 text-white'
-                                  : 'bg-gray-200 text-gray-700'
-                              }`}
-                            >
-                              {tag}
-                            </span>
-                    ))}
-                    {food.category.length > 3 && (
-                      <button
-                        onClick={() => handleSeeMoreTags(food.category)}
-                        className="text-xs underline cursor-pointer text-color2"
-                      >
-                        See More
-                      </button>
-                    )}
-                  </div>
-                  </div>
+                          <div className="flex flex-wrap gap-2"> 
+                            {food.category.slice(0, 3).map((tag, index) => (
+                            <span
+                                key={index}
+                                className={`text-xs px-2 py-1 rounded-full ${
+                                  selectedFoodType
+                                    .map((a) => a.toLowerCase())
+                                    .includes(tag.toLowerCase().replace(/s$/, ''))
+                                    ? 'bg-color2 text-white'
+                                    : 'bg-gray-200 text-gray-700'
+                                }`}
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                            {food.category.length > 3 && (
+                              <button
+                                onClick={() => handleSeeMoreTags(food.category)}
+                                className="text-xs underline cursor-pointer text-color2"
+                              >
+                                See More
+                              </button>
+                            )}
+                          </div>
+                        </div>
                         <div className='flex gap-2 items-center flex-wrap'>
                           {/* Business Name */}
                           <h3 className="text-lg sm:text-base lg:text-lg font-semibold text-gray-800 truncate">{food.businessName}</h3>
@@ -491,31 +491,31 @@ const toggleTagFiltering = () => {
                         </div>
 
                       </div>
-                        {/* Ratings & Price */}
-                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-2">   
-                          
-                           <div className="flex items-center gap-1 mb-2 sm:mb-0">
-                              {food.rating ? (
-                                <>
-                                  <span className="text-black text-[12px]">{food.rating.toFixed(1)}</span>
-                                  <span className="text-yellow-500">
-                                    {'★'.repeat(Math.floor(food.rating))}
-                                    {'☆'.repeat(5 - Math.floor(food.rating))}
-                                  </span>
-                                </>
-                              ) : (
-                                <span className="text-gray-500 text-[12px] sm:text-sm">No ratings</span>
-                              )}
-                            </div>
-                          
-                            <p className="text-md sm:text-sm font-semibold text-black">
-                            {food.lowest_price && food.highest_price ? (
-                              `₱${food.lowest_price} - ₱${food.highest_price}`
+                      {/* Ratings & Price */}
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-2">   
+                        
+                          <div className="flex items-center gap-1 mb-2 sm:mb-0">
+                            {food.rating ? (
+                              <>
+                                <span className="text-black text-[12px]">{food.rating.toFixed(1)}</span>
+                                <span className="text-yellow-500">
+                                  {'★'.repeat(Math.floor(food.rating))}
+                                  {'☆'.repeat(5 - Math.floor(food.rating))}
+                                </span>
+                              </>
                             ) : (
-                              <span className="text-gray-400 italic text-[12px] sm:text-sm">Price Range Not available</span>
+                              <span className="text-gray-500 text-[12px] sm:text-sm">No ratings</span>
                             )}
-                          </p>
-                        </div>
+                          </div>
+                        
+                          <p className="text-md sm:text-sm font-semibold text-black">
+                          {food.lowest_price && food.highest_price ? (
+                            `₱${food.lowest_price} - ₱${food.highest_price}`
+                          ) : (
+                            <span className="text-gray-400 italic text-[12px] sm:text-sm">Price Range Not available</span>
+                          )}
+                        </p>
+                      </div>
                       {/* Explore More Button */}
                       <Link to={`/business/${encryptId(food.business_id)}`} >
                         <Button className="w-full bg-color1 text-color3 rounded-md hover:bg-color2">
@@ -553,37 +553,36 @@ const toggleTagFiltering = () => {
         </motion.button>
       )}
 
-      
-            {/* Modal for displaying all tags */}
-            <Modal disableAnimation isOpen={isOpen} onClose={onClose}>
-              <ModalContent>
-                <ModalHeader>All Tags</ModalHeader>
-                <ModalBody>
-                  <div className="flex gap-2 flex-wrap">
-                    {selectedTags.map((tag, index) => (
-                      <span
-                            key={index}
-                                    className={`text-xs px-2 py-1 rounded-full ${
-                                      selectedFoodType
-                                        .map((a) => a.toLowerCase())
-                                        .includes(tag.toLowerCase().replace(/s$/, ''))
-                                        ? 'bg-color2 text-white'
-                                        : 'bg-gray-200 text-gray-700'
-                                    }`}
-                                  >
-                                    {tag}
-                                  </span>
-                    ))}
-                  </div>
-                </ModalBody>
-                <ModalFooter>
-                  <Button color="danger" onPress={onClose}>
-                    Close
-                  </Button>
-                </ModalFooter>
-              </ModalContent>
-            </Modal>
 
+      {/* Modal for displaying all tags */}
+      <Modal disableAnimation isOpen={isOpen} onClose={onClose}>
+        <ModalContent>
+          <ModalHeader>All Tags</ModalHeader>
+          <ModalBody>
+            <div className="flex gap-2 flex-wrap">
+              {selectedTags.map((tag, index) => (
+                <span
+                  key={index}
+                  className={`text-xs px-2 py-1 rounded-full ${
+                    selectedFoodType
+                      .map((a) => a.toLowerCase())
+                      .includes(tag.toLowerCase().replace(/s$/, ''))
+                      ? 'bg-color2 text-white'
+                      : 'bg-gray-200 text-gray-700'
+                  }`}
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </ModalBody>
+          <ModalFooter>
+            <Button color="danger" onPress={onClose}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 };

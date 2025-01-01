@@ -47,9 +47,9 @@ const Activities = () => {
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
   const [showButton, setShowButton] = useState(false); // State to show/hide button
- const [openTooltip, setOpenTooltip] = useState(null); // Store the ID of the open tooltip
+  const [openTooltip, setOpenTooltip] = useState(null); // Store the ID of the open tooltip
 
- const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedTags, setSelectedTags] = useState([]);
   const [highlightedTags, setHighlightedTags] = useState([]);
   const [isFilteringByTags, setIsFilteringByTags] = useState(false);
@@ -300,96 +300,96 @@ const toggleTagFiltering = () => {
                 
                 {/* Destination Dropdown */}
                 <div className='mb-6'>
-                    <h3 className='text-sm font-medium text-gray-700 mb-2'>Destination</h3>
-                    <Select
-                        placeholder="Select Destination"
-                        selectedKeys={[selectedDestination]}
-                        onSelectionChange={(value) => handleDestinationChange(value.currentKey)}
-                    >
-                        {destinations.map((destination) => (
-                            <SelectItem key={destination} value={destination}>
-                                {destination}
-                            </SelectItem>
-                        ))}
-                    </Select>
+                  <h3 className='text-sm font-medium text-gray-700 mb-2'>Destination</h3>
+                  <Select
+                    placeholder="Select Destination"
+                    selectedKeys={[selectedDestination]}
+                    onSelectionChange={(value) => handleDestinationChange(value.currentKey)}
+                  >
+                    {destinations.map((destination) => (
+                      <SelectItem key={destination} value={destination}>
+                          {destination}
+                      </SelectItem>
+                    ))}
+                  </Select>
                 </div>
 
                 {/* Activity Type Filter */}
                 <div className='mb-6 max-h-[230px] overflow-auto scrollbar-custom'>
-                    <h3 className='text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2'>Activity Type</h3>
-                    <CheckboxGroup
-                        value={selectedActivities}
-                        onChange={handleActivityChange}
-                    >
-                        {activityTypes.map((type) => (
-                            <Checkbox key={type} value={type}>
-                                {type}
-                            </Checkbox>
-                        ))}
-                    </CheckboxGroup>
+                  <h3 className='text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2'>Activity Type</h3>
+                  <CheckboxGroup
+                    value={selectedActivities}
+                    onChange={handleActivityChange}
+                  >
+                    {activityTypes.map((type) => (
+                      <Checkbox key={type} value={type}>
+                          {type}
+                      </Checkbox>
+                    ))}
+                  </CheckboxGroup>
                 </div>
 
                 {/* Amenities Filter */}
                 <div className='mb-6 max-h-[230px] overflow-auto scrollbar-custom'>
-                    <h3 className='text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2'>Amenities</h3>
-                    <CheckboxGroup
-                        value={selectedAmenities}
-                        onChange={handleAmenitiesChange}
-                    >
-                        {amenitiesList.map((amenity) => (
-                            <Checkbox key={amenity} value={amenity}>
-                                {amenity}
-                            </Checkbox>
-                        ))}
-                    </CheckboxGroup>
+                  <h3 className='text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2'>Amenities</h3>
+                  <CheckboxGroup
+                    value={selectedAmenities}
+                    onChange={handleAmenitiesChange}
+                  >
+                    {amenitiesList.map((amenity) => (
+                      <Checkbox key={amenity} value={amenity}>
+                          {amenity}
+                      </Checkbox>
+                    ))}
+                  </CheckboxGroup>
                 </div>
 
                 {/* Budget Range Filter */}
                 <div className='mb-6'>
-                    <h3 className='text-sm font-medium text-gray-700 mb-2'>Budget Range (PHP)</h3>
-                    <Slider
-                        step={100}
-                        minValue={0}
-                        maxValue={10000}
-                        value={budgetRange}
-                        onChange={setBudgetRange}
-                        formatOptions={{ style: 'currency', currency: 'PHP' }}
-                        className="max-w-md flex"
-                    />
-                    <div className='flex justify-between text-xs'>
-                        <span>₱{budgetRange[0]}</span>
-                        <span>₱{budgetRange[1]}+</span>
-                    </div>
+                  <h3 className='text-sm font-medium text-gray-700 mb-2'>Budget Range (PHP)</h3>
+                  <Slider
+                    step={100}
+                    minValue={0}
+                    maxValue={10000}
+                    value={budgetRange}
+                    onChange={setBudgetRange}
+                    formatOptions={{ style: 'currency', currency: 'PHP' }}
+                    className="max-w-md flex"
+                  />
+                  <div className='flex justify-between text-xs'>
+                    <span>₱{budgetRange[0]}</span>
+                    <span>₱{budgetRange[1]}+</span>
+                  </div>
                 </div>
 
                 {/* Ratings Filter */}
                 <div>
-                    <h3 className='text-sm font-medium text-gray-700 mb-2'>Ratings</h3>
-                    <div className='space-y-2'>
-                        <label className='flex items-center'>
-                            <input
-                                type='checkbox'
-                                onChange={() => handleRatingClick('All')}
-                                checked={selectedRatings.length === 0}
-                                className='form-checkbox text-color2'
-                            />
-                            <span className='ml-2 text-sm'>All Ratings</span>
-                        </label>
-                        {[5, 4, 3, 2, 1].map((star) => (
-                            <label key={star} className='flex items-center'>
-                                <input
-                                    type='checkbox'
-                                    onChange={() => handleRatingClick(star)}
-                                    checked={selectedRatings.includes(star)}
-                                    className='form-checkbox text-color2'
-                                />
-                                <span className='ml-2 text-sm flex items-center'>
-                                    {'★'.repeat(star)}{'☆'.repeat(5 - star)}
-                                    <span className='ml-1'>{star} Star{star > 1 ? 's' : ''}</span>
-                                </span>
-                            </label>
-                        ))}
-                    </div>
+                  <h3 className='text-sm font-medium text-gray-700 mb-2'>Ratings</h3>
+                  <div className='space-y-2'>
+                    <label className='flex items-center'>
+                      <input
+                        type='checkbox'
+                        onChange={() => handleRatingClick('All')}
+                        checked={selectedRatings.length === 0}
+                        className='form-checkbox text-color2'
+                      />
+                      <span className='ml-2 text-sm'>All Ratings</span>
+                    </label>
+                    {[5, 4, 3, 2, 1].map((star) => (
+                      <label key={star} className='flex items-center'>
+                        <input
+                          type='checkbox'
+                          onChange={() => handleRatingClick(star)}
+                          checked={selectedRatings.includes(star)}
+                          className='form-checkbox text-color2'
+                        />
+                        <span className='ml-2 text-sm flex items-center'>
+                          {'★'.repeat(star)}{'☆'.repeat(5 - star)}
+                          <span className='ml-1'>{star} Star{star > 1 ? 's' : ''}</span>
+                        </span>
+                      </label>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -449,9 +449,9 @@ const toggleTagFiltering = () => {
                       <div className="p-2 ">
                         {/* Tags */}
                         <div className="flex justify-between  items-center mb-2">  
-                        <div className="flex flex-wrap gap-2"> 
-                       {activity.category.slice(0, 3).map((tag, index) => (
-                       <span
+                          <div className="flex flex-wrap gap-2"> 
+                          {activity.category.slice(0, 3).map((tag, index) => (
+                            <span
                               key={index}
                               className={`text-xs px-2 py-1 rounded-full ${
                                 selectedActivities
@@ -460,20 +460,20 @@ const toggleTagFiltering = () => {
                                   ? 'bg-color2 text-white'
                                   : 'bg-gray-200 text-gray-700'
                               }`}
-                            >
-                              {tag}
-                            </span>
-                    ))}
-                    {activity.category.length > 3 && (
-                      <button
-                        onClick={() => handleSeeMoreTags(activity.category)}
-                        className="text-xs underline cursor-pointer text-color2"
-                      >
-                        See More
-                      </button>
-                    )}
-                  </div>
-                  </div>
+                              >
+                                {tag}
+                              </span> 
+                            ))}
+                            {activity.category.length > 3 && (
+                              <button
+                                onClick={() => handleSeeMoreTags(activity.category)}
+                                className="text-xs underline cursor-pointer text-color2"
+                              >
+                                See More
+                              </button>
+                            )}
+                          </div>
+                        </div>
 
                         <div className='flex gap-2 items-center flex-wrap'>
                           {/* Business Name */}
@@ -507,36 +507,36 @@ const toggleTagFiltering = () => {
 
                       </div>
                       
-                        {/* Ratings & Price */}
-                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-2">                       
-                          <div className="flex items-center gap-1 mb-2 sm:mb-0">
-                              {activity.rating ? (
-                                <>
-                                  <span className="text-black text-[12px]">{activity.rating}</span>
-                                  <span className="text-yellow-500">
-                                    {'★'.repeat(Math.floor(activity.rating))}
-                                    {'☆'.repeat(5 - Math.floor(activity.rating))}
-                                  </span>
-                                </>
-                              ) : (
-                                <span className="text-gray-500 text-[12px] sm:text-sm">No ratings</span>
-                              )}
-                            </div>
-                         
-
-                            <p className="text-md sm:text-sm font-semibold text-black">
-                            {activity.lowest_price && activity.highest_price ? (
-                              `₱${activity.lowest_price} - ₱${activity.highest_price}`
-                            ) : (
-                              <span className="text-gray-400 italic text-[12px] sm:text-sm">Price Range Not available</span>
-                            )}
-                          </p>
+                      {/* Ratings & Price */}
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-2">                       
+                        <div className="flex items-center gap-1 mb-2 sm:mb-0">
+                          {activity.rating ? (
+                            <>
+                              <span className="text-black text-[12px]">{activity.rating}</span>
+                              <span className="text-yellow-500">
+                                {'★'.repeat(Math.floor(activity.rating))}
+                                {'☆'.repeat(5 - Math.floor(activity.rating))}
+                              </span>
+                            </>
+                          ) : (
+                            <span className="text-gray-500 text-[12px] sm:text-sm">No ratings</span>
+                          )}
                         </div>
+                        
+
+                        <p className="text-md sm:text-sm font-semibold text-black">
+                          {activity.lowest_price && activity.highest_price ? (
+                            `₱${activity.lowest_price} - ₱${activity.highest_price}`
+                          ) : (
+                            <span className="text-gray-400 italic text-[12px] sm:text-sm">Price Range Not available</span>
+                          )}
+                        </p>
+                      </div>
                       {/* Explore More Button */}
                       <Link to={`/business/${encryptId(activity.business_id)}`} >
                           <Button className="w-full bg-color1 text-color3 rounded-md hover:bg-color2">
-                          Explore More
-                        </Button>
+                            Explore More
+                          </Button>
                       </Link>
                     </motion.div>
                   ))
@@ -577,17 +577,17 @@ const toggleTagFiltering = () => {
             <div className="flex gap-2 flex-wrap">
               {selectedTags.map((tag, index) => (
                 <span
-                      key={index}
-                              className={`text-xs px-2 py-1 rounded-full ${
-                                selectedActivities
-                                  .map((a) => a.toLowerCase())
-                                  .includes(tag.toLowerCase().replace(/s$/, ''))
-                                  ? 'bg-color2 text-white'
-                                  : 'bg-gray-200 text-gray-700'
-                              }`}
-                            >
-                              {tag}
-                            </span>
+                  key={index}
+                  className={`text-xs px-2 py-1 rounded-full ${
+                    selectedActivities
+                      .map((a) => a.toLowerCase())
+                      .includes(tag.toLowerCase().replace(/s$/, ''))
+                      ? 'bg-color2 text-white'
+                      : 'bg-gray-200 text-gray-700'
+                  }`}
+                >
+                  {tag}
+                </span>
               ))}
             </div>
           </ModalBody>
