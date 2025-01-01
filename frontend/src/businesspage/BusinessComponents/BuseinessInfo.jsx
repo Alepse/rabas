@@ -4,7 +4,7 @@ import { Tabs, Tab, Card, CardBody, Textarea, Button, Avatar } from "@nextui-org
 import { businessIcons } from './businessIcons';
 import DOMPurify from 'dompurify';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
-import { FaClipboardList, FaInfoCircle, FaConciergeBell, FaStar } from 'react-icons/fa';
+import { FaClipboardList, FaInfoCircle, FaConciergeBell, FaStar, FaClock, FaMapMarkerAlt } from 'react-icons/fa';
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
@@ -114,114 +114,144 @@ const BusinessInfo = ({businessData, loading}) => {
         }}
       >
         <Tab key="about-location" title={<><FaInfoCircle className="mr-2" />About Us</>}>
-          <Card>
-            <CardBody>
-              <div className="flex flex-col lg:flex-row h-auto lg:h-[47em] overflow-y-auto scrollbar-custom gap-8">
-                <div className="flex-1 p-4">
-                  <h2 className="text-2xl md:text-3xl font-bold mb-4">About Our Business</h2>
-                  <div className='max-w-full lg:max-w-[40rem] w-full flex flex-col justify-center items-start'>
-                    <div className="text-gray-700 mb-6 break-words whitespace-normal">
-                      <h1 className="text-md font-normal">
-                        {businessData.aboutUs}
-                      </h1>
-                    </div>
-                  </div>
-                  <div className="mb-6">
-                    <h3 className="text-xl font-semibold flex items-center gap-3 mb-2">Contact Information</h3>
-                    <ul className="space-y-2 ">
-                      {businessData.contactInfo && businessData.contactInfo.length > 0 ? (
-                        businessData.contactInfo.map((info, index) => (
-                          <li key={`${info.label}-${index}`} className="flex text-gray-700  items-center gap-2">
-                            {renderIcon(info.icon)}
-                            <span>
-                              {info.label}{info.value ? `: ${info.value}` : ''}
-                            </span>
-                          </li>
-                        ))
-                      ) : (
-                        <li className="italic text-gray-500 p-4 bg-gray-100 rounded-md">
-                          No contact information available
-                        </li>
-                      )}
-                    </ul>
-                  </div>
-                  <Card>
-                    <CardBody>
-                      <h3 className="text-xl font-semibold flex items-center gap-3 mb-3">Opening Hours</h3>
-                      <ul className="space-y-2">
-                        {businessData.openingHours && businessData.openingHours.length > 0 ? (
-                          businessData.openingHours.map((hours, index) => (
-                            <li key={index} className="flex justify-between items-center py-2 border-b">
-                              <span className="font-medium">{hours.day}</span>
-                              <span className="text-gray-600">
-                                {hours.open === "Closed" && hours.close === "Closed" ? "Closed" : `${formatTime(hours.open)} - ${formatTime(hours.close)}`}
-                              </span>
-                            </li>
-                          ))
-                        ) : (
-                          <li className="italic text-gray-500 p-4 bg-gray-100 rounded-md">
-                            No opening hours available
-                          </li>
-                        )}
-                      </ul>
-                    </CardBody>
-                  </Card>
-                </div>
-                <div className="flex-1 p-4 z-0 ">
-                  <h2 className="text-2xl md:text-3xl font-bold mb-4">Location</h2>
-                  <p className="mb-4 text-gray-600">{businessData.completeAddress}</p>
-                  <MapContainer 
-                    center={initialCenter && initialCenter.lat != null && initialCenter.lng != null 
-                      ? [initialCenter.lat, initialCenter.lng] 
-                      : defaultCenter} 
-                    zoom={currentZoom} 
-                    className="w-full h-96"
+  <Card className="p-4">
+    <CardBody>
+      <div className="space-y-8 h-auto lg:h-[47em] overflow-y-auto scrollbar-custom">
+        {/* About Us Section */}
+        <div className='border border-gray-200 rounded-md shadow-sm p-4'>
+          <h2 className="text-2xl md:text-3xl font-bold mb-4">About Our Business</h2>
+          <div className="text-gray-700 mb-6 break-words whitespace-normal">
+            <p className="text-md font-normal">{businessData.aboutUs}</p>
+          </div>
+        </div>
+
+        {/* Contact Information and Opening Hours */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Contact Information */}
+          <div className="p-4 border border-gray-200 rounded-md shadow-sm">
+            <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+               Contact Information
+            </h3>
+            <ul className="space-y-3">
+              {businessData.contactInfo && businessData.contactInfo.length > 0 ? (
+                businessData.contactInfo.map((info, index) => (
+                  <li
+                    key={`${info.label}-${index}`}
+                    className="text-gray-700 flex items-center gap-3"
                   >
-                    <TileLayer
-                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    />
-                    <MapEvents setCurrentZoom={setCurrentZoom} />
+                    {renderIcon(info.icon)}
+                    <span>
+                      {info.label}
+                      {info.value ? `: ${info.value}` : ''}
+                    </span>
+                  </li>
+                ))
+              ) : (
+                <li className="italic text-gray-500">
+                  No contact information available
+                </li>
+              )}
+            </ul>
+          </div>
 
-                    {pin_location && pin_location.latitude != null && pin_location.longitude != null ? (
-                      (() => {
-                        const { businessName, businessLogo } = businessData;
-                        const position = [pin_location.latitude, pin_location.longitude];
-                        const showLogo = currentZoom >= 10; // Set zoom level to show/hide logo
+          {/* Opening Hours */}
+          <div className="p-4 border border-gray-200 rounded-md shadow-sm">
+            <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+              <FaClock /> Opening Hours
+            </h3>
+            <ul className="space-y-2">
+              {businessData.openingHours && businessData.openingHours.length > 0 ? (
+                businessData.openingHours.map((hours, index) => (
+                  <li
+                    key={index}
+                    className="flex justify-between items-center py-1 border-b last:border-none text-gray-700"
+                  >
+                    <span>{hours.day}</span>
+                    <span>
+                      {hours.open === "Closed" && hours.close === "Closed"
+                        ? "Closed"
+                        : `${formatTime(hours.open)} - ${formatTime(hours.close)}`}
+                    </span>
+                  </li>
+                ))
+              ) : (
+                <li className="italic text-gray-500">
+                  No opening hours available
+                </li>
+              )}
+            </ul>
+          </div>
+        </div>
 
-                        // Adjust font size based on zoom level
-                        const fontSize = currentZoom >= 12 ? '1rem' : '0.85rem';
+        {/* Location Section */}
+<div className="relative">
+  <h2 className="text-2xl md:text-3xl font-bold mb-4 flex items-center gap-2">
+    <FaMapMarkerAlt /> Location
+  </h2>
+  <p className="mb-4 text-gray-600">{businessData.completeAddress}</p>
+  <div className="w-full h-96 rounded-md shadow-lg overflow-hidden relative z-10">
+    <MapContainer
+      center={
+        initialCenter && initialCenter.lat != null && initialCenter.lng != null
+          ? [initialCenter.lat, initialCenter.lng]
+          : defaultCenter
+      }
+      zoom={currentZoom}
+      className="w-full h-full"
+      style={{ zIndex: 0 }} // Ensures the map stays at the correct level
+    >
+      <TileLayer
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      />
+      <MapEvents setCurrentZoom={setCurrentZoom} />
 
-                        const customDivIcon = L.divIcon({
-                          className: 'custom-icon',
-                          html: `
-                            <div class="custom-popup flex items-center whitespace-nowrap font-bold text-color1 " style="font-size: ${fontSize};">
-                              ${showLogo ? `<div class="pin-container">
-                                <div class="pin-head">
-                                  <img src="${BASE_URL}/${businessLogo}" alt="${businessName}" class="pin-logo" />
-                                </div>
-                                <div class="pin-point"></div>
-                              </div><span>${businessName}</span>` : `<div class="business-name">${businessName}</div>`}
-                            </div>
-                          `,
-                          iconSize: [50, 70],
-                          iconAnchor: [25, 70]
-                        });
+      {pin_location && pin_location.latitude != null && pin_location.longitude != null ? (
+        (() => {
+          const { businessName, businessLogo } = businessData;
+          const position = [pin_location.latitude, pin_location.longitude];
+          const showLogo = currentZoom >= 10; // Set zoom level to show/hide logo
 
-                        return <Marker key={businessData.business_id} position={position} icon={customDivIcon} />;
-                      })()
-                    ) : (
-                      <div className="text-center text-gray-500 mt-4">No valid pin location available for this business.</div>
-                    )}
-                  </MapContainer>
-                  <Button color="primary" className="w-full mb-6 hover:bg-color2/90" onClick={handleGetDirections}>
-                    Get Directions
-                  </Button>
-                </div>
+          const customDivIcon = L.divIcon({
+            className: 'custom-icon',
+            html: `
+              <div class="custom-popup flex items-center whitespace-nowrap font-bold text-color1">
+                ${showLogo ? `
+                  <div class="pin-container">
+                    <div class="pin-head">
+                      <img src="${BASE_URL}/${businessLogo}" alt="${businessName}" class="pin-logo" />
+                    </div>
+                    <div class="pin-point"></div>
+                  </div>
+                  <span>${businessName}</span>
+                ` : `<div class="business-name">${businessName}</div>`}
               </div>
-            </CardBody>
-          </Card>
-        </Tab>
+            `,
+            iconSize: [50, 70],
+            iconAnchor: [25, 70],
+          });
+
+          return <Marker key={businessData.business_id} position={position} icon={customDivIcon} />;
+        })()
+      ) : (
+        <div className="text-center text-gray-500 mt-4">No valid pin location available for this business.</div>
+      )}
+    </MapContainer>
+  </div>
+  <Button
+    color="primary"
+    className="w-full mt-6 hover:bg-color2/90 relative z-10"
+    onClick={handleGetDirections}
+  >
+    Get Directions
+  </Button>
+</div>
+
+      </div>
+    </CardBody>
+  </Card>
+</Tab>
+
         <Tab key="facilities" title={<><FaConciergeBell className="mr-2" />Facilities & Amenities</>}>
           <Card>
             <CardBody>
