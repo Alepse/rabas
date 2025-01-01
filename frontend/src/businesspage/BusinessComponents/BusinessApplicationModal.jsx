@@ -38,7 +38,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
       { label: "Adventure", value: "adventure" },
       { label: "Tour", value: "tour" },
       { label: "Relaxation", value: "relaxation" },
-      { label: "Water Sports", value: "water_sports" },
+      { label: "Water Sports", value: "water sports" },
       { label: "Nature", value: "nature" },
       { label: "Add Category", value: "others" },
     ],
@@ -57,8 +57,8 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
       { label: "Add Category", value: "others" },
     ],
     shop: [
-      { label: "Souvenir Shop", value: "souvenir_shop" },
-      { label: "Clothing Shop", value: "clothing_shop" },
+      { label: "Souvenir Shop", value: "souvenir shop" },
+      { label: "Clothing Shop", value: "clothing shop" },
       { label: "Add Category", value: "others" },
     ],
   });
