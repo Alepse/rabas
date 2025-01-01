@@ -266,16 +266,16 @@ const BusinessInfo = ({businessData, loading, userData, isLoggedIn}) => {
         }}
       >
         <Tab key="about-location" title={<><FaInfoCircle className="mr-2" />About Us</>}>
-  <Card className="p-4">
-    <CardBody>
-      <div className="space-y-8 h-auto overflow-y-auto scrollbar-custom">
-        {/* About Us Section */}
-        <div className='border  max-h-[12rem] overflow-y-auto scrollbar-custom border-gray-200 rounded-md shadow-sm p-4'>
-          <h2 className="text-2xl md:text-3xl font-bold mb-4">About Our Business</h2>
-          <div className="text-gray-700 mb-6 break-words whitespace-normal">
-            <p className="text-md font-normal">{businessData.aboutUs}</p>
-          </div>
-        </div>
+          <Card className="p-4">
+            <CardBody>
+              <div className="space-y-8 h-auto overflow-y-auto scrollbar-custom">
+                {/* About Us Section */}
+                <div className='border  max-h-[12rem] overflow-y-auto scrollbar-custom border-gray-200 rounded-md shadow-sm p-4'>
+                  <h2 className="text-2xl md:text-3xl font-bold mb-4">About Our Business</h2>
+                  <div className="text-gray-700 mb-6 break-words whitespace-normal">
+                    <p className="text-md font-normal">{businessData.aboutUs}</p>
+                  </div>
+                </div>
 
                 {/* Contact Information and Opening Hours */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
