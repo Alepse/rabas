@@ -19,7 +19,7 @@ const BusinessHero = (coverPhotos) => {
 
   const settings = {
     dots: false,
-    infinite: true,
+    infinite: coverPhotos.length > 1,
     speed: 500,
     slidesToShow: 1,
     slidesToScroll: 1,
