@@ -18,11 +18,15 @@ import { FaCamera, FaBusinessTime } from 'react-icons/fa';
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
-// Function to encrypt the business_id
 const encryptId = (id) => {
+  console.log('Encrypting ID:', id); // Debugging log
   const secretKey = import.meta.env.VITE_SECRET_KEY;
   if (!secretKey) {
     console.error('Secret key is not defined');
+    return null;
+  }
+  if (!id) {
+    console.error('ID is null or undefined');
     return null;
   }
   const ciphertext = CryptoJS.AES.encrypt(id.toString(), secretKey).toString();
