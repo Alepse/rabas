@@ -425,7 +425,8 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
   };
 
   return (
-<Modal  
+<Modal 
+ disableAnimation 
   size="xl"  
   isOpen={isBusinessOpen}  
   hideCloseButton={true}  
