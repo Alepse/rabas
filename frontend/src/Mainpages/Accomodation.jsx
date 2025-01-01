@@ -36,7 +36,7 @@ const useIsLargeScreen = () => {
 const Accommodations = () => {
   // State Variables
   const [accommodationDetails, setAccommodationDetails] = useState([]);
- 
+ const [selectedAccommodations, setSelectedAccommodations] = useState([]);
   const [selectedAmenities, setSelectedAmenities] = useState([]);
   const [selectedRatings, setSelectedRatings] = useState([]);
   const [selectedDestination, setSelectedDestination] = useState('All');
@@ -121,7 +121,7 @@ const Accommodations = () => {
   };
 
   const handleTagChange = (selected) => {
-    setSelectedTags(selected);
+    setSelectedAccommodations(selected);
   };
 
   const handleAmenitiesChange = (selected) => {
@@ -190,8 +190,8 @@ const Accommodations = () => {
  
   // Filtering logic
   const filteredAccommodations = accommodationDetails.filter((accommodation) => {
-    const matchesTags = selectedTags.length === 0 || 
-      selectedTags.every((selected) => 
+    const matchesAccommodations = selectedAccommodations.length === 0 || 
+      selectedAccommodations.every((selected) => 
         accommodation.category.map(tag => tag.toLowerCase().replace(/s$/, '')).includes(selected.toLowerCase().replace(/s$/, ''))
       );
 
@@ -213,7 +213,7 @@ const Accommodations = () => {
     const maxPrice = parseFloat(accommodation.highest_price) || Infinity;
   const matchesBudget = minPrice <= budgetRange[1] && maxPrice >= budgetRange[0];
 
-    return matchesTags && matchesAmenities && matchesRating && matchesDestination && matchesBudget;
+    return matchesAccommodations && matchesAmenities && matchesRating && matchesDestination && matchesBudget;
   });
 
   // Dropdown Options
@@ -288,7 +288,7 @@ const Accommodations = () => {
                 <div className='mb-6 max-h-[230px] overflow-auto scrollbar-custom'>
                     <h3 className='text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2'>Accommodation Type</h3>
                     <CheckboxGroup
-                        value={selectedTags}
+                        value={selectedAccommodations}
                         onChange={handleTagChange}
                     >
                         {accommodationTypes.map((type) => (
@@ -425,7 +425,7 @@ const Accommodations = () => {
                        <span
                               key={index}
                               className={`text-xs px-2 py-1 rounded-full ${
-                                selectedTags
+                                selectedAccommodations
                                   .map((a) => a.toLowerCase())
                                   .includes(tag.toLowerCase().replace(/s$/, ''))
                                   ? 'bg-color2 text-white'
@@ -552,7 +552,7 @@ const Accommodations = () => {
                       <span
                             key={index}
                                     className={`text-xs px-2 py-1 rounded-full ${
-                                      selectedTags
+                                       selectedAccommodations
                                         .map((a) => a.toLowerCase())
                                         .includes(tag.toLowerCase().replace(/s$/, ''))
                                         ? 'bg-color2 text-white'
