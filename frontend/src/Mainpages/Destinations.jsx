@@ -1,5 +1,5 @@
 import React, { useState, useEffect, lazy, Suspense, useRef } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import Nav from '../components/nav';
 import Footer from '../components/Footer';
 import Hero from '../components/herodestination';
@@ -40,6 +40,8 @@ import Sorsogon from './DestinationsSectioncomponent/Sorsogon';
 import EmergencyHotlines from '../Mainpages/DestinationsSectioncomponent/EmergencyHotlines';
 import wave from '@/assets/wave2.webp'
 import { Skeleton } from '@nextui-org/react';
+import { MdOutlineKeyboardArrowRight } from 'react-icons/md';
+
 
 
 const destinationComponents = {
@@ -126,6 +128,40 @@ const Destinations = () => {
       <AnimatedSection>
         <Search />
       </AnimatedSection>
+
+        <div className="container w-full flex justify-start mx-auto overflow-x-auto scrollbar-custom scrollbar-hide mb-4">
+        <nav className="text-sm text-gray-500 whitespace-nowrap">
+          <ol className="list-none p-0 inline-flex">
+            <li className="flex items-center">
+              <Link to="/home" className="hover:text-color1 truncate">Home</Link>
+              <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
+            </li>
+            <li className="flex items-center">
+              <Link to="/activities" className="hover:text-color1 truncate">Activities</Link>
+              <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
+            </li>
+            <li className="flex items-center">
+              <Link to="/accommodations" className="hover:text-color1 truncate">Accommodations</Link>
+              <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
+            </li>
+            <li className="flex items-center">
+              <Link to="/foodplaces" className="hover:text-color1 truncate">Food Places</Link>
+              <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
+            </li>
+            <li className="flex items-center">
+              <Link to="/shops" className="hover:text-color1 truncate">Shops</Link>
+              <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
+            </li>
+            <li className="flex items-center">
+              <Link to="/discover" className="hover:text-color1 truncate">Discover</Link>
+              <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
+            </li>
+            <li className="flex items-center text-gray-700 truncate">
+              <p className="truncate">Destinations</p>
+            </li>
+          </ol>
+        </nav>
+      </div>
         
 
       {/* Main content */}
