@@ -19,7 +19,7 @@ import { FaCamera, FaBusinessTime } from 'react-icons/fa';
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 const encryptId = (id) => {
-  console.log('Encrypting ID:', id); // Debugging log
+  // console.log('Encrypting ID:', id); // Debugging log
   const secretKey = import.meta.env.VITE_SECRET_KEY;
   if (!secretKey) {
     // console.error('Secret key is not defined');
