@@ -133,31 +133,15 @@ const Destinations = () => {
         <nav className="text-sm text-gray-500 whitespace-nowrap">
           <ol className="list-none p-0 inline-flex">
             <li className="flex items-center">
-              <Link to="/home" className="hover:text-color1 truncate">Home</Link>
+              <Link to="/" className="hover:text-color1 truncate">Home</Link>
               <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
             </li>
             <li className="flex items-center">
-              <Link to="/activities" className="hover:text-color1 truncate">Activities</Link>
-              <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
-            </li>
-            <li className="flex items-center">
-              <Link to="/accommodations" className="hover:text-color1 truncate">Accommodations</Link>
-              <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
-            </li>
-            <li className="flex items-center">
-              <Link to="/foodplaces" className="hover:text-color1 truncate">Food Places</Link>
-              <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
-            </li>
-            <li className="flex items-center">
-              <Link to="/shops" className="hover:text-color1 truncate">Shops</Link>
-              <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
-            </li>
-            <li className="flex items-center">
-              <Link to="/discover" className="hover:text-color1 truncate">Discover</Link>
+              <Link to="/destinations" className="hover:text-color1 truncate">Destination</Link>
               <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
             </li>
             <li className="flex items-center text-gray-700 truncate">
-              <p className="truncate">Destinations</p>
+              <p className="truncate">{initialDestination}</p>
             </li>
           </ol>
         </nav>
@@ -186,23 +170,23 @@ const Destinations = () => {
             ))
           ) : (
             [
-              { name: 'Bulusan', value: "Bulusan", img: bulusan },
-              { name: 'Bulan', value: "Bulan", img: bulan },
-              { name: 'Barcelona', value: "Barcelona", img: barcelona },
-              { name: 'Casiguran', value: "Casiguran", img: casiguran },
-              { name: 'Castilla', value: "Castilla", img: castilla },
-              { name: 'Donsol', value: "Donsol", img: donsol },
-              { name: 'Gubat', value: "Gubat", img: gubat },
-              { name: 'Irosin', value: "Irosin", img: irosin },
-              { name: 'Juban', value: "Juban", img: juban },
-              { name: 'Magallanes', value: "Magallanes", img: magallanes },
-              { name: 'Matnog', value: "Matnog", img: matnog },
-              { name: 'Pilar', value: "Pilar", img: pilar },
-              { name: 'Prieto Diaz', value: "PrietoDiaz", img: prieto },
-              { name: 'Sta. Magdalena', value: "StaMagdalena", img: santa },
-              { name: 'Sorsogon', value: "Sorsogon", img: Sorso },
-            ].map(({name, value, img }) => (
-              <AnimatedSection key={value}>
+              { id: 1, name: 'Bulusan', value: "Bulusan", img: bulusan },
+              { id: 2, name: 'Bulan', value: "Bulan", img: bulan },
+              { id: 3, name: 'Barcelona', value: "Barcelona", img: barcelona },
+              { id: 4, name: 'Casiguran', value: "Casiguran", img: casiguran },
+              { id: 5, name: 'Castilla', value: "Castilla", img: castilla },
+              { id: 6, name: 'Donsol', value: "Donsol", img: donsol },
+              { id: 7, name: 'Gubat', value: "Gubat", img: gubat },
+              { id: 8, name: 'Irosin', value: "Irosin", img: irosin },
+              { id: 9, name: 'Juban', value: "Juban", img: juban },
+              { id: 10, name: 'Magallanes', value: "Magallanes", img: magallanes },
+              { id: 11, name: 'Matnog', value: "Matnog", img: matnog },
+              { id: 12, name: 'Pilar', value: "Pilar", img: pilar },
+              { id: 13, name: 'Prieto Diaz', value: "PrietoDiaz", img: prieto },
+              { id: 14, name: 'Sta. Magdalena', value: "StaMagdalena", img: santa },
+              { id: 15, name: 'Sorsogon', value: "Sorsogon", img: Sorso },
+            ].map(({index, name, value, img }) => (
+              <AnimatedSection key={index}>
                 <div
                   className="relative h-[100px] md:h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer"
                   onClick={() => handleDestinationClick(value)}

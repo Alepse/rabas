@@ -256,23 +256,7 @@ const toggleTagFiltering = () => {
         <nav className="text-sm text-gray-500 whitespace-nowrap">
           <ol className="list-none p-0 inline-flex">
             <li className="flex items-center">
-              <Link to="/home" className="hover:text-color1 truncate">Home</Link>
-              <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
-            </li>
-            <li className="flex items-center">
-              <Link to="/activities" className="hover:text-color1 truncate">Activities</Link>
-              <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
-            </li>
-            <li className="flex items-center">
-              <Link to="/accommodations" className="hover:text-color1 truncate">Accommodations</Link>
-              <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
-            </li>
-            <li className="flex items-center">
-              <Link to="/shops" className="hover:text-color1 truncate">Shops</Link>
-              <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
-            </li>
-            <li className="flex items-center">
-              <Link to="/discover" className="hover:text-color1 truncate">Discover</Link>
+              <Link to="/" className="hover:text-color1 truncate">Home</Link>
               <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
             </li>
             <li className="flex items-center text-gray-700 truncate">
