@@ -228,7 +228,7 @@ const BusinessSection = ({isLoggedIn, businessData, userData}) => {
                         <span className="line-through text-gray-500">₱{parseFloat(deal.price).toFixed(2)}</span> 
                         <span className="text-red-500 ml-2">
                           ₱{(parseFloat(deal.price) * (1 - deal.discount / 100)).toFixed(2)}
-                        </span>
+                        </span> {deal.pricing_unit}
                       </p>
                     </div>
                     <div className='flex justify-between gap-2 mt-4'>
