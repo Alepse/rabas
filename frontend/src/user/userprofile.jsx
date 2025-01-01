@@ -36,71 +36,89 @@ const encryptId = (id) => {
 // Function to render liked pages
 const renderLikedPages = (likedPages, handleUnlikePage) => {
   return likedPages.length === 0 ? (
-    <p className='text-slate-500'>You haven't liked any pages yet.</p>
+    <p className="text-slate-500">You haven't liked any pages yet.</p>
   ) : (
-    likedPages.map((item, index) => (
-      <div key={item.id || index} className='bg-white max-w-[800px] w-full rounded-lg shadow-lg hover:shadow-slate-500 duration-300 mb-4'>
-        <img
-          src={`${BASE_URL}/${item.image}`}
-          alt={item.name}
-          className='w-full h-48 object-cover rounded-t-lg'
-        />
-        <div className='p-4'>
-          <div className='flex items-center justify-between gap-2'>
-            <div className='mb-2'>
-              <span className='inline-block bg-color2 text-white text-xs px-2 py-1 rounded-full'>
-                {item.category}
-              </span>
-            </div>
-            <div className='flex items-center gap-2'>
-              <div className='flex items-center gap-1'>
+    <div className="flex flex-col gap-4 w-full">
+      {likedPages.map((item, index) => (
+        <div
+          key={item.id || index}
+          className="flex flex-col sm:flex-row items-start bg-white w-full rounded-lg shadow-lg hover:shadow-slate-500 duration-300 mb-4"
+        >
+          {/* Image Section */}
+          <img
+            src={`${BASE_URL}/${item.image}`}
+            alt={item.name}
+            className="w-full sm:w-48 h-[10.6rem] object-cover rounded-t-lg sm:rounded-none sm:rounded-l-lg"
+          />
+
+          {/* Content Section */}
+          <div className="flex-1 p-4">
+            {/* Category and Ratings */}
+            <div className="flex items-center justify-between gap-2 mb-2">
+            
+
+             
+              <div className="flex items-center gap-1">
                 {item.rating ? (
                   <>
-                    <span className='text-black text-[12px]'>{parseFloat(item.rating).toFixed(1)}</span>
-                    <span className='text-yellow-500'>
+                    <span className="text-black text-[12px]">
+                      {parseFloat(item.rating).toFixed(1)}
+                    </span>
+                    <span className="text-yellow-500">
                       {'★'.repeat(item.rating)}{'☆'.repeat(5 - item.rating)}
                     </span>
                   </>
                 ) : (
-                  <span className='text-black text-[12px]'>No ratings</span>
+                  <span className="text-black text-[12px]">No ratings</span>
                 )}
               </div>
             </div>
-          </div>
-          <h3 className='font-semibold text-lg text-color1'>{item.name}</h3>
-          <div className='text-xs text-gray-500 mb-2 flex items-center'>
-            <GiPositionMarker /> {item.destination}
-          </div>
-          <p className='text-sm text-gray-600 mb-2'>{item.description}</p>
-          {/* Price Range Section */}
-          <div className="text-md sm:text-sm font-semibold text-black">
-            {item.lowest_price && item.highest_price ? (
-              `₱${item.lowest_price} - ₱${item.highest_price}`
-            ) : (
-              <span className="text-gray-400 italic text-[12px] sm:text-sm">
-                Price Range Not Available
-              </span>
-            )}
-          </div>
-          <div className='flex items-center justify-between'>
-            <Link to={`/business/${encryptId(item.business_id)}`}>
-              <Button className='bg-color1 text-white hover:bg-color2'>Visit</Button>
-            </Link>
-            <Button
-              className='h-9 px-3 bg-color2 text-white'
-              onClick={() => handleUnlikePage(item.business_id)}
-            >
-              <div className='text-sm flex items-center gap-2'>
-                <AiOutlineLike />
-                Unlike
-              </div>
-            </Button>
+
+            {/* Title and Description */}
+            <h3 className="font-semibold text-md text-color1 mb-1">{item.name}</h3>
+            <div className="text-xs text-gray-500 mb-1 flex items-center">
+              <GiPositionMarker /> {item.destination}
+            </div>
+            <p className="text-sm text-gray-600 mb-2 line-clamp-2">{item.description}</p>
+           <div className='flex gap-4 justify-between items-center' >
+            {/* Price Range */}
+            <div className="text-sm  font-semibold text-black ">
+              {item.lowest_price && item.highest_price ? (
+                `₱${item.lowest_price} - ₱${item.highest_price}`
+              ) : (
+                <span className="text-gray-400 italic">
+                  Price Range Not Available
+                </span>
+              )}
+
+            </div>
+          
+            </div>
+               {/* Actions */}
+               <div className="flex items-center mt-2 md:justify-end justify-between gap-2">
+              <Link to={`/business/${encryptId(item.business_id)}`}>
+                <Button size='sm' className="bg-color1 text-white hover:bg-color2 text-sm">Visit</Button>
+              </Link>
+              <Button
+                className="h-8 px-3 bg-color2 text-white text-sm"
+                onClick={() => handleUnlikePage(item.business_id)}
+              >
+                <div className="flex items-center gap-1">
+                  <AiOutlineLike />
+                  Unlike
+                </div>
+              </Button>
+            </div>
+
           </div>
         </div>
-      </div>
-    ))
+      ))}
+    </div>
   );
 };
+
+
+
 
 // Simplified component for the "My Booking" tab
 const MyBookingTab = ({ bookings, onCancelBooking }) => {
@@ -692,9 +710,9 @@ const UserProfile = ({ activities = [] }) => {
         <Tabs aria-label="Options" selectedKey={selected} onSelectionChange={setSelected}    variant="underlined"  
         classNames={{
           base: "w-full overflow-x-auto mb-4",
-          tabList: "gap-6 w-full p-4 container",
+          tabList: "gap-6 w-full p-0 flex  container",
           tab: "max-w-fit px-0 h-12",
-          tabContent: "text-color1"
+          tabContent: "text-color1 "
         }}>
           {/* Profile Tab */}
           <Tab key="profile" title="Profile">
@@ -756,19 +774,33 @@ const UserProfile = ({ activities = [] }) => {
               </CardBody>
             </Card>
           </Tab>
+{/* Liked Pages Tab */}
+<Tab key="likedPages" title="Liked Pages">
+  <Card >
+    <CardBody className="p-4 sm:p-6 ">
+      {/* Header */}
+      <h1 className="text-2xl sm:text-3xl font-bold mb-4 text-center sm:text-left">
+        Liked Pages
+      </h1>
+      <div className="bg-gray-300 w-full h-[1px] mb-6"></div>
 
-          {/* Liked Pages Tab */}
-          <Tab key="likedPages" title="Liked Pages">
-            <Card>
-              <CardBody className='p-6 min-h-[700px]'>
-                <h1 className='text-4xl font-bold mb-3'>Liked Pages</h1>
-                <div className='bg-gray-300 w-full h-[1px] mb-8'></div>
-                <div className='overflow-y-auto max-h-[600px] scrollbar-custom flex flex-col items-center'>
-                  {renderLikedPages(likedPages, handleUnlikePage)}
-                </div>
-              </CardBody>
-            </Card>
-          </Tab>
+      {/* Content Container */}
+      <div className="overflow-y-auto  max-h-[600px] p-4 scrollbar-custom">
+        {likedPages.length > 0 ? (
+          <div className="flex flex-col gap-4 items-center">
+            {renderLikedPages(likedPages, handleUnlikePage)}
+          </div>
+        ) : (
+          <p className="text-slate-500 text-center mt-4">
+            You haven't liked any pages yet.
+          </p>
+        )}
+      </div>
+    </CardBody>
+  </Card>
+</Tab>
+
+
 
           {/* My Booking Tab */}
           <Tab key="myBookings" title="My Bookings">

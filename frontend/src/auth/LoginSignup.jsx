@@ -209,11 +209,12 @@ const LoginSignup = () => {
   };
 
   const renderInitialView = () => (
-    <div className="flex flex-col h-full items-center justify-center gap-6 px-5 py-20">
-      <img className="w-[11rem]" src={Logo2} />
-      <h1 className="text-center font-semibold font-font1 text-2xl mb-9 py-10">
+    <div className="flex flex-col h-full w-full items-center justify-center gap-2 p-4 ">
+      <img className="w-[9rem] mt-7" src={Logo2} />
+      <h1 className="text-center font-semibold font-font1 text-xl md:text-2xl   ">
         Sign in to explore more in RabaSorsogon
       </h1>
+      <div className='w-full flex flex-col gap-2 mt-9'>
       <Button
         className="flex items-center justify-center border-2 py-2 hover:bg-color2 hover:text-white transition rounded-lg"
         onClick={handleGoogleLogin}
@@ -240,21 +241,22 @@ const LoginSignup = () => {
       >
         Sign Up
       </Button>
+      </div>
       
     </div>
   );
 
   const renderLoginForm = () => (
-    <div className="flex flex-col h-full items-center justify-center gap-6 px-5 py-20">
+    <div className="flex  flex-col w-full  items-center justify-center p-4 gap-2  ">
     <button
     className="absolute top-5 left-5 flex items-center text-gray-500 hover:text-black transition-all mb-4"
     onClick={() => setView("initial")}
     >
       <FaArrowLeft className="mr-2" /> Back
     </button>
-      <img className="w-[11rem]" src={Logo2} />
-        <h1 className="text-center font-semibold font-font1 text-2xl mb-9 py-5">Login!</h1>
-          <form onSubmit={handleLogin} className="flex flex-col gap-4  ">
+      <img className="max-w-[10rem]" src={Logo2} />
+        <h1 className="text-center font-semibold font-font1 text-2xl  ">Login!</h1>
+          <form onSubmit={handleLogin} className="flex flex-col  p-2 w-[20rem] gap-4  ">
             <Input
               label="Email/username"
               type="text"
@@ -282,7 +284,8 @@ const LoginSignup = () => {
                 </button>
               }
             />
-            <div className="flex w-full justify-between gap-24 text-xs">
+            <div className="flex  justify-between gap-24 items-center  text-xs">
+            <div>
               <Link
                 className="cursor-pointer hover:underline text-color2"
                 size="sm"
@@ -290,132 +293,136 @@ const LoginSignup = () => {
               >
                 Forgot Password?
               </Link>
-              <p>
-                Need an account?{" "}
+              </div>
+             
+            </div>
+            <Button type="submit" color="primary" className="hover:bg-color2" fullWidth>
+              Login
+            </Button>
+
+          </form>
+          <div className='flex gap-1 flex-wrap'>
+                <p>Need an account?</p>
                 <Link
-                  className="cursor-pointer hover:underline text-color2"
+                  className="cursor-pointer ml-1 hover:underline text-color2"
                   size="sm"
                   onClick={() => setView("signup")}
                 >
                   Sign up
                 </Link>
-              </p>
-            </div>
-            <Button type="submit" color="primary" className="hover:bg-color2" fullWidth>
-              Login
-            </Button>
-          </form>
-
+              </div>
     </div>
   );
   
   const renderSignupForm = () => (
     <div className="flex flex-col h-full items-center justify-center gap-6 px-5 py-20">
-      <img className="w-[11rem]" src={Logo2} />
-      <button
-        className="absolute top-5 left-5 flex items-center text-gray-500 hover:text-black transition-all mb-4"
-        onClick={() => setView("initial")}
-      >
-        <FaArrowLeft className="mr-2" /> Back
-      </button>
-        <h1 className='font-font1 text-center text-2xl mb-2'>Signup!</h1>
-          <form onSubmit={handleSignup} className="flex flex-col min-w-[260px] w-auto gap-4">
-            <Input
-              label="First Name"
-              type="text"
-              name='firstName'
-              value={signupData.firstName}
-              onChange={handleSignupChange}
-              required
-            />
-            <Input
-              label="Last Name"
-              type="text"
-              name='lastName'
-              value={signupData.lastName}
-              onChange={handleSignupChange}
-              required
-            />
-            <Input
-              label="Email"
-              type="email"
-              name='email'
-              value={signupData.email}
-              onChange={handleSignupChange}
-              required
-            />
-            <Input
-              label="Username"
-              type="text"
-              name='username'
-              value={signupData.username}
-              onChange={handleSignupChange}
-              required
-            />
-            <Input
-              label="Address"
-              type="text"
-              name='address'
-              value={signupData.address}
-              onChange={handleSignupChange}
-              required
-            />
-            <Input
-              label="Contact Number"
-              type="text"
-              name='phone'
-              value={signupData.phone}
-              onChange={handleSignupChange}
-              required
-            />
-            <Input
-              label="Password"
-              type={showPassword ? "text" : "password"}
-              name='password'
-              value={signupData.password}
-              onChange={handleSignupChange}
-              required
-              endContent={
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="focus:outline-none"
-                >
-                  {showPassword ? (
-                    <FaEyeSlash className="text-2xl text-default-400" />
-                  ) : (
-                    <FaEye className="text-2xl text-default-400" />
-                  )}
-                </button>
-              }
-            />
-            <Input
-              label="Confirm Password"
-              type={showPassword ? "text" : "password"}
-              name='confirmPassword'
-              value={signupData.confirmPassword}
-              onChange={handleSignupChange}
-              required
-              endContent={
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="focus:outline-none"
-                >
-                  {showPassword ? (
-                    <FaEyeSlash className="text-2xl text-default-400" />
-                  ) : (
-                    <FaEye className="text-2xl text-default-400" />
-                  )}
-                </button>
-              }
-            />
-      
-            <Button type="submit" color="primary" className="hover:bg-color2" fullWidth>
-              Sign Up
-            </Button>
-          </form>
+  <img className="w-[11rem]" src={Logo2} />
+  <button
+    className="absolute top-5 left-5 flex items-center text-gray-500 hover:text-black transition-all mb-4"
+    onClick={() => setView("initial")}
+  >
+    <FaArrowLeft className="mr-2" /> Back
+  </button>
+  <h1 className="font-font1 text-center text-2xl mb-2">Signup!</h1>
+  <form onSubmit={handleSignup} className="grid grid-cols-1 sm:grid-cols-2 gap-4 min-w-[260px] w-auto">
+    <Input
+      label="First Name"
+      type="text"
+      name="firstName"
+      value={signupData.firstName}
+      onChange={handleSignupChange}
+      required
+    />
+    <Input
+      label="Last Name"
+      type="text"
+      name="lastName"
+      value={signupData.lastName}
+      onChange={handleSignupChange}
+      required
+    />
+    <Input
+      label="Email"
+      type="email"
+      name="email"
+      value={signupData.email}
+      onChange={handleSignupChange}
+      required
+    />
+    <Input
+      label="Username"
+      type="text"
+      name="username"
+      value={signupData.username}
+      onChange={handleSignupChange}
+      required
+    />
+    <Input
+      label="Address"
+      type="text"
+      name="address"
+      value={signupData.address}
+      onChange={handleSignupChange}
+      required
+    />
+    <Input
+      label="Contact Number"
+      type="text"
+      name="phone"
+      value={signupData.phone}
+      onChange={handleSignupChange}
+      required
+    />
+    <Input
+      label="Password"
+      type={showPassword ? "text" : "password"}
+      name="password"
+      value={signupData.password}
+      onChange={handleSignupChange}
+      required
+      endContent={
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          className="focus:outline-none"
+        >
+          {showPassword ? (
+            <FaEyeSlash className="text-2xl text-default-400" />
+          ) : (
+            <FaEye className="text-2xl text-default-400" />
+          )}
+        </button>
+      }
+    />
+    <Input
+      label="Confirm Password"
+      type={showPassword ? "text" : "password"}
+      name="confirmPassword"
+      value={signupData.confirmPassword}
+      onChange={handleSignupChange}
+      required
+      endContent={
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          className="focus:outline-none"
+        >
+          {showPassword ? (
+            <FaEyeSlash className="text-2xl text-default-400" />
+          ) : (
+            <FaEye className="text-2xl text-default-400" />
+          )}
+        </button>
+      }
+    />
+    <div className="col-span-1 sm:col-span-2">
+      <Button type="submit" color="primary" className="hover:bg-color2" fullWidth>
+        Sign Up
+      </Button>
     </div>
+  </form>
+</div>
+
   );
 
   // Render OTP form
