@@ -35,7 +35,7 @@ const useIsLargeScreen = () => {
 const Foods = () => {
   // State Variables
   const [foodDetails, setFoodDetails] = useState([]);
-  const [selectedCuisines, setSelectedCuisines] = useState([]);
+  const [selectedFoodType, setselectedFoodType] = useState([]);
   const [selectedAmenities, setSelectedAmenities] = useState([]);
   const [selectedRatings, setSelectedRatings] = useState([]);
   const [selectedDestination, setSelectedDestination] = useState('All');
@@ -123,7 +123,7 @@ const toggleTagFiltering = () => {
   };
 
   const handleCuisineChange = (selected) => {
-    setSelectedCuisines(selected);
+    setselectedFoodType(selected);
   };
 
   const handleAmenitiesChange = (selected) => {
@@ -161,28 +161,58 @@ const toggleTagFiltering = () => {
     return encodeURIComponent(ciphertext);
   };
 
-  // Define the cuisine types based on the tags used in your food data
-  const cuisineTypes = ['Filipino', 'Italian', 'Chinese', 'Japanese', 'Mexican', 'Cafe'];
 
+  // Capitalize each word
+  const capitalizeWords = (str) =>
+    str
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+
+  // Extract, combine, and capitalize all activity types
+  const foodType = foodDetails
+    .flatMap((activity) => activity.category)
+    .filter((type, index, self) => self.indexOf(type) === index) // Remove duplicates
+    .map(capitalizeWords); // Capitalize each type
+
+  const amenitiesList = Object.values(foodDetails) // Get all category arrays
+    .flatMap((data) =>
+      data.facilities?.flatMap((facility) =>
+        facility.items.map((item) => item.name)
+      ) || []
+    )
+    .filter(
+      (item, index, self) =>
+        self.findIndex((i) => i.toLowerCase() === item.toLowerCase()) === index
+    ) // Remove duplicates case-insensitively
+    .map((item) =>
+      item
+        .toLowerCase()
+        .replace(/(^\w|\s\w)/g, (match) => match.toUpperCase()) // Capitalize each word
+    );
   // Filtering logic
   const filteredFoods = foodDetails.filter((food) => {
-    const matchesCuisines = selectedCuisines.length === 0 || 
-      selectedCuisines.every((selected) => 
+    const matchesCuisines = selectedFoodType.length === 0 || 
+      selectedFoodType.every((selected) => 
         food.category.map(tag => tag.toLowerCase().replace(/s$/, '')).includes(selected.toLowerCase().replace(/s$/, ''))
       );
     const matchesAmenities = selectedAmenities.length === 0 || 
       selectedAmenities.every((amenity) => 
-        food.amenities.map(a => a.toLowerCase().replace(/s$/, '')).includes(amenity.toLowerCase().replace(/s$/, ''))
+        food.facilities
+        ?.flatMap((facility) =>
+          facility.items.map((a) => a.name.toLowerCase().replace(/s$/, '')) // Normalize item facilities
+        )
+        .includes(amenity.toLowerCase().replace(/s$/, '')) // Normalize selected amenities
       );
-    const matchesRating = selectedRatings.length === 0 || 
-      selectedRatings.includes(Math.floor(food.rating || 0));
-    const matchesDestination = selectedDestination === 'All' || food.destination === selectedDestination;
+  const matchesRating = selectedRatings.length === 0 || 
+    selectedRatings.includes(Math.floor(food.rating || 0));
+  const matchesDestination = selectedDestination === 'All' || food.destination === selectedDestination;
 
-    const minPrice = parseFloat(food.lowest_price) || 0;
-    const maxPrice = parseFloat(food.highest_price) || Infinity;
-    const matchesBudget = minPrice <= budgetRange[1] && maxPrice >= budgetRange[0];
+  const minPrice = parseFloat(food.lowest_price) || 0;
+  const maxPrice = parseFloat(food.highest_price) || Infinity;
+  const matchesBudget = minPrice <= budgetRange[1] && maxPrice >= budgetRange[0];
 
-    return matchesCuisines && matchesAmenities && matchesRating && matchesDestination && matchesBudget;});
+  return matchesCuisines && matchesAmenities && matchesRating && matchesDestination && matchesBudget;});
 
   
 
@@ -254,14 +284,14 @@ const toggleTagFiltering = () => {
                     </Select>
                 </div>
 
-                {/* Cuisine Type Filter */}
+                {/* Food place Type Filter */}
                 <div className='mb-6 max-h-[230px] overflow-auto scrollbar-custom'>
-                    <h3 className='text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2'>Cuisine Type</h3>
+                    <h3 className='text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2'>Food Place Type</h3>
                     <CheckboxGroup
-                        value={selectedCuisines}
+                        value={selectedFoodType}
                         onChange={handleCuisineChange}
                     >
-                        {cuisineTypes.map((type) => (
+                        {foodType.map((type) => (
                             <Checkbox key={type} value={type}>
                                 {type}
                             </Checkbox>
@@ -276,7 +306,7 @@ const toggleTagFiltering = () => {
                         value={selectedAmenities}
                         onChange={handleAmenitiesChange}
                     >
-                        {['Wi-Fi', 'Parking', 'Delivery'].map((amenity) => (
+                        {amenitiesList.map((amenity) => (
                             <Checkbox key={amenity} value={amenity}>
                                 {amenity}
                             </Checkbox>
@@ -395,7 +425,7 @@ const toggleTagFiltering = () => {
                        <span
                               key={index}
                               className={`text-xs px-2 py-1 rounded-full ${
-                                selectedCuisines
+                                selectedFoodType
                                   .map((a) => a.toLowerCase())
                                   .includes(tag.toLowerCase().replace(/s$/, ''))
                                   ? 'bg-color2 text-white'

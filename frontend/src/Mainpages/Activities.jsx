@@ -162,8 +162,37 @@ const toggleTagFiltering = () => {
     return encodeURIComponent(ciphertext);
   };
 
+  // Capitalize each word
+  const capitalizeWords = (str) =>
+  str
+    .split(' ')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+
+  // Extract, combine, and capitalize all activity types
+  const activityTypes = activityDetails
+    .flatMap((activity) => activity.category)
+    .filter((type, index, self) => self.indexOf(type) === index) // Remove duplicates
+    .map(capitalizeWords); // Capitalize each type
+
+  const amenitiesList = Object.values(activityDetails) // Get all category arrays
+    .flatMap((data) =>
+      data.facilities?.flatMap((facility) =>
+        facility.items.map((item) => item.name)
+      ) || []
+    )
+    .filter(
+      (item, index, self) =>
+        self.findIndex((i) => i.toLowerCase() === item.toLowerCase()) === index
+    ) // Remove duplicates case-insensitively
+    .map((item) =>
+      item
+        .toLowerCase()
+        .replace(/(^\w|\s\w)/g, (match) => match.toUpperCase()) // Capitalize each word
+    );
+
   // Define the activity types based on the tags used in your activity data
-  const activityTypes = [ 'Adventure', 'Swimming', 'Surfing', 'Hiking', 'Camping', 'Tour', 'History', 'Snorkeling'];
+  // const activityTypes = [ 'Adventure', 'Swimming', 'Surfing', 'Hiking', 'Camping', 'Tour', 'History', 'Snorkeling'];
 
   // Filtering logic
   const filteredActivities = activityDetails.filter((activity) => {
@@ -174,11 +203,17 @@ const toggleTagFiltering = () => {
 
       // console.log('selectedActivities', selectedActivities);
       // console.log('activity.category', activity.category);
+    
     const matchesAmenities = selectedAmenities.length === 0 || 
       selectedAmenities.every((amenity) => 
-        activity.amenities.map(a => a.toLowerCase().replace(/s$/, '')).includes(amenity.toLowerCase().replace(/s$/, ''))
+        activity.facilities
+        ?.flatMap((facility) =>
+          facility.items.map((a) => a.name.toLowerCase().replace(/s$/, '')) // Normalize item facilities
+        )
+        .includes(amenity.toLowerCase().replace(/s$/, '')) // Normalize selected amenities
       );
-      const matchesRating = selectedRatings.length === 0 || 
+      
+    const matchesRating = selectedRatings.length === 0 || 
       selectedRatings.includes(Math.floor(activity.rating || 0));
     const matchesDestination = selectedDestination === 'All' || activity.destination === selectedDestination;
     const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(activity.category);
@@ -285,7 +320,7 @@ const toggleTagFiltering = () => {
                         value={selectedAmenities}
                         onChange={handleAmenitiesChange}
                     >
-                        {['Parking', 'Restrooms', 'Guides'].map((amenity) => (
+                        {amenitiesList.map((amenity) => (
                             <Checkbox key={amenity} value={amenity}>
                                 {amenity}
                             </Checkbox>

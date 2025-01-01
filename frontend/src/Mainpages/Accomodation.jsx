@@ -159,27 +159,59 @@ const Accommodations = () => {
     return encodeURIComponent(ciphertext);
   };
 
-  // Define the accommodation types based on the tags used in your accommodation data
-  const accommodationTypes = ['Hotel', 'Inn', 'Lodge', 'Resort'];
+  // Capitalize each word
+  const capitalizeWords = (str) =>
+    str
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
 
+  // Extract, combine, and capitalize all activity types
+  const accommodationTypes = accommodationDetails
+    .flatMap((activity) => activity.category)
+    .filter((type, index, self) => self.indexOf(type) === index) // Remove duplicates
+    .map(capitalizeWords); // Capitalize each type
+
+  const amenitiesList = Object.values(accommodationDetails) // Get all category arrays
+    .flatMap((data) =>
+      data.facilities?.flatMap((facility) =>
+        facility.items.map((item) => item.name)
+      ) || []
+    )
+    .filter(
+      (item, index, self) =>
+        self.findIndex((i) => i.toLowerCase() === item.toLowerCase()) === index
+    ) // Remove duplicates case-insensitively
+    .map((item) =>
+      item
+        .toLowerCase()
+        .replace(/(^\w|\s\w)/g, (match) => match.toUpperCase()) // Capitalize each word
+    );
+ 
   // Filtering logic
   const filteredAccommodations = accommodationDetails.filter((accommodation) => {
     const matchesTags = selectedTags.length === 0 || 
       selectedTags.every((selected) => 
         accommodation.category.map(tag => tag.toLowerCase().replace(/s$/, '')).includes(selected.toLowerCase().replace(/s$/, ''))
       );
-    const matchesAmenities = selectedAmenities.length === 0 || 
-      selectedAmenities.every((amenity) => 
-        accommodation.amenities.map(a => a.toLowerCase().replace(/s$/, '')).includes(amenity.toLowerCase().replace(/s$/, ''))
-      );
-      const matchesRating = selectedRatings.length === 0 || 
-      selectedRatings.includes(Math.floor(accommodation.rating || 0));
-    const matchesDestination = selectedDestination === 'All' || accommodation.destination === selectedDestination;
 
-     // Ensure lowest_price and highest_price are numbers
-     const minPrice = parseFloat(accommodation.lowest_price) || 0;
-     const maxPrice = parseFloat(accommodation.highest_price) || Infinity;
-    const matchesBudget = minPrice <= budgetRange[1] && maxPrice >= budgetRange[0];
+  const matchesAmenities = selectedAmenities.length === 0 || 
+    selectedAmenities.every((amenity) => 
+      accommodation.facilities
+      ?.flatMap((facility) =>
+        facility.items.map((a) => a.name.toLowerCase().replace(/s$/, '')) // Normalize item facilities
+      )
+      .includes(amenity.toLowerCase().replace(/s$/, '')) // Normalize selected amenities
+    );
+    
+  const matchesRating = selectedRatings.length === 0 || 
+    selectedRatings.includes(Math.floor(accommodation.rating || 0));
+  const matchesDestination = selectedDestination === 'All' || accommodation.destination === selectedDestination;
+
+    // Ensure lowest_price and highest_price are numbers
+    const minPrice = parseFloat(accommodation.lowest_price) || 0;
+    const maxPrice = parseFloat(accommodation.highest_price) || Infinity;
+  const matchesBudget = minPrice <= budgetRange[1] && maxPrice >= budgetRange[0];
 
     return matchesTags && matchesAmenities && matchesRating && matchesDestination && matchesBudget;
   });
@@ -274,7 +306,7 @@ const Accommodations = () => {
                         value={selectedAmenities}
                         onChange={handleAmenitiesChange}
                     >
-                        {['Wi-Fi', 'Breakfast', 'Parking', 'Pool'].map((amenity) => (
+                        {amenitiesList.map((amenity) => (
                             <Checkbox key={amenity} value={amenity}>
                                 {amenity}
                             </Checkbox>

@@ -156,8 +156,18 @@ const Shop = () => {
     return encodeURIComponent(ciphertext);
   };
 
-  // Define the shop categories based on the tags used in your shop data
-  const shopCategories = ['Clothing Store', 'Electronics Store', 'Groceries Store', 'Souvenir Shop'];
+  // Capitalize each word
+  const capitalizeWords = (str) =>
+    str
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+
+  // Extract, combine, and capitalize all activity types
+  const shopCategories = shopDetails
+    .flatMap((activity) => activity.category)
+    .filter((type, index, self) => self.indexOf(type) === index) // Remove duplicates
+    .map(capitalizeWords); // Capitalize each type
 
   // Filtering logic
   const filteredShops = shopDetails.filter((shop) => {
