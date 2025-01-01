@@ -15,6 +15,8 @@ import wave from '@/assets/wave2.webp';
 import CryptoJS from 'crypto-js';
 import axios from 'axios';
 import { FaCamera, FaBusinessTime } from 'react-icons/fa';
+import { FaCalendarAlt, FaClock, FaUser, FaEnvelope, FaPhone, FaMoneyBillWave , FaComment, } from 'react-icons/fa';
+import { BsFillPersonLinesFill } from "react-icons/bs";
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
@@ -166,90 +168,250 @@ const MyBookingTab = ({ bookings, onCancelBooking }) => {
 
   return (
     <div className="p-6">
-      <h3 className="text-4xl font-bold mb-4 ">My Bookings</h3>
-      <div className='bg-gray-300 w-full h-[1px] mb-8'></div>
-      <Tabs aria-label="Booking Status" selectedKey={activeTab} onSelectionChange={setActiveTab} className='overflow-x-auto w-full'>
+      {/* Page Title */}
+      <h3 className="text-4xl font-bold mb-4">My Bookings</h3>
+      <div className="bg-gray-300 h-[1px] mb-8"></div>
+
+      {/* Tabs */}
+      <Tabs
+        aria-label="Booking Status"
+        selectedKey={activeTab}
+        onSelectionChange={setActiveTab}
+        className="overflow-x-auto"
+      >
+        {/* Active Tab */}
         <Tab key="active" title="Active">
-          <div className="overflow-y-auto max-h-[450px] scrollbar-custom">
-            {filterBookings("active").length === 0 ? (
-              <p className='text-slate-500'>No active bookings at the moment.</p>
+          <div className="overflow-y-auto max-h-[500px] scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
+            {filterBookings('active').length === 0 ? (
+              <p className="text-gray-500 text-center">No active bookings at the moment.</p>
             ) : (
-              filterBookings("active").map((booking) => (
-                <div key={booking.booking_id} className="bg-white shadow-lg p-4 rounded-lg mb-4">
-                  <div className="p-3 bg-gray-50 rounded-lg text-sm text-black border border-gray-200">
-                    <h4 className="font-semibold mb-2">Booking Details:</h4>
-                    <ul className="space-y-1">
-                      <li><strong>Product:</strong> {booking.productName}</li>
-                      <li><strong>Booked Name:</strong> {booking.customerName}</li>
-                      <li><strong>Guests:</strong> {booking.numberOfGuests}</li>
-                      <li><strong>Email:</strong> {booking.email}</li>
-                      <li><strong>Phone:</strong> {booking.phone}</li>
-                      <li><strong>Date:</strong> {new Date(booking.dateIn).toLocaleDateString()}</li>
-                      <li><strong>Time:</strong> {new Date(booking.dateIn).toLocaleTimeString()}</li>
-                      <li><strong>Special Requests:</strong> {booking.specialRequests}</li>
-                      <li><strong>Amount:</strong> ₱{parseFloat(booking.priceDetails.discountedPrice).toLocaleString()}</li>
-                      <li><strong>Status:</strong> {booking.status}</li>
-                    </ul>
+              filterBookings('active').map((booking) => (
+                <div
+                  key={booking.booking_id}
+                  className="bg-white shadow-lg rounded-lg p-4 border border-gray-200 mb-4"
+                >
+                  {/* Booking Title */}
+                  <h4 className="font-bold text-xl mb-2">{booking.productName}</h4>
+                  <h1 className='mb-3 flex items-center gap-3'><BsFillPersonLinesFill/><strong > Name: </strong>{booking.customerName}</h1>
+                  {/* Booking Details with Icons */}
+
+                  
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-3">
+                      <FaCalendarAlt className="text-gray-500" />
+                      <p>
+                        <strong>Date:</strong>{' '}
+                        {new Date(booking.dateIn).toLocaleDateString('en-US', {
+                          weekday: 'long',
+                          month: 'long',
+                          day: 'numeric',
+                          year: 'numeric',
+                        })}
+                      </p>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <FaClock className="text-gray-500" />
+                      <p>
+                        <strong>Time:</strong> {new Date(booking.dateIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <FaUser className="text-gray-500" />
+                      <p>
+                        <strong>Guests:</strong> {booking.numberOfGuests}
+                      </p>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <FaEnvelope className="text-gray-500" />
+                      <p>
+                        <strong>Email:</strong> {booking.email}
+                      </p>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <FaPhone className="text-gray-500" />
+                      <p>
+                        <strong>Phone:</strong> {booking.phone}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center space-x-3">
+                    <FaComment className="text-gray-500" />
+                    <p>
+                      <strong>Special Requests:</strong> {booking.specialRequests ? booking.specialRequests : 'None'}
+                    </p>
                   </div>
+                    
+                    <div className="flex items-center space-x-3">
+                      <FaMoneyBillWave className="text-gray-500" />
+                      <p>
+                        <strong>Amount:</strong> ₱{parseFloat(booking.priceDetails.discountedPrice).toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Cancel Button */}
                   {booking.status === 'pending' && (
-                    <Button 
-                      className="mt-2 bg-red-500 text-white hover:bg-red-600" 
-                      onClick={() => onCancelBooking(booking.booking_id)}
-                    >
-                      Cancel Booking
-                    </Button>
+                    <div className="mt-6">
+                      <button
+                        onClick={() => onCancelBooking(booking.booking_id)}
+                        className="w-full bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition"
+                      >
+                        Cancel Booking
+                      </button>
+                      <p className="text-xs text-gray-500 mt-2 text-center">
+                        Cancellation is free up to 24 hours before the booking
+                      </p>
+                    </div>
                   )}
                 </div>
               ))
             )}
           </div>
         </Tab>
+
+        {/* Completed Tab */}
         <Tab key="completed" title="Completed">
-          <div className="overflow-y-auto max-h-[500px] scrollbar-custom">
-            {filterBookings("completed").length === 0 ? (
-              <p className='text-slate-500'>No completed bookings at the moment.</p>
+          <div className="overflow-y-auto max-h-[500px] scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
+            {filterBookings('completed').length === 0 ? (
+              <p className="text-gray-500 text-center">No completed bookings at the moment.</p>
             ) : (
-              filterBookings("completed").map((booking) => (
-                <div key={booking.booking_id} className="bg-white shadow-lg p-4 rounded-lg ">
-                  <div className="p-3 bg-gray-50 rounded-lg text-sm text-black border border-gray-200">
-                    <h4 className="font-semibold mb-2">Booking Details:</h4>
-                    <ul className="space-y-1">
-                      <li><strong>Product:</strong> {booking.productName}</li>
-                      <li><strong>Guests:</strong> {booking.numberOfGuests}</li>
-                      <li><strong>Email:</strong> {booking.email}</li>
-                      <li><strong>Phone:</strong> {booking.phone}</li>
-                      <li><strong>Date:</strong> {new Date(booking.dateIn).toLocaleDateString()}</li>
-                      <li><strong>Time:</strong> {new Date(booking.dateIn).toLocaleTimeString()}</li>
-                      <li><strong>Special Requests:</strong> {booking.specialRequests}</li>
-                      <li><strong>Amount:</strong> ₱{parseFloat(booking.priceDetails.discountedPrice).toLocaleString()}</li>
-                      <li><strong>Status:</strong> {booking.status}</li>
-                    </ul>
+              filterBookings('completed').map((booking) => (
+                <div
+                  key={booking.booking_id}
+                  className="bg-white shadow-lg rounded-lg p-4 border border-gray-200 mb-4"
+                >
+                  {/* Booking Title */}
+                  <h4 className="font-bold text-xl mb-2">{booking.productName}</h4>
+                  <h1 className='mb-3 flex items-center gap-3'><BsFillPersonLinesFill/><strong > Name: </strong>{booking.customerName}</h1>
+                  {/* Booking Details with Icons */}
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-3">
+                      <FaCalendarAlt className="text-gray-500" />
+                      <p>
+                        <strong>Date:</strong>{' '}
+                        {new Date(booking.dateIn).toLocaleDateString('en-US', {
+                          weekday: 'long',
+                          month: 'long',
+                          day: 'numeric',
+                          year: 'numeric',
+                        })}
+                      </p>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <FaClock className="text-gray-500" />
+                      <p>
+                        <strong>Time:</strong> {new Date(booking.dateIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <FaUser className="text-gray-500" />
+                      <p>
+                        <strong>Guests:</strong> {booking.numberOfGuests}
+                      </p>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <FaEnvelope className="text-gray-500" />
+                      <p>
+                        <strong>Email:</strong> {booking.email}
+                      </p>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <FaPhone className="text-gray-500" />
+                      <p>
+                        <strong>Phone:</strong> {booking.phone}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center space-x-3">
+                    <FaComment className="text-gray-500" />
+                    <p>
+                      <strong>Special Requests:</strong> {booking.specialRequests ? booking.specialRequests : 'None'}
+                    </p>
                   </div>
+                    
+                    <div className="flex items-center space-x-3">
+                      <FaMoneyBillWave className="text-gray-500" />
+                      <p>
+                        <strong>Amount:</strong> ₱{parseFloat(booking.priceDetails.discountedPrice).toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+
                 </div>
               ))
             )}
           </div>
         </Tab>
+
+        {/* Cancelled Tab */}
         <Tab key="cancelled" title="Cancelled">
-          <div className="overflow-y-auto max-h-[500px] scrollbar-custom">
-            {filterBookings("cancelled").length === 0 ? (
-              <p className='text-slate-500'>No cancelled bookings at the moment.</p>
+          <div className="overflow-y-auto max-h-[500px] scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
+            {filterBookings('cancelled').length === 0 ? (
+              <p className="text-gray-500 text-center">No cancelled bookings at the moment.</p>
             ) : (
-              filterBookings("cancelled").map((booking) => (
-                <div key={booking.booking_id} className="bg-white shadow-lg p-4 rounded-lg ">
-                  <div className="p-3 bg-gray-50 rounded-lg text-sm text-black border border-gray-200">
-                    <h4 className="font-semibold mb-2">Booking Details:</h4>
-                    <ul className="space-y-1">
-                      <li><strong>Product:</strong> {booking.productName}</li>
-                      <li><strong>Guests:</strong> {booking.numberOfGuests}</li>
-                      <li><strong>Email:</strong> {booking.email}</li>
-                      <li><strong>Phone:</strong> {booking.phone}</li>
-                      <li><strong>Date:</strong> {new Date(booking.dateIn).toLocaleDateString()}</li>
-                      <li><strong>Time:</strong> {new Date(booking.dateIn).toLocaleTimeString()}</li>
-                      <li><strong>Special Requests:</strong> {booking.specialRequests}</li>
-                      <li><strong>Amount:</strong> ₱{parseFloat(booking.priceDetails.discountedPrice).toLocaleString()}</li>
-                    </ul>
+              filterBookings('cancelled').map((booking) => (
+                <div
+                  key={booking.booking_id}
+                  className="bg-white shadow-lg rounded-lg p-4 border border-gray-200 mb-4"
+                >
+                  {/* Booking Title */}
+                  <h4 className="font-bold text-xl mb-2">{booking.productName}</h4>
+                  <h1 className='mb-3 flex items-center gap-3'><BsFillPersonLinesFill/><strong > Name: </strong>{booking.customerName}</h1>
+
+                  {/* Booking Details with Icons */}
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-3">
+                      <FaCalendarAlt className="text-gray-500" />
+                      <p>
+                        <strong>Date:</strong>{' '}
+                        {new Date(booking.dateIn).toLocaleDateString('en-US', {
+                          weekday: 'long',
+                          month: 'long',
+                          day: 'numeric',
+                          year: 'numeric',
+                        })}
+                      </p>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <FaClock className="text-gray-500" />
+                      <p>
+                        <strong>Time:</strong> {new Date(booking.dateIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <FaUser className="text-gray-500" />
+                      <p>
+                        <strong>Guests:</strong> {booking.numberOfGuests}
+                      </p>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <FaEnvelope className="text-gray-500" />
+                      <p>
+                        <strong>Email:</strong> {booking.email}
+                      </p>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <FaPhone className="text-gray-500" />
+                      <p>
+                        <strong>Phone:</strong> {booking.phone}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center space-x-3">
+                    <FaComment className="text-gray-500" />
+                    <p>
+                      <strong>Special Requests:</strong> {booking.specialRequests ? booking.specialRequests : 'None'}
+                    </p>
                   </div>
+                    
+                    <div className="flex items-center space-x-3">
+                      <FaMoneyBillWave className="text-gray-500" />
+                      <p>
+                        <strong>Amount:</strong> ₱{parseFloat(booking.priceDetails.discountedPrice).toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+
                 </div>
               ))
             )}
