@@ -39,7 +39,28 @@ const encryptId = (id) => {
   return encodeURIComponent(ciphertext);
 };
 
-const Search = () => {
+const Highlight = ({ content, match }) => {
+  if (!match || !match.trim() || !content) return <span>{content}</span>;
+
+  const regex = new RegExp(`(${match.trim()})`, 'gi');
+  const parts = content.toString().split(regex);
+
+  return (
+    <span>
+      {parts.map((part, i) =>
+        part.toLowerCase() === match.toLowerCase().trim() ? (
+          <span key={i} className="bg-yellow-200 font-bold text-black rounded">
+            {part.trim()}
+          </span>
+        ) : (
+          part.replace(/\s+$/, '') // Remove trailing spaces from non-highlighted parts
+        )
+      )}
+    </span>
+  );
+};
+
+const Search = (handleCloseMenu) => {
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -160,8 +181,9 @@ const Search = () => {
     let results = [];
     const searchInput = query.toLowerCase();
   
-    const matchesSearch = (str) => new RegExp(`^${searchInput}`).test(str.toLowerCase()); // Matches from the start  
-  
+    // const matchesSearch = (str) => new RegExp(`^${searchInput}`).test(str.toLowerCase()); // Matches from the start  
+    const matchesSearch = (str) => str.toLowerCase().includes(searchInput);
+    
     switch (activeTab) {
       case 'all':
         results = [
@@ -243,6 +265,7 @@ const Search = () => {
               const handleClick = () => {
                 setSearchQuery(''); 
                 setSearchResults([]);
+                handleCloseMenu();
               };
               const content = (
                 <div className="flex p-2 hover:bg-gray-200 cursor-pointer">
@@ -253,14 +276,24 @@ const Search = () => {
                         alt={result.imageUrl}
                         className="w-12 h-12 rounded-full mr-3 object-cover"
                       />
-                      <h3 className="text-md font-semibold">{result.title}</h3>
+                      <h3 className="text-md">
+                        <Highlight
+                          content={result.title}
+                          match={searchQuery}
+                        />
+                      </h3>
                     </div>
                   )}
                   {result.name && (
                     <div className="w-full flex items-center">
                       <FaMapMarkerAlt className="w-12 h-12 text-gray-500 mr-3" />
                       <div>
-                        <p className="text-md font-semibold">{result.name}</p>
+                        <p className="text-md">
+                          <Highlight
+                            content={result.name}
+                            match={searchQuery}
+                          />
+                        </p>
                       </div>
                     </div>
                   )}
@@ -313,6 +346,10 @@ const Nav = () => {
     if (window.scrollY > 500) {
       setIsMenuOpen(false);
     } 
+  };
+
+  const handleCloseMenu = () => {
+    setIsMenuOpen(false);
   };
 
   const handleResize = () => {
@@ -489,7 +526,7 @@ const Nav = () => {
           <div className="hidden xl:flex items-center gap-6">
             <div className="flex space-x-8 items-center text-color1">
               <div className="relative">
-                <Search />
+                <Search handleCloseMenu={() => handleCloseMenu()} />
               </div>
               <div
                 className={`cursor-pointer text text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1 ${activeLink === '/' ? ' border-light border-b-1 p-1 font-semibold  ' : ''}`}
