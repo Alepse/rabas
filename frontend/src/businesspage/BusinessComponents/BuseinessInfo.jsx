@@ -1,12 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { updateBusinessData } from '@/redux/businessSlice'; 
 import { Tabs, Tab, Card, CardBody, Textarea, Button, Avatar } from "@nextui-org/react";
 import { businessIcons } from './businessIcons';
 import DOMPurify from 'dompurify';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import { FaClipboardList, FaInfoCircle, FaConciergeBell, FaStar, FaClock, FaMapMarkerAlt } from 'react-icons/fa';
+import Swal from 'sweetalert2';
+import axios from 'axios';
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
+
+const showSuccessAlert = (message) => {
+  Swal.fire({
+    title: 'Success!',
+    text: message,
+    icon: 'success',
+    confirmButtonText: 'OK',
+    confirmButtonColor: '#0BDA51', // Green color for confirmation
+    cancelButtonColor: '#D33736',  // Red color for cancellation
+  });
+};
+
+const showErrorAlert = (message) => {
+  Swal.fire({
+    title: 'Error!',
+    text: message,
+    icon: 'error',
+    confirmButtonText: 'Try Again',
+    confirmButtonColor: '#0BDA51', // Green color for confirmation
+    cancelButtonText: 'Close',
+    cancelButtonColor: '#D33736',  // Red color for cancellation
+  });
+};
 
 const StarRating = ({ rating, onRatingChange, size = "md" }) => {
   const [hoverRating, setHoverRating] = useState(0);
@@ -29,20 +54,47 @@ const StarRating = ({ rating, onRatingChange, size = "md" }) => {
   );
 };
 
-const ReviewCard = ({ name, rating, comment, avatar }) => (
-  <Card className="w-full">
-    <CardBody className="flex flex-col sm:flex-row items-start space-y-4 sm:space-y-0 sm:space-x-4">
-      <Avatar src={avatar} size="lg" />
-      <div className="flex-grow">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2">
-          <h3 className="text-lg font-semibold flex items-center gap-3">{name}</h3>
-          <StarRating rating={rating} onRatingChange={() => {}} />
-        </div>
-        <div className="text-gray-600" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(comment || '') }} />
-      </div>
-    </CardBody>
-  </Card>
-);
+const ReviewCard = ({ name, rating, comment, avatar, date }) => {
+//  console.log(name, rating, comment, avatar);
+  return (
+    <div className="h-full">
+      <Card className="w-full px-2">
+        <CardBody className="flex flex-col sm:flex-row items-start space-y-4 sm:space-y-0 sm:space-x-4">
+          <div className="flex-grow">
+            <div className="flex mb-2 p-1">
+              <div className="h-16 w-16 sm:h-24 sm:w-24 gap-5">
+                <img
+                  src={avatar ? `${BASE_URL}/${avatar}` : `https://ui-avatars.com/api/?name=${name?.charAt(0).toUpperCase()}`}
+                  className="w-full h-full rounded-full object-cover shadow-gray-400 p-1 lg:p-4"
+                  alt="avatar"
+                />
+              </div>
+              <div className="flex items-center max-w-[70%]">
+                <h3 className="sm:text-sm md:text-lg lg:text-lg font-semibold flex items-center px-2 gap-3 break-all">
+                  {name}
+                </h3>
+              </div>
+            </div>
+            <div className="flex mb-2 p-1">
+              <StarRating rating={rating} onRatingChange={() => {}} />
+              <p className="text-sm flex items-center px-4">
+              {new Date(date).toLocaleString('en-US', {
+                year: 'numeric',
+                month: 'numeric',
+                day: 'numeric',
+              })}
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2">
+              
+            </div>
+            <div className="text-gray-600 py-4" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(comment || '') }} />
+          </div>
+        </CardBody>
+      </Card>
+    </div>
+  )
+};
 
 const formatTime = (time) => {
   if (time === "Closed") return "Closed";
@@ -54,11 +106,12 @@ const formatTime = (time) => {
   return `${formattedHour}:${minute} ${ampm}`;
 };
 
-const BusinessInfo = ({businessData, loading}) => {
-  const [rating, setRating] = useState(0);
-  const [review, setReview] = useState("");
+const BusinessInfo = ({businessData, loading, userData, isLoggedIn}) => {
+  const [reviews, setReviews] = useState("");
+  const [newReview, setNewReview] = useState('');
+  const [newRating, setNewRating] = useState(0);
   const [currentZoom, setCurrentZoom] = useState(10);
-
+  const [isReviewed, setIsReviewed] = useState(false);
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -67,18 +120,80 @@ const BusinessInfo = ({businessData, loading}) => {
     return <div>No data available</div>;
   }
 
-  const handleSubmitReview = (e) => {
-    e.preventDefault();
-    const newReview = {
-      id: Date.now(),
-      name: "Current User",
-      rating,
-      comment: review,
-      avatar: "https://i.pravatar.cc/150?u=currentuser"
-    };
-    dispatch(updateBusinessData({ reviews: [newReview, ...(businessData.reviews || [])] }));
-    setRating(0);
-    setReview("");
+  // console.log(isReviewed);
+
+
+  const fetchReviewsAndRatings = async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/business-getAllReviewsAndRatings`);
+      
+      if (response.data.success) {
+        // console.log(response.data.reviewsAndRatings);
+        const reviews = response.data.reviewsAndRatings.filter(review => review.business_id === parseInt(businessData.business_id));
+        // console.log('Filtered Reviews:', reviews);
+
+        const is_reviewed = response.data.reviewsAndRatings.filter(review => review.user_id === parseInt(userData.user_id) && review.business_id === parseInt(businessData.business_id));
+        // console.log('Is reviewed:', is_reviewed);
+        setIsReviewed(is_reviewed.length > 0);
+        setReviews(reviews);
+      } else {
+        console.error('Failed to fetch reviews and ratings:', response.data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching reviews and ratings:', error);
+    }
+  };
+  useEffect(() => {
+    if (businessData && userData) {
+      fetchReviewsAndRatings();
+    }
+  }, [businessData, userData]);
+
+  const handleReviewSubmit = async () => {
+    if (newRating > 0) {
+      try {
+        const response = await fetch(`${BASE_URL}/business-addReviewsAndRatings`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            user_id: userData.user_id,
+            business_id: businessData.business_id,
+            rating: newRating,
+            comment: newReview
+          }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Add the new review to the existing list of reviews
+          setReviews([...reviews, {
+            username: userData.username, // Or fetch the username from session if available
+            ratings: newRating,
+            comment: newReview
+          }]);
+    fetchReviewsAndRatings();
+
+          // Refresh products in the parent component
+          // refreshProducts();
+          showSuccessAlert("Review added successfully");
+          clearReview();
+        } else {
+          showErrorAlert('Failed to submit review:', data.message);
+          console.error('Failed to submit review:', data.message);
+        }
+      } catch (error) {
+        showErrorAlert('Error submitting review:', error);
+        console.error('Error submitting review:', error);
+      }
+    }
+  };
+
+  const clearReview = () => {
+    setNewReview('');
+    setNewRating(0);
   };
 
   const renderIcon = (iconName) => {
@@ -287,46 +402,61 @@ const BusinessInfo = ({businessData, loading}) => {
         <Tab key="reviews" title={<><FaStar className="mr-2" />Reviews</>}>
           <Card>
             <CardBody>
-              <h2 className="text-2xl font-bold mb-6">Customer Reviews</h2>
-              <div className="space-y-4 mb-8">
-                {businessData.reviews && businessData.reviews.map((review, index) => (
-                  <ReviewCard
-                    key={`${review.id}-${index}`}
-                    name={review.name}
-                    rating={review.rating}
-                    comment={review.comment}
-                    avatar={review.avatar}
-                  />
-                ))}
-              </div>
-              <Card className="bg-gray-50">
-                <CardBody>
-                  <h3 className="text-xl font-bold mb-4">Leave a Review</h3>
-                  <form onSubmit={handleSubmitReview} className="space-y-4">
-                    <div>
-                      <label className="mb-2 font-semibold flex items-center gap-3">Your Rating</label>
-                      <StarRating rating={rating} onRatingChange={setRating} size="lg" />
-                    </div>
-                    <Textarea
-                      label="Your Review"
-                      placeholder="Tell us about your experience..."
-                      value={review}
-                      onValueChange={setReview}
-                      minRows={3}
-                      className="w-full"
-                      required
+              <h2 className="text-2xl font-bold py-4 px-8 mb-6">Ratings and reviews</h2>
+              <div className="space-y-4 px-4 mb-8">
+                {Array.isArray(reviews) && reviews.length > 0 ? (
+                  reviews.map((review, index) => (
+                    <ReviewCard
+                      key={`${review.ratings_id}-${index}`}
+                      name={review.username || "Deleted account"}
+                      rating={review.ratings}
+                      comment={review.comment || "No comment provided."}
+                      avatar={review.image_path || review.image}
+                      date={(review.create_at)} 
                     />
-                    <Button
-                      type="submit"
-                      color="primary"
-                      disabled={rating === 0 || !review}
-                      className="w-full"
-                    >
-                      Submit Review
-                    </Button>
-                  </form>
-                </CardBody>
-              </Card>
+                  ))
+                ) : (
+                  <p className="text-slate-500">No reviews available.</p>
+                )}
+              </div>
+              <div className="py-4 px-8">
+                {!isReviewed && (
+                  <Card className="bg-gray-50">
+                    <CardBody>
+                      <h3 className="text-xl font-bold mb-4">Leave a Review</h3>
+                      {/* <form onSubmit={handleReviewSubmit} className="space-y-4"> */}
+                        <div>
+                          <label className="mb-2 font-semibold flex items-center gap-3">Your Rating</label>
+                          <StarRating rating={newRating} onRatingChange={setNewRating} size="lg" />
+                        </div>
+                        <Textarea
+                          label="Your Review"
+                          placeholder="Tell us about your experience..."
+                          value={newReview}
+                          onValueChange={setNewReview}
+                          minRows={3}
+                          className="w-full"
+                        />
+                        <Button
+                          type="submit"
+                          color="primary"
+                          onClick={() => {
+                            if (isLoggedIn) {
+                              handleReviewSubmit();
+                            } else {
+                              showErrorAlert('Please log in to submit a review.');
+                            }
+                          }} 
+                          disabled={newRating === 0}
+                          className="w-full"
+                        >
+                          Submit Review
+                        </Button>
+                      {/* </form> */}
+                    </CardBody>
+                  </Card> 
+                )}
+              </div>
             </CardBody>
           </Card>
         </Tab>

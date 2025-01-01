@@ -318,7 +318,7 @@ const BusinessPage = () => {
 
       {/* Info Section with Animation */}
       <AnimatedSection>
-        <Info businessData={businessData} loading={loading} />
+        <Info businessData={businessData} loading={loading} userData={userData} isLoggedIn={isLoggedIn} />
       </AnimatedSection>
 
       {/* Deals Section with Animation */}

@@ -4413,6 +4413,7 @@ app.get('/getAllReviewsAndRatings', async (req, res) => {
       products.name AS title, 
       products.description,
       users.username, 
+      users.user_id,
       users.email
     FROM 
       product_ratings
@@ -4451,6 +4452,94 @@ app.post('/addReviewsAndRatings', async (req, res) => {
     
     // Use pool.query to interact with the database
     const [results] = await pool.query(sql, [product_id, user_id, rating, comment || '']);
+
+    return res.json({ success: true, message: 'Review and rating added successfully' });
+  } catch (err) {
+    console.error('Error adding review and rating:', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+// Endpoint for reviews and ratings
+app.get('/business-getAllReviewsAndRatings', async (req, res) => {
+  const sql = `
+    SELECT 
+      br.*, 
+      b.businessName AS title, 
+      u.username, 
+      u.user_id,
+      u.email,
+      u.image,
+      u.image_path
+    FROM 
+      business_ratings br
+    LEFT JOIN 
+      businesses b ON b.business_id = br.business_id
+    LEFT JOIN 
+      users u ON u.user_id = br.user_id
+  `;
+
+  try {
+    // Use the connection pool to query the database
+    const [results] = await pool.query(sql);
+
+    return res.json({ success: true, reviewsAndRatings: results });
+  } catch (err) {
+    console.error('Error fetching reviews and ratings:', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+// Endpoint to edit reviews and ratings
+app.put('/business-editReviewAndRating', async (req, res) => {
+  const { ratings_id, rating, comment } = req.body;
+
+  // Validate the input
+  if (!ratings_id || !rating) {
+    return res.status(400).json({ success: false, message: 'Rating ID and Rating are required' });
+  }
+
+  try {
+    // SQL query to update the review and rating
+    const sql = `
+      UPDATE business_ratings
+      SET ratings = ?, comment = ?
+      WHERE ratings_id = ?
+    `;
+
+    // Use pool.query to interact with the database
+    const [results] = await pool.query(sql, [rating, comment || '', ratings_id]);
+
+    // Check if any row was affected (to ensure the ID exists)
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: 'Review and rating not found' });
+    }
+
+    return res.json({ success: true, message: 'Review and rating updated successfully' });
+  } catch (err) {
+    console.error('Error updating review and rating:', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+// Endpoint to add reviews and reatings to the buisness in business profile
+app.post('/business-addReviewsAndRatings', async (req, res) => {
+  const { business_id, user_id, rating, comment } = req.body;
+
+  // Validate the input
+  if (!business_id || !user_id || !rating) {
+    return res.status(400).json({ success: false, message: 'Business ID, User ID, and Rating are required' });
+  }
+
+  try {
+    // SQL query to insert the review and rating
+    const sql = `
+      INSERT INTO business_ratings (business_id, user_id, ratings, comment)
+      VALUES (?, ?, ?, ?)
+    `;
+    
+    // Use pool.query to interact with the database
+    const [results] = await pool.query(sql, [business_id, user_id, rating, comment || '']);
 
     return res.json({ success: true, message: 'Review and rating added successfully' });
   } catch (err) {
