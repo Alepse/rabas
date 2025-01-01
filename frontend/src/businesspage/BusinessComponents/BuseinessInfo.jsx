@@ -5,6 +5,7 @@ import { businessIcons } from './businessIcons';
 import DOMPurify from 'dompurify';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import { FaClipboardList, FaInfoCircle, FaConciergeBell, FaStar, FaClock, FaMapMarkerAlt } from 'react-icons/fa';
+import { AiOutlineEdit } from "react-icons/ai";
 import Swal from 'sweetalert2';
 import axios from 'axios';
 // Use the environment variable for the base URL
@@ -54,13 +55,18 @@ const StarRating = ({ rating, onRatingChange, size = "md" }) => {
   );
 };
 
-const ReviewCard = ({ name, rating, comment, avatar, date }) => {
+const ReviewCard = ({ name, rating, comment, avatar, date, isMyReview }) => {
 //  console.log(name, rating, comment, avatar);
   return (
     <div className="h-full">
       <Card className="w-full px-2">
         <CardBody className="flex flex-col sm:flex-row items-start space-y-4 sm:space-y-0 sm:space-x-4">
           <div className="flex-grow">
+            {isMyReview && (
+              <AiOutlineEdit
+                className="cursor-pointer text-gray-600 ml-2 text-2xl"
+              />
+            )}
             <div className="flex mb-2 p-1">
               <div className="h-16 w-16 sm:h-24 sm:w-24 gap-5">
                 <img
@@ -132,7 +138,7 @@ const BusinessInfo = ({businessData, loading, userData, isLoggedIn}) => {
       
       if (response.data.success) {
         // console.log(response.data.reviewsAndRatings);
-        const reviews = response.data.reviewsAndRatings.filter(review => review.business_id === parseInt(businessData.business_id));
+        const reviews = response.data.reviewsAndRatings.filter(review => review.user_id !== parseInt(userData.user_id) && review.business_id === parseInt(businessData.business_id));
         // console.log('Filtered Reviews:', reviews);
 
         const myReview = response.data.reviewsAndRatings.filter(review => review.user_id === parseInt(userData.user_id) && review.business_id === parseInt(businessData.business_id));
@@ -429,6 +435,22 @@ const BusinessInfo = ({businessData, loading, userData, isLoggedIn}) => {
             <CardBody>
               <h2 className="text-2xl font-bold py-4 px-8 mb-6">Ratings and reviews</h2>
               <div className="space-y-4 px-4 mb-8">
+                
+                {Array.isArray(myReview) && (
+                  myReview.map((review, index) => (
+                    <ReviewCard
+                      key={`${review.ratings_id}-${index}`}
+                      name={review.username || "Deleted account"}
+                      rating={review.ratings}
+                      comment={review.comment || "No comment provided."}
+                      avatar={review.image_path || review.image}
+                      date={(review.create_at)} 
+                      isMyReview={true}
+                    />
+                  ))
+                )}
+              </div>
+              <div className="space-y-4 px-4 mb-8">
                 {Array.isArray(reviews) && reviews.length > 0 ? (
                   reviews.map((review, index) => (
                     <ReviewCard
@@ -438,6 +460,7 @@ const BusinessInfo = ({businessData, loading, userData, isLoggedIn}) => {
                       comment={review.comment || "No comment provided."}
                       avatar={review.image_path || review.image}
                       date={(review.create_at)} 
+                      isMyReview={false}
                     />
                   ))
                 ) : (
