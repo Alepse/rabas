@@ -17,6 +17,8 @@ import { useInView } from 'react-intersection-observer';
 import Swal from 'sweetalert2';
 import UserChatModal from '@/user/userChatSystem/UserChatModal';
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
+import { Modal, ModalContent, ModalBody, useDisclosure } from "@nextui-org/react";
+import LoginSignup from '@/auth/LoginSignup';
 
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL;
@@ -64,6 +66,11 @@ const BusinessPage = () => {
   const [userData, setUserData] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isChatModalOpen, setIsChatModalOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
 
   const checkLoginStatus = useCallback(async () => {
     try {
@@ -146,7 +153,7 @@ const BusinessPage = () => {
 
   const openChatModal = () => {
     if (!isLoggedIn) {
-      return showErrorAlert('Please login to send a message.');
+      return onOpen();
     }
     if (businessData) {
       setIsChatModalOpen(true);
@@ -190,7 +197,7 @@ const BusinessPage = () => {
 
   const handleLikeClick = () => {
     if (!isLoggedIn) {
-      return showErrorAlert('Please login to like a page.');
+      return onOpen();
     }
     if (!isLiked) {
       likeBusiness(businessData.business_id);
@@ -328,12 +335,12 @@ const BusinessPage = () => {
 
       {/* Deals Section with Animation */}
       <AnimatedSection>
-        <Section isLoggedIn={isLoggedIn} businessData={businessData} userData={userData} />
+        <Section isLoggedIn={isLoggedIn} businessData={businessData} userData={userData} openLoginForm={() => onOpen()} />
       </AnimatedSection>
 
       {/* All Products Section with Animation */}
       <AnimatedSection>
-        <Allproducts isLoggedIn={isLoggedIn} businessData={businessData} userData={userData} />
+        <Allproducts isLoggedIn={isLoggedIn} businessData={businessData} userData={userData} openLoginForm={() => onOpen()} />
       </AnimatedSection>
 
       <Footer />
@@ -354,6 +361,26 @@ const BusinessPage = () => {
           ↑
         </motion.button>
       )}
+
+      <Modal
+       disableAnimation
+        backdrop="opaque"
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        isDismissable={false}
+        className='max-h-full  w-full max-w-[600px] overflow-auto scrollbar-custom'
+      >
+        <ModalContent>
+          {() => (
+            <>
+              <ModalBody>
+                <LoginSignup />
+              </ModalBody>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
       <UserChatModal isOpen={isChatModalOpen} onClose={closeChatModal} onOpenChat={businessData} />
     </div>
   );

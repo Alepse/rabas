@@ -246,7 +246,7 @@ const ReviewModal = ({ isOpen, onClose, product, isLoggedIn, refreshProducts }) 
 };
 
 // Product Card Component
-const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn, refreshProducts, businessData, userData }) => {
+const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn, refreshProducts, businessData, userData, openLoginForm }) => {
   const [isReviewModalOpen, setReviewModalOpen] = useState(false);
   const [isInclusionsModalOpen, setInclusionsModalOpen] = useState(false);
   const onModalOpen = () => {
@@ -304,7 +304,7 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn, refreshPro
 
   const handleClickInquire = (product) => {
     if (!isLoggedIn){
-      return  showErrorAlert('Please login to send a message.');
+      return  openLoginForm();
     }
     setSelectedProduct(product);
     handleModalOpen();
@@ -407,7 +407,16 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn, refreshPro
                 ))}
               </div>
               <Tooltip content="Write a Review">
-                <button className="bg-transparent" onClick={openReviewModal}>
+                <button 
+                  className="bg-transparent" 
+                    onClick={() => {
+                      if (isLoggedIn) {
+                        openReviewModal();
+                      } else {
+                        openLoginForm();
+                      }
+                    }}
+                >
                   <TbMessageStar  className="text-lg cursor-pointer" />
                 </button>
               </Tooltip>
@@ -465,7 +474,7 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn, refreshPro
                     if (isLoggedIn) {
                       openBookingModal(product);
                     } else {
-                      showErrorAlert('Please log in to book this product.');
+                      openLoginForm();
                     }
                   }}
                 >
@@ -632,7 +641,7 @@ const LoadingSpinner = () => (
 );
 
 // Main Business All Products Component
-const BusinessAllproducts = ({isLoggedIn, businessData, userData}) => {
+const BusinessAllproducts = ({isLoggedIn, businessData, userData, openLoginForm}) => {
   const [mockData, setMockData] = useState({
     activities: [],
     accommodations: [],
@@ -905,6 +914,7 @@ const BusinessAllproducts = ({isLoggedIn, businessData, userData}) => {
                   refreshProducts={() => refreshProducts(product.product_category)} 
                   businessData={businessData}
                   userData={userData}
+                  openLoginForm={() => openLoginForm()}
                 />
               ))
             ) : (

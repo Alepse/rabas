@@ -42,7 +42,7 @@ const showErrorAlert = (message) => {
 };
 
 
-const BusinessSection = ({isLoggedIn, businessData, userData}) => {
+const BusinessSection = ({isLoggedIn, businessData, userData, openLoginForm}) => {
   const [activeModal, setActiveModal] = useState(null);
   const [mockData, setMockData] = useState({
     activities: [],
@@ -131,7 +131,7 @@ const BusinessSection = ({isLoggedIn, businessData, userData}) => {
 
   const handleClickInquire = (product) => {
     if (!isLoggedIn){
-      return  showErrorAlert('Please login to send a message.');
+      return  openLoginForm();
     }
     setSelectedProduct(product);
     handleModalOpen();
@@ -249,7 +249,7 @@ const BusinessSection = ({isLoggedIn, businessData, userData}) => {
                           if (isLoggedIn) {
                             openBookingModal(deal);
                           } else {
-                            showErrorAlert('Please log in to book this product.');
+                            openLoginForm();
                           }
                         }}
                       >
