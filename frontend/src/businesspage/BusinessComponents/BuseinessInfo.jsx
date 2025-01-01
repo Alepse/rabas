@@ -120,7 +120,7 @@ const BusinessInfo = ({businessData, loading, userData, isLoggedIn}) => {
     return <div>No data available</div>;
   }
 
-  console.log(isReviewed);
+  // console.log(isReviewed);
 
 
   const fetchReviewsAndRatings = async () => {
@@ -132,8 +132,8 @@ const BusinessInfo = ({businessData, loading, userData, isLoggedIn}) => {
         const reviews = response.data.reviewsAndRatings.filter(review => review.business_id === parseInt(businessData.business_id));
         // console.log('Filtered Reviews:', reviews);
 
-        const is_reviewed = response.data.reviewsAndRatings.filter(review => review.user_id === parseInt(userData.user_id));
-        console.log('Is reviewed:', is_reviewed);
+        const is_reviewed = response.data.reviewsAndRatings.filter(review => review.user_id === parseInt(userData.user_id) && review.business_id === parseInt(businessData.business_id));
+        // console.log('Is reviewed:', is_reviewed);
         setIsReviewed(is_reviewed.length > 0);
         setReviews(reviews);
       } else {
