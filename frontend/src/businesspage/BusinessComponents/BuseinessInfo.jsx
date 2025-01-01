@@ -5,7 +5,6 @@ import { businessIcons } from './businessIcons';
 import DOMPurify from 'dompurify';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import { FaClipboardList, FaInfoCircle, FaConciergeBell, FaStar, FaClock, FaMapMarkerAlt } from 'react-icons/fa';
-import { FaClipboardList, FaInfoCircle, FaConciergeBell, FaStar } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 import axios from 'axios';
 // Use the environment variable for the base URL
