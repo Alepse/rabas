@@ -60,13 +60,10 @@ const Home = () => {
        <WhatodoSection/>
       </AnimatedSection>
 
-      {/* Destination Section */}
-      <AnimatedSection>
-        <DestinationSection />
-      </AnimatedSection>
+      
       
       <AnimatedSection>
-      <div className=' h-[20rem]   w-full bg-color1/80 ' style={{  
+      <div className=' h-[10rem]   w-full bg-color1/80 ' style={{  
       backgroundImage: `url(${wave2})`,  
       backgroundSize: '100% 100%', // adjust the size to make the background smaller  
       backgroundRepeat: 'no-repeat', // prevents the image from repeating  
@@ -83,6 +80,11 @@ const Home = () => {
       {/* Plan Trip Section */}
       <AnimatedSection>
         <PlanTripSection />
+      </AnimatedSection>
+
+      {/* Destination Section */}
+      <AnimatedSection>
+        <DestinationSection />
       </AnimatedSection>
 
       {/* About Section */}

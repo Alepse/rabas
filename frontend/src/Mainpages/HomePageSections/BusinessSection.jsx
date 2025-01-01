@@ -72,8 +72,8 @@ const BusinessSection = () => {
         <h1 className="text-3xl md:text-5xl font-bold text-color1">
         Sorsogon's Hidden Gems
         </h1>
-        <p className="text-md md:text-lg text-gray-500 mt-3">
-        Your Guide to Unforgettable Visits, Comfy Stays, and Delicious Meals.
+        <p className="text-md md:text-lg text-gray-600 mt-3 py-2">
+          Your Guide to <span className="font-semibold">Unforgettable</span> Visits, <span className="font-semibold">Comfy</span> Stays, and <span className="font-semibold">Delicious</span> Meals.
         </p>
       </div>
       

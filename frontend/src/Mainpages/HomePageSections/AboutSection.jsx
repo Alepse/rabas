@@ -17,7 +17,7 @@ const AboutSection = () => {
         <div className="max-w-3xl mx-auto text-center mb-12">
           <p className="text-lg text-gray-700">
             At Rabasorsogon, we're passionate about showcasing the vibrant culture and natural beauty of Sorsogon. 
-            Our expert local knowledge and commitment to authentic experiences set us apart.
+            Local knowledge and commitment to authentic experiences set us apart.
           </p>
         </div>
 
