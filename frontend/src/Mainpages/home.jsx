@@ -55,12 +55,9 @@ const Home = () => {
       <Search/>
      </AnimatedSection>
     
-      
       <AnimatedSection>
        <WhatodoSection/>
       </AnimatedSection>
-
-      
       
       <AnimatedSection>
       <div className=' h-[10rem]   w-full bg-color1/80 ' style={{  

@@ -58,7 +58,7 @@ const WhatToDoSection = () => {
   }, []);
 
   return (
-    <section className="py-24 mt-24 bg-white relative">
+    <section className="py-16 mt-24 bg-white relative">
       {/* Top Wave */}
       <div className="absolute top-0 left-0 right-0">
         <svg viewBox="0 0 1440 150" className="w-full h-auto fill-[#1B4D3E] opacity-60">
