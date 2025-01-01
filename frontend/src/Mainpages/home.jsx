@@ -82,14 +82,14 @@ const Home = () => {
         <PlanTripSection />
       </AnimatedSection>
 
-      {/* Destination Section */}
-      <AnimatedSection>
-        <DestinationSection />
-      </AnimatedSection>
-
       {/* About Section */}
       <AnimatedSection>
         <AboutSection />
+      </AnimatedSection>
+
+      {/* Destination Section */}
+      <AnimatedSection>
+        <DestinationSection />
       </AnimatedSection>
 
       {/* Footer */}

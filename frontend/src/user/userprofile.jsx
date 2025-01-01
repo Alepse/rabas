@@ -7,7 +7,7 @@ import { Tabs, Tab, Card, CardBody, Button, useDisclosure } from "@nextui-org/re
 import BusinessApplicationModal from '@/businesspage/BusinessComponents/BusinessApplicationModal';
 import { GiPositionMarker } from 'react-icons/gi';
 import { Spinner } from "@nextui-org/react";
-import { AiOutlineLike } from 'react-icons/ai';
+import { AiOutlineDislike  } from 'react-icons/ai';
 import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { motion } from 'framer-motion';
@@ -45,7 +45,7 @@ const renderLikedPages = (likedPages, handleUnlikePage) => {
       {likedPages.map((item) => (
         <div
           key={item.id || item.business_id} // Use a fallback if business_id is unavailable
-          className="flex flex-col sm:flex-row items-start bg-white w-full rounded-lg shadow-lg hover:shadow-slate-500 duration-300 mb-4"
+          className="flex flex-col sm:flex-row items-start bg-white w-full rounded-lg shadow-lg hover:shadow-slate-500 duration-300 mb-4 p-4"
         >
           {item.business_id ? (
             <>
@@ -99,26 +99,26 @@ const renderLikedPages = (likedPages, handleUnlikePage) => {
                     )}
                   </div>
                 </div>
-
-                {/* Actions */}
-                <div className="flex items-center mt-2 md:justify-end justify-between gap-2">
+              </div>
+              {/* Actions */}
+              <div className="flex-1">
+                <div className="flex flex-col items-center mt-2 justify-center justify-between gap-2 lg:gap-8">
+                  <Button
+                    className="px-10 py-6 rounded-lg bg-color2 text-white text-sm"
+                    onClick={() => handleUnlikePage(item.id)}
+                  >
+                    <div className="flex items-center gap-2">
+                      <AiOutlineDislike />Unlike
+                    </div>
+                  </Button>
                   <Link to={`/business/${encryptId(item?.business_id)}`}>
                     <Button
                       size="sm"
-                      className="bg-color1 text-white hover:bg-color2 text-sm"
+                      className="px-14 py-6 rounded-lg bg-color1 text-white hover:bg-color2 text-sm"
                     >
                       Visit
                     </Button>
                   </Link>
-                  <Button
-                    className="h-8 px-3 bg-color2 text-white text-sm"
-                    onClick={() => handleUnlikePage(item.id)}
-                  >
-                    <div className="flex items-center gap-1">
-                      <AiOutlineLike />
-                      Unlike
-                    </div>
-                  </Button>
                 </div>
               </div>
             </>
