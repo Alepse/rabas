@@ -600,7 +600,7 @@ const Nav = () => {
                   <DropdownItem key="messages" onClick={openChatModal}>
                     <div className='flex items-center gap-4 text-md  p-1'>
                       Messages
-                      <Badge color='danger' placement='top-right' content='2' />
+                      {/* <Badge color='danger' placement='top-right' content='2' /> */}
                     </div>
                   </DropdownItem>
                   <DropdownItem key="Bookings">
