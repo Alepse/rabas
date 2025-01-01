@@ -56,21 +56,24 @@ const StarRating = ({ rating, onRatingChange, size = "md" }) => {
 };
 
 const ReviewCard = ({ name, rating, comment, avatar, date, isMyReview }) => {
-//  console.log(name, rating, comment, avatar);
   return (
     <div className="h-full">
-      <Card className="w-full px-2">
+      <Card className="w-full px-2 relative">
+        {isMyReview && (
+          <AiOutlineEdit
+            className="absolute top-2 right-2 cursor-pointer text-gray-600 text-2xl"
+          />
+        )}
         <CardBody className="flex flex-col sm:flex-row items-start space-y-4 sm:space-y-0 sm:space-x-4">
           <div className="flex-grow">
-            {isMyReview && (
-              <AiOutlineEdit
-                className="cursor-pointer text-gray-600 ml-2 text-2xl"
-              />
-            )}
             <div className="flex mb-2 p-1">
               <div className="h-16 w-16 sm:h-24 sm:w-24 gap-5">
                 <img
-                  src={avatar ? `${BASE_URL}/${avatar}` : `https://ui-avatars.com/api/?name=${name?.charAt(0).toUpperCase()}`}
+                  src={
+                    avatar
+                      ? `${BASE_URL}/${avatar}`
+                      : `https://ui-avatars.com/api/?name=${name?.charAt(0).toUpperCase()}`
+                  }
                   className="w-full h-full rounded-full object-cover shadow-gray-400 p-1 lg:p-4"
                   alt="avatar"
                 />
@@ -84,22 +87,25 @@ const ReviewCard = ({ name, rating, comment, avatar, date, isMyReview }) => {
             <div className="flex mb-2 p-1">
               <StarRating rating={rating} onRatingChange={() => {}} />
               <p className="text-sm flex items-center px-4">
-              {new Date(date).toLocaleString('en-US', {
-                year: 'numeric',
-                month: 'numeric',
-                day: 'numeric',
-              })}
+                {new Date(date).toLocaleString('en-US', {
+                  year: 'numeric',
+                  month: 'numeric',
+                  day: 'numeric',
+                })}
               </p>
             </div>
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2">
-              
-            </div>
-            <div className="text-gray-600 py-4" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(comment || '') }} />
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2"></div>
+            <div
+              className="text-gray-600 py-4"
+              dangerouslySetInnerHTML={{
+                __html: DOMPurify.sanitize(comment || ''),
+              }}
+            />
           </div>
         </CardBody>
       </Card>
     </div>
-  )
+  );
 };
 
 const formatTime = (time) => {

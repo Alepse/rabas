@@ -7,6 +7,18 @@ import { Link } from 'react-router-dom';
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
+const showErrorAlert = (message) => {
+  Swal.fire({
+    title: 'Error!',
+    text: message,
+    icon: 'error',
+    confirmButtonText: 'Ok',
+    confirmButtonColor: '#0BDA51', // Green color for confirmation
+    cancelButtonText: 'Close',
+    cancelButtonColor: '#D33736',  // Red color for cancellation
+  });
+};
+
 const LoginSignup = () => {
   const [view, setView] = useState("initial"); // initial, email, signup, forgotPassword
   const [selected, setSelected] = useState("login");
@@ -59,12 +71,12 @@ const LoginSignup = () => {
       const data = await response.json();
       if (data.success) {
         setOtpSession(data.sessionId); // Save OTP session ID
-        console.log('OtpSession saved', data);
+        // console.log('OtpSession saved', data);
         setView("loginotp"); // Redirect to OTP view
         Swal.fire('OTP Sent!', 'Check your email for the OTP.', 'success');
         setIsOtpSent(true); //
       } else {
-        Swal.fire('Login Failed!', data.error, 'error');
+        showErrorAlert('Login Failed!', data.message);
       }
     } catch (error) {
       console.error('Error:', error); 
@@ -248,180 +260,179 @@ const LoginSignup = () => {
 
   const renderLoginForm = () => (
     <div className="flex  flex-col w-full  items-center justify-center p-4 gap-2  ">
-    <button
-    className="absolute top-5 left-5 flex items-center text-gray-500 hover:text-black transition-all mb-4"
-    onClick={() => setView("initial")}
-    >
-      <FaArrowLeft className="mr-2" /> Back
-    </button>
+      <button
+      className="absolute top-5 left-5 flex items-center text-gray-500 hover:text-black transition-all mb-4"
+      onClick={() => setView("initial")}
+      >
+        <FaArrowLeft className="mr-2" /> Back
+      </button>
       <img className="max-w-[10rem]" src={Logo2} />
-        <h1 className="text-center font-semibold font-font1 text-2xl  ">Login!</h1>
-          <form onSubmit={handleLogin} className="flex flex-col  p-2 w-[20rem] gap-4  ">
-            <Input
-              label="Email/username"
-              type="text"
-              value={identifier}
-              onChange={(e) => setIdentifier(e.target.value)}
-              required
-            />
-            <Input
-              label="Password"
-              type={showPassword ? "text" : "password"}
-              value={loginPassword}
-              onChange={(e) => setLoginPassword(e.target.value)}
-              required
-              endContent={
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="focus:outline-none"
-                >
-                  {showPassword ? (
-                    <FaEyeSlash className="text-2xl text-default-400" />
-                  ) : (
-                    <FaEye className="text-2xl text-default-400" />
-                  )}
-                </button>
-              }
-            />
-            <div className="flex  justify-between gap-24 items-center  text-xs">
-            <div>
-              <Link
-                className="cursor-pointer hover:underline text-color2"
-                size="sm"
-                onClick={() => setView("forgotpassword")}
-              >
-                Forgot Password?
-              </Link>
-              </div>
-             
-            </div>
-            <Button type="submit" color="primary" className="hover:bg-color2" fullWidth>
-              Login
-            </Button>
-
-          </form>
-          <div className='flex gap-1 flex-wrap'>
-                <p>Need an account?</p>
-                <Link
-                  className="cursor-pointer ml-1 hover:underline text-color2"
-                  size="sm"
-                  onClick={() => setView("signup")}
-                >
-                  Sign up
-                </Link>
-              </div>
+      <h1 className="text-center font-semibold font-font1 text-2xl  ">Login!</h1>
+      <form onSubmit={handleLogin} className="flex flex-col  p-2 w-[20rem] gap-4  ">
+        <Input
+          label="Email/username"
+          type="text"
+          value={identifier}
+          onChange={(e) => setIdentifier(e.target.value)}
+          required
+        />
+        <Input
+          label="Password"
+          type={showPassword ? "text" : "password"}
+          value={loginPassword}
+          onChange={(e) => setLoginPassword(e.target.value)}
+          required
+          endContent={
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="focus:outline-none"
+            >
+              {showPassword ? (
+                <FaEyeSlash className="text-2xl text-default-400" />
+              ) : (
+                <FaEye className="text-2xl text-default-400" />
+              )}
+            </button>
+          }
+        />
+        <div className="flex  justify-between gap-24 items-center  text-xs">
+          <div>
+            <Link
+              className="cursor-pointer hover:underline text-color2"
+              size="sm"
+              onClick={() => setView("forgotpassword")}
+            >
+              Forgot Password?
+            </Link>
+          </div>
+          
+        </div>
+        <Button type="submit" color="primary" className="hover:bg-color2" fullWidth>
+          Login
+        </Button>
+      </form>
+      <div className='flex gap-1 flex-wrap'>
+        <p>Need an account?</p>
+        <Link
+          className="cursor-pointer ml-1 hover:underline text-color2"
+          size="sm"
+          onClick={() => setView("signup")}
+        >
+          Sign up
+        </Link>
+      </div>
     </div>
   );
   
   const renderSignupForm = () => (
     <div className="flex flex-col h-full items-center justify-center gap-6 px-5 py-20">
-  <img className="w-[11rem]" src={Logo2} />
-  <button
-    className="absolute top-5 left-5 flex items-center text-gray-500 hover:text-black transition-all mb-4"
-    onClick={() => setView("initial")}
-  >
-    <FaArrowLeft className="mr-2" /> Back
-  </button>
-  <h1 className="font-font1 text-center text-2xl mb-2">Signup!</h1>
-  <form onSubmit={handleSignup} className="grid grid-cols-1 sm:grid-cols-2 gap-4 min-w-[260px] w-auto">
-    <Input
-      label="First Name"
-      type="text"
-      name="firstName"
-      value={signupData.firstName}
-      onChange={handleSignupChange}
-      required
-    />
-    <Input
-      label="Last Name"
-      type="text"
-      name="lastName"
-      value={signupData.lastName}
-      onChange={handleSignupChange}
-      required
-    />
-    <Input
-      label="Email"
-      type="email"
-      name="email"
-      value={signupData.email}
-      onChange={handleSignupChange}
-      required
-    />
-    <Input
-      label="Username"
-      type="text"
-      name="username"
-      value={signupData.username}
-      onChange={handleSignupChange}
-      required
-    />
-    <Input
-      label="Address"
-      type="text"
-      name="address"
-      value={signupData.address}
-      onChange={handleSignupChange}
-      required
-    />
-    <Input
-      label="Contact Number"
-      type="text"
-      name="phone"
-      value={signupData.phone}
-      onChange={handleSignupChange}
-      required
-    />
-    <Input
-      label="Password"
-      type={showPassword ? "text" : "password"}
-      name="password"
-      value={signupData.password}
-      onChange={handleSignupChange}
-      required
-      endContent={
-        <button
-          type="button"
-          onClick={() => setShowPassword(!showPassword)}
-          className="focus:outline-none"
-        >
-          {showPassword ? (
-            <FaEyeSlash className="text-2xl text-default-400" />
-          ) : (
-            <FaEye className="text-2xl text-default-400" />
-          )}
-        </button>
-      }
-    />
-    <Input
-      label="Confirm Password"
-      type={showPassword ? "text" : "password"}
-      name="confirmPassword"
-      value={signupData.confirmPassword}
-      onChange={handleSignupChange}
-      required
-      endContent={
-        <button
-          type="button"
-          onClick={() => setShowPassword(!showPassword)}
-          className="focus:outline-none"
-        >
-          {showPassword ? (
-            <FaEyeSlash className="text-2xl text-default-400" />
-          ) : (
-            <FaEye className="text-2xl text-default-400" />
-          )}
-        </button>
-      }
-    />
-    <div className="col-span-1 sm:col-span-2">
-      <Button type="submit" color="primary" className="hover:bg-color2" fullWidth>
-        Sign Up
-      </Button>
+      <img className="w-[11rem]" src={Logo2} />
+      <button
+        className="absolute top-5 left-5 flex items-center text-gray-500 hover:text-black transition-all mb-4"
+        onClick={() => setView("initial")}
+      >
+        <FaArrowLeft className="mr-2" /> Back
+      </button>
+      <h1 className="font-font1 text-center text-2xl mb-2">Signup!</h1>
+      <form onSubmit={handleSignup} className="grid grid-cols-1 sm:grid-cols-2 gap-4 min-w-[260px] w-auto">
+        <Input
+          label="First Name"
+          type="text"
+          name="firstName"
+          value={signupData.firstName}
+          onChange={handleSignupChange}
+          required
+        />
+        <Input
+          label="Last Name"
+          type="text"
+          name="lastName"
+          value={signupData.lastName}
+          onChange={handleSignupChange}
+          required
+        />
+        <Input
+          label="Email"
+          type="email"
+          name="email"
+          value={signupData.email}
+          onChange={handleSignupChange}
+          required
+        />
+        <Input
+          label="Username"
+          type="text"
+          name="username"
+          value={signupData.username}
+          onChange={handleSignupChange}
+          required
+        />
+        <Input
+          label="Address"
+          type="text"
+          name="address"
+          value={signupData.address}
+          onChange={handleSignupChange}
+          required
+        />
+        <Input
+          label="Contact Number"
+          type="text"
+          name="phone"
+          value={signupData.phone}
+          onChange={handleSignupChange}
+          required
+        />
+        <Input
+          label="Password"
+          type={showPassword ? "text" : "password"}
+          name="password"
+          value={signupData.password}
+          onChange={handleSignupChange}
+          required
+          endContent={
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="focus:outline-none"
+            >
+              {showPassword ? (
+                <FaEyeSlash className="text-2xl text-default-400" />
+              ) : (
+                <FaEye className="text-2xl text-default-400" />
+              )}
+            </button>
+          }
+        />
+        <Input
+          label="Confirm Password"
+          type={showPassword ? "text" : "password"}
+          name="confirmPassword"
+          value={signupData.confirmPassword}
+          onChange={handleSignupChange}
+          required
+          endContent={
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="focus:outline-none"
+            >
+              {showPassword ? (
+                <FaEyeSlash className="text-2xl text-default-400" />
+              ) : (
+                <FaEye className="text-2xl text-default-400" />
+              )}
+            </button>
+          }
+        />
+        <div className="col-span-1 sm:col-span-2">
+          <Button type="submit" color="primary" className="hover:bg-color2" fullWidth>
+            Sign Up
+          </Button>
+        </div>
+      </form>
     </div>
-  </form>
-</div>
 
   );
 
