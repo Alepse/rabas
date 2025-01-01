@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import CryptoJS from 'crypto-js';
 import Nav from '../components/nav';
@@ -16,8 +16,10 @@ import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import Swal from 'sweetalert2';
 import UserChatModal from '@/user/userChatSystem/UserChatModal';
+import { MdOutlineKeyboardArrowRight } from "react-icons/md";
+
 // Use the environment variable for the base URL
-const BASE_URL = import.meta.env.VITE_BASE_URL; 
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const showSuccessAlert = (message) => {
   Swal.fire({
@@ -25,8 +27,8 @@ const showSuccessAlert = (message) => {
     text: message,
     icon: 'success',
     confirmButtonText: 'OK',
-    confirmButtonColor: '#0BDA51', // Green color for confirmation
-    cancelButtonColor: '#D33736',  // Red color for cancellation
+    confirmButtonColor: '#0BDA51',
+    cancelButtonColor: '#D33736',
   });
 };
 
@@ -36,9 +38,9 @@ const showErrorAlert = (message) => {
     text: message,
     icon: 'error',
     confirmButtonText: 'Try Again',
-    confirmButtonColor: '#0BDA51', // Green color for confirmation
+    confirmButtonColor: '#0BDA51',
     cancelButtonText: 'Close',
-    cancelButtonColor: '#D33736',  // Red color for cancellation
+    cancelButtonColor: '#D33736',
   });
 };
 
@@ -62,15 +64,16 @@ const BusinessPage = () => {
   const [userData, setUserData] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isChatModalOpen, setIsChatModalOpen] = useState(false);
+
   const checkLoginStatus = useCallback(async () => {
     try {
       const response = await fetch(`${BASE_URL}/check-login`, {
         method: 'GET',
-        credentials: 'include' // Include cookies
+        credentials: 'include',
       });
       if (response.ok) {
         const data = await response.json();
-        setIsLoggedIn(data.isLoggedIn); // Set login status
+        setIsLoggedIn(data.isLoggedIn);
       } else {
         setIsLoggedIn(false);
       }
@@ -99,7 +102,6 @@ const BusinessPage = () => {
     }
   }, [isLoggedIn]);
 
-  // Function to decrypt the business_id
   const decryptId = (encryptedId) => {
     const secretKey = import.meta.env.VITE_SECRET_KEY;
     const bytes = CryptoJS.AES.decrypt(decodeURIComponent(encryptedId), secretKey);
@@ -143,17 +145,17 @@ const BusinessPage = () => {
   };
 
   const openChatModal = () => {
-    if (!isLoggedIn){
-      return  showErrorAlert('Please login to send a message.');
+    if (!isLoggedIn) {
+      return showErrorAlert('Please login to send a message.');
     }
-    if(businessData){
-    setIsChatModalOpen(true);}
+    if (businessData) {
+      setIsChatModalOpen(true);
+    }
   };
 
   const closeChatModal = () => {
     setIsChatModalOpen(false);
   };
-
 
   const fetchLikedBusinesses = async () => {
     try {
@@ -176,8 +178,7 @@ const BusinessPage = () => {
     try {
       const response = await axios.get(`${BASE_URL}/getLikesCount/${businessId}`, { withCredentials: true });
       if (response.data.success) {
-        const likes = response.data.businessLikes.likes; // Extract the likes count
-        setLikesCount(likes); // Update the state with the likes count
+        setLikesCount(response.data.businessLikes.likes);
       } else {
         showErrorAlert('Failed to fetch likes count for the business.');
       }
@@ -186,39 +187,6 @@ const BusinessPage = () => {
       showErrorAlert('An error occurred while fetching the likes count.');
     }
   };
-
-  useEffect(() => {
-    fetchLikeCounts(decryptId(encryptedBusinessId));
-  }, [likesCount]);
-  
-  const likeBusiness = async (businessId) => {
-    try {
-      const response = await axios.post(`${BASE_URL}/like-business`, { businessId }, { withCredentials: true });
-      if (response.data.success) {
-        setIsLiked(true);
-        fetchLikeCounts(businessId); // Pass businessId here
-      } else {
-        // showErrorAlert('Failed to like the business.');
-      }
-    } catch (error) {
-      console.error('Error liking business:', error);
-      showErrorAlert('An error occurred while liking the business.');
-    }
-  };
-  
-  const unlikeBusiness = async (businessId) => {
-    try {
-      const response = await axios.delete(`${BASE_URL}/unlike-business/${businessId}`, { withCredentials: true });
-      if (response.data.success) {
-        setIsLiked(false);
-        fetchLikeCounts(businessId); // Pass businessId here
-      } else {
-        // showErrorAlert('Failed to unlike the business.');
-      }
-    } catch (error) {
-      console.error('Error unliking business:', error);
-    }
-  };  
 
   const handleLikeClick = () => {
     if (!isLoggedIn) {
@@ -231,13 +199,38 @@ const BusinessPage = () => {
     }
   };
 
+  const likeBusiness = async (businessId) => {
+    try {
+      const response = await axios.post(`${BASE_URL}/like-business`, { businessId }, { withCredentials: true });
+      if (response.data.success) {
+        setIsLiked(true);
+        fetchLikeCounts(businessId);
+      }
+    } catch (error) {
+      console.error('Error liking business:', error);
+      showErrorAlert('An error occurred while liking the business.');
+    }
+  };
+
+  const unlikeBusiness = async (businessId) => {
+    try {
+      const response = await axios.delete(`${BASE_URL}/unlike-business/${businessId}`, { withCredentials: true });
+      if (response.data.success) {
+        setIsLiked(false);
+        fetchLikeCounts(businessId);
+      }
+    } catch (error) {
+      console.error('Error unliking business:', error);
+    }
+  };
+
   if (loading) {
     return (
-      <Spinner 
-        className='flex justify-center items-center h-screen' 
-        size='lg' 
-        label="Loading..." 
-        color="primary" 
+      <Spinner
+        className="flex justify-center items-center h-screen"
+        size="lg"
+        label="Loading..."
+        color="primary"
       />
     );
   }
@@ -261,46 +254,72 @@ const BusinessPage = () => {
   };
 
   return (
-    <div className='mx-auto min-h-screen bg-light font-sans'>
+    <div className="mx-auto min-h-screen bg-light font-sans">
       <Nav />
 
-      <div className='container p-3 rounded-md mt-[5.2rem] flex justify-center'> 
-        <Search/>
+      <div className="container p-1 rounded-md mb-3 flex justify-center">
+        <Search />
       </div>
 
-      {/* Hero Section with Animation */}
-      <AnimatedSection>
-        <HeroAndGallery images={businessData.coverPhotos} />
-      </AnimatedSection>
+    
 
       {/* Business Header Section */}
-      <div className='container mx-auto px-4'>
+      <div className="container mx-auto px-4">
         <AnimatedSection>
-          <div className='flex flex-wrap items-center gap-4 py-4'>
-            <img 
-              className='w-16 h-16 sm:w-24 sm:h-24 rounded-full object-cover shadow-gray-400 p-5' 
-              src={businessData.businessLogo ? `${BASE_URL}/${businessData.businessLogo}` : `https://ui-avatars.com/api/?name=${businessData?.businessName?.charAt(0).toUpperCase()}`} 
+          {/* Breadcrumbs */}
+      <div className="container px-4 mx-auto mb-4">
+        <nav className="text-sm text-gray-500">
+          <ol className="list-none p-0 inline-flex">
+            <li className="flex items-center">
+              <Link to="/home" className="hover:text-color1">Home</Link>
+              <span className="mx-2"><MdOutlineKeyboardArrowRight/></span>
+            </li>
+            <li className="flex items-center">
+              <Link to="/activities" className="hover:text-color1">Activities</Link>
+              <span className="mx-2"><MdOutlineKeyboardArrowRight/></span>
+            </li>
+            <li className="flex items-center">
+              <Link to="/accommodations" className="hover:text-color1">Accommodations</Link>
+              <span className="mx-2"><MdOutlineKeyboardArrowRight/></span>
+            </li>
+            <li className="flex items-center">
+              <Link to="/foodplaces" className="hover:text-color1">Food Places</Link>
+              <span className="mx-2"><MdOutlineKeyboardArrowRight/></span>
+            </li>
+            <li className="flex items-center">
+              <Link to="/shops" className="hover:text-color1">Shops</Link>
+              <span className="mx-2"><MdOutlineKeyboardArrowRight/></span>
+            </li>
+            <li className="flex items-center">
+              <Link to="/discover" className="hover:text-color1">Discover</Link>
+              <span className="mx-2"><MdOutlineKeyboardArrowRight/></span>
+            </li>
+            <li className="flex items-center text-gray-700">
+              <p>{businessData.businessName}</p>
+            </li>
+          </ol>
+        </nav>
+      </div>
+          <div className="flex flex-wrap items-center gap-4 py-4">
+            <img
+              className="w-16 h-16 sm:w-24 sm:h-24 rounded-full object-cover object-center border shadow-gray-400"
+              src={businessData.businessLogo ? `${BASE_URL}/${businessData.businessLogo}` : `https://ui-avatars.com/api/?name=${businessData?.businessName?.charAt(0).toUpperCase()}`}
               alt={businessData.businessName}
             />
-            <h1 className='text-xl sm:text-2xl font-medium mr-16'>{businessData.businessName}</h1>
-            <div className='flex flex-wrap items-center gap-3'>
-              <Button className='h-9 px-3 bg-slate-300 hover:text-white hover:bg-color2/90' onClick={openChatModal}>
-                <div className='text-sm flex items-center gap-2'>
-                  Message
-                </div>
+            <h1 className="text-xl sm:text-2xl font-medium mr-16">{businessData.businessName}</h1>
+            <div className="flex flex-wrap items-center gap-3">
+              <Button className="h-9 px-3 bg-slate-300 hover:text-white hover:bg-color2/90" onClick={openChatModal}>
+                <div className="text-sm flex items-center gap-2">Message</div>
               </Button>
               <Button
-                className={`h-9 px-3 ${
-                  isLiked ? 'bg-color2 text-white' : 'bg-slate-300'
-                }`}
+                className={`h-9 px-3 ${isLiked ? 'bg-color2 text-white' : 'bg-slate-300'}`}
                 onClick={handleLikeClick}
               >
-              <div className='text-sm flex items-center gap-2'>
-                <AiOutlineLike />
-                {likesCount > 0 ? formatNumber(likesCount) : ''}
-              </div>
+                <div className="text-sm flex items-center gap-2">
+                  <AiOutlineLike />
+                  {likesCount > 0 ? formatNumber(likesCount) : ''}
+                </div>
               </Button>
-              {/* <span className="ml-1 text-sm">{businessData.likes}</span> */}
               <div className="flex items-center">
                 {businessData.rating ? (
                   <>
@@ -315,6 +334,11 @@ const BusinessPage = () => {
           </div>
         </AnimatedSection>
       </div>
+
+      {/* Hero Section with Animation */}
+      <AnimatedSection>
+        <HeroAndGallery images={businessData.coverPhotos} />
+      </AnimatedSection>
 
       {/* Info Section with Animation */}
       <AnimatedSection>
@@ -354,7 +378,6 @@ const BusinessPage = () => {
   );
 };
 
-// AnimatedSection component to apply entry animations
 const AnimatedSection = ({ children }) => {
   const controls = useAnimation();
   const [ref, inView] = useInView({ threshold: 0.1, triggerOnce: true });
