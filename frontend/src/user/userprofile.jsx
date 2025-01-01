@@ -32,6 +32,7 @@ const encryptId = (id) => {
   const ciphertext = CryptoJS.AES.encrypt(id.toString(), secretKey).toString();
   return encodeURIComponent(ciphertext);
 };
+
 const renderLikedPages = (likedPages, handleUnlikePage) => {
   return likedPages.length === 0 ? (
     <p className="text-slate-500">You haven't liked any pages yet.</p>
@@ -97,7 +98,7 @@ const renderLikedPages = (likedPages, handleUnlikePage) => {
 
                 {/* Actions */}
                 <div className="flex items-center mt-2 md:justify-end justify-between gap-2">
-                  <Link to={`/business/${encryptId(item.business_id)}`}>
+                  <Link to={`/business/${encryptId(item?.business_id)}`}>
                     <Button
                       size="sm"
                       className="bg-color1 text-white hover:bg-color2 text-sm"
