@@ -180,9 +180,10 @@ const BusinessSection = ({isLoggedIn, businessData, userData}) => {
     <div className='mx-auto mt-4 container p-4 bg-white rounded-md shadow-md mb-4'>
       <div className='flex justify-between items-center p-2'>
         <h1 className='text-2xl font-semibold'>Deals</h1>
-        <h1 className='text-md font-semibold text-color1 hover:tracking-wide duration-300 hover:underline cursor-pointer'>
-          See More
-        </h1>
+{/*         
+          <h1 className='text-md font-semibold text-color1 hover:tracking-wide duration-300 hover:underline cursor-pointer'>
+            See More
+          </h1> */}
       </div>
 
       <div className='mt-8'>
@@ -231,7 +232,7 @@ const BusinessSection = ({isLoggedIn, businessData, userData}) => {
                         <span className="line-through text-gray-500">₱{parseFloat(deal.price).toFixed(2)}</span> 
                         <span className="text-red-500 ml-2">
                           ₱{(parseFloat(deal.price) * (1 - deal.discount / 100)).toFixed(2)}
-                        </span>
+                        </span> {deal.pricing_unit}
                       </p>
                     </div>
                     <div className='flex justify-between gap-2 mt-4'>

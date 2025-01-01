@@ -427,7 +427,7 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn, refreshPro
               {product.discount > 0 ? (
                 <>
                   <span className="line-through text-gray-500">₱{product.price}</span>
-                  <span className="text-red-500 ml-2">₱{discountedPrice}</span>
+                  <span className="text-red-500 ml-2">₱{discountedPrice}</span> {product.pricing_unit}
                   {product.expiration && (
                     <p className="text-xs text-red-500 mt-1">
                       Discount expires on:{' '}
@@ -444,7 +444,7 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn, refreshPro
                   )}
                 </>
               ) : (
-                `₱${product.price}`
+                `₱${product.price} ${product.pricing_unit}`
               )}
             </div>
             <div className="flex flex-wrap gap-2 justify-between mt-3 md:mt-2">
