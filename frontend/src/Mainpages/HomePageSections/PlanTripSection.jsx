@@ -12,10 +12,12 @@ import Surf from '@/assets/surf.jpg';
 import Dive from '@/assets/dive.jpg';
 import { Modal, ModalContent, ModalBody, useDisclosure } from "@nextui-org/react";
 import LoginSignup from '@/auth/LoginSignup';
+import { Skeleton } from '@nextui-org/react';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL; // Ensure you have the base URL
 
 const PlanTripSection = () => {
+  const [loading, setLoading] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Track login status
   const { isOpen, onOpen, onOpenChange } = useDisclosure(); // Modal controls
@@ -39,6 +41,8 @@ const PlanTripSection = () => {
       }
     } catch (error) {
       setIsLoggedIn(false); // Default to not logged in on error
+    } finally {
+      setLoading(false);
     }
   }, [onOpen]);
 
@@ -59,50 +63,60 @@ const PlanTripSection = () => {
 
   return (
     <section className="bg-white" style={{ backgroundImage: `url(${wave})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat' }}>
-      <div className="mx-auto p-9 container">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-          <motion.div
-            className="space-y-8"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-color1 mb-9">
-              Want To Plan <span className="text-color2">A Trip?</span>
-            </h2>
-            <p className="text-lg md:text-xl text-gray-600 ">
-              Create your itinerary with Map Navigation and explore amazing destinations. 
-              Let us help you make unforgettable memories.
-            </p>
-            
-            <Button 
-              size="lg" 
-              className="mt-7 font-semibold bg-color1 text-white hover:bg-color2 transition-colors duration-300" 
-              onClick={handlePlanAdventureClick} // Use the onClick handler
-            >
-              <CalendarIcon className="mr-2 h-5 w-5" />
-              Plan Your Adventure
-            </Button>
-          </motion.div>
-          <div className="grid grid-cols-3 md:grid-cols-3 gap-4">
-            {images.map((image, index) => (
-              <motion.div
-                key={index}
-                className={`${image.className} transition-transform hover:shadow-xl hover:shadow-color2 duration-500 `}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
-                <img
-                  src={image.src}
-                  alt={image.alt}
-                  className="w-full h-full object-cover shadow-lg"
-                />
-              </motion.div>
-            ))}
+      {loading ?
+      (
+        <div className="w-full">
+          <div className="py-8">
+            <Skeleton className="rounded-lg mb-4 p-5"/>
+            <Skeleton className="flex flex-col h-[600px] lg:flex-row items-center mb-6 shadow-lg p-3 rounded-sm shadow-slate-400" />
           </div>
         </div>
-      </div>
+      ) : ( 
+        <div className="mx-auto p-9 container">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+            <motion.div
+              className="space-y-8"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-color1 mb-9">
+                Want To Plan <span className="text-color2">A Trip?</span>
+              </h2>
+              <p className="text-lg md:text-xl text-gray-600 ">
+                Create your itinerary with Map Navigation and explore amazing destinations. 
+                Let us help you make unforgettable memories.
+              </p>
+              
+              <Button 
+                size="lg" 
+                className="mt-7 font-semibold bg-color1 text-white hover:bg-color2 transition-colors duration-300" 
+                onClick={handlePlanAdventureClick} // Use the onClick handler
+              >
+                <CalendarIcon className="mr-2 h-5 w-5" />
+                Plan Your Adventure
+              </Button>
+            </motion.div>
+            <div className="grid grid-cols-3 md:grid-cols-3 gap-4">
+              {images.map((image, index) => (
+                <motion.div
+                  key={index}
+                  className={`${image.className} transition-transform hover:shadow-xl hover:shadow-color2 duration-500 `}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
+                  <img
+                    src={image.src}
+                    alt={image.alt}
+                    className="w-full h-full object-cover shadow-lg"
+                  />
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
       <Modal
        disableAnimation
         backdrop="opaque"
