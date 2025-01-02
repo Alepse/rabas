@@ -26,7 +26,8 @@ import { Skeleton } from "@nextui-org/skeleton";
 
 
 const destinations = [
-    { name: 'Barcelona', image: Barcelona },
+  
+    { name: 'Barcelona', image: Barcelona } ,
     { name: 'Bulan', image: Bulan },
     { name: 'Bulusan', image: Bulusan },
     { name: 'Casiguran', image: Casiguran },

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import Nav from '../components/nav';
 import Hero from '../components/hero';
 import Footer from '../components/Footer';
-import Search from '../components/Search';
 import { Spinner } from '@nextui-org/react';
 import DestinationSection from './HomePageSections/DestinationSection';
 import BusinessSection from './HomePageSections/BusinessSection';
