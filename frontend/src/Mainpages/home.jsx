@@ -51,12 +51,10 @@ const Home = () => {
         <Hero />
       </AnimatedSection>
       
-     <AnimatedSection>
-      <Search/>
-     </AnimatedSection>
-    
       <AnimatedSection>
        <WhatodoSection/>
+    
+    
       </AnimatedSection>
       
       <AnimatedSection>
@@ -79,14 +77,16 @@ const Home = () => {
         <PlanTripSection />
       </AnimatedSection>
 
-      {/* Destination Section */}
-      <AnimatedSection>
-        <DestinationSection />
-      </AnimatedSection>
+     
 
       {/* About Section */}
       <AnimatedSection>
         <AboutSection />
+      </AnimatedSection>
+
+       {/* Destination Section */}
+       <AnimatedSection>
+        <DestinationSection />
       </AnimatedSection>
 
       {/* Footer */}

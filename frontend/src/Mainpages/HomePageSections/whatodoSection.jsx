@@ -10,6 +10,7 @@ import Room from '@/assets/room.webp';
 import Food from '@/assets/Food.jpg';
 import Shop from '@/assets/Souvenirs.jpg';
 import { Skeleton } from '@nextui-org/react';
+import Search from '@/components/Search';
 
 const categories = [
   {
@@ -58,14 +59,16 @@ const WhatToDoSection = () => {
   }, []);
 
   return (
-    <section className="py-16 mt-24 bg-white relative">
+    <section className="py-16  bg-white relative">
       {/* Top Wave */}
-      <div className="absolute top-0 left-0 right-0">
+      <div className="absolute top-0 left-0 right-0 ">
         <svg viewBox="0 0 1440 150" className="w-full h-auto fill-[#1B4D3E] opacity-60">
           <path d="M0,80L80,85.3C160,91,320,101,480,96C640,91,800,69,960,64C1120,59,1280,69,1360,74.7L1440,80L1440,0L1360,0C1280,0,1120,0,960,0C800,0,640,0,480,0C320,0,160,0,80,0L0,0Z" />
         </svg>
       </div>
-
+       <div className=' md:mt-24 mb-9 '>
+      <Search/>
+      </div>
       <div className="container mx-auto px-4 pt-5">
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-bold mt-16 text-color1 mb-4">

@@ -4,8 +4,8 @@ import Logo from '../assets/rabas.png';
 
 const Footer = () => {
   return (
-    <footer className="bg-gradient-to-r from-color1 to-color2 mt-2 text-color3  py-10 h-full ">
-      <div className="max-w-7xl mx-auto px-4">
+    <footer className="bg-gradient-to-r from-color1 to-color2  text-color3  py-10 h-full ">
+      <div className="container mx-auto px-4">
         <div className="flex flex-wrap md:justify-between gap-8 justify-center">
         
           {/* Left Column */}

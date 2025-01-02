@@ -52,14 +52,14 @@ const DestinationSection = () => {
   }, []);
 
   return (
-    <section className='mt-12    mx-auto bg-transparent p-8 rounded-lg' style={{  
+    <section className='   mx-auto bg-transparent p-8 ' style={{  
       backgroundImage: `url(${wave})`,  
       backgroundSize: '100% 100%', // adjust the size to make the background smaller  
       backgroundRepeat: 'no-repeat', // prevents the image from repeating  
       backgroundPosition: 'center', // centers the image in the container  
     }}  >
    
-      <div className='flex flex-col container '>
+      <div className='flex flex-col mt-10 container '>
           <h1 className='text-4xl z-20 font-bold text-gray-800 mb-2'>
           Journey Through Sorsogon
           </h1>
