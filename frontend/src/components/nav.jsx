@@ -5,7 +5,12 @@ import { Avatar, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Badge } 
 import { CiSquareInfo } from "react-icons/ci";
 import { TbNotes } from "react-icons/tb";
 import LoginSignup from '@/auth/LoginSignup';
+import { RiCompassDiscoverLine } from "react-icons/ri";
 import { PiJeep } from "react-icons/pi";
+import { CgProfile } from "react-icons/cg";
+import { TiMessageTyping } from "react-icons/ti";
+import { MdOutlineCalendarMonth } from "react-icons/md";
+import { LuLogOut } from "react-icons/lu";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -17,11 +22,9 @@ import {
 import { FaHome, FaBars, FaTimes, FaSearch, FaHiking, FaBed, FaUtensils, FaShoppingBag, FaMapMarkerAlt } from 'react-icons/fa';
 import { GiPositionMarker } from "react-icons/gi";
 import { FaRegCircleUser } from "react-icons/fa6";
-import { FaPersonWalking } from "react-icons/fa6";
 import { Modal, ModalContent, ModalBody, useDisclosure } from "@nextui-org/react";
 import { Link, useLocation } from 'react-router-dom';
 import UserChatModal from '@/user/userChatSystem/UserChatModal';
-import { Tabs, Tab } from '@nextui-org/react';
 import axios from 'axios';
 import { Skeleton } from "@nextui-org/skeleton";
 import CryptoJS from 'crypto-js';
@@ -478,11 +481,11 @@ const Nav = () => {
         
           <div className="flex items-center gap-3 xl:hidden">
             {isLoggedIn ? (
-              <Dropdown placement="bottom-end">
+              <Dropdown className='bg-light' placement="bottom-end">
                 <DropdownTrigger>
                   <div className="cursor-pointer ml-6">
                     <Avatar
-                      className='text-lg bg-color1 text-white duration-300'
+                      className='text-lg bg-color1 text-light hover:bg-color2/80 transition-colors duration-300'
                       src={userData?.image_path
                         ? `${BASE_URL}/${userData.image_path}`
                         : userData?.google_id
@@ -492,23 +495,23 @@ const Nav = () => {
                     />
                   </div>
                 </DropdownTrigger>
-                <DropdownMenu>
+                <DropdownMenu  >
                   <DropdownItem key="profile">
-                    <Link to='/userprofile' className="block w-full text-left p-2">
-                      Profile
+                    <Link to='/userprofile' className="gap-1 w-full flex items-center  text-left text-md p-1">
+                    <CgProfile/>Profile
                     </Link>
                   </DropdownItem>
                   <DropdownItem key="messages" onClick={openChatModal}>
-                    <div className='flex items-center gap-4 p-2'>
-                      Messages
+                    <div className='flex items-center gap-1 text-md  p-1'>
+                    <TiMessageTyping />Messages
                       {/* <Badge color='danger' placement='top-right' content='2' /> */}
                     </div>
                   </DropdownItem>
                   <DropdownItem key="Bookings">
-                    <Link to='/userprofile#myBookings' className="block w-full text-left p-2">Bookings</Link>
+                    <Link to='/userprofile#myBookings' className="w-full text-left p-1 flex gap-1 items-center"><MdOutlineCalendarMonth />Bookings</Link>
                   </DropdownItem>
                   <DropdownItem key="logout" onClick={handleLogout}>
-                    <div className="block w-full text-left p-2">Logout</div>
+                    <div className="flex gap-1 items-center w-full text-left p-1"> <LuLogOut />Logout</div>
                   </DropdownItem>
                 </DropdownMenu>
               </Dropdown>
@@ -546,21 +549,21 @@ const Nav = () => {
                       <NavigationMenuLink>
                         <div className="py-2 px-1 w-max bg-light shadow-md">
                           <ul className="space-y-2 text-dark text-md ">
-                            <Link to='/destinations?name=Barcelona'><li className=' py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Barcelona</li></Link>
-                            <Link to='/destinations?name=Bulan'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Bulan</li></Link>
-                            <Link to='/destinations?name=Bulusan'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Bulusan</li></Link>
-                            <Link to='/destinations?name=Casiguran'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Casiguran</li></Link>
-                            <Link to='/destinations?name=Castilla'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Castilla</li></Link>
-                            <Link to='/destinations?name=Donsol'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Donsol</li></Link>
-                            <Link to='/destinations?name=Gubat'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Gubat</li></Link>
-                            <Link to='/destinations?name=Irosin'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Irosin</li></Link>
-                            <Link to='/destinations?name=Juban'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Juban</li></Link>
-                            <Link to='/destinations?name=Magallanes'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Magallanes</li></Link>
-                            <Link to='/destinations?name=Matnog'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Matnog</li></Link>
-                            <Link to='/destinations?name=Pilar'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Pilar</li></Link>
-                            <Link to='/destinations?name=PrietoDiaz'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Prieto Diaz</li></Link>
-                            <Link to='/destinations?name=StaMagdalena'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Sta. Magdalena</li></Link>
-                            <Link to='/destinations?name=Sorsogon'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Sorsogon City</li></Link>
+                            <Link to='/destinations?name=Barcelona'><li className=' py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2'><GiPositionMarker />Barcelona</li></Link>
+                            <Link to='/destinations?name=Bulan'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2'><GiPositionMarker />Bulan</li></Link>
+                            <Link to='/destinations?name=Bulusan'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2'><GiPositionMarker />Bulusan</li></Link>
+                            <Link to='/destinations?name=Casiguran'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2'><GiPositionMarker />Casiguran</li></Link>
+                            <Link to='/destinations?name=Castilla'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2'><GiPositionMarker />Castilla</li></Link>
+                            <Link to='/destinations?name=Donsol'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2'><GiPositionMarker />Donsol</li></Link>
+                            <Link to='/destinations?name=Gubat'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2'><GiPositionMarker />Gubat</li></Link>
+                            <Link to='/destinations?name=Irosin'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2'><GiPositionMarker />Irosin</li></Link>
+                            <Link to='/destinations?name=Juban'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2'><GiPositionMarker />Juban</li></Link>
+                            <Link to='/destinations?name=Magallanes'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2'><GiPositionMarker />Magallanes</li></Link>
+                            <Link to='/destinations?name=Matnog'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2'><GiPositionMarker />Matnog</li></Link>
+                            <Link to='/destinations?name=Pilar'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2'><GiPositionMarker />Pilar</li></Link>
+                            <Link to='/destinations?name=PrietoDiaz'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2'><GiPositionMarker />Prieto Diaz</li></Link>
+                            <Link to='/destinations?name=StaMagdalena'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2'><GiPositionMarker />Sta. Magdalena</li></Link>
+                            <Link to='/destinations?name=Sorsogon'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2'><GiPositionMarker />Sorsogon City</li></Link>
                           </ul>
                         </div>
                       </NavigationMenuLink>
@@ -568,22 +571,22 @@ const Nav = () => {
                   </NavigationMenuItem>
                 </NavigationMenuList>
               </NavigationMenu>
-
+             
               <NavigationMenu className='z-40 '>
                 <NavigationMenuList>
                   <NavigationMenuItem>
                     <NavigationMenuTrigger className={`cursor-pointer rounded-none text-white hover:font-semibold duration-100 text-lg font-light flex items-center gap-1   ${activeLink === '/Discover' ? 'font-semibold border-b-1 border-light p-1' : ''}`}>
-                      <FaPersonWalking />
+                    <RiCompassDiscoverLine/> 
                       <a href='/Discover'> Discover </a>
                     </NavigationMenuTrigger>
                     <NavigationMenuContent>
                       <NavigationMenuLink>
                         <div className="py-2 px-1 w-max bg-light">
                           <ul className="text-dark text-md space-y-3">
-                            <a href='/activities'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Activities</li></a>
-                            <a href='/accommodations'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Accommodations</li></a>
-                            <a href='/foodplaces'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Food Places</li></a>
-                            <a href='/shops'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Shops</li></a>
+                            <a href='/activities'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2'><FaHiking/>Activities</li></a>
+                            <a href='/accommodations'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2 '><FaBed/>Accommodations</li></a>
+                            <a href='/foodplaces'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2 '><FaUtensils/>Food Places</li></a>
+                            <a href='/shops'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2'>  <FaShoppingBag/>Shops</li></a>
                           </ul>
                         </div>
                       </NavigationMenuLink>
@@ -630,21 +633,21 @@ const Nav = () => {
                 </DropdownTrigger>
                 <DropdownMenu  >
                   <DropdownItem key="profile">
-                    <Link to='/userprofile' className="block w-full text-left text-md p-1">
-                      Profile
+                    <Link to='/userprofile' className="gap-1 w-full flex items-center  text-left text-md p-1">
+                    <CgProfile/>Profile
                     </Link>
                   </DropdownItem>
                   <DropdownItem key="messages" onClick={openChatModal}>
-                    <div className='flex items-center gap-4 text-md  p-1'>
-                      Messages
+                    <div className='flex items-center gap-1 text-md  p-1'>
+                    <TiMessageTyping />Messages
                       {/* <Badge color='danger' placement='top-right' content='2' /> */}
                     </div>
                   </DropdownItem>
                   <DropdownItem key="Bookings">
-                    <Link to='/userprofile#myBookings' className="block w-full text-left p-1">Bookings</Link>
+                    <Link to='/userprofile#myBookings' className="w-full text-left p-1 flex gap-1 items-center"><MdOutlineCalendarMonth />Bookings</Link>
                   </DropdownItem>
                   <DropdownItem key="logout" onClick={handleLogout}>
-                    <div className="block w-full text-left p-1">Logout</div>
+                    <div className="flex gap-1 items-center w-full text-left p-1"> <LuLogOut />Logout</div>
                   </DropdownItem>
                 </DropdownMenu>
               </Dropdown>
@@ -680,21 +683,21 @@ const Nav = () => {
                       <NavigationMenuLink className='z-1'>
                         <div className="py-2 px-1 h-max w-max max-h-[190px] overflow-y-auto bg-light shadow-md rounded-large">
                           <ul className="space-y-2 text-dark text-sm">
-                            <Link to='/destinations?name=Barcelona'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Barcelona</li></Link>
-                            <Link to='/destinations?name=Bulan'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Bulan</li></Link>
-                            <Link to='/destinations?name=Bulusan'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Bulusan</li></Link>
-                            <Link to='/destinations?name=Casiguran'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Casiguran</li></Link>
-                            <Link to='/destinations?name=Castilla'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Castilla</li></Link>
-                            <Link to='/destinations?name=Donsol'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Donsol</li></Link>
-                            <Link to='/destinations?name=Gubat'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Gubat</li></Link>
-                            <Link to='/destinations?name=Irosin'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Irosin</li></Link>
-                            <Link to='/destinations?name=Juban'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Juban</li></Link>
-                            <Link to='/destinations?name=Magallanes'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Magallanes</li></Link>
-                            <Link to='/destinations?name=Matnog'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Matnog</li></Link>
-                            <Link to='/destinations?name=Pilar'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Pilar</li></Link>
-                            <Link to='/destinations?name=PrietoDiaz'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Prieto Diaz</li></Link>
-                            <Link to='/destinations?name=StaMagdalena'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Sta. Magdalena</li></Link>
-                            <Link to='/destinations?name=Sorsogon'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Sorsogon City</li></Link>
+                          <Link to='/destinations?name=Barcelona'><li className=' py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2'><GiPositionMarker />Barcelona</li></Link>
+                            <Link to='/destinations?name=Bulan'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2'><GiPositionMarker />Bulan</li></Link>
+                            <Link to='/destinations?name=Bulusan'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2'><GiPositionMarker />Bulusan</li></Link>
+                            <Link to='/destinations?name=Casiguran'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2'><GiPositionMarker />Casiguran</li></Link>
+                            <Link to='/destinations?name=Castilla'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2'><GiPositionMarker />Castilla</li></Link>
+                            <Link to='/destinations?name=Donsol'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2'><GiPositionMarker />Donsol</li></Link>
+                            <Link to='/destinations?name=Gubat'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2'><GiPositionMarker />Gubat</li></Link>
+                            <Link to='/destinations?name=Irosin'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2'><GiPositionMarker />Irosin</li></Link>
+                            <Link to='/destinations?name=Juban'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2'><GiPositionMarker />Juban</li></Link>
+                            <Link to='/destinations?name=Magallanes'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2'><GiPositionMarker />Magallanes</li></Link>
+                            <Link to='/destinations?name=Matnog'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2'><GiPositionMarker />Matnog</li></Link>
+                            <Link to='/destinations?name=Pilar'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2'><GiPositionMarker />Pilar</li></Link>
+                            <Link to='/destinations?name=PrietoDiaz'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2'><GiPositionMarker />Prieto Diaz</li></Link>
+                            <Link to='/destinations?name=StaMagdalena'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2'><GiPositionMarker />Sta. Magdalena</li></Link>
+                            <Link to='/destinations?name=Sorsogon'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2'><GiPositionMarker />Sorsogon City</li></Link>
                           </ul>
                         </div>
                       </NavigationMenuLink>
@@ -709,17 +712,17 @@ const Nav = () => {
                   <NavigationMenuItem>
                     <NavigationMenuTrigger className="flex gap-16 text-color1 hover:text-gray-700 text-lg cursor-pointer hover:font-semibold duration-100 font-light">
                       <div className="hover:text-gray-700 hover:bg-gray-300 cursor-pointer duration-100 text-lg font-light flex items-center gap-2">
-                        <FaPersonWalking className='m-2' /> <a href='/Discover' className='m-2' > Discover </a>
+                        <RiCompassDiscoverLine  className='m-2' /> <a href='/Discover' className='m-2' > Discover </a>
                       </div>
                     </NavigationMenuTrigger>
                     <NavigationMenuContent>
                       <NavigationMenuLink>
                         <div className="py-4 px-2 w-max bg-light shadow-md">
                           <ul className="space-y-2 text-dark text-sm">
-                            <Link to='/activities'><li className='py-1 px-14 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg'>Activities</li></Link>
-                            <Link to='/accommodations'><li className='py-1 px-14 duration-100 hover:bg-gray-300 cursor-pointer rounded-lg'>Accommodations</li></Link>
-                            <Link to='/foodplaces'><li className='py-1 px-14 duration-100 hover:bg-gray-300 cursor-pointer rounded-lg'>Food Places</li></Link>
-                            <Link to='/shops'><li className='py-1 px-14 duration-100 hover:bg-gray-300 cursor-pointer rounded-lg'>Shops</li></Link>
+                          <a href='/activities'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2'><FaHiking/>Activities</li></a>
+                            <a href='/accommodations'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2 '><FaBed/>Accommodations</li></a>
+                            <a href='/foodplaces'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2 '><FaUtensils/>Food Places</li></a>
+                            <a href='/shops'><li className='py-1 px-10 hover:bg-gray-300 duration-100 cursor-pointer rounded-lg flex items-center gap-2'>  <FaShoppingBag/>Shops</li></a>
                           </ul>
                         </div>
                       </NavigationMenuLink>
