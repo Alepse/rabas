@@ -4,7 +4,11 @@ import ActivitiesTab from './businessSectionContents/ActivitiesTab';
 import AccommodationsTab from './businessSectionContents/AccommodationsTab';
 import FoodPlacesTab from './businessSectionContents/FoodPlacesTab';
 import ShopsTab from './businessSectionContents/ShopsTab';
+import { FaWalking } from "react-icons/fa";
 import wave from '@/assets/wave.webp'
+import { MdFoodBank } from "react-icons/md";
+import { FaBed } from 'react-icons/fa6';
+import { FaBasketShopping } from "react-icons/fa6";
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 const BusinessSection = () => {
   const [businessData, setBusinessData] = useState({
@@ -80,10 +84,11 @@ const BusinessSection = () => {
       <Tabs 
         aria-label="Sorsogon Exploration Options"
         variant="underlined"
+        color='primary'
         classNames={{
-          base: "w-full overflow-x-auto rounded-full",
+          base: "w-full  overflow-x-auto ",
           tabList: "gap-6 w-full  p-4  container ",
-          tab: "max-w-fit px-0 h-12 ",
+          tab: "max-w-fit px-1  h-12 ",
           tabContent: " text-color1  ",
           cursor: "w-full bg-color1",
         
@@ -93,7 +98,7 @@ const BusinessSection = () => {
           key="activities" 
           title={
             <div className="flex items-center space-x-2">
-              <span>Activities</span>
+               <span className='flex items-center gap-2 text-md'><FaWalking/> Activities</span>
             </div>
           }
         >
@@ -103,7 +108,7 @@ const BusinessSection = () => {
           key="accommodations" 
           title={
             <div className="flex items-center space-x-2">
-              <span>Accommodations</span>
+              <span className='flex items-center gap-2 text-md'><FaBed/>Accommodations</span>
             </div>
           }
         >
@@ -113,7 +118,7 @@ const BusinessSection = () => {
           key="food-places" 
           title={
             <div className="flex items-center space-x-2">
-              <span>Food Places</span>
+              <span className='flex items-center gap-2 text-md'><MdFoodBank/>Food Places</span>
             </div>
           }
         >
@@ -123,7 +128,7 @@ const BusinessSection = () => {
           key="shops" 
           title={
             <div className="flex items-center space-x-2">
-              <span>Shops</span>
+             <span className='flex items-center gap-2 text-md'><FaBasketShopping/> Shops</span>
             </div>
           }
         >
