@@ -440,10 +440,10 @@ const Nav = () => {
   return (
     <div className={` bg-gradient-to-tr from-[#1B4D3E] to-color2  flex justify-center fixed top-0 z-50 w-full shadow-lg`}>
       {loading ? (
-        <div className="flex justify-between items-center w-full container mx-auto h-[4rem] p-4">
+        <div className="flex justify-between items-center w-full container mx-auto h-[3.2rem] p-6">
           {/* Logo Skeleton */}
           <div className="flex items-center space-x-2">
-            <Skeleton className="h-[3rem] w-[3rem] rounded-full" />
+            <Skeleton className="h-[2.3rem] w-[2.5rem] rounded-full" />
             <Skeleton className="h-[1.5rem] w-[8rem] rounded-md" />
           </div>
 
@@ -519,7 +519,7 @@ const Nav = () => {
             )}
 
             <button onClick={toggleMenu} className=" text-2xl z-50 p-2">
-              {isMenuOpen ? <FaTimes className='text-xl mb-3'/> : <FaBars className='text-white ' />}
+              {isMenuOpen ? <FaTimes className='text-2xl mt-5 mb-2'/> : <FaBars className='text-white ' />}
             </button>
           </div>
 

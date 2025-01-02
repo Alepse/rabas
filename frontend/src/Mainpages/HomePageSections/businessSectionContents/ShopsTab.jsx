@@ -115,7 +115,7 @@ const ShopSwiper = ({ title, link, isLast, shops, loading, uniqueId }) => {
           {title}
         </h1>
         {link && (
-          <Link to={link} target='_blank' className='mb-4 md:mb-0'>
+          <Link to={link} className='mb-4 md:mb-0'>
             <h1 className='text-md font-semibold text-color1 hover:tracking-wide duration-300 hover:underline cursor-pointer'>
               See More ⥬
             </h1>
