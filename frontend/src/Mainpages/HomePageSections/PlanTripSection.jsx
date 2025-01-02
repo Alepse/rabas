@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,45 +17,43 @@ const BASE_URL = import.meta.env.VITE_BASE_URL; // Ensure you have the base URL
 
 const PlanTripSection = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Track login status
+  const { isOpen, onOpen, onOpenChange } = useDisclosure(); // Modal controls
+
   const images = [
-    { src: View, alt: "Scenic view", className: "col-span-4 row-span-2 rounded-lg" },
-    { src: Kayak, alt: "Kayaking" },
-    { src: Surf, alt: "Surfing" },
-    { src: Dive, alt: "Beach", className: "col-span-2 rounded-lg" },
+    { src: View, alt: 'Scenic view', className: 'col-span-4 row-span-2 rounded-lg' },
+    { src: Kayak, alt: 'Kayaking' },
+    { src: Surf, alt: 'Surfing' },
+    { src: Dive, alt: 'Beach', className: 'col-span-2 rounded-lg' },
   ];
 
   const checkLoginStatus = useCallback(async () => {
     try {
       const response = await fetch(`${BASE_URL}/check-login`, {
         method: 'GET',
-        credentials: 'include'
+        credentials: 'include',
       });
       if (response.ok) {
         const data = await response.json();
-        if (!data.isLoggedIn) {
-          // Show alert if not logged in
-          // await Swal.fire({
-          //   icon: 'warning',
-          //   title: 'Not Logged In',
-          //   text: 'You need to log in to access this page.',
-          //   confirmButtonText: 'OK',
-          //   confirmButtonColor: '#0BDA51'
-          // });
-          return onOpen(); // Not logged in
-        }
-        return true; // Logged in
+        setIsLoggedIn(data.isLoggedIn);
       }
     } catch (error) {
-      console.error('Error checking login status:', error);
+      setIsLoggedIn(false); // Default to not logged in on error
     }
-    return onOpen(); // Default to not logged in on error
-  }, []);
+  }, [onOpen]);
+
+  useEffect(() => {
+    checkLoginStatus(); // Check login status on mount
+  }, [checkLoginStatus]);
 
   const handlePlanAdventureClick = async () => {
-    const isLoggedIn = await checkLoginStatus();
+    if (isLoggedIn === null) {
+      onOpen();
+    }
     if (isLoggedIn) {
       window.location.href = '/trip'; // Redirect to the trip page if logged in
+    } else {
+      onOpen(); // Open modal if not logged in
     }
   };
 
