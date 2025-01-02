@@ -6,7 +6,7 @@ import ActivityBackground from '../assets/activity.jpg';
 const HeroActivity = () => {
   return (
     <div
-      className="relative flex flex-col items-center justify-center mx-auto bg-cover bg-center h-[400px] mt-16"
+      className="relative flex flex-col items-center justify-center mx-auto bg-cover bg-center h-[400px] mt-12"
       style={{
         backgroundImage: `url(${ActivityBackground})`,
       }}

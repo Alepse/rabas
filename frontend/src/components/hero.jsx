@@ -68,7 +68,7 @@ const Hero = () => {
     fade: false,
     cssEase: "linear",
     autoplay: true,
-    autoplaySpeed: 5000,
+    autoplaySpeed: 3000,
     appendDots: (dots) => (
       <div style={{ position: 'absolute', bottom: '10px', width: '100%' }}>
         <ul style={{ margin: "0px" }}> {dots} </ul>
@@ -80,7 +80,7 @@ const Hero = () => {
   };
 
   return (
-    <div className="mx-auto mt-16 h-[500px] relative font-sans overflow-hidden">
+    <div className="mx-auto mt-10 h-[420px] relative font-sans overflow-hidden">
       <Slider {...settings}>
         {images.map((image, index) => (
           <div key={index} className="relative h-[500px]">
@@ -91,22 +91,22 @@ const Hero = () => {
             />
             <div className="absolute inset-0 bg-black bg-opacity-50"></div>
             <div className="absolute  inset-0 flex flex-col items-center justify-center text-center p-4">
-              <h1 className="text-white text-2xl md:text-5xl lg:text-6xl font-bold mb-4 animate-fadeIn">
+              <h1 className="text-white text-2xl md:text-3xl lg:text-4xl font-bold mb-4 animate-fadeIn">
                 {greetings[index].title}
               </h1>
-              <p className="text-white text-lg md:text-xl max-w-2xl mb-8 animate-fadeIn animation-delay-300">
+              <p className="text-white text-md md:text-lg max-w-2xl mb-8 animate-fadeIn animation-delay-300">
                 {greetings[index].description}
               </p>
             </div>
           </div>
         ))}
       </Slider>
-      <div className="absolute bottom-[8rem] left-0 right-0 flex justify-center">
+      <div className="absolute bottom-[3rem] left-0 right-0 flex justify-center">
         <a
           href='/destinations'
-          className="mt-4 flex items-center bg-light text-black font-semibold py-3 px-6 rounded-full transform transition-all duration-300 hover:translate-x-2 animate-slideUp animation-delay-600"
+          className=" flex items-center bg-light text-black font-semibold p-2 rounded-full transform transition-all duration-300 hover:translate-x-2 animate-slideUp animation-delay-600"
         >
-          Explore <FiChevronRight className="ml-2" size={20} />
+          Explore<FiChevronRight className="ml-2" size={20} />
         </a>
       </div>
     </div>

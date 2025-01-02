@@ -4,7 +4,7 @@ import Logo from '../assets/rabas.png';
 
 const Footer = () => {
   return (
-    <footer className="bg-gradient-to-r from-color1 to-color2  text-color3  py-10 h-full ">
+    <footer className="bg-gradient-to-tr from-[#1B4D3E] to-color2  text-color3  py-10 h-full ">
       <div className="container mx-auto px-4">
         <div className="flex flex-wrap md:justify-between gap-8 justify-center">
         

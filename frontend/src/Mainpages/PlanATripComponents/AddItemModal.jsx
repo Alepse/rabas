@@ -599,7 +599,7 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                                 return filteredItems.map((item, index) => (
                                         <motion.div
                                             key={index}
-                                            className="bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 relative p-2"
+                                            className="bg-white rounded-lg shadow-lg relative p-2"
                                             variants={cardVariants}
                                         >
                                             {item.cardImage ? (

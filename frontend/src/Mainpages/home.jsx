@@ -53,8 +53,6 @@ const Home = () => {
       
       <AnimatedSection>
        <WhatodoSection/>
-    
-    
       </AnimatedSection>
       
       <AnimatedSection>

@@ -129,10 +129,10 @@ const WhatToDoSection = () => {
 
         {/* Custom Navigation Buttons */}
         <div className="flex justify-between mt-4 text-white text-xl">
-          <button className="prev-btn absolute  z-10 left-5 top-[58%]">
+          <button className="prev-btn absolute  z-10 left-5 top-[69%]">
             <ChevronLeft className="cursor-pointer size-11" />
           </button>
-          <button className="next-btn   absolute z-10 right-5 top-[58%]">
+          <button className="next-btn   absolute z-10 right-5 top-[69%]">
             <ChevronRight className="cursor-pointer size-11" />
           </button>
         </div>

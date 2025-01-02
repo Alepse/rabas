@@ -438,7 +438,7 @@ const Nav = () => {
   }, [location.pathname]);
 
   return (
-    <div className={` bg-gradient-to-r from-color1 to-color2 flex justify-center fixed top-0 z-50 w-full shadow-lg`}>
+    <div className={` bg-gradient-to-tr from-[#1B4D3E] to-color2  flex justify-center fixed top-0 z-50 w-full shadow-lg`}>
       {loading ? (
         <div className="flex justify-between items-center w-full container mx-auto h-[4rem] p-4">
           {/* Logo Skeleton */}
@@ -466,13 +466,13 @@ const Nav = () => {
           </div>
         </div>
       ) : (
-        <div className="flex justify-between items-center w-full container  mx-auto h-[4rem] p-4">
+        <div className="flex justify-between items-center w-full container  mx-auto h-[3.2rem] p-6">
           <a
             className='flex items-center hover:scale-105 duration-500'
             href='/'
             onClick={() => handleLinkClick('/')}
           >
-            <img className="lg:h-[3rem] max-h-[3rem] lg:w-[3rem] max-w-[3rem]" src={Logo} alt="Logo" />
+            <img className="lg:h-[2.3rem] max-h-[2.3rem] lg:w-[2.5rem] max-w-[3rem]" src={Logo} alt="Logo" />
             <div className='text-white ml-2 text-lg font-mono '>RabaSorsogon</div>
           </a>
         
