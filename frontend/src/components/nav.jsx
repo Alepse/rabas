@@ -446,7 +446,7 @@ const Nav = () => {
         <div className="flex justify-between items-center w-full container mx-auto h-[3.2rem] p-6">
           {/* Logo Skeleton */}
           <div className="flex items-center space-x-2">
-            <Skeleton className="h-[2.3rem] w-[2.5rem] rounded-full" />
+            <Skeleton className="h-[2.3rem] w-[2.4rem] rounded-full" />
             <Skeleton className="h-[1.5rem] w-[8rem] rounded-md" />
           </div>
 
@@ -475,7 +475,7 @@ const Nav = () => {
             href='/'
             onClick={() => handleLinkClick('/')}
           >
-            <img className="lg:h-[2.3rem] max-h-[2.3rem] lg:w-[2.5rem] max-w-[3rem]" src={Logo} alt="Logo" />
+            <img className="lg:h-[2.3rem] max-h-[2.3rem] lg:w-[2.4rem] max-w-[3rem]" src={Logo} alt="Logo" />
             <div className='text-white ml-2 text-lg font-mono '>RabaSorsogon</div>
           </a>
         
