@@ -68,7 +68,7 @@ const Hero = () => {
     fade: false,
     cssEase: "linear",
     autoplay: true,
-    autoplaySpeed: 3000,
+    autoplaySpeed: 4000,
     appendDots: (dots) => (
       <div style={{ position: 'absolute', bottom: '10px', width: '100%' }}>
         <ul style={{ margin: "0px" }}> {dots} </ul>
