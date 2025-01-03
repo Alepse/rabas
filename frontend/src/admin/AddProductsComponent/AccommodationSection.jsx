@@ -506,7 +506,7 @@ const AccommodationSection = () => {
         </div>
 
         {/* Buttons */}
-        <div className="flex flex-wrap justify-center sm:justify-end gap-3 w-full sm:w-auto">
+        <div className="flex flex-wrap justify-start sm:justify-end gap-3 w-full sm:w-auto">
           {selectedAccommodations.length > 0 && (
             <Button
               color="danger"
