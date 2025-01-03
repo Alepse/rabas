@@ -53,21 +53,19 @@ const links = [
 const WhatToDoSection = () => {
   const [loading, setLoading] = useState(true);
 
-  // Simulate data loading
   useEffect(() => {
     setLoading(false);
   }, []);
 
   return (
-    <section className="py-16  bg-white relative">
-      {/* Top Wave */}
-      <div className="absolute top-0 left-0 right-0 ">
+    <section className="py-16 bg-white relative">
+      <div className="absolute top-0 left-0 right-0">
         <svg viewBox="0 0 1440 150" className="w-full h-auto fill-[#1B4D3E] opacity-60">
           <path d="M0,80L80,85.3C160,91,320,101,480,96C640,91,800,69,960,64C1120,59,1280,69,1360,74.7L1440,80L1440,0L1360,0C1280,0,1120,0,960,0C800,0,640,0,480,0C320,0,160,0,80,0L0,0Z" />
         </svg>
       </div>
-       <div className=' md:mt-24 mb-9 '>
-      <Search/>
+      <div className='md:mt-24 mb-9'>
+        <Search />
       </div>
       <div className="container mx-auto px-4 pt-5">
         <div className="text-center mb-12">
@@ -78,7 +76,6 @@ const WhatToDoSection = () => {
         </div>
 
         {loading ? (
-          // Skeleton loader
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {Array.from({ length: 4 }).map((_, index) => (
               <div key={index} className="relative overflow-hidden rounded-2xl aspect-[3/4]">
@@ -108,7 +105,8 @@ const WhatToDoSection = () => {
                   <div className="relative overflow-hidden rounded-2xl aspect-[3/4] group">
                     <div
                       className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
-                      style={{ backgroundImage: `url(${category.image})` }}
+                      style={{ backgroundImage: `url(${category.image})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+                      loading="lazy" // Lazy load the image
                     />
                     <div className={`absolute inset-0 bg-gradient-to-t ${category.gradient}`} />
                     <div className="absolute inset-0 p-6 flex flex-col justify-end">
@@ -127,12 +125,11 @@ const WhatToDoSection = () => {
           </Swiper>
         )}
 
-        {/* Custom Navigation Buttons */}
         <div className="flex justify-between mt-4 text-white text-xl">
-          <button className="prev-btn absolute  z-10 left-5 top-[69%]">
+          <button className="prev-btn absolute z-10 left-5 top-[69%]">
             <ChevronLeft className="cursor-pointer size-11" />
           </button>
-          <button className="next-btn   absolute z-10 right-5 top-[69%]">
+          <button className="next-btn absolute z-10 right-5 top-[69%]">
             <ChevronRight className="cursor-pointer size-11" />
           </button>
         </div>
