@@ -2,9 +2,16 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import svgr from 'vite-plugin-svgr';
+import compression from 'vite-plugin-compression';
+import { visualizer } from 'rollup-plugin-visualizer';
 
 export default defineConfig({
-  plugins: [react(), svgr()],
+  plugins: [
+    react(),
+    svgr(),
+    compression(), // Enable gzip/brotli compression
+    visualizer({ open: true }), // Analyze bundle size
+  ],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
@@ -30,11 +37,17 @@ export default defineConfig({
     },
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom'], // Split React libraries into a separate chunk
+        manualChunks: (id) => {
+          // Split dependencies to optimize bundle size
+          if (id.includes('node_modules')) {
+            return 'vendor'; // Separate vendor libraries
+          }
+          if (id.includes('components')) {
+            return 'components'; // Separate components
+          }
         },
       },
     },
-    chunkSizeWarningLimit: 1000, // Increase the chunk size warning limit
+    chunkSizeWarningLimit: 1500, // Increase the chunk size warning limit if needed
   },
 });
