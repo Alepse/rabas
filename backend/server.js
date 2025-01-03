@@ -1320,7 +1320,7 @@ app.post('/submitBusinessApplication', async (req, res) => {
     // Send the email notification
     await transporter.sendMail({
       from: process.env.GMAIL_USER,
-      to: 'rabasorsogon@gmail.com', // add dd ang ibang account ng member
+      to: 'rabasorsogon@gmail.com, per.yongyong71@gmail.com, nebrejrempis18@gmail.com, Alepse@gmail.com', // add dd ang ibang account ng member
       subject,
       text,
       html: text,
