@@ -724,7 +724,7 @@ const Nav = () => {
                     </DropdownItem>
                   )}
                   <DropdownItem key="logout" onClick={handleLogout}>
-                    <div className="flex gap-1 items-center w-full text-left p-1"> <LuLogOut className="w-7 h-7" />Logout</div>
+                    <div className="flex text-red-500 rounded-lg gap-1 items-center w-full text-left p-1"> <LuLogOut className="w-7 h-7" />Logout</div>
                   </DropdownItem>
                 </DropdownMenu>
               </Dropdown>
