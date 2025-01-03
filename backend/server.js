@@ -1310,7 +1310,7 @@ app.post('/submitBusinessApplication', async (req, res) => {
 
     let subject = 'New Business Application';
     let text = `
-      Rabasorsogon has a new business application from ${firstName} ${lastName} with business application id ${application_id}. 
+      Rabasorsogon has a new business application from <b>${firstName} ${lastName}</b> with business application id <b>${application_id}</b>. 
       \nVisit admin dashboard for more information. 
       \nClick <a href="https://rabasorsogon.com/superadmindashboard" target="_blank">here</a> to navigate to the admin dashboard.
       \n\nBest regards,
@@ -1322,7 +1322,8 @@ app.post('/submitBusinessApplication', async (req, res) => {
       from: process.env.GMAIL_USER,
       to: 'rabasorsogon@gmail.com', // add dd ang ibang account ng member
       subject,
-      text
+      text,
+      html: text,
     });
 
     // Return a success response with the generated application_id
