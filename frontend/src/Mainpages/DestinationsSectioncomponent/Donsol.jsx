@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { MapPin, Star, Info } from 'lucide-react'
-import donsolpic1 from '@/assets/donsolpic2.jpg'
-import donsolpic2  from '@/assets/donsol.jpg'
+import donsolpic1 from '@/assets/donsolpic2.webp'
+import donsolpic2  from '@/assets/donsol.webp'
 import donsolpic3   from '@/assets/donsolpic3.webp'
-import donsolpic4   from '@/assets/donsolpic4.jpg'
-import donsolpic5   from '@/assets/donsolpic5.jpg'
+import donsolpic4   from '@/assets/donsolpic4.webp'
+import donsolpic5   from '@/assets/donsolpic5.webp'
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -12,7 +12,6 @@ import { Navigation } from 'swiper/modules';
 import { Link } from 'react-router-dom';
 import { Button } from '@nextui-org/react';
 import { GiPositionMarker } from 'react-icons/gi';
-import img from '@/assets/shop.webp'; // Sample image
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa'
 import axios from 'axios';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';

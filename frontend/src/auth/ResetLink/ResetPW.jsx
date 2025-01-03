@@ -4,7 +4,7 @@ import { Button, Input, Spacer } from '@nextui-org/react';
 import Swal from 'sweetalert2';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import axios from 'axios';
-import Logo2 from '../../assets/rabas.png';
+import Logo2 from '../../assets/rabas.webp';
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 

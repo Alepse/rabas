@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { MapPin, Star, Info } from 'lucide-react'
-import pilarpic1 from '@/assets/pilarpic2.jpg'
-import pilarpic2 from '@/assets/pilar.jpg'
-import pilarpic3  from '@/assets/pilarpic3.jpg'
+import pilarpic1 from '@/assets/pilarpic2.webp'
+import pilarpic2 from '@/assets/pilar.webp'
+import pilarpic3  from '@/assets/pilarpic3.webp'
 import pilarpic4 from '@/assets/pilarpic4.webp'
-import pilarpic5  from '@/assets/pilarpic5.jpg'
+import pilarpic5  from '@/assets/pilarpic5.webp'
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';

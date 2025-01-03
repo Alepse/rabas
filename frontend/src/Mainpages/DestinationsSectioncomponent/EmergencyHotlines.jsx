@@ -49,13 +49,11 @@ const EmergencyHotlines = () => {
 
     return (
       <Button
-        className="flex justify-between items-center w-full p-4 rounded-lg shadow-md hover:shadow-lg transition-all border border-gray-200"
+        className="flex flex-col items-center justify-center h-24 w-full rounded-lg shadow-md hover:shadow-lg transition-all bg-gray-100 hover:bg-gray-200 border border-gray-300 p-4"
         onClick={handleCopy}
       >
-        <span className="text-sm font-medium text-gray-800">{name}</span>
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-semibold text-gray-600">{number}</span>
-        </div>
+        <span className="xl:text-[11px] text-[9px] font-bold text-gray-800">{name}</span>
+        <span className="text-xs font-medium text-gray-600 mt-1">{number}</span>
       </Button>
     );
   };
@@ -70,7 +68,7 @@ const EmergencyHotlines = () => {
         <CardBody className="px-6 py-6">
           <section className="mb-8">
             <h3 className="text-lg font-semibold text-gray-700 mb-4">Important Hotlines</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {importantHotlines.map((hotline, index) => (
                 <HotlineButton key={index} name={hotline.name} number={hotline.number} />
               ))}
@@ -78,7 +76,7 @@ const EmergencyHotlines = () => {
           </section>
           <section>
             <h3 className="text-lg font-semibold text-gray-700 mb-4">Local Hotlines</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {localHotlines.map((hotline, index) => (
                 <HotlineButton key={index} name={hotline.name} number={hotline.number} />
               ))}

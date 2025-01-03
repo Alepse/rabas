@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { MapPin, Star, Info } from 'lucide-react'
-import casiguranpic1 from '@/assets/casiguran.jpg'
-import casiguranpic2  from '@/assets/casiguranpic2.jpg'
-import casiguranpic3 from '@/assets/casiguranpic3.png'
-import casiguranpic4 from '@/assets/casiguranpic4.jpg'
-import casiguranpic5 from '@/assets/casiguranpic5.jpg'
+import casiguranpic1 from '@/assets/casiguran.webp'
+import casiguranpic2  from '@/assets/casiguranpic2.webp'
+import casiguranpic3 from '@/assets/casiguranpic3.webp'
+import casiguranpic4 from '@/assets/casiguranpic4.webp'
+import casiguranpic5 from '@/assets/casiguranpic5.webp'
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -12,7 +12,6 @@ import { Navigation } from 'swiper/modules';
 import { Link } from 'react-router-dom';
 import { Button } from '@nextui-org/react';
 import { GiPositionMarker } from 'react-icons/gi';
-import img from '@/assets/shop.webp'; // Sample image
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa'
 import axios from 'axios';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
@@ -499,7 +498,7 @@ const Casiguran = () => {
           <div className="mt-8 z-10  bg-color1 rounded-lg shadow-md p-1 w-full bg-gradient-to-r from-color1 to-color2">
             <MapContainer center={[12.9738, 123.9807]} zoom={10} className="w-full h-96">
               <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.webp"
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               />
               <MapEvents setCurrentZoom={setCurrentZoom} />

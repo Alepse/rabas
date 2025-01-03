@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { MapPin, Star, Info } from 'lucide-react'
-import sorsogonpic1 from '@/assets/sorsogonpic2.jpg'
+import sorsogonpic1 from '@/assets/sorsogonpic2.webp'
 import sorsogonpic2 from '@/assets/sorsogonpic1.webp'
-import sorsogonpic3 from '@/assets/sorsogonpic3.jpg'
-import sorsogonpic4 from '@/assets/sorsogonpic4.jpg'
-import sorsogonpic5  from '@/assets/sorsogonpic5.jpg'
+import sorsogonpic3 from '@/assets/sorsogonpic3.webp'
+import sorsogonpic4 from '@/assets/sorsogonpic4.webp'
+import sorsogonpic5  from '@/assets/sorsogonpic5.webp'
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';

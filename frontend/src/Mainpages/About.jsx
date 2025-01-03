@@ -5,7 +5,7 @@ import { Card, CardBody, CardHeader, Spinner } from '@nextui-org/react';
 import { motion } from 'framer-motion';
 import Hero from '@/components/heroabout';
 import Footer from '@/components/Footer';
-import Logo from '@/assets/rabas.png';
+import Logo from '@/assets/rabas.webp';
 import { Users, MapPin, Heart, Compass, Coffee } from 'lucide-react';
 import wave from '@/assets/wave2.webp'
 import { MdOutlineKeyboardArrowRight } from 'react-icons/md';

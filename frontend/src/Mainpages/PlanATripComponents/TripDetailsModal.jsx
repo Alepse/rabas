@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Accordion, AccordionItem, Input, Checkbox, Textarea } from "@nextui-org/react";
-import MapFeature from '../../LeafletMap/MapFeature';
-import SchedulesPlan from './SchedulesPlan';
 import PropTypes from 'prop-types';
 import Swal from 'sweetalert2';
 import { FaPlus } from 'react-icons/fa';

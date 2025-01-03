@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react'
 import { MapPin, Star, Info } from 'lucide-react'
 import bulanpic1 from '@/assets/bulan.webp'
 import bulanpic2  from '@/assets/bulanpic2.webp'
-import bulanpic3  from '@/assets/bulanpic3.jpg'
-import bulanpic4   from '@/assets/bulanpic4.jpg'
-import bulanpic5   from '@/assets/bulanpic5.jpg'
+import bulanpic3  from '@/assets/bulanpic3.webp'
+import bulanpic4   from '@/assets/bulanpic4.webp'
+import bulanpic5   from '@/assets/bulanpic5.webp'
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -12,7 +12,6 @@ import { Navigation } from 'swiper/modules';
 import { Link } from 'react-router-dom';
 import { Button } from '@nextui-org/react';
 import { GiPositionMarker } from 'react-icons/gi';
-import img from '@/assets/shop.webp'; // Sample image
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa'
 import axios from 'axios';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';

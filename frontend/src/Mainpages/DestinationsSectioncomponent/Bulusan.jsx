@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { MapPin, Star, Info } from 'lucide-react'
-import bulusanpic1 from '@/assets/bulusan-destination.jpg'
-import bulusanpic2 from '@/assets/bulusanpic2.jpg'
+import bulusanpic1 from '@/assets/bulusan-destination.webp'
+import bulusanpic2 from '@/assets/bulusanpic2.webp'
 import bulusanpic3 from '@/assets/bulusanpic3.webp'
 import bulusanpic4 from '@/assets/bulusanpic4.webp'
 import bulusanpic5 from '@/assets/bulusanpic5.webp'
@@ -12,7 +12,6 @@ import { Navigation } from 'swiper/modules';
 import { Link } from 'react-router-dom';
 import { Button } from '@nextui-org/react';
 import { GiPositionMarker } from 'react-icons/gi';
-import img from '@/assets/shop.webp'; // Sample image
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa'
 import axios from 'axios';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';

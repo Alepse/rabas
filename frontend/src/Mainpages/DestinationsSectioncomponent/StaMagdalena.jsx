@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { MapPin, Star, Info } from 'lucide-react'
-import stapic1 from '@/assets/stapic1.jpg'
+import stapic1 from '@/assets/stapic1.webp'
 import stapic2 from '@/assets/stapic2.webp'
-import stapic3 from '@/assets/santa.jpg'
+import stapic3 from '@/assets/santa.webp'
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';

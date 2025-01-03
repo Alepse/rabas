@@ -1,9 +1,9 @@
 import Slider from 'react-slick';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
-import hall from '../assets/hall.jpeg';
-import bulusan from '../assets/bulusan.jpg';
+import hall from '../assets/hall.webp';
+import bulusan from '../assets/bulusan.webp';
 import subic from '../assets/subic.webp'
-import dancalan from '../assets/dancalan.png';
+import dancalan from '../assets/dancalan.webp';
 
 
 // Import Slick CSS files
@@ -68,7 +68,7 @@ const Hero = () => {
     fade: false,
     cssEase: "linear",
     autoplay: true,
-    autoplaySpeed: 3000,
+    autoplaySpeed: 4000,
     appendDots: (dots) => (
       <div style={{ position: 'absolute', bottom: '10px', width: '100%' }}>
         <ul style={{ margin: "0px" }}> {dots} </ul>

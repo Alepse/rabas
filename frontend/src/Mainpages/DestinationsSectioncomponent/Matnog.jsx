@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { MapPin, Star, Info } from 'lucide-react'
 import matnogpic1 from '@/assets/matnog.webp'
-import matnogpic2 from '@/assets/matnogpic2.jpeg'
-import matnogpic3 from '@/assets/matnogpic2.jpg'
-import matnogpic4 from '@/assets/matnogpic3.jpg'
-import matnogpic5 from '@/assets/matnogpic4.jpg'
+import matnogpic2 from '@/assets/matnogpic2.webp'
+import matnogpic3 from '@/assets/matnogpic22.webp'
+import matnogpic4 from '@/assets/matnogpic3.webp'
+import matnogpic5 from '@/assets/matnogpic4.webp'
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';

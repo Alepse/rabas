@@ -1,5 +1,5 @@
 import React from 'react';
-import ActivityBackground from '../assets/activity.jpg';
+import ActivityBackground from '../assets/activity.webp';
 
 
 

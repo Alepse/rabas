@@ -5,10 +5,10 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 
 import { MapPin, Utensils, Building2, TreePine, ChevronLeft, ChevronRight } from 'lucide-react';
-import Surf from '@/assets/surfing.jpg';
+import Surf from '@/assets/surfing.webp';
 import Room from '@/assets/room.webp';
-import Food from '@/assets/Food.jpg';
-import Shop from '@/assets/Souvenirs.jpg';
+import Food from '@/assets/puds.webp';
+import Shop from '@/assets/Souvenirs.webp';
 import { Skeleton } from '@nextui-org/react';
 import Search from '@/components/Search';
 
