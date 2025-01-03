@@ -22,6 +22,7 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
   const [userId, setUserId] = useState(null);
   const [userData, setUserData] = useState(null);
   const [showTooltip, setShowTooltip] = useState(false);
+  const [numberOfDays, setNumberOfDays] = useState();
   const [formData, setFormData] = useState({
     business_id: product.business_id || null,
     user_id: null,
@@ -197,6 +198,7 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
       ? 1 
       : Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)); // Calculate days
   
+    setNumberOfDays(numberOfDays);
     return numberOfDays > 0 ? numberOfDays * discountedPrice : 0;
   };
 
@@ -340,6 +342,7 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
                 <p className="font-bold text-lg">
                   <strong>Descounted Price:</strong> 
                   <span className="ml-2 text-green-600">₱{Number(formData.discountedPrice).toFixed(2)}</span>
+                  <span className="ml-2 text-gray-500">(x{Number(numberOfDays).toFixed(0)})</span>
                 </p>
               </>
             )}
