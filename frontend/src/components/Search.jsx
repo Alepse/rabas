@@ -147,131 +147,61 @@ const Search = () => {
   const handleInputChange = (e) => {
     const value = e.target.value;
     setSearchQuery(value);
-
+  
     if (value.length > 0) {
       performSearch(value);
     } else {
       setSearchResults([]);
     }
   };
-
-  const performSearch = (query) => {
-  let results = [];
-  const searchInput = query.toLowerCase();
-
-  // const matchesSearch = (str) => new RegExp(`^${searchInput}`).test(str.toLowerCase()); // Matches from the start  
-  const matchesSearch = (str) => str.toLowerCase().includes(searchInput);
   
-    switch (activeTab) {
-      case 'all':
-        results = [
-          ...businessListings.activitiesAndAttractions.filter((activity) => 
-            matchesSearch(activity.title)
-          ),
-          ...businessListings.accommodations.filter((accommodation) => 
-            matchesSearch(accommodation.title)
-          ),
-          ...businessListings.foodPlaces.filter((food) => 
-            matchesSearch(food.title)
-          ),
-          ...businessListings.shops.filter((shop) => 
-            matchesSearch(shop.title)
-          ),
-          ...locations.filter((location) => 
-            matchesSearch(location.name)
-          ),
-        ];
-        break;
-      case 'activities':
-        results = businessListings.activitiesAndAttractions.filter((activity) =>
-          matchesSearch(activity.title)
-        );
-        break;
-      case 'accommodation':
-        results = businessListings.accommodations.filter((accommodation) =>
-          matchesSearch(accommodation.title)
-        );
-        break;
-      case 'food':
-        results = businessListings.foodPlaces.filter((food) =>
-          matchesSearch(food.title)
-        );
-        break;
-      case 'shops':
-        results = businessListings.shops.filter((shop) =>
-          matchesSearch(shop.title)
-        );
-        break;
-      default:
-        break;
-    }
-
+  const performSearch = (query) => {
+    let results = [];
+    const searchInput = query.toLowerCase();
+  
+    const matchesSearch = (str) => str.toLowerCase().includes(searchInput);
+  
+    // Search across all categories
+    results = [
+      ...businessListings.activitiesAndAttractions.filter((activity) => 
+        matchesSearch(activity.title)
+      ),
+      ...businessListings.accommodations.filter((accommodation) => 
+        matchesSearch(accommodation.title)
+      ),
+      ...businessListings.foodPlaces.filter((food) => 
+        matchesSearch(food.title)
+      ),
+      ...businessListings.shops.filter((shop) => 
+        matchesSearch(shop.title)
+      ),
+      ...locations.filter((location) => 
+        matchesSearch(location.name)
+      ),
+    ];
+  
     setSearchResults(results);
   };
-
+  
   const clearSearchField = () => {
     setSearchQuery('');
     setSearchResults([]);
   };
-
-  const handleTabChange = (key) => {
-    setActiveTab(key);
-    setSearchQuery('');
-    setSearchResults([]);
-  };
-
-  const getTitleForTab = (tab) => {
-    switch (tab) {
-      case 'all':
-        return 'Explore Everything';
-      case 'activities':
-        return 'Find Exciting Activities';
-      case 'accommodation':
-        return 'Discover Comfortable Stays';
-      case 'food':
-        return 'Taste Delicious Food';
-      case 'shops':
-        return 'Shop Till You Drop';
-      default:
-        return 'What to Visit';
-    }
-  };
-
+  
   return (
-    <div className="flex flex-col items-center p-5 w-full   max-w-4xl mx-auto ">
+    <div className="flex flex-col items-center p-5 w-full max-w-4xl mx-auto">
       <div>
-        <h1 className='font-semibold text-2xl mt-9'>{getTitleForTab(activeTab)}</h1>
+        <h1 className="font-semibold text-2xl m-9">Explore Everything</h1>
       </div>
-      <div className="w-full mb-6 overflow-x-auto">
-        <Tabs
-          aria-label="Search Options"
-          onSelectionChange={handleTabChange}
-          variant="underlined"
-          classNames={{
-            base: "w-full overflow-x-auto rounded-full",
-            tabList: "gap-6 w-full p-4 flex md:justify-center",
-            tab: "max-w-fit px-0 h-12",
-            tabContent: "text-color1",
-            cursor: "w-full bg-color1",
-          }}
-          defaultValue="all"
-        >
-          <Tab key="all" title={<span className="flex items-center"><FaSearch className="mr-2" />Search All</span>} />
-          <Tab key="activities" title={<span className="flex items-center"><FaHiking className="mr-2" />Activities</span>} />
-          <Tab key="accommodation" title={<span className="flex items-center"><FaBed className="mr-2" />Accommodation</span>} />
-          <Tab key="food" title={<span className="flex items-center"><FaUtensils className="mr-2" />Food Places</span>} />
-          <Tab key="shops" title={<span className="flex items-center"><FaShoppingBag className="mr-2" />Shops</span>} />
-        </Tabs>
-      </div>
-
+      
       <div className="flex items-center w-full mb-4">
         <FaSearch className="text-color1 mr-2" />
         <input
           type="text"
-          placeholder={`Search for ${activeTab}`}
+          placeholder="Search Everything"
           value={searchQuery}
           onChange={handleInputChange}
-          className="flex-grow p-2 border border-gray-300 focus:outline-none rounded-xl"
+          className="flex-grow p-2 border border-gray-300 shadow-md focus:outline-none rounded-xl"
         />
         {searchQuery && (
           <FaTimes
@@ -280,7 +210,7 @@ const Search = () => {
           />
         )}
       </div>
-
+  
       <div className="relative w-full">
         {searchResults.length > 0 && (
           <motion.div
@@ -291,7 +221,7 @@ const Search = () => {
           >
             {searchResults.map((result, index) => {
               const handleClick = () => {
-                setSearchQuery(''); 
+                setSearchQuery('');
                 setSearchResults([]);
               };
               const content = (
@@ -326,14 +256,14 @@ const Search = () => {
                   )}
                 </div>
               );
-
+  
               return result.title ? (
                 <Link
                   key={index}
                   to={`/business/${encryptId(result.businessInfo.id)}`}
                   className="block"
-                  onClick={handleClick} 
-                > 
+                  onClick={handleClick}
+                >
                   {content}
                 </Link>
               ) : (
@@ -341,7 +271,7 @@ const Search = () => {
                   key={index}
                   to={`/destinations?name=${result.value}`}
                   className="block"
-                  onClick={handleClick} 
+                  onClick={handleClick}
                 >
                   {content}
                 </Link>
@@ -352,6 +282,5 @@ const Search = () => {
       </div>
     </div>
   );
-};
-
+};  
 export default Search;

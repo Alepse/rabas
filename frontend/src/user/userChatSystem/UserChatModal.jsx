@@ -5,8 +5,21 @@ import { FiSend, FiImage, FiDownload, FiArrowDown } from "react-icons/fi";
 import { toast } from 'react-toastify';
 import { MdDateRange, MdPeople, MdEmail, MdPhone, MdClose } from "react-icons/md";
 import axios from 'axios';
+import CryptoJS from 'crypto-js';
+import { useNavigate } from 'react-router-dom';
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
+
+// Function to encrypt the business_id
+const encryptId = (id) => {
+  const secretKey = import.meta.env.VITE_SECRET_KEY;
+  if (!secretKey) {
+    console.error('Secret key is not defined');
+    return null;
+  }
+  const ciphertext = CryptoJS.AES.encrypt(id.toString(), secretKey).toString();
+  return encodeURIComponent(ciphertext);
+};
 
 // Component for rendering booking details
 const BookingDetailsCard = ({ message, isSender }) => {
@@ -170,6 +183,7 @@ const ProductCard = ({ product }) => (
 
 // User Chat Modal Component
 const UserChatModal = ({ isOpen, onClose, onOpenChat }) => {
+  const navigate = useNavigate();
   const [activeChatUser, setActiveChatUser] = useState(onOpenChat || null);
   const [messageInput, setMessageInput] = useState('');
   const [messages, setMessages] = useState({});
@@ -189,6 +203,12 @@ const UserChatModal = ({ isOpen, onClose, onOpenChat }) => {
     sudoToBottom(); //sroll to bottom during startup
     }
   }, [isOpen]);
+
+  const handleProfileClick = () => {
+    const businessPath = `/business/${encryptId(selectedBusiness)}`;
+    navigate(businessPath, { replace: true });  // Navigate to the business page
+    window.location.reload();  // Reload the page after navigation
+  };
 
   useEffect(() => {
     axios.get(`${BASE_URL}/check-login`, { withCredentials: true })
@@ -782,15 +802,17 @@ const UserChatModal = ({ isOpen, onClose, onOpenChat }) => {
             {selectedBusiness ? (
               <>
                 <div className="flex items-center space-x-3 p-3 bg-color1 text-white rounded-t-lg">
-                  <img
-                    src={activeChatUser.avatarUrl 
-                      ? `${BASE_URL}/${activeChatUser.avatarUrl}` 
-                      : activeChatUser.businessLogo 
-                      ? `${BASE_URL}/${activeChatUser.businessLogo}` 
-                      : `https://ui-avatars.com/api/?name=${activeChatUser.name}`}                    
-                    alt="User Avatar"
-                    className="w-10 h-10 rounded-full"
-                  />
+                  <div onClick={handleProfileClick} className="w-10 h-10 cursor-pointer">
+                    <img
+                      src={activeChatUser.avatarUrl 
+                        ? `${BASE_URL}/${activeChatUser.avatarUrl}` 
+                        : activeChatUser.businessLogo 
+                        ? `${BASE_URL}/${activeChatUser.businessLogo}` 
+                        : `https://ui-avatars.com/api/?name=${activeChatUser.name}`}                    
+                      alt="User Avatar"
+                      className="w-10 h-10 rounded-full"
+                    />
+                  </div>
                   <div className="flex flex-col">
                     <span className="font-semibold">{activeChatUser.name ? activeChatUser.name : activeChatUser.businessName}</span>
                     <span className="text-sm text-green-400">Active now</span>
