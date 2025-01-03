@@ -25,6 +25,7 @@ const allowedOrigins = [
   "https://rabasorsogon.com", 
   "https://www.rabasorsogon.com",
   "http://147.93.19.247:5173",
+  "http://192.168.56.1:5173",
 ];
 
 // Configure CORS with allowed origins and credentials
@@ -1297,6 +1298,32 @@ app.post('/submitBusinessApplication', async (req, res) => {
     );
 
     console.log('Business application submitted successfully. Affected rows:', results.affectedRows);
+
+    // Configure email transporter
+    const transporter = nodemailer.createTransport({
+      service: 'Gmail',
+      auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_PASS
+      }
+    });
+
+    let subject = 'New Business Application';
+    let text = `
+      Rabasorsogon has a new business application from ${firstName} ${lastName} with business application id ${application_id}. 
+      \nVisit admin dashboard for more information. 
+      \nClick <a href="https://rabasorsogon.com/superadmindashboard" target="_blank">here</a> to navigate to the admin dashboard.
+      \n\nBest regards,
+      \nRabaSorsogon
+    `;
+
+    // Send the email notification
+    await transporter.sendMail({
+      from: process.env.GMAIL_USER,
+      to: 'rabasorsogon@gmail.com', // add dd ang ibang account ng member
+      subject,
+      text
+    });
 
     // Return a success response with the generated application_id
     return res.json({ success: true, message: 'Business application submitted successfully', application_id });

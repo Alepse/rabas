@@ -442,6 +442,7 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn, refreshPro
             <div className="text-lg font-semibold">
               {product.discount > 0 ? (
                 <>
+                  <span className="line-through text-gray-500">₱{product.price}</span>
                   <span className="text-red-500 ml-2">
                     ₱{discountedPrice}/{product.pricing_unit.startsWith("per ") ? product.pricing_unit.slice(4) : product.pricing_unit}
                   </span>
