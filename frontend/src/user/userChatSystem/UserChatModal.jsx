@@ -206,9 +206,8 @@ const UserChatModal = ({ isOpen, onClose, onOpenChat }) => {
 
   const handleProfileClick = () => {
     const businessPath = `/business/${encryptId(selectedBusiness)}`;
-    // window.location.reload();
     navigate(businessPath, { replace: true });  // Navigate to the business page
-      // Reload the page after navigation
+    window.location.reload();  // Reload the page after navigation
   };
 
   useEffect(() => {
