@@ -3,15 +3,12 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 import svgr from 'vite-plugin-svgr';
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react(), svgr()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
-  },
-  optimizeDeps: {
   },
   css: {
     preprocessorOptions: {
@@ -21,6 +18,16 @@ export default defineConfig({
     },
   },
   build: {
+    minify: 'terser', // Enable minification with Terser
+    terserOptions: {
+      compress: {
+        drop_console: true, // Remove console logs
+        drop_debugger: true, // Remove debugger statements
+      },
+      format: {
+        comments: false, // Remove comments
+      },
+    },
     rollupOptions: {
       output: {
         manualChunks: {
@@ -28,6 +35,6 @@ export default defineConfig({
         },
       },
     },
-    chunkSizeWarningLimit: 1000, // Increase the chunk size warning limit to 1000 kB
+    chunkSizeWarningLimit: 1000, // Increase the chunk size warning limit
   },
 });
