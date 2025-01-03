@@ -338,7 +338,7 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
                   <span className="ml-2">{Number(formData.discount).toFixed(0)}% OFF</span>
                 </p>
                 <p className='font-semibold'>
-                  <strong>Final Price:</strong> 
+                  <strong>Discounted Price:</strong> 
                   <span className="ml-2 text-green-600">₱{Number(formData.discountedPrice).toFixed(2)}</span>
                   <span className="ml-2 text-gray-500">(x{Number(formData.numberOfGuests).toFixed(0)})</span>
                 </p>
