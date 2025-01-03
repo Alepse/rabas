@@ -28,6 +28,6 @@ export default defineConfig({
         },
       },
     },
-    chunkSizeWarningLimit: 3000, // Increase the chunk size warning limit to 1000 kB
+    chunkSizeWarningLimit: 1000, // Increase the chunk size warning limit to 1000 kB
   },
 });
