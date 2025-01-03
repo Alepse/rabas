@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import Nav from '../components/nav';
 import Hero from '../components/heroactivity';
 import Footer from '@/components/Footer';
-import pic1 from '../assets/donsol.jpg';
 import { Button, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/react";
 import { Checkbox, CheckboxGroup, Select, SelectItem, Slider , Tooltip} from "@nextui-org/react";
 import { GiPositionMarker } from "react-icons/gi";

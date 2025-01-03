@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { MapPin, Star, Info } from 'lucide-react'
-import magallanespic1 from '@/assets/magallanespic3.jpg'
-import magallanespic2 from '@/assets/magallanespic1.jpg'
-import magallanespic3 from '@/assets/magallanes.jpg'
-import magallanespic4 from '@/assets/magallanespic2.jpg'
-import magallanespic5 from '@/assets/magallanespic4.jpg'
+import magallanespic1 from '@/assets/magallanespic3.webp'
+import magallanespic2 from '@/assets/magallanespic1.webp'
+import magallanespic3 from '@/assets/magallanes.webp'
+import magallanespic4 from '@/assets/magallanespic2.webp'
+import magallanespic5 from '@/assets/magallanespic4.webp'
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -12,7 +12,6 @@ import { Navigation } from 'swiper/modules';
 import { Link } from 'react-router-dom';
 import { Button } from '@nextui-org/react';
 import { GiPositionMarker } from 'react-icons/gi';
-import img from '@/assets/shop.webp'; // Sample image
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa'
 import axios from 'axios';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';

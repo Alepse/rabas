@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Input, Button } from '@nextui-org/react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import Logo2 from '../../assets/rabas.png';
+import Logo2 from '../../assets/rabas.webp';
 import Swal from 'sweetalert2'; // For alerts
 import { useNavigate } from 'react-router-dom';
 

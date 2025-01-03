@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import Logo from '../assets/rabas.png';
+import Logo from '@/assets/rabas.webp';
 import { Avatar, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Badge } from "@nextui-org/react";
 import { CiSquareInfo } from "react-icons/ci";
 import { TbNotes } from "react-icons/tb";

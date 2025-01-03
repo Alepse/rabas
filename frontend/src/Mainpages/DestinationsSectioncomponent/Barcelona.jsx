@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { MapPin, Star, Info } from 'lucide-react'
-import barcelonapic1 from '@/assets/barcelona.jpg'
+import barcelonapic1 from '@/assets/barcelona.webp'
 import barcelonapic2 from '@/assets/barcelonapic2.webp'
 import barcelonapic3  from '@/assets/barcelonapic3.webp'
 import barcelonapic4  from '@/assets/barcelonapic4.webp'
@@ -12,7 +12,6 @@ import { Navigation } from 'swiper/modules';
 import { Link } from 'react-router-dom';
 import { Button } from '@nextui-org/react';
 import { GiPositionMarker } from 'react-icons/gi';
-import img from '@/assets/shop.webp'; // Sample image
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa'
 import axios from 'axios';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';

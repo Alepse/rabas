@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { MapPin, Star, Info } from 'lucide-react'
-import castillapic1 from '@/assets/castillapic4.jpg'
-import castillapic2  from '@/assets/castillapic2.jpg'
-import castillapic3 from '@/assets/castillapic3.jpg'
-import castillapic4 from '@/assets/castillapic1.jpg'
-import castillapic5 from '@/assets/castillapic5.jpg'
+import castillapic1 from '@/assets/castillapic4.webp'
+import castillapic2  from '@/assets/castillapic2.webp'
+import castillapic3 from '@/assets/castillapic3.webp'
+import castillapic4 from '@/assets/castillapic1.webp'
+import castillapic5 from '@/assets/castillapic5.webp'
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -12,7 +12,6 @@ import { Navigation } from 'swiper/modules';
 import { Link } from 'react-router-dom';
 import { Button } from '@nextui-org/react';
 import { GiPositionMarker } from 'react-icons/gi';
-import img from '@/assets/shop.webp'; // Sample image
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa'
 import axios from 'axios';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';

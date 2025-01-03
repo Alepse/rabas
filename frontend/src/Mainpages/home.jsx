@@ -9,7 +9,7 @@ import PlanTripSection from './HomePageSections/PlanTripSection';
 import AboutSection from './HomePageSections/AboutSection';
 import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import wave2 from '@/assets/wavy.png'
+import wave2 from '@/assets/wavy.webp'
 import WhatodoSection from './HomePageSections/whatodoSection';
 
 const Home = () => {

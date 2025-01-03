@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { MapPin, Star, Info } from 'lucide-react'
-import irosinpic1 from '@/assets/irosinpic3.jpg'
-import irosinpic2 from '@/assets/irosinpic2.jpg'
-import irosinpic3  from '@/assets/irosin.jpg'
-import irosinpic4  from '@/assets/irosinpic4.jpg'
-import irosinpic5   from '@/assets/irosinpic5.jpg'
+import irosinpic1 from '@/assets/irosinpic3.webp'
+import irosinpic2 from '@/assets/irosinpic2.webp'
+import irosinpic3  from '@/assets/irosin.webp'
+import irosinpic4  from '@/assets/irosinpic4.webp'
+import irosinpic5   from '@/assets/irosinpic5.webp'
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -12,7 +12,6 @@ import { Navigation } from 'swiper/modules';
 import { Link } from 'react-router-dom';
 import { Button } from '@nextui-org/react';
 import { GiPositionMarker } from 'react-icons/gi';
-import img from '@/assets/shop.webp'; // Sample image
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa'
 import axios from 'axios';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';

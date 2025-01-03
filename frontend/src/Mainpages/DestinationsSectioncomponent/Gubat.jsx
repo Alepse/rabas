@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { MapPin, Star, Info } from 'lucide-react'
-import gubatpic1 from '@/assets/gubat.jpg'
-import gubatpic2 from '@/assets/gubatpic1.jpg'
-import gubatpic3 from '@/assets/gubatpic2.jpg'
-import gubatpic4 from '@/assets/gubatpic3.jpg'
-import gubatpic5 from '@/assets/gubatpic4.jpg'
+import gubatpic1 from '@/assets/gubat.webp'
+import gubatpic2 from '@/assets/gubatpic1.webp'
+import gubatpic3 from '@/assets/gubatpic2.webp'
+import gubatpic4 from '@/assets/gubatpic3.webp'
+import gubatpic5 from '@/assets/gubatpic4.webp'
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -12,7 +12,6 @@ import { Navigation } from 'swiper/modules';
 import { Link } from 'react-router-dom';
 import { Button } from '@nextui-org/react';
 import { GiPositionMarker } from 'react-icons/gi';
-import img from '@/assets/shop.webp'; // Sample image
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa'
 import axios from 'axios';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';

@@ -1,5 +1,5 @@
 import React from 'react';
-import Logo from '../assets/rabas.png';
+import Logo from '@/assets/rabas.webp';
 
 
 const Footer = () => {

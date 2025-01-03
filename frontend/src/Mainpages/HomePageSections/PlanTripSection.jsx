@@ -2,14 +2,13 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Swal from 'sweetalert2';
 import wave from '@/assets/wave3.svg';
 
 // Import images
-import Kayak from '@/assets/kayak.jpg';
-import View from '@/assets/view.jpg';
-import Surf from '@/assets/surf.jpg';
-import Dive from '@/assets/dive.jpg';
+import Kayak from '@/assets/kayak.webp';
+import View from '@/assets/view.webp';
+import Surf from '@/assets/surf.webp';
+import Dive from '@/assets/dive.webp';
 import { Modal, ModalContent, ModalBody, useDisclosure } from "@nextui-org/react";
 import LoginSignup from '@/auth/LoginSignup';
 import { Skeleton } from '@nextui-org/react';

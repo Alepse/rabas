@@ -1,5 +1,5 @@
 import React from 'react'
-import Sorsogon from '../assets/sorsogon city.jpg'
+import Sorsogon from '../assets/sorsogon city.webp'
 
 
 const herodiscover = () => {  

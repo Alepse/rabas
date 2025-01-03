@@ -1,5 +1,5 @@
 import React from 'react';
-import Sorso from '../assets/sorsogon.png';
+import Sorso from '../assets/sorsogon.webp';
 
 const HeroDestination = () => {
   return (

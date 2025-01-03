@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { MapPin, Star, Info } from 'lucide-react'
-import prietopic1 from '@/assets/prieto.jpg'
-import prietopic2 from '@/assets/prietopic2.jpg'
-import prietopic3  from '@/assets/prietopic3.jpg'
-import prietopic4 from '@/assets/prietopic4.jpg'
-import prietopic5  from '@/assets/prietopic5.jpeg'
+import prietopic1 from '@/assets/prieto.webp'
+import prietopic2 from '@/assets/prietopic2.webp'
+import prietopic3  from '@/assets/prietopic3.webp'
+import prietopic4 from '@/assets/prietopic4.webp'
+import prietopic5  from '@/assets/prietopic5.webp'
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
