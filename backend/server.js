@@ -2616,6 +2616,7 @@ app.post('/book-accommodation', async (req, res) => {
     originalPrice,    // Added
     discount,         // Added
     discountedPrice,  // Added
+    amountToPay,
     specialRequests,
     numberOfGuests,
     status
@@ -2639,8 +2640,8 @@ app.post('/book-accommodation', async (req, res) => {
       INSERT INTO bookings (
         user_id, business_id, product_id, customerName, productName, numberOfGuests, 
         email, phone, type, dateIn, dateOut, specialRequests, 
-        originalPrice, discount, discountedPrice, status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        originalPrice, discount, discountedPrice, amountToPay, status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
@@ -2659,6 +2660,7 @@ app.post('/book-accommodation', async (req, res) => {
       originalPrice || 0,
       discount || 0,
       discountedPrice || originalPrice || 0,
+      amountToPay,
       status || 0
     ];
 
@@ -2683,6 +2685,7 @@ app.post('/book-accommodation', async (req, res) => {
       originalPrice,
       discount,
       discountedPrice,
+      amountToPay,
       status
     });
     

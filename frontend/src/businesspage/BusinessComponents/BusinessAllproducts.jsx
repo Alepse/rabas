@@ -429,14 +429,22 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn, refreshPro
           </div>
 
           <p className="text-gray-700 text-sm mb-4">{product.description}</p>
+
+          {/* Number of Guests */}
+          {product.product_category === 'accommodation' && product.numberOfGuests && (
+            <p className="text-gray-600 text-sm mt-6">
+              <strong>Capacity:</strong> Accommodates up to {product.numberOfGuests} guest{product.numberOfGuests > 1 ? 's' : ''}.
+            </p>
+          )}
     
           {/* Price and Actions */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between mt-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between mt-2">
             <div className="text-lg font-semibold">
               {product.discount > 0 ? (
                 <>
-                  <span className="line-through text-gray-500">₱{product.price}</span>
-                  <span className="text-red-500 ml-2">₱{discountedPrice}</span> {product.pricing_unit}
+                  <span className="text-red-500 ml-2">
+                    ₱{discountedPrice}/{product.pricing_unit.startsWith("per ") ? product.pricing_unit.slice(4) : product.pricing_unit}
+                  </span>
                   {product.expiration && (
                     <p className="text-xs text-red-500 mt-1">
                       Discount expires on:{' '}
@@ -453,7 +461,7 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn, refreshPro
                   )}
                 </>
               ) : (
-                `₱${product.price} ${product.pricing_unit}`
+                `₱${product.price}/${product.pricing_unit.startsWith("per ") ? product.pricing_unit.slice(4) : product.pricing_unit}`
               )}
             </div>
             <div className="flex flex-wrap gap-2 justify-between mt-3 md:mt-2">
@@ -465,7 +473,7 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn, refreshPro
               >
                 Inquire
               </Button>
-              {product.product_category !== 'shop' && (
+              {product.product_category !== 'shop' && product.booking_operation === 1 && (
                 <Button
                 size='sm'
                   color="success"

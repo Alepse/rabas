@@ -61,6 +61,7 @@ const AccommodationSection = () => {
   const [errorText, setErrorText] = useState(""); // State for validation messages
   const [errorTextTerms, setErrorTextTerms] = useState("");
   const [errorTextInclusions, setErrorTextInclusions] = useState("");
+  const [errorTermsAndConditions, setErrorTermsAndConditions] = useState(""); 
   const sliderRefs = useRef({});
   // console.log(accommodations);
 
@@ -833,6 +834,7 @@ const AccommodationSection = () => {
                         setTermsAndConditions(e.target.value);
                         setErrorTextTerms("");
                       }}
+                      required={termsList.length < 1}
                       fullWidth
                     />
                     {errorTextTerms && (
@@ -846,10 +848,10 @@ const AccommodationSection = () => {
                     >
                       Add Term or Condition
                     </Button>
-                  
+                    
                     {/* Terms List */}
                     <ul className="mt-3 flex items-center flex-wrap gap-3 pl-5 text-sm">
-                      {termsList.length > 0 ? (
+                      {termsList.length > 0 && (
                         termsList.map((term) => (
                           <li key={term.id} className="flex gap-3 items-center bg-light p-2 rounded-md">
                             {term.item}
@@ -863,10 +865,15 @@ const AccommodationSection = () => {
                             </Button>
                           </li>
                         ))
-                      ) : (
-                        <li>No terms added.</li>
                       )}
                     </ul>
+
+                    {/* Validation for terms list */}
+                    {termsList.length === 0 && (
+                      <div className="text-red-500 text-sm mt-2">
+                        You must add at least one term or condition.
+                      </div>
+                    )}
                   </div>
                 )}
 

@@ -18,8 +18,10 @@ import { CgNotes } from "react-icons/cg";
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
+  console.log(product);
   const [userId, setUserId] = useState(null);
   const [userData, setUserData] = useState(null);
+  const [showTooltip, setShowTooltip] = useState(false);
   const [formData, setFormData] = useState({
     business_id: product.business_id || null,
     user_id: null,
@@ -35,6 +37,7 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
     discountedPrice: product.discount ? 
       Number(product.price) - (Number(product.price) * Number(product.discount) / 100) : 
       Number(product.price) || 0,
+    amountToPay: Number(product.amountToPay) || 0,
     type: product.type || '',
     agreeToTerms: false,
     specialRequests: '',
@@ -75,18 +78,20 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
   }, [userId]);
 
   useEffect(() => {
+    const initialAmount = calculateAmountToPay(formData.checkInOutDates, formData.discountedPrice);
     setFormData((prevFormData) => ({
       ...prevFormData,
       business_id: product.business_id || null,
       productName: product.name || '',
       originalPrice: Number(product.price) || 0,
       discount: Number(product.discount) || 0,
-      discountedPrice: product.discount ? 
-        Number(product.price) - (Number(product.price) * Number(product.discount) / 100) : 
-        Number(product.price) || 0,
+      discountedPrice: product.discount
+        ? Number(product.price) - (Number(product.price) * Number(product.discount) / 100)
+        : Number(product.price) || 0,
+      amountToPay: initialAmount,
       type: product.type || '',
     }));
-  }, [product]);
+  }, [product]);  
 
   const [isPolicyModalOpen, setPolicyModalOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
@@ -133,7 +138,7 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
           booking_id: bookingId,
           email: formData.email,
           phone: formData.phone,
-          amount: `${Number(formData.discountedPrice).toFixed(2)}`,
+          amount: `${Number(formData.amountToPay).toFixed(2)}`,
           checkInOutDates: formData.checkInOutDates,
           productName: product.name,
           numberOfGuests: formData.numberOfGuests,
@@ -181,6 +186,42 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
     }
   };
 
+  const calculateAmountToPay = (checkInOutDates, discountedPrice) => {
+    if (!checkInOutDates?.start || !checkInOutDates?.end) return 0;
+  
+    const startDate = new Date(checkInOutDates.start);
+    const endDate = new Date(checkInOutDates.end);
+  
+    // If the start and end date are the same, treat as 1 day
+    const numberOfDays = startDate.getTime() === endDate.getTime() 
+      ? 1 
+      : Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)); // Calculate days
+  
+    return numberOfDays > 0 ? numberOfDays * discountedPrice : 0;
+  };
+
+  const handleNumberOfGuestsChange = (e) => {
+    let value = e.target.value;
+  
+    // Ensure the value doesn't exceed the max and isn't 0
+    if (value <= 0) value = 1; // Prevent zero or negative values
+    value = Math.min(value, product.numberOfGuests); // Ensure the value doesn't exceed max
+  
+    setFormData({ ...formData, numberOfGuests: value });
+  
+    // Show tooltip when max value is reached
+    if (value === product.numberOfGuests) {
+      setShowTooltip(true);
+  
+      // Hide the tooltip after 2 seconds
+      setTimeout(() => {
+        setShowTooltip(false);
+      }, 2000); // 2000 ms = 2 seconds
+    } else if (value < product.numberOfGuests) {
+      setShowTooltip(false);
+    }
+  };  
+
   const steps = [
     
     <div key="step1" className="space-y-4">
@@ -226,18 +267,37 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
       <RangeCalendar
         aria-label="Select Check-in and Check-out Dates"
         visibleMonths={2}
-        onChange={(dates) => setFormData({ ...formData, checkInOutDates: dates })}
+        value={formData.checkInOutDates} 
+        onChange={(dates) => {
+          const updatedAmount = calculateAmountToPay(dates, formData.discountedPrice);
+          setFormData({
+            ...formData,
+            checkInOutDates: dates,
+            amountToPay: updatedAmount,
+          });
+        }}
       />
       </div>
+      <div className="relative group">
         <Input
-        type="number"
-        label="Number of Guests"
-        required
-        fullWidth
-        min={1}
-        value={formData.numberOfGuests}
-        onChange={(e) => setFormData({ ...formData, numberOfGuests: e.target.value })}
-      />
+          type="number"
+          label="Number of Guests"
+          required
+          fullWidth
+          min={1}
+          max={product.numberOfGuests}
+          value={formData.numberOfGuests}
+          onChange={handleNumberOfGuestsChange}
+        />
+        {/* Tooltip shown for a few seconds */}
+        {showTooltip && (
+          <div className="absolute top-full left-0 mt-2 w-full text-xs bg-red-200 text-red-800 p-2 rounded shadow-md z-40">
+            <p>
+              You've reached the maximum number of guests ({product.numberOfGuests}).
+            </p>
+          </div>
+        )}
+      </div>
       <Input
         label="Special Requests"
         fullWidth
@@ -278,11 +338,15 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
                   <span className="ml-2">{Number(formData.discount).toFixed(0)}% OFF</span>
                 </p>
                 <p className="font-bold text-lg">
-                  <strong>Final Price:</strong> 
+                  <strong>Descounted Price:</strong> 
                   <span className="ml-2 text-green-600">₱{Number(formData.discountedPrice).toFixed(2)}</span>
                 </p>
               </>
             )}
+            <p className="font-bold text-lg">
+              <strong>Amount To Pay:</strong> 
+              <span className="ml-2 text-green-600">₱{Number(formData.amountToPay).toFixed(2)}</span>
+            </p>
           </div>
           
         </div>
@@ -330,12 +394,17 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
             Terms & Conditions
           </ModalHeader>
           <ModalBody className="space-y-4">
-            <p>By making a reservation, you agree to the following terms and conditions:</p>
-            <ul className="list-disc pl-5">
-              <li>All reservations are subject to availability.</li>
-              <li>Cancellations must be made 24 hours in advance.</li>
-              <li>Payment is required at the time of booking.</li>
-            </ul>
+          {product.termsAndConditions && (
+            <>
+              <p>By making a reservation, you agree to the following terms and conditions:</p>
+              <ul className="list-disc pl-5">
+                {/* Map through the terms and render each item */}
+                {product.termsAndConditions.map((term, index) => (
+                  <li key={term.id}>{term.item}</li>  // Render 'item' of each term
+                ))}
+              </ul>
+            </>
+          )}
           </ModalBody>
           <ModalFooter>
             <Button auto color='danger'  onClick={() => setPolicyModalOpen(false)}>
