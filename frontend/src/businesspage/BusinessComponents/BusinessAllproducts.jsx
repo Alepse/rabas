@@ -442,13 +442,13 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn, refreshPro
             <div className="text-lg font-semibold">
               {product.discount > 0 ? (
                 <>
-                  <span className="line-through text-gray-500">₱{product.price}</span>
-                  <span className="text-red-500 ml-2">
+                  <span className="line-through text-red-500 ml-2">₱{product.price}</span>
+                  <span className="text-gray-500 ml-2">
                     ₱{discountedPrice}/{product.pricing_unit.startsWith("per ") ? product.pricing_unit.slice(4) : product.pricing_unit}
                   </span>
                   {product.expiration && (
-                    <p className="text-xs text-red-500 mt-1">
-                      Discount expires on:{' '}
+                    <p className="text-xs font-bold text-gray-600 mt-1">
+                      <span className="font-bold text-red-500">Discount expires on:{' '}</span>
                       {new Date(product.expiration).toLocaleString('en-US', {
                         weekday: 'long',
                         year: 'numeric',
