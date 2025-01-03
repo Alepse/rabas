@@ -198,7 +198,7 @@ const Search = () => {
         <FaSearch className="text-color1 mr-2" />
         <input
           type="text"
-          placeholder="Search Everything"
+          placeholder="Search..."
           value={searchQuery}
           onChange={handleInputChange}
           className="flex-grow p-2 border border-gray-300 shadow-md focus:outline-none rounded-xl"
