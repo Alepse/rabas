@@ -860,48 +860,71 @@ const UserProfile = ({ activities = [] }) => {
           {userData?.username ? userData.username : 'Loading...'}
         </div>
         {businessApplications.length > 0 ? (
-          businessApplications.map((application) => {
-            if (application.status === 0) {
-              return (
-                <Button key={`pending-${application.application_id}`} className='text-white bg-yellow-500 hover:bg-yellow-600 mb-4'>
-                  Pending Application
-                </Button>
-              );
-            } else if (application.status === 1) {
-              return (
-                <div key={`approved-${application.application_id}`} className='mb-4 flex justify-center items-center flex-col'>
-                  <h1 className='font-bold mb-2'>Switch to Business:</h1>
-                  <button 
-                    className='text-gray-500 hover:bg-color2 hover:text-white flex items-center p-2 rounded-md gap-1 border-1 border-color1 shadow-md transition duration-300 ease-in-out transform hover:scale-105'
+          businessApplications.some(application => application.status === 1) ? (
+            // Show only the accepted application
+            businessApplications
+              .filter(application => application.status === 1)
+              .map(application => (
+                <div
+                  key={`approved-${application.application_id}`}
+                  className="mb-4 flex justify-center items-center flex-col"
+                >
+                  <h1 className="font-bold mb-2">Switch to Business:</h1>
+                  <button
+                    className="text-gray-500 hover:bg-color2 hover:text-white flex items-center p-2 rounded-md gap-1 border-1 border-color1 shadow-md transition duration-300 ease-in-out transform hover:scale-105"
                     onClick={() => handleBusinessClick(businessData?.business_id)} // Use optional chaining
-                    key={application.application_id}
                   >
-                    {/* Check if businessData is available before accessing its properties */}
                     {businessData && businessData.businessLogo ? (
-                      <Avatar 
-                        src={`${BASE_URL}/${businessData.businessLogo}`} 
-                        alt={businessData.businessName} // Alt text for accessibility
+                      <Avatar
+                        src={`${BASE_URL}/${businessData.businessLogo}`}
+                        alt={businessData.businessName}
                       />
                     ) : (
-                      <div className="flex items-center justify-center w-10 h-10 bg-gray-200 rounded-full"> {/* Optional styling for the icon container */}
-                        <FaBusinessTime className="text-gray-500" size={24} /> {/* Display the icon */}
+                      <div className="flex items-center justify-center w-10 h-10 bg-gray-200 rounded-full">
+                        <FaBusinessTime className="text-gray-500" size={24} />
                       </div>
                     )}
-                    <p>{businessData ? businessData.businessName : 'Loading...'}</p> {/* Show loading text if businessData is not available */}
+                    <p>{businessData ? businessData.businessName : 'Loading...'}</p>
                   </button>
                 </div>
-              );
-            } else if (application.status === -1) {
-              return (
-                <Button key={`denied-${application.application_id}`} className='text-white bg-red-500 hover:bg-red-600 mb-4'>
-                  Denied
-                </Button>
-              );
-            }
-          })
+              ))
+          ) : (
+            // Otherwise, process pending or rejected applications
+            businessApplications.map(application => {
+              if (application.status === 0) {
+                return (
+                  <Button
+                    key={`pending-${application.application_id}`}
+                    className="text-white bg-yellow-500 hover:bg-yellow-600 mb-4"
+                  >
+                    Pending Application
+                  </Button>
+                );
+              } else if (application.status === -1) {
+                return (
+                  <div key={`denied-${application.application_id}`} className="mb-4">
+                    <div className="text-white bg-red-500 hover:bg-red-600 p-4 rounded-md">
+                      Your application with business application ID {application.application_id} has been denied.
+                    </div>
+                    <Button
+                      className="text-white bg-color1 hover:bg-color2 mt-4"
+                      onPress={onBusinessOpen}
+                    >
+                      + Send another application
+                    </Button>
+                  </div>
+                );
+              }
+              return null;
+            })
+          )
         ) : (
-          <Button className='text-white bg-color1 hover:bg-color2 mb-4' onPress={onBusinessOpen}> 
-            + Apply Business Account 
+          // If no applications exist, show the "Apply Business Account" button
+          <Button
+            className="text-white bg-color1 hover:bg-color2 mb-4"
+            onPress={onBusinessOpen}
+          >
+            + Apply Business Account
           </Button>
         )}
       </div>

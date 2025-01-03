@@ -45,6 +45,7 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
     discountedPrice: product.discount ? 
       Number(product.price) - (Number(product.price) * Number(product.discount) / 100) : 
       Number(product.price) || 0,
+    amountToPay: 0,
     type: product.type || '',
     agreeToTerms: false,
     specialRequests: '',
@@ -85,19 +86,22 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
   }, [userId]);
 
   useEffect(() => {
+    const discountedPrice = product.discount
+      ? Number(product.price) - (Number(product.price) * Number(product.discount) / 100)
+      : Number(product.price) || 0;
+  
     setFormData((prevFormData) => ({
       ...prevFormData,
       business_id: product.business_id || null,
       product_id: product.product_id || null,
       originalPrice: Number(product.price) || 0,
       discount: Number(product.discount) || 0,
-      discountedPrice: product.discount ? 
-        Number(product.price) - (Number(product.price) * Number(product.discount) / 100) : 
-        Number(product.price) || 0,
+      discountedPrice: discountedPrice,
+      amountToPay: discountedPrice * Number(formData.numberOfGuests) || 0, // Make sure formData.numberOfGuests is also handled correctly
       type: product.type || '',
     }));
-  }, [product]);
-
+  }, [product, formData.numberOfGuests]);  // Depend on formData.numberOfGuests to recalculate amountToPay when it changes
+  
   const [isPolicyModalOpen, setPolicyModalOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
 
@@ -252,14 +256,14 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
 
   const steps = [
     <div key="step1" className="space-y-4">
-        <h1 className='p-1 text-lg border-b flex gap-2 items-center'><FaUserPen/>Personl Details</h1>
+      <h1 className='p-1 text-lg border-b flex gap-2 items-center'><FaUserPen/>Personl Details</h1>
       <Input label="First Name" required fullWidth placeholder="Enter your first name" value={formData.firstName} onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} />
       <Input label="Last Name" required fullWidth placeholder="Enter your last name" value={formData.lastName} onChange={(e) => setFormData({ ...formData, lastName: e.target.value })} />
       <Input type="tel" label="Phone Number" required fullWidth placeholder="Enter your phone number" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
       <Input type="email" label="Email Address" required fullWidth placeholder="Enter your email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
     </div>,
     <div key="step2" className="space-y-4">
-  <h1 className='p-1 text-lg border-b flex gap-2 items-center '><MdEditCalendar/> Appointment Date/Time </h1>
+      <h1 className='p-1 text-lg border-b flex gap-2 items-center '><MdEditCalendar/> Appointment Date/Time </h1>
       <div className='flex justify-center'>
         <DatePicker
           aria-label="Select Visit Date"
@@ -334,11 +338,16 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
                   <span className="ml-2">{Number(formData.discount).toFixed(0)}% OFF</span>
                 </p>
                 <p className='font-semibold'>
-                  <strong>Final Price:</strong> 
+                  <strong>Discounted Price:</strong> 
                   <span className="ml-2 text-green-600">₱{Number(formData.discountedPrice).toFixed(2)}</span>
+                  <span className="ml-2 text-gray-500">(x{Number(formData.numberOfGuests).toFixed(0)})</span>
                 </p>
               </>
             )}
+            <p className="font-bold text-lg">
+              <strong>Amount To Pay:</strong> 
+              <span className="ml-2 text-green-600">₱{Number(formData.amountToPay).toFixed(2)}</span>
+            </p>
           </div>
         </div>
         <Checkbox
@@ -363,9 +372,9 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
         closeOnOverlayClick={false} // Ensure the modal does not close on overlay click
       >
         <ModalContent className="rounded-lg">
-                <ModalHeader className="text-xl flex justify-center font-bold bg-light  text-black ">
-                   Book an Appointment 
-                  </ModalHeader>
+          <ModalHeader className="text-xl flex justify-center font-bold bg-light  text-black ">
+            Book an Appointment 
+          </ModalHeader>
           <ModalBody className="space-y-6">
             {steps[currentStep]}
             <div className="flex justify-between mt-4">
@@ -392,12 +401,17 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
             Terms & Conditions
           </ModalHeader>
           <ModalBody className="space-y-4">
-            <p>By making a reservation, you agree to the following terms and conditions:</p>
-            <ul className="list-disc pl-5">
-              <li>All reservations are subject to availability.</li>
-              <li>Cancellations must be made 24 hours in advance.</li>
-              <li>Payment is required at the time of booking.</li>
-            </ul>
+          {product.termsAndConditions && (
+            <>
+              <p>By making a reservation, you agree to the following terms and conditions:</p>
+              <ul className="list-disc pl-5">
+                {/* Map through the terms and render each item */}
+                {product.termsAndConditions.map((term, index) => (
+                  <li key={term.id}>{term.item}</li>  // Render 'item' of each term
+                ))}
+              </ul>
+            </>
+          )}
           </ModalBody>
           <ModalFooter>
             <Button auto onClick={() => setPolicyModalOpen(false)}>

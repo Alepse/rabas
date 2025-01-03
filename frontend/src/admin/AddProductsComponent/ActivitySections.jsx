@@ -6,10 +6,34 @@ import Slider from 'react-slick';
 import { addProduct, handleUpdateActivity, deleteActivities, fetchBusinessProducts } from '@/redux/activitiesSlice';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { FaSearch, FaChevronLeft, FaChevronRight, FaImage } from 'react-icons/fa';
+import { FaSearch, FaImage } from 'react-icons/fa';
 import { FaPlus } from "react-icons/fa";
+import Swal from 'sweetalert2';
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
+
+const showSuccessAlert = (message) => {
+  Swal.fire({
+    title: 'Success!',
+    text: message,
+    icon: 'success',
+    confirmButtonText: 'OK',
+    confirmButtonColor: '#0BDA51',
+    cancelButtonColor: '#D33736',
+  });
+};
+
+const showErrorAlert = (message) => {
+  Swal.fire({
+    title: 'Error!',
+    text: message,
+    icon: 'error',
+    confirmButtonText: 'Try Again',
+    confirmButtonColor: '#0BDA51',
+    cancelButtonText: 'Close',
+    cancelButtonColor: '#D33736',
+  });
+};
 
 const ActivitySections = () => {
   // State Management
@@ -250,16 +274,17 @@ const ActivitySections = () => {
           // Dispatch Redux action to remove activities from the state
           dispatch(deleteActivities(selectedActivities));
           
-          // Optionally reset the selection
+          showSuccessAlert("Selected activity deleted successfully");
+          // reset the selection
           setSelectedActivities([]);
         } else {
-          console.error('Failed to delete products:', data.message);
+          showErrorAlert('Failed to delete products:', data.message);
         }
       } catch (error) {
-        console.error('Error deleting products:', error);
+        showErrorAlert('Error deleting products:', error);
       }
     } else {
-      // console.log('No activities selected for deletion.');
+      showErrorAlert('No activities selected for deletion.');
     }
   };
 
@@ -306,7 +331,7 @@ const ActivitySections = () => {
             // Return the image object with id, path, and title
             return result.image; // responds with the image object
           } catch (error) {
-            console.error('Image upload failed:', error);
+            showErrorAlert('Image upload failed:', error);
             return null; // Handle error as needed
           }
         } else {
@@ -395,10 +420,10 @@ const ActivitySections = () => {
         // Check if we are in editing mode or adding a new activity
         if (isEditing) {
           result = dispatch(handleUpdateActivity(formData));
-          // console.log('Activity updated successfully:', result);
+          showSuccessAlert('Activity updated successfully:', result);
         } else {
           result = dispatch(addProduct(formData));
-          // console.log('Activity added successfully:', result.payload);
+          showSuccessAlert('Activity added successfully:', result.payload);
         }
   
         // Close modal and reset form after successful submission
@@ -406,10 +431,10 @@ const ActivitySections = () => {
         resetForm();
       } catch (error) {
         // console.error('Failed to submit activity:', error);
-        alert('An error occurred while saving the activity. Please try again.');
+        showErrorAlert('An error occurred while saving the activity. Please try again.');
       }
     } else {
-      alert('Please fill in all required fields.'); // Alert if required fields are missing
+      showErrorAlert('Please fill in all required fields.'); // Alert if required fields are missing
     }
   };  
 
@@ -471,17 +496,21 @@ const ActivitySections = () => {
             <FaSearch className="absolute top-2 left-3 text-gray-500" />
           </div>
         </div>
-        <div className="flex space-x-3">
-          <Button
-            color="danger"
-            onClick={handleDeleteSelected}
-            disabled={!selectedActivities.length}
-          >
-            Delete Selected
-          </Button>
+        {/* Buttons */}
+        <div className="flex flex-wrap justify-start sm:justify-end gap-3 w-full sm:w-auto">
+          {selectedActivities.length > 0 && (
+            <Button
+              color="danger"
+              onClick={handleDeleteSelected}
+              disabled={!selectedActivities.length}
+              className="w-32 px-4 py-2 text-sm sm:text-base text-center"
+            >
+              Delete Selected
+            </Button>
+          )}
           <Button
             color="primary"
-            className="text-white hover:bg-color2"
+            className="w-32 px-4 py-2 text-sm sm:text-base text-white hover:bg-color2 text-center"
             onPress={() => setModalOpen(true)}
           >
             Add
@@ -745,8 +774,16 @@ const ActivitySections = () => {
                   {/* Booking Option */}
                   <div className="mb-4">
                     <Checkbox
-                      checked={hasBooking}
-                      onChange={(e) => setHasBooking(e.target.checked)}
+                      isSelected={hasBooking}
+                      onChange={(e) => {
+                        const isChecked = e.target.checked;
+                        setHasBooking(isChecked);
+  
+                        // Clear the terms list if checkbox is unchecked
+                        if (!isChecked) {
+                          setTermsList([]); // Reset the terms list
+                        }
+                      }}
                     >
                       Activity has booking option
                     </Checkbox>
@@ -763,6 +800,7 @@ const ActivitySections = () => {
                           setTermsAndConditions(e.target.value);
                           setErrorTextTerms("");
                         }}
+                        required={termsList.length < 1}
                         fullWidth
                       />
                       {errorTextTerms && (
@@ -779,7 +817,7 @@ const ActivitySections = () => {
                     
                       {/* Terms List */}
                       <ul className="mt-3 flex items-center flex-wrap gap-3 pl-5 text-sm">
-                        {termsList.length > 0 ? (
+                        {termsList.length > 0 && (
                           termsList.map((term) => (
                             <li key={term.id} className="flex gap-3 items-center bg-light p-2 rounded-md">
                               {term.item}
@@ -793,10 +831,15 @@ const ActivitySections = () => {
                               </Button>
                             </li>
                           ))
-                        ) : (
-                          <li>No terms added.</li>
                         )}
                       </ul>
+
+                      {/* Validation for terms list */}
+                      {termsList.length === 0 && (
+                        <div className="text-red-500 text-sm mt-2">
+                          You must add at least one term or condition.
+                        </div>
+                      )}
                     </div>
                   )}
 

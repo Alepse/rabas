@@ -25,6 +25,7 @@ const allowedOrigins = [
   "https://rabasorsogon.com", 
   "https://www.rabasorsogon.com",
   "http://147.93.19.247:5173",
+  "http://192.168.56.1:5173",
 ];
 
 // Configure CORS with allowed origins and credentials
@@ -1298,6 +1299,33 @@ app.post('/submitBusinessApplication', async (req, res) => {
 
     console.log('Business application submitted successfully. Affected rows:', results.affectedRows);
 
+    // Configure email transporter
+    const transporter = nodemailer.createTransport({
+      service: 'Gmail',
+      auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_PASS
+      }
+    });
+
+    let subject = 'New Business Application';
+    let text = `
+      Rabasorsogon has a new business application from <b>${firstName} ${lastName}</b> with business application id <b>${application_id}</b>. 
+      \nVisit admin dashboard for more information. 
+      \nClick <a href="https://rabasorsogon.com/superadmindashboard" target="_blank">here</a> to navigate to the admin dashboard.
+      \n\nBest regards,
+      \nRabaSorsogon
+    `;
+
+    // Send the email notification
+    await transporter.sendMail({
+      from: process.env.GMAIL_USER,
+      to: 'rabasorsogon@gmail.com, per.yongyong71@gmail.com, nebrejrempis18@gmail.com, Alepse@gmail.com', // add dd ang ibang account ng member
+      subject,
+      text,
+      html: text,
+    });
+
     // Return a success response with the generated application_id
     return res.json({ success: true, message: 'Business application submitted successfully', application_id });
   } catch (error) {
@@ -2085,6 +2113,7 @@ app.post('/add-product', upload.array('productImages', 5), async (req, res) => {
     description,
     price,
     pricing_unit,
+    numberOfGuests,
     booking_operation,
     inclusions,
     termsAndConditions,
@@ -2126,8 +2155,8 @@ app.post('/add-product', upload.array('productImages', 5), async (req, res) => {
 
     // Now insert the product with the retrieved business_id using the pool
     const query = `
-      INSERT INTO products (business_id, product_category, user_id, type, name, description, price, pricing_unit, booking_operation, inclusions, termsAndConditions, images)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO products (business_id, product_category, user_id, type, name, description, price, pricing_unit, numberOfGuests, booking_operation, inclusions, termsAndConditions, images)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
@@ -2139,6 +2168,7 @@ app.post('/add-product', upload.array('productImages', 5), async (req, res) => {
       description || null,
       price || null,
       pricing_unit || null,
+      numberOfGuests,
       parseInt(booking_operation) || 0,
       JSON.stringify(inclusionsArray), // Convert inclusions to JSON
       JSON.stringify(termsArray), // Convert termsAndConditions to JSON
@@ -2160,6 +2190,7 @@ app.post('/add-product', upload.array('productImages', 5), async (req, res) => {
       description,
       price,
       pricing_unit: pricing_unit || '',
+      numberOfGuests,
       booking_operation: parseInt(booking_operation) || 0,
       inclusions: inclusionsArray, // Return the original array
       termsAndConditions: termsArray, // Return the original array
@@ -2208,6 +2239,7 @@ app.put('/update-product', upload.array('productImages', 5), async (req, res) =>
     description,
     price, 
     pricing_unit, 
+    numberOfGuests,
     booking_operation, 
     inclusions, 
     termsAndConditions, 
@@ -2249,7 +2281,7 @@ app.put('/update-product', upload.array('productImages', 5), async (req, res) =>
 
   const query = `
     UPDATE products 
-    SET type = ?, name = ?, description = ?, price = ?, pricing_unit = ?, booking_operation = ?, inclusions = ?, termsAndConditions = ?, images = ?
+    SET type = ?, name = ?, description = ?, price = ?, pricing_unit = ?, numberOfGuests = ?, booking_operation = ?, inclusions = ?, termsAndConditions = ?, images = ?
     WHERE product_id = ? AND user_id = ?
   `;
 
@@ -2259,6 +2291,7 @@ app.put('/update-product', upload.array('productImages', 5), async (req, res) =>
     description,
     price,
     pricing_unit || null,
+    numberOfGuests,
     parseInt(booking_operation) || 0,
     JSON.stringify(inclusionsArray), // Store inclusions as a JSON string
     JSON.stringify(termsAndConditionsArray), // Store terms and conditions as a JSON string
@@ -2311,6 +2344,7 @@ app.put('/update-product', upload.array('productImages', 5), async (req, res) =>
       description,
       price,
       pricing_unit: pricing_unit || null,
+      numberOfGuests,
       booking_operation: parseInt(booking_operation) || 0,
       inclusions: inclusionsArray,
       termsAndConditions: termsAndConditionsArray,
@@ -2610,6 +2644,7 @@ app.post('/book-accommodation', async (req, res) => {
     originalPrice,    // Added
     discount,         // Added
     discountedPrice,  // Added
+    amountToPay,
     specialRequests,
     numberOfGuests,
     status
@@ -2633,8 +2668,8 @@ app.post('/book-accommodation', async (req, res) => {
       INSERT INTO bookings (
         user_id, business_id, product_id, customerName, productName, numberOfGuests, 
         email, phone, type, dateIn, dateOut, specialRequests, 
-        originalPrice, discount, discountedPrice, status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        originalPrice, discount, discountedPrice, amountToPay, status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
@@ -2653,6 +2688,7 @@ app.post('/book-accommodation', async (req, res) => {
       originalPrice || 0,
       discount || 0,
       discountedPrice || originalPrice || 0,
+      amountToPay,
       status || 0
     ];
 
@@ -2677,6 +2713,7 @@ app.post('/book-accommodation', async (req, res) => {
       originalPrice,
       discount,
       discountedPrice,
+      amountToPay,
       status
     });
     

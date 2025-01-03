@@ -27,6 +27,7 @@ export const addProduct = createAsyncThunk(
       withCredentials: true,
     });
 
+    // console.log("Server response:", response.data);
     const product = response.data;
     if (!product || !product.product_id || !product.name) {
       throw new Error('Invalid accommodation data received from the server');
@@ -38,6 +39,7 @@ export const addProduct = createAsyncThunk(
       accommodationName: product.name,
       pricing: product.price,
       pricingUnit: product.pricing_unit,
+      numberOfGuests: product.numberOfGuests,
       description: product.description,
       hasBooking: parseInt(product.booking_operation) === 1, // Convert to number and compare
       inclusions: (product.inclusions || []).map((inclusion) => ({
@@ -84,6 +86,7 @@ export const handleUpdateAccommodation = createAsyncThunk(
         accommodationName: product.name,
         pricing: product.price,
         pricingUnit: product.pricing_unit,
+        numberOfGuests: product.numberOfGuests,
         description: product.description,
         hasBooking: parseInt(product.booking_operation) === 1,
         inclusions: (product.inclusions || []).map((inclusion) => ({
@@ -128,9 +131,10 @@ const accommodationSlice = createSlice({
       state.accommodations.push({
         id: newAccommodation.id,
         category: newAccommodation.category,
-        accommodationName: newAccommodation.accommodationName || "N/A",
-        pricing: newAccommodation.pricing || "0",
-        pricingUnit: newAccommodation.pricingUnit || "per night",
+        accommodationName: newAccommodation.accommodationName,
+        pricing: newAccommodation.pricing,
+        pricingUnit: newAccommodation.pricingUnit,
+        numberOfGuests: newAccommodation.numberOfGuests,
         description: newAccommodation.description || "",
         hasBooking: newAccommodation.hasBooking || false,
         inclusions: newAccommodation.inclusions.map(inclusion => ({
@@ -151,14 +155,14 @@ const accommodationSlice = createSlice({
     },
     updateAccommodation(state, action) {
       const updatedAccommodation = action.payload;
-      console.log("Accommodation: ", updatedAccommodation);
-      console.log("All accommodation IDs in state:", state.accommodations.map(accommodation => accommodation.id));
+      // console.log("Accommodation: ", updatedAccommodation);
+      // console.log("All accommodation IDs in state:", state.accommodations.map(accommodation => accommodation.id));
 
       const accommodationIndex = state.accommodations.findIndex(
         accommodation => accommodation.id.toString() === updatedAccommodation.product_id.toString()
       );
 
-      console.log("Accomodation Index: ", accommodationIndex);
+      // console.log("Accomodation Index: ", accommodationIndex);
 
       if (accommodationIndex !== -1) {
         // Update the existing accommodation
@@ -167,6 +171,7 @@ const accommodationSlice = createSlice({
           accommodationName: updatedAccommodation.accommodationName || "N/A",
           pricing: updatedAccommodation.pricing || "0",
           pricingUnit: updatedAccommodation.pricingUnit || "per night",
+          numberOfGuests: updatedAccommodation.numberOfGuests,
           description: updatedAccommodation.description || "",
           hasBooking: updatedAccommodation.hasBooking || false,
           inclusions: updatedAccommodation.inclusions.map(inclusion => ({
@@ -205,6 +210,7 @@ const accommodationSlice = createSlice({
           accommodationName: product.name,
           pricing: product.price,
           pricingUnit: product.pricing_unit,
+          numberOfGuests: product.numberOfGuests,
           description: product.description,
           hasBooking: product.booking_operation === 1,
           inclusions: product.inclusions || [],

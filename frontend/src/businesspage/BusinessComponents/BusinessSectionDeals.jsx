@@ -225,10 +225,10 @@ const BusinessSection = ({isLoggedIn, businessData, userData, openLoginForm}) =>
                     </div>
                     <div className='flex justify-between items-center mt-4'>
                       <p className='font-bold text-gray-800'>
-                        <span className="line-through text-gray-500">₱{parseFloat(deal.price).toFixed(2)}</span> 
-                        <span className="text-red-500 ml-2">
-                          ₱{(parseFloat(deal.price) * (1 - deal.discount / 100)).toFixed(2)}
-                        </span> {deal.pricing_unit}
+                        <span className="line-through text-red-500">₱{parseFloat(deal.price).toFixed(2)}</span> 
+                        <span className="text-gray-500 ml-2">
+                          ₱{(parseFloat(deal.price) * (1 - deal.discount / 100)).toFixed(2)}/{deal.pricing_unit.startsWith("per ") ? deal.pricing_unit.slice(4) : deal.pricing_unit}
+                        </span>
                       </p>
                     </div>
                     <div className='flex justify-between gap-2 mt-4'>
