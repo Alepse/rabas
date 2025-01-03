@@ -208,7 +208,8 @@ const UserChatModal = ({ isOpen, onClose, onOpenChat }) => {
     const businessProfileID = activeChatUser.id || activeChatUser.business_id;
     const businessPath = `/business/${encryptId(businessProfileID)}`;
     navigate(businessPath, { replace: true });  // Navigate to the business page
-    window.location.reload();  // Reload the page after navigation
+    handleClose();
+    // window.location.reload();  // Reload the page after navigation
   };
 
   useEffect(() => {
