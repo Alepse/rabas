@@ -2085,6 +2085,7 @@ app.post('/add-product', upload.array('productImages', 5), async (req, res) => {
     description,
     price,
     pricing_unit,
+    numberOfGuests,
     booking_operation,
     inclusions,
     termsAndConditions,
@@ -2092,7 +2093,7 @@ app.post('/add-product', upload.array('productImages', 5), async (req, res) => {
   } = req.body;
   const user_id = req.session?.user?.user_id;
 
-  if (!user_id || !name || !price) {
+  if (!user_id || !name || !price || !numberOfGuests) {
     return res.status(400).json({ success: false, message: 'Missing required fields' });
   }
 
@@ -2126,8 +2127,8 @@ app.post('/add-product', upload.array('productImages', 5), async (req, res) => {
 
     // Now insert the product with the retrieved business_id using the pool
     const query = `
-      INSERT INTO products (business_id, product_category, user_id, type, name, description, price, pricing_unit, booking_operation, inclusions, termsAndConditions, images)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO products (business_id, product_category, user_id, type, name, description, price, pricing_unit, numberOfGuests, booking_operation, inclusions, termsAndConditions, images)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
@@ -2139,6 +2140,7 @@ app.post('/add-product', upload.array('productImages', 5), async (req, res) => {
       description || null,
       price || null,
       pricing_unit || null,
+      numberOfGuests,
       parseInt(booking_operation) || 0,
       JSON.stringify(inclusionsArray), // Convert inclusions to JSON
       JSON.stringify(termsArray), // Convert termsAndConditions to JSON
@@ -2160,6 +2162,7 @@ app.post('/add-product', upload.array('productImages', 5), async (req, res) => {
       description,
       price,
       pricing_unit: pricing_unit || '',
+      numberOfGuests,
       booking_operation: parseInt(booking_operation) || 0,
       inclusions: inclusionsArray, // Return the original array
       termsAndConditions: termsArray, // Return the original array
@@ -2208,6 +2211,7 @@ app.put('/update-product', upload.array('productImages', 5), async (req, res) =>
     description,
     price, 
     pricing_unit, 
+    numberOfGuests,
     booking_operation, 
     inclusions, 
     termsAndConditions, 
@@ -2217,7 +2221,7 @@ app.put('/update-product', upload.array('productImages', 5), async (req, res) =>
   
   const user_id = req.session?.user?.user_id;
 
-  if (!user_id || !product_id || !name || !price) {
+  if (!user_id || !product_id || !name || !price || !numberOfGuests) {
     return res.status(400).json({ success: false, message: 'Missing required fields' });
   }
 
@@ -2249,7 +2253,7 @@ app.put('/update-product', upload.array('productImages', 5), async (req, res) =>
 
   const query = `
     UPDATE products 
-    SET type = ?, name = ?, description = ?, price = ?, pricing_unit = ?, booking_operation = ?, inclusions = ?, termsAndConditions = ?, images = ?
+    SET type = ?, name = ?, description = ?, price = ?, pricing_unit = ?, numberOfGuests = ?, booking_operation = ?, inclusions = ?, termsAndConditions = ?, images = ?
     WHERE product_id = ? AND user_id = ?
   `;
 
@@ -2259,6 +2263,7 @@ app.put('/update-product', upload.array('productImages', 5), async (req, res) =>
     description,
     price,
     pricing_unit || null,
+    numberOfGuests,
     parseInt(booking_operation) || 0,
     JSON.stringify(inclusionsArray), // Store inclusions as a JSON string
     JSON.stringify(termsAndConditionsArray), // Store terms and conditions as a JSON string
@@ -2311,6 +2316,7 @@ app.put('/update-product', upload.array('productImages', 5), async (req, res) =>
       description,
       price,
       pricing_unit: pricing_unit || null,
+      numberOfGuests,
       booking_operation: parseInt(booking_operation) || 0,
       inclusions: inclusionsArray,
       termsAndConditions: termsAndConditionsArray,

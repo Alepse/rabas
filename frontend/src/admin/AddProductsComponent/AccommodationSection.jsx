@@ -6,9 +6,33 @@ import Slider from 'react-slick';
 import { addProduct, handleUpdateAccommodation, deleteAccommodations, fetchBusinessProducts } from '@/redux/accomodationSlice';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { FaSearch, FaChevronLeft, FaChevronRight, FaImage, FaPlus } from 'react-icons/fa';
+import { FaSearch, FaImage, FaPlus } from 'react-icons/fa';
+import Swal from 'sweetalert2';
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL;
+
+const showSuccessAlert = (message) => {
+  Swal.fire({
+    title: 'Success!',
+    text: message,
+    icon: 'success',
+    confirmButtonText: 'OK',
+    confirmButtonColor: '#0BDA51',
+    cancelButtonColor: '#D33736',
+  });
+};
+
+const showErrorAlert = (message) => {
+  Swal.fire({
+    title: 'Error!',
+    text: message,
+    icon: 'error',
+    confirmButtonText: 'Try Again',
+    confirmButtonColor: '#0BDA51',
+    cancelButtonText: 'Close',
+    cancelButtonColor: '#D33736',
+  });
+};
 
 const AccommodationSection = () => {
   // State Management
@@ -17,7 +41,8 @@ const AccommodationSection = () => {
   const [editingAccommodationId, setEditingAccommodationId] = useState(null);
   const [accommodationName, setAccommodationName] = useState('');
   const [pricing, setPricing] = useState('');
-  const [pricingUnit, setPricingUnit] = useState('');
+  const [pricingUnit, setPricingUnit] = useState('per day');
+  const [numberOfGuests, setNumberOfGuests] = useState(1);
   const [description, setDescription] = useState('');
   const [hasBooking, setHasBooking] = useState(false);
   const [inclusions, setInclusions] = useState('');
@@ -37,6 +62,7 @@ const AccommodationSection = () => {
   const [errorTextTerms, setErrorTextTerms] = useState("");
   const [errorTextInclusions, setErrorTextInclusions] = useState("");
   const sliderRefs = useRef({});
+  // console.log(accommodations);
 
   const [options, setOptions] = useState([
     { value: 'hotel', label: 'Hotel' },
@@ -246,17 +272,17 @@ const AccommodationSection = () => {
         if (data.success) {
           // Dispatch Redux action to remove accommodations from the state
           dispatch(deleteAccommodations(selectedAccommodations));
-          
-          // Optionally reset the selection
+          showSuccessAlert("Selected accommodation deleted successfully");
+          // reset the selection
           setSelectedAccommodations([]);
         } else {
-          console.error('Failed to delete products:', data.message);
+          showErrorAlert('Failed to delete products:', data.message);
         }
       } catch (error) {
-        console.error('Error deleting products:', error);
+        showErrorAlert('Error deleting products:', error);
       }
     } else {
-      // console.log('No accommodations selected for deletion.');
+      showErrorAlert('No accommodations selected for deletion.');
     }
   };
 
@@ -273,14 +299,15 @@ const AccommodationSection = () => {
     e.preventDefault(); // Prevent default form submission behavior
   
     // Check that all required fields are filled
-    if (accommodationName && pricing && pricingUnit && accommodationType) {
+    if (accommodationName && pricing && numberOfGuests && accommodationType) {
       // Construct the new accommodation object
       const newAccommodation = {
         category: 'accommodation',
         type: accommodationType,
         name: accommodationName,
         price: pricing,
-        pricing_unit: pricingUnit,
+        pricing_unit: pricingUnit || 'per day',
+        numberOfGuests: numberOfGuests,
         description: description,
         booking_operation: hasBooking ? 1 : 0,
         inclusions: inclusionList,
@@ -329,6 +356,7 @@ const AccommodationSection = () => {
       formData.append('type', newAccommodation.type);
       formData.append('name', newAccommodation.name);
       formData.append('price', newAccommodation.price);
+      formData.append('numberOfGuests', newAccommodation.numberOfGuests);
       formData.append('pricing_unit', newAccommodation.pricing_unit);
       formData.append('description', newAccommodation.description);
       formData.append('booking_operation', newAccommodation.booking_operation.toString());
@@ -392,21 +420,22 @@ const AccommodationSection = () => {
         // Check if we are in editing mode or adding a new accommodation
         if (isEditing) {
           result = dispatch(handleUpdateAccommodation(formData));
-          // console.log('Accommodation updated successfully:', result);
+
+          showSuccessAlert('Accommodation updated successfully', result);
         } else {
           result = dispatch(addProduct(formData));
-          // console.log('Accommodation added successfully:', result.payload);
+          showSuccessAlert('Accommodation added successfully', result.payload);
         }
   
         // Close modal and reset form after successful submission
         setModalOpen(false);
         resetForm();
       } catch (error) {
-        // console.error('Failed to submit accommodation:', error);
-        alert('An error occurred while saving the accommodation. Please try again.');
+        showErrorAlert('Failed to submit accommodation:', error);
+        // alert('An error occurred while saving the accommodation. Please try again.');
       }
     } else {
-      alert('Please fill in all required fields.'); // Alert if required fields are missing
+      showErrorAlert('Please fill in all required fields.'); // Alert if required fields are missing
     }
   };  
   
@@ -415,6 +444,7 @@ const AccommodationSection = () => {
     setAccommodationName('');
     setPricing('');
     setPricingUnit('');
+    setNumberOfGuests('');
     setDescription('');
     setInclusionList([]);
     setImages([]);
@@ -433,6 +463,7 @@ const AccommodationSection = () => {
     setAccommodationName(accommodation.accommodationName);
     setPricing(accommodation.pricing);
     setPricingUnit(accommodation.pricingUnit);
+    setNumberOfGuests(accommodation.numberOfGuests);
     setDescription(accommodation.description);
     setInclusionList(accommodation.inclusions);
     setImages(accommodation.images || []);
@@ -459,28 +490,36 @@ const AccommodationSection = () => {
   return (
     <div className="max-h-[620px] p-3 w-full h-full rounded-xl shadow-gray-400 shadow-lg bg-white">
       {/* Header Section */}
-      <div className="flex justify-between p-3 items-center">
-        <div className="font-semibold text-xl mb-3 p-3 items-center gap-4 flex">
-          <h1>Accommodations</h1>
-          <div className='relative'>
+      <div className="flex flex-wrap justify-between p-3 items-center gap-4">
+        {/* Title and Search */}
+        <div className="w-full sm:w-auto flex flex-wrap items-center gap-4">
+          <h1 className="flex-grow text-center sm:text-left text-xl font-semibold mb-3 sm:mb-0">
+            Accommodations
+          </h1>
+          <div className="relative flex-grow sm:flex-grow-0 w-full sm:w-auto">
             <Input
-              placeholder='Search ...'
-              className='w-72 pl-10 placeholder:text-gray-400 placeholder:italic focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+              placeholder="Search ..."
+              className="w-full sm:w-72 pl-10 placeholder:text-gray-400 placeholder:italic focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
-            <FaSearch className='absolute top-2 left-3 text-gray-500' />
+            <FaSearch className="absolute top-2 left-3 text-gray-500" />
           </div>
         </div>
-        <div className="flex space-x-3">
-          <Button
-            color="danger"
-            onClick={handleDeleteSelected}
-            disabled={!selectedAccommodations.length}
-          >
-            Delete Selected
-          </Button>
+
+        {/* Buttons */}
+        <div className="flex flex-wrap justify-center sm:justify-end gap-3 w-full sm:w-auto">
+          {selectedAccommodations.length > 0 && (
+            <Button
+              color="danger"
+              onClick={handleDeleteSelected}
+              disabled={!selectedAccommodations.length}
+              className="w-32 px-4 py-2 text-sm sm:text-base text-center"
+            >
+              Delete Selected
+            </Button>
+          )}
           <Button
             color="primary"
-            className="text-white hover:bg-color2"
+            className="w-32 px-4 py-2 text-sm sm:text-base text-white hover:bg-color2 text-center"
             onPress={() => setModalOpen(true)}
           >
             Add
@@ -539,6 +578,9 @@ const AccommodationSection = () => {
               <h2 className="text-sm font-bold">Accommodation Name: {accommodation.accommodationName}</h2>
               <p className="text-sm">
                 <strong>Price:</strong> ₱{accommodation.pricing} {accommodation.pricingUnit}
+              </p>
+              <p className="text-sm">
+                <strong>Max guest/room capacity:</strong> {accommodation.numberOfGuests}
               </p>
               <p className="text-sm">
                 <strong>Description:</strong> {accommodation.description}
@@ -613,7 +655,7 @@ const AccommodationSection = () => {
 
       {/* Modal for Adding/Editing Accommodations */}
       <Modal
-      disableAnimation
+        disableAnimation
         scrollBehavior="inside"
         isOpen={modalOpen}
         onOpenChange={(open) => {
@@ -641,6 +683,7 @@ const AccommodationSection = () => {
                       label="Select Accommodation Type"
                       placeholder={accommodationType ? accommodationType : "Select or add an item"}
                       selectedKeys={new Set([accommodationType.toLowerCase()])} // Use selectedKey to reflect the selected value
+                      isRequired
                       onSelectionChange={(key) => {
                         const selectedKey = key instanceof Set ? Array.from(key)[0] : key;
                         const selectedOption = options.find(option => option.value === selectedKey);
@@ -714,16 +757,39 @@ const AccommodationSection = () => {
                       min="0"
                     />
                   </div>
-                  <div className="w-1/2">
+                  <div className="w-1/2 relative group">
                     <Input
-                      label="Pricing Unit"
-                      placeholder="per pax, per person, etc."
+                      label="Pricing Unit (this field is default to per day)"
+                      placeholder="per day"
                       value={pricingUnit}
                       onChange={(e) => setPricingUnit(e.target.value)}
                       fullWidth
-                      required
+                      isDisabled
                     />
+                    {/* Hover Notes */}
+                    <div className="absolute top-full left-0 mt-2 hidden w-full text-xs bg-gray-200 text-gray-800 p-2 rounded shadow-md group-hover:block z-50">
+                      <p>
+                        This field is set to "per day" by default for convenience. Future updates will allow customization based on the product type or pricing model. For example, you may define "per hour," "per month," or other units.
+                      </p>
+                    </div>
                   </div>
+                </div>
+
+                {/* Max guest / room capacity */}
+                <div className="mb-4">
+                  <Input
+                    label="Max guest / room capacity"
+                    placeholder="Enter room capacity"
+                    type="number"
+                    value={numberOfGuests}
+                    min={1} // This ensures the user cannot enter values below 1
+                    required
+                    onChange={(e) => {
+                      const value = Math.max(1, e.target.value); // Ensure the value is at least 1
+                      setNumberOfGuests(value);
+                    }}
+                    fullWidth
+                  />
                 </div>
 
                 {/* Description */}
@@ -734,6 +800,7 @@ const AccommodationSection = () => {
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     fullWidth
+                    required
                   />
                 </div>
 
