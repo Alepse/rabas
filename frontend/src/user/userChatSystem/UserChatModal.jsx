@@ -196,7 +196,7 @@ const UserChatModal = ({ isOpen, onClose, onOpenChat }) => {
   const [businesses, setBusinesses] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showScrollToBottom, setShowScrollToBottom] = useState(false); // State for arrow visibility
-
+  // console.log('sdfsfd', onOpenChat);
   useEffect(() => {
     if (isOpen && selectedBusiness) {
     fetchMessages();
@@ -205,7 +205,8 @@ const UserChatModal = ({ isOpen, onClose, onOpenChat }) => {
   }, [isOpen]);
 
   const handleProfileClick = () => {
-    const businessPath = `/business/${encryptId(selectedBusiness)}`;
+    const businessProfileID = activeChatUser.id || activeChatUser.business_id;
+    const businessPath = `/business/${encryptId(businessProfileID)}`;
     navigate(businessPath, { replace: true });  // Navigate to the business page
     window.location.reload();  // Reload the page after navigation
   };
