@@ -85,7 +85,7 @@ const Hero = () => {
         {images.map((image, index) => (
           <div key={index} className="relative h-[500px]">
             <img
-              loading={index === 0 ? 'eager' : 'lazy'}
+              loading="lazy"
               src={image}
               alt={`Slide ${index + 1}`}
               className="w-full h-full object-cover"
