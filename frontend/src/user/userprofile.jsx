@@ -101,14 +101,14 @@ const renderLikedPages = (likedPages, handleUnlikePage) => {
                 </div>
               </div>
               {/* Actions */}
-              <div className="flex-1">
-                <div className="flex flex-col items-center mt-2 justify-center justify-between gap-2 lg:gap-8">
+              <div className="flex-1 w-full h-full flex items-center mt-5 justify-center">
+                <div className="flex flex-col gap-4 lg:gap-8 items-center">
                   <Button
                     className="px-10 py-6 rounded-lg bg-color2 text-white text-sm"
                     onClick={() => handleUnlikePage(item.id)}
                   >
                     <div className="flex items-center gap-2">
-                      <AiOutlineDislike />Unlike
+                      <AiOutlineDislike /> Unlike
                     </div>
                   </Button>
                   <Link to={`/business/${encryptId(item?.business_id)}`}>
@@ -130,7 +130,7 @@ const renderLikedPages = (likedPages, handleUnlikePage) => {
               {/* Actions */}
               <div className="flex items-center mt-2 md:justify-end justify-between gap-2">
                   <Button
-                    className="h-8 px-3 bg-color2 text-white text-sm"
+                    className="h-8 px-3 bg-color2 text-white rounded-lg text-sm"
                     onClick={() => handleUnlikePage(item.id)}
                   >
                     <div className="flex items-center gap-1">
