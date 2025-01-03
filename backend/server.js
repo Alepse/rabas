@@ -2093,7 +2093,7 @@ app.post('/add-product', upload.array('productImages', 5), async (req, res) => {
   } = req.body;
   const user_id = req.session?.user?.user_id;
 
-  if (!user_id || !name || !price || !numberOfGuests) {
+  if (!user_id || !name || !price) {
     return res.status(400).json({ success: false, message: 'Missing required fields' });
   }
 
@@ -2221,7 +2221,7 @@ app.put('/update-product', upload.array('productImages', 5), async (req, res) =>
   
   const user_id = req.session?.user?.user_id;
 
-  if (!user_id || !product_id || !name || !price || !numberOfGuests) {
+  if (!user_id || !product_id || !name || !price) {
     return res.status(400).json({ success: false, message: 'Missing required fields' });
   }
 
