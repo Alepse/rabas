@@ -107,6 +107,7 @@ const WhatToDoSection = () => {
                       className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
                       style={{ backgroundImage: `url(${category.image})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
                       loading="lazy" // Lazy load the image
+                      rel="preload"
                     />
                     <div className={`absolute inset-0 bg-gradient-to-t ${category.gradient}`} />
                     <div className="absolute inset-0 p-6 flex flex-col justify-end">

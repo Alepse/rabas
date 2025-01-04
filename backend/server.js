@@ -5,6 +5,7 @@ const cors = require('cors'); // npm install cors
 const multer = require('multer'); // npm install multer
 const fs = require('fs');
 const path = require('path'); // Built-in Node.js module
+const sharp = require('sharp');
 const session = require('express-session'); // npm install express-session
 const MySQLStore = require('express-mysql-session')(session); // npm install express-mysql-session
 const bcrypt = require('bcryptjs'); // npm install bcryptjs
@@ -574,11 +575,42 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+// Middleware to convert images to WebP and compress
+const convertToWebP = async (req, res, next) => {
+  if (!req.files || req.files.length === 0) {
+    return next();
+  }
+
+  try {
+    for (const file of req.files) {
+      const originalPath = file.path;
+      const webpPath = `uploads/${path.parse(file.filename).name}.webp`;
+
+      // Convert and compress image to WebP
+      await sharp(originalPath)
+        .webp({ quality: 80 }) // Adjust quality between 75-85
+        .toFile(webpPath);
+
+      // Remove the original file after conversion
+      fs.unlinkSync(originalPath);
+
+      // Update the file path in req.files for further processing
+      file.path = webpPath;
+      file.filename = `${path.parse(file.filename).name}.webp`;
+    }
+
+    next();
+  } catch (error) {
+    console.error('Error processing image:', error);
+    res.status(500).json({ error: 'Image processing failed' });
+  }
+};
+
 // Serve static files from the 'uploads' directory
 app.use('/uploads', express.static('uploads'));
 
 // Endpoint for updating user profile
-app.put('/updateUserProfile/:id', upload.single('profilePic'), async (req, res) => {
+app.put('/updateUserProfile/:id', upload.single('profilePic'), convertToWebP, async (req, res) => {
   const userId = req.params.id;
   let { username, email, phoneNumber, address } = req.body;
   let imagePath = req.body.image_path; // Existing image path

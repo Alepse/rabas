@@ -6,6 +6,7 @@ import { FaCheck, FaPlus, FaTimes } from "react-icons/fa";
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import MapPicker from '../../components/map-picker';
+
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
@@ -18,6 +19,7 @@ const municipalities = [
 ];
 
 const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userData }) => {
+  const [loadingSpinning, setLoadingSpinning] = useState(false);
   const [step, setStep] = useState(1)
   const [formData, setFormData] = useState({
     firstName: "",
@@ -340,6 +342,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
         setStep(4);
       } else if (step === 4) {
         try {
+          setLoadingSpinning(true);
           const response = await fetch(`${BASE_URL}/submitBusinessApplication`, {
             method: 'POST',
             headers: {
@@ -357,6 +360,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
             console.error('Server Error:', data);  // Log the server response for errors
             throw new Error('Failed to submit application');
           }
+          setLoadingSpinning(false); // Hide the loading spinner after submission successfull
   
           MySwal.fire({
             icon: 'success',
@@ -370,6 +374,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
           });
   
         } catch (error) {
+          setLoadingSpinning(false);  // Hide the loading spinner after submission failure
           console.error('Error:', error);
           MySwal.fire({
             icon: 'error',
@@ -380,6 +385,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
         }
       }
     } else {
+      setLoadingSpinning(false); // Hide
       MySwal.fire({
         icon: 'error',
         title: 'Oops...',
@@ -425,53 +431,62 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
   };
 
   return (
-<Modal 
- disableAnimation 
-  size="xl"  
-  isOpen={isBusinessOpen}  
-  hideCloseButton={true}  
-  aria-labelledby="modal-title"  
->  
-  <ModalContent className=" sm:max-w-md md:max-w-lg lg:max-w-2xl overflow-auto flex justify-center">  
-    <ModalHeader className="flex justify-between items-center bg-color1">  
-      <h2 id="modal-title" className="text-2xl text-white font-bold">  
-        Apply for Business Account  
-      </h2>  
-      <button 
-        aria-label="Close" 
-        className='text-white hover:text-gray-300 transition-colors duration-200 absolute right-2 top-2'
-        onClick={handleCloseModal}
-      >
-        <FaTimes />
-      </button>
-    </ModalHeader>  
-    <ModalBody className="p-4 overflow-y-auto max-h-[80vh] ">  
-      <Progress value={(step / 4) * 100}  classNames={{ indicator: "bg-color2",}} />  
-      {renderStep()}  
-    </ModalBody>  
-    <ModalFooter className="flex justify-between">  
-      {step === 1 ? (
-        <Button auto flat color="danger" onClick={handleCloseModal}>
-          Cancel
-        </Button>
-      ) : (
-        <Button auto color="primary" onClick={handleBack}>
-          Back
-        </Button>
+  <Modal 
+  disableAnimation 
+    size="xl"  
+    isOpen={isBusinessOpen}  
+    hideCloseButton={true}  
+    aria-labelledby="modal-title"  
+  >  
+    <ModalContent className=" sm:max-w-md md:max-w-lg lg:max-w-2xl overflow-auto flex justify-center">  
+      <ModalHeader className="flex justify-between items-center bg-color1">  
+      {loadingSpinning && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-70 z-50 flex justify-center items-center">
+          <div className="flex flex-col items-center">
+            <div className="spinner"></div>
+            <p className="mt-4 text-lg text-white font-semibold animate-pulse">Loading, please wait...</p>
+          </div>
+        </div>
       )}
-      <Button auto color={step === 4 ? "success" : "primary"} className='text-white' onClick={handleNext}>  
-        {step === 4 ? (  
-          <>  
-            <FaCheck className="mr-2" />  
-            Submit Application  
-          </>  
-        ) : (  
-          "Next"  
-        )}  
-      </Button>  
-    </ModalFooter>  
-  </ModalContent>  
-</Modal>
+
+        <h2 id="modal-title" className="text-2xl text-white font-bold">  
+          Apply for Business Account  
+        </h2>  
+        <button 
+          aria-label="Close" 
+          className='text-white hover:text-gray-300 transition-colors duration-200 absolute right-2 top-2'
+          onClick={handleCloseModal}
+        >
+          <FaTimes />
+        </button>
+      </ModalHeader>  
+      <ModalBody className="p-4 overflow-y-auto max-h-[80vh] ">  
+        <Progress value={(step / 4) * 100}  classNames={{ indicator: "bg-color2",}} />  
+        {renderStep()}  
+      </ModalBody>  
+      <ModalFooter className="flex justify-between">  
+        {step === 1 ? (
+          <Button auto flat color="danger" onClick={handleCloseModal}>
+            Cancel
+          </Button>
+        ) : (
+          <Button auto color="primary" onClick={handleBack}>
+            Back
+          </Button>
+        )}
+        <Button auto color={step === 4 ? "success" : "primary"} className='text-white' onClick={handleNext}>  
+          {step === 4 ? (  
+            <>  
+              <FaCheck className="mr-2" />  
+              Submit Application  
+            </>  
+          ) : (  
+            "Next"  
+          )}  
+        </Button>  
+      </ModalFooter>  
+    </ModalContent>  
+  </Modal>
 
   );
 };
