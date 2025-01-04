@@ -441,6 +441,7 @@ const UserProfile = ({ activities = [] }) => {
   const [loading, setLoading] = useState(true);
   const [showButton, setShowButton] = useState(false);
   const [bookings, setBookings] = useState([]);
+  const [loadingSpinning, setLoadingSpinning] = useState(false);
 
   useEffect(() => {
     document.title = 'RabaSorsogon | Profile';
@@ -811,16 +812,19 @@ const UserProfile = ({ activities = [] }) => {
     }
   };
 
-  if (loading) {
-    return <Spinner className='flex justify-center items-center h-screen ' size='lg' label="Loading..." color="primary" />;
-  }
-
   return (
     <div className='mx-auto min-h-screen font-sans bg-light' style={{ backgroundImage: `url(${wave})`, backgroundSize: 'auto', backgroundRepeat: 'repeat', backgroundPosition: 'center' }}>
       <Nav />
       <div className='container p-3 rounded-md mt-[7.2rem] flex justify-center'>
         <Search />
       </div>
+
+      {/* {loadingSpinning && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 z-50 flex justify-center items-center">
+          <Spinner size="lg" label="Loading..." />
+        </div>
+      )} */}
+
 
         <div className="container w-full flex justify-start mx-auto overflow-x-auto scrollbar-custom scrollbar-hide mb-4">
         <nav className="text-sm text-gray-500 whitespace-nowrap">

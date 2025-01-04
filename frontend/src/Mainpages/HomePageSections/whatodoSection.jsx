@@ -5,10 +5,10 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 
 import { MapPin, Utensils, Building2, TreePine, ChevronLeft, ChevronRight } from 'lucide-react';
-import Surf from '@/assets/surfing.webp';
-import Room from '@/assets/room.webp';
+import Surf from '@/assets/sorf.webp';
+import Room from '@/assets/hotil.webp';
 import Food from '@/assets/puds.webp';
-import Shop from '@/assets/Souvenirs.webp';
+import Shop from '@/assets/shoop.webp';
 import { Skeleton } from '@nextui-org/react';
 import Search from '@/components/Search';
 
@@ -107,6 +107,7 @@ const WhatToDoSection = () => {
                       className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
                       style={{ backgroundImage: `url(${category.image})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
                       loading="lazy" // Lazy load the image
+                      rel="preload"
                     />
                     <div className={`absolute inset-0 bg-gradient-to-t ${category.gradient}`} />
                     <div className="absolute inset-0 p-6 flex flex-col justify-end">
