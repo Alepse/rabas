@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 import Swal from 'sweetalert2';
 import { FaPlus } from 'react-icons/fa';
 import AddItemModal from './AddItemModal';
+import { Link } from 'react-router-dom';
+import CryptoJS from 'crypto-js';
 import axios from 'axios';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
 // Use the environment variable for the base URL
@@ -17,6 +19,17 @@ const formatTime = (time) => {
   return `${formattedHour}:${minute || '00'} ${ampm}`;
 };
 
+// Function to encrypt the business_id
+const encryptId = (id) => {
+  const secretKey = import.meta.env.VITE_SECRET_KEY;
+  if (!secretKey) {
+    console.error('Secret key is not defined');
+    return null;
+  }
+  const ciphertext = CryptoJS.AES.encrypt(id.toString(), secretKey).toString();
+  return encodeURIComponent(ciphertext);
+};
+
 const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {}, itinerary }) => {
   if (!trip) return null;
 
@@ -26,15 +39,20 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
   const [originalItinerary, setOriginalItinerary] = useState(itinerary); // Store original itinerary
 
   const [currentLocation, setCurrentLocation] = useState(null);
-  const [destination, setDestination] = useState(null);
-
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [currentDate, setCurrentDate] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [editItemIndex, setEditItemIndex] = useState(null);
   const [editItemDetails, setEditItemDetails] = useState({ title: '', time: '', isBooked: false, notes: '' });
-
+  
   const [currentZoom, setCurrentZoom] = useState(10);
+  const [selectedLocation, setSelectedLocation] = useState(null); // State to hold the selected location details
+
+  let destinationOrder = 0;
+
+  const handleMarkerClick = (item) => {
+    setSelectedLocation(item); // Store clicked location details
+  };
 
   const handleEditToggle = () => {
     if (!isEditing) {
@@ -150,12 +168,12 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
         const updatedItinerary = { ...itinerary };
         updatedItinerary[date].splice(index, 1);
         onUpdateTrip({ ...trip, itinerary: updatedItinerary });
-        // Swal.fire({
-        //   title: 'Deleted!',
-        //   text: 'Your item has been deleted.',
-        //   icon: 'success',
-        //   confirmButtonColor: '#0BDA51'
-        // });
+        Swal.fire({
+          title: 'Deleted!',
+          text: 'Your item has been deleted.',
+          icon: 'success',
+          confirmButtonColor: '#0BDA51'
+        });
       }
     });
   };
@@ -192,6 +210,49 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
       [name]: type === 'checkbox' ? checked : value
     }));
   };
+
+  const handleShowDirection = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const userLat = position.coords.latitude;
+          const userLng = position.coords.longitude;
+
+          // Collect all pin locations (destinations)
+          const destinations = [];
+          Object.keys(itinerary || {}).forEach(date => {
+            itinerary[date].forEach(item => {
+              const { pin_location } = item;
+              if (pin_location) {
+                destinations.push(`${pin_location.latitude},${pin_location.longitude}`);
+              }
+            });
+          });
+
+          // Prepare the directions URL for Google Maps with multiple destinations
+          const origin = `${userLat},${userLng}`;
+          const route = [origin, ...destinations].join('/'); // Join the origin and destinations with "/"
+          
+          const directionsUrl = `https://www.google.com/maps/dir/${route}/@${userLat},${userLng},11z/data=!3e9`;
+
+          // Open the directions URL in a new tab
+          window.open(directionsUrl, '_blank');
+        },
+        (error) => {
+          alert("Error getting current location: " + error.message);
+        }
+      );
+    } else {
+      alert("Geolocation is not supported by this browser.");
+    }
+  };
+
+  const getOrdinalSuffix = (n) => {
+    const s = ["th", "st", "nd", "rd"];
+    const v = n % 100;
+    return s[(v - 20) % 10] || s[v] || s[0];
+  };
+  
 
   return (
     <Modal disableAnimation isOpen={isOpen} onClose={onClose} isDismissable={false} hideCloseButton className="rounded-lg shadow-lg mx-auto p-3 max-h-screen max-w-[1200px]">
@@ -242,7 +303,6 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
                 )}
               </div>
             </AccordionItem>
-            
             <AccordionItem title="Selected Destinations">
               <div className="p-4">
                 <h3 className="font-semibold text-lg">Locations Navigation:</h3>
@@ -254,51 +314,100 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
                   <MapEvents setCurrentZoom={setCurrentZoom} />
                   {Object.keys(itinerary || {}).map(date =>
                     itinerary[date].map((item, index) => {
-                      const { pin_location, title, imageUrl } = item;
-                      if (pin_location && currentZoom >= 7) {
+                      const { pin_location, title, imageUrl, id } = item;
+                      console.log("itemsss", item);
+                      if (pin_location) {
+                        destinationOrder += 1;  // Count the destinations
                         const position = [pin_location.latitude, pin_location.longitude];
                         const locationName = title;
-                        const showLogo = currentZoom >= 10;
+                        const showName = currentZoom >= 10;
                         const fontSize = currentZoom >= 12 ? '1rem' : '0.85rem';
 
                         const customDivIcon = L.divIcon({
                           className: 'custom-icon',
                           html: `
                             <div class="custom-popup flex items-center whitespace-nowrap font-bold text-color1" style="font-size: ${fontSize};">
-                              ${showLogo ? `
+                              ${showName ? `
                                 <div class="pin-container">
                                   <div class="pin-head">
                                     <img src="${BASE_URL}/${imageUrl}" alt="${title}" class="pin-logo" />
                                   </div>
                                   <div class="pin-point"></div>
-                                </div><span>${locationName}</span>
-                              ` : `<div class="business-name">${locationName}</div>`}
+                                </div><span>${locationName}${index+1}</span>
+                              ` : `<div class="pin-container">
+                                  <div class="pin-head">
+                                    <img src="${BASE_URL}/${imageUrl}" alt="${title}" class="pin-logo" />
+                                  </div>
+                                  <div class="pin-point"></div>`}
                             </div>
                           `,
                           iconSize: [50, 70],
-                          iconAnchor: [25, 70]
+                          iconAnchor: [25, 70],
                         });
-
-                        // Click handler to redirect to Google Maps
-                        const handleMarkerClick = () => {
-                          const destination = `${pin_location.latitude},${pin_location.longitude}`;
-                          window.open(`https://www.google.com/maps/dir/?api=1&destination=${destination}`, '_blank');
-                        };
 
                         return (
                           <Marker
                             key={`${date}-${index}`}
                             position={position}
                             icon={customDivIcon}
-                            eventHandlers={{
-                              click: handleMarkerClick, // Attach click handler
-                            }}
-                          />
+                            className="custom-marker-class"
+                          >
+                            <Popup closeButton={false}>
+                              {/* Enhanced details inside the popup */}
+                              <div className="popup-content relative bg-white rounded-lg p-4 w-72 ">
+                                {/* Destination order badge */}
+                                <span className="absolute top-2 left-2 text-white text-sm font-bold bg-blue-500 -translate-x-[45px] -translate-y-[15px] rounded-full px-3 py-1 z-10">
+                                  {`${destinationOrder}${getOrdinalSuffix(destinationOrder)}`}
+                                </span>
+                                <div className="mb-2 text-gray-500 text-xs">{date}</div>
+                                <div className="flex gap-4">
+                                  <div className="flex-1">
+                                    <img 
+                                      src={`${BASE_URL}/${imageUrl}`} 
+                                      alt={title} 
+                                      className="h-full w-full rounded-md object-cover border border-gray-200"
+                                    />
+                                  </div>
+                                  <div className="flex-1">
+                                    <h3 className="font-bold text-base text-gray-800 mb-1">{title}</h3>
+                                    <Link to={`/business/${encryptId(id)}`}>
+                                      <Button className="w-full bg-color1 text-color3 rounded-md hover:bg-color2">
+                                        Explore More
+                                      </Button>
+                                    </Link>
+                                  </div>
+                                </div>
+                              </div>
+                            </Popup>
+                          </Marker>
                         );
                       }
                       return null;
                     })
                   )}
+                  {/* Button to show directions for all pins */}
+                  <div style={{
+                    position: 'absolute',
+                    bottom: '10px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    zIndex: 1000,
+                  }}>
+                    <button
+                      className="bg-color1 hover:bg-color2"
+                      onClick={handleShowDirection}
+                      style={{
+                        padding: '10px 20px',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '5px',
+                        cursor: 'pointer',
+                        fontSize: '16px',
+                      }}
+                    >
+                      Show direction
+                    </button>
+                  </div>
                 </MapContainer>
               </div>
             </AccordionItem>
