@@ -304,3 +304,21 @@
     transform: rotate(360deg);
   }
 }
+
+
+
+.leaflet-fade-anim .leaflet-map-pane .leaflet-popup {
+  margin-top: 25px !important;
+  height: 0 !important;
+  border-radius: 8px;
+}
+
+.leaflet-popup-tip {
+  display: none;
+}
+
+.leaflet-popup-content-wrapper {
+  padding: 0 !important;
+  text-align: left;
+  border-radius: 12px;
+}
