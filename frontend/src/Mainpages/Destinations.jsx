@@ -1,12 +1,18 @@
 import React, { useState, useEffect, lazy, Suspense, useRef } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { motion, useAnimation } from 'framer-motion';
+import { useInView } from 'react-intersection-observer';
+import { Spinner } from '@nextui-org/react';
 import Nav from '../components/nav';
 import Footer from '../components/Footer';
 import Hero from '../components/herodestination';
 import Search from '@/components/Search';
-import { Spinner } from '@nextui-org/react';
-import { motion, useAnimation } from 'framer-motion';
-import { useInView } from 'react-intersection-observer';
+import wave from '@/assets/wave2.webp';
+import { MdOutlineKeyboardArrowRight } from 'react-icons/md';
+import EmergencyHotlines from '../Mainpages/DestinationsSectioncomponent/EmergencyHotlines';
+
+
+// Assets
 import bulusan from '../assets/bulusan-destination.webp';
 import bulan from '../assets/bulan.webp';
 import barcelona from '../assets/barcelona.webp';
@@ -22,48 +28,27 @@ import pilar from '../assets/pilar.webp';
 import prieto from '../assets/prieto.webp';
 import santa from '../assets/santa.webp';
 import Sorso from '../assets/sorsogon city.webp';
-import Bulusan from './DestinationsSectioncomponent/Bulusan';
-import Bulan from './DestinationsSectioncomponent/Bulan';
-import Barcelona from './DestinationsSectioncomponent/Barcelona';
-import Casiguran from './DestinationsSectioncomponent/Casiguran';
-import Castilla from './DestinationsSectioncomponent/Castilla';
-import Donsol from './DestinationsSectioncomponent/Donsol';
-import Gubat from './DestinationsSectioncomponent/Gubat';
-import Irosin from './DestinationsSectioncomponent/Irosin';
-import Juban from './DestinationsSectioncomponent/Juban';
-import Magallanes from './DestinationsSectioncomponent/Magallanes';
-import Matnog from './DestinationsSectioncomponent/Matnog';
-import Pilar from './DestinationsSectioncomponent/Pilar';
-import PrietoDiaz from './DestinationsSectioncomponent/PrietoDiaz';
-import StaMagdalena from './DestinationsSectioncomponent/StaMagdalena';
-import Sorsogon from './DestinationsSectioncomponent/Sorsogon';
-import EmergencyHotlines from '../Mainpages/DestinationsSectioncomponent/EmergencyHotlines';
-import wave from '@/assets/wave2.webp'
-import { Skeleton } from '@nextui-org/react';
-import { MdOutlineKeyboardArrowRight } from 'react-icons/md';
 
-
-
+// Lazy-loaded destination components
 const destinationComponents = {
-  Bulusan,
-  Bulan,
-  Barcelona,
-  Casiguran,
-  Castilla,
-  Donsol,
-  Gubat,
-  Irosin,
-  Juban,
-  Magallanes,
-  Matnog,
-  Pilar,
-  PrietoDiaz,
-  StaMagdalena,
-  Sorsogon,
+  Bulusan: lazy(() => import('./DestinationsSectioncomponent/Bulusan')),
+  Bulan: lazy(() => import('./DestinationsSectioncomponent/Bulan')),
+  Barcelona: lazy(() => import('./DestinationsSectioncomponent/Barcelona')),
+  Casiguran: lazy(() => import('./DestinationsSectioncomponent/Casiguran')),
+  Castilla: lazy(() => import('./DestinationsSectioncomponent/Castilla')),
+  Donsol: lazy(() => import('./DestinationsSectioncomponent/Donsol')),
+  Gubat: lazy(() => import('./DestinationsSectioncomponent/Gubat')),
+  Irosin: lazy(() => import('./DestinationsSectioncomponent/Irosin')),
+  Juban: lazy(() => import('./DestinationsSectioncomponent/Juban')),
+  Magallanes: lazy(() => import('./DestinationsSectioncomponent/Magallanes')),
+  Matnog: lazy(() => import('./DestinationsSectioncomponent/Matnog')),
+  Pilar: lazy(() => import('./DestinationsSectioncomponent/Pilar')),
+  PrietoDiaz: lazy(() => import('./DestinationsSectioncomponent/PrietoDiaz')),
+  StaMagdalena: lazy(() => import('./DestinationsSectioncomponent/StaMagdalena')),
+  Sorsogon: lazy(() => import('./DestinationsSectioncomponent/Sorsogon')),
 };
 
 const Destinations = () => {
-  const [loading, setLoading] = useState(true);
   const [showButton, setShowButton] = useState(false);
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -74,10 +59,6 @@ const Destinations = () => {
 
   useEffect(() => {
     document.title = 'RabaSorsogon | Destinations';
-  }, []);
-
-  useEffect(() => {
-    setLoading(false);
   }, []);
 
   useEffect(() => {
@@ -105,31 +86,42 @@ const Destinations = () => {
     if (!selectedDestination) return null;
     const DestinationComponent = destinationComponents[selectedDestination];
     if (!DestinationComponent) return null;
+
     return (
-      <Suspense fallback={<Spinner size='lg' label="Loading destination..." color="primary" className='flex justify-center items-center h-20' />}>
+      <Suspense fallback={<Spinner size="lg" label="Loading destination..." color="primary" className="flex justify-center items-center h-20" />}>
         <DestinationComponent />
       </Suspense>
     );
   };
 
-  if (loading) {
-    return <Spinner className='flex justify-center items-center h-screen' size='lg' label="Loading..." color="primary" />;
-  }
+  const municipalities = [
+    { id: 1, name: 'Barcelona', value: 'Barcelona', img: barcelona },
+    { id: 2, name: 'Bulan', value: 'Bulan', img: bulan },
+    { id: 3, name: 'Bulusan', value: 'Bulusan', img: bulusan },
+    { id: 4, name: 'Casiguran', value: 'Casiguran', img: casiguran },
+    { id: 5, name: 'Castilla', value: 'Castilla', img: castilla },
+    { id: 6, name: 'Donsol', value: 'Donsol', img: donsol },
+    { id: 7, name: 'Gubat', value: 'Gubat', img: gubat },
+    { id: 8, name: 'Irosin', value: 'Irosin', img: irosin },
+    { id: 9, name: 'Juban', value: 'Juban', img: juban },
+    { id: 10, name: 'Magallanes', value: 'Magallanes', img: magallanes },
+    { id: 11, name: 'Matnog', value: 'Matnog', img: matnog },
+    { id: 12, name: 'Pilar', value: 'Pilar', img: pilar },
+    { id: 13, name: 'Prieto Diaz', value: 'PrietoDiaz', img: prieto },
+    { id: 14, name: 'Sta. Magdalena', value: 'StaMagdalena', img: santa },
+    { id: 15, name: 'Sorsogon', value: 'Sorsogon', img: Sorso },
+  ];
 
   return (
-    <div className='mx-auto min-h-screen bg-light font-sans' style={{ backgroundImage: `url(${wave})`, backgroundSize: 'auto', backgroundRepeat: 'repeat', backgroundPosition: 'center' }}>
+    <div className="mx-auto min-h-screen bg-light font-sans" style={{ backgroundImage: `url(${wave})`, backgroundSize: 'auto', backgroundRepeat: 'repeat', backgroundPosition: 'center' }}>
       <Nav />
-
-      {/* Hero Section */}
       <AnimatedSection>
         <Hero />
       </AnimatedSection>
-
       <AnimatedSection>
         <Search />
       </AnimatedSection>
-
-        <div className="container w-full flex justify-start mx-auto overflow-x-auto scrollbar-custom scrollbar-hide mb-4">
+      <div className="container w-full flex justify-start mx-auto overflow-x-auto scrollbar-custom scrollbar-hide mb-4">
         <nav className="text-sm text-gray-500 whitespace-nowrap">
           <ol className="list-none p-0 inline-flex">
             <li className="flex items-center">
@@ -138,77 +130,43 @@ const Destinations = () => {
             </li>
             <li className="flex items-center">
               <Link to="/destinations" className="hover:text-color1 truncate">Destination</Link>
-              <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
             </li>
             <li className="flex items-center text-gray-700 truncate">
+              <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
               <p className="truncate">{initialDestination}</p>
             </li>
           </ol>
         </nav>
       </div>
-        
-
-      {/* Main content */}
-      <div className='mt-4 mx-auto w-full container'>
-
-         {/* Selected destination section */}
-         <div ref={destinationSectionRef}>
+      <div className="mt-4 mx-auto w-full container">
+        <div ref={destinationSectionRef}>
           {renderDestinationSection()}
         </div>
       </div>
-        <div className='p-6 mb-3 container mx-auto'>
-          <h1 className='font-semibold text-2xl'>Discover the Beauty of Sorsogon</h1>
-        </div>
-
-        {/* Municipalities grid */}
-        <div className=' container mx-autobg-transparent text-[11px] md:text-sm grid grid-cols-3 sm:grid-cols-2 font-font1 md:grid-cols-4 lg:grid-cols-5 gap-4'>
-          {loading ? (
-            Array.from({ length: 15 }).map((_, index) => (
-              <AnimatedSection key={index}>
-                <Skeleton className=' h-[100px] md:h-[200px] w-full rounded-sm' />
-              </AnimatedSection>
-            ))
-          ) : (
-            [
-              { id: 1, name: 'Bulusan', value: "Bulusan", img: bulusan },
-              { id: 2, name: 'Bulan', value: "Bulan", img: bulan },
-              { id: 3, name: 'Barcelona', value: "Barcelona", img: barcelona },
-              { id: 4, name: 'Casiguran', value: "Casiguran", img: casiguran },
-              { id: 5, name: 'Castilla', value: "Castilla", img: castilla },
-              { id: 6, name: 'Donsol', value: "Donsol", img: donsol },
-              { id: 7, name: 'Gubat', value: "Gubat", img: gubat },
-              { id: 8, name: 'Irosin', value: "Irosin", img: irosin },
-              { id: 9, name: 'Juban', value: "Juban", img: juban },
-              { id: 10, name: 'Magallanes', value: "Magallanes", img: magallanes },
-              { id: 11, name: 'Matnog', value: "Matnog", img: matnog },
-              { id: 12, name: 'Pilar', value: "Pilar", img: pilar },
-              { id: 13, name: 'Prieto Diaz', value: "PrietoDiaz", img: prieto },
-              { id: 14, name: 'Sta. Magdalena', value: "StaMagdalena", img: santa },
-              { id: 15, name: 'Sorsogon', value: "Sorsogon", img: Sorso },
-            ].map(({index, name, value, img }) => (
-              <AnimatedSection key={index}>
-                <div
-                  className="relative h-[100px] md:h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer"
-                  onClick={() => handleDestinationClick(value)}
-                >
-                  <img className="h-full w-full object-cover rounded-sm shadow-md" src={img} alt={name} />
-                  <div className="absolute  bottom-0 left-0 right-0 bg-dark/60 text-white rounded-lg p-1 text-md text-center w-full">
-                    {name}
-                  </div>
-                </div>
-              </AnimatedSection>
-            ))
-          )}
-        </div>
-
-        {/* Emergency Hotlines Section */}
+      <div className="p-6 mb-3 container mx-auto">
+        <h1 className="font-semibold text-2xl">Discover the Beauty of Sorsogon</h1>
+      </div>
+      <div className="container mx-auto mb-3 grid grid-cols-3 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        {municipalities.map(({ id, name, value, img }) => (
+          <AnimatedSection key={id}>
+            <div
+              className="relative h-[100px] md:h-[200px] w-full border-2 hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer"
+              onClick={() => handleDestinationClick(value)}
+            >
+              <img className="h-full w-full object-cover rounded-sm shadow-md" src={img} alt={name} />
+              <div className="absolute bottom-0 left-0 right-0 bg-dark/60 text-white rounded-lg p-1 text-md text-center w-full">
+                {name}
+              </div>
+            </div>
+          </AnimatedSection>
+        ))}
+      </div>
+      {!selectedDestination && (
         <AnimatedSection>
-        <EmergencyHotlines />
+          <EmergencyHotlines />
         </AnimatedSection>
-
+      )}
       <Footer />
-
-      {/* Scroll-to-top button */}
       {showButton && (
         <motion.button
           className="fixed bottom-5 right-2 p-3 rounded-full shadow-lg z-10"
@@ -216,9 +174,9 @@ const Destinations = () => {
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           animate={{ y: [0, -10, 0] }}
-          transition={{ duration: 0.6, repeat: Infinity, repeatType: "loop" }}
+          transition={{ duration: 0.6, repeat: Infinity, repeatType: 'loop' }}
           style={{
-            background: 'linear-gradient(135deg, #688484  0%, #092635 100%)',
+            background: 'linear-gradient(135deg, #688484 0%, #092635 100%)',
             color: 'white',
           }}
         >
@@ -229,7 +187,6 @@ const Destinations = () => {
   );
 };
 
-// AnimatedSection component to apply entry animations
 const AnimatedSection = ({ children }) => {
   const controls = useAnimation();
   const [ref, inView] = useInView({ threshold: 0.1, triggerOnce: true });
