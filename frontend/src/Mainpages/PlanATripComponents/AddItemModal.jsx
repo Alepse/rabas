@@ -393,6 +393,43 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
     const [checkOutTime, setCheckOutTime] = useState('');
     const [isBookingConfirmed, setIsBookingConfirmed] = useState(false);
     const [notes, setNotes] = useState('');
+     const [selectedFilters, setSelectedFilters] = useState([]);
+
+    const renderTags = (tags, selectedFilters) => {
+        const maxVisibleTags = 3;
+        const visibleTags = tags.slice(0, maxVisibleTags);
+        const hiddenTags = tags.slice(maxVisibleTags);
+    
+        return (
+          <div className="flex flex-wrap gap-2">
+            {visibleTags.map((tag, idx) => (
+              <span
+                key={idx}
+                className={`text-xs px-2 py-1 rounded-full ${
+                  selectedFilters.some(filter => filter.toLowerCase() === tag.toLowerCase())
+                    ? 'bg-color2 text-white'
+                    : 'bg-gray-200 text-gray-700'
+                }`}
+              >
+                {tag}
+              </span>
+            ))}
+            {hiddenTags.length > 0 && (
+              <span
+                className="text-xs underline cursor-pointer text-color2"
+                onClick={() => {
+                    setSelectedItems(tags);
+                  setSelectedFilters(selectedFilters);
+                  onOpen();
+                }}
+              >
+                See More
+              </span>
+            )}
+          </div>
+        );
+      };
+    
 
     const handleAddItemClick = (item) => {
         setSelectedItem(item);
@@ -618,28 +655,12 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                                                 </div>
                                             )}
                                             
-                                            <div className="p-4">
+                                            <div className="p-2">
                                                 <div className="flex justify-between items-center mb-2">
-                                                    <div className="flex flex-wrap gap-2">
-                                                        {item.category.map((cat, idx) => (
-                                                            <span key={idx} className="bg-color2 text-color3 text-xs px-2 py-1 rounded-full">
-                                                                {cat}
-                                                            </span>
-                                                        ))}
-                                                    </div>
-                                                    <div className="flex items-center gap-1">
-                                                    {item.rating ? (
-                                                        <>
-                                                        <span className="text-[12px]">{parseFloat(item.rating).toFixed(1)}</span>
-                                                        <span className="text-yellow-500">
-                                                            {'★'.repeat(Math.floor(item.rating))}
-                                                            {'☆'.repeat(5 - Math.floor(item.rating))}
-                                                        </span>
-                                                        </>
-                                                    ) : (
-                                                        <span className="text-gray-500 text-[12px]">No ratings</span>
-                                                    )}
-                                                    </div>
+                                                <div className="flex justify-between  items-center mb-2">
+                                                    {renderTags(item.category, filters.selectedType)}
+                                               </div>
+                                                   
                                                 </div>
                                                 <h3 className="text-lg font-semibold text-gray-800">
                                                     {renderTitleWithBoldSearch(item.businessName)}
@@ -648,24 +669,33 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                                                     <GiPositionMarker className="mr-1" />
                                                     {item.destination}
                                                 </div>
-                                                <div className="flex mb-2 max-w-[500px] max-h-[5rem] overflow-y-auto scrollbar-custom flex-col">
-                                                {item.description ? (
-                                                    <p className="text-sm text-gray-600 mb-2">
-                                                        {item.description}
-                                                    </p>
-                                                    ) : (
-                                                    <p className="text-sm text-gray-400 italic mb-2">
-                                                        No description
-                                                    </p>
-                                                    )}
+                                                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-2">
+                                                {/* Rating Section */}
+                                                <div className="flex items-center gap-1 mb-2 sm:mb-0">
+                                                {item.rating ? (
+                                                    <>
+                                                    <span className="text-[12px] sm:text-sm">{parseFloat(item.rating).toFixed(1)}</span>
+                                                    <span className="text-yellow-500 text-[12px] sm:text-sm">
+                                                        {'★'.repeat(Math.floor(item.rating))}
+                                                        {'☆'.repeat(5 - Math.floor(item.rating))}
+                                                    </span>
+                                                    </>
+                                                ) : (
+                                                    <span className="text-gray-500 text-[12px] sm:text-sm">No ratings</span>
+                                                )}
                                                 </div>
-                                                <p className="text-md font-semibold text-black mb-2">
+
+                                                {/* Price Range Section */}
+                                                <div className="text-md sm:text-sm font-semibold text-black">
                                                 {item.lowest_price && item.highest_price ? (
                                                     `₱${item.lowest_price} - ₱${item.highest_price}`
-                                                    ) : (
-                                                    <span className="text-gray-400 italic">Price Range Not available</span>
-                                                    )}
-                                                </p>
+                                                ) : (
+                                                    <span className="text-gray-400 italic text-[12px] sm:text-sm">
+                                                    Price Range Not Available
+                                                    </span>
+                                                )}
+                                                </div>
+                                            </div>
                                                 <div className="p-1">
                                                     <Button
                                                         className="w-full bg-color1 text-color3 hover:bg-color2 "
@@ -822,7 +852,39 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                             <Button onClick={handleAddToItinerary} className="w-full bg-color1 text-color3">
                                 Add to Itinerary
                             </Button>
+
+                            
+                                  {/* Modal for displaying all tags */}
+                                  <Modal disableAnimation isOpen={isOpen} onClose={onClose}>
+                                    <ModalContent>
+                                      <ModalHeader>
+                                        <h2>All Tags</h2>
+                                      </ModalHeader>
+                                      <ModalBody>
+                                        <div className="flex flex-wrap gap-2">
+                                          {selectedItems.map((tag, idx) => (
+                                            <span
+                                              key={idx}
+                                              className={`text-xs px-2 py-1 rounded-full ${
+                                                selectedFilters.some(filter => filter.toLowerCase() === tag.toLowerCase())
+                                                  ? 'bg-color2 text-white'
+                                                  : 'bg-gray-200 text-gray-700'
+                                              }`}
+                                            >
+                                              {tag}
+                                            </span>
+                                          ))}
+                                        </div>
+                                      </ModalBody>
+                                      <ModalFooter>
+                                        <Button color='danger' auto flat onClick={onClose}>
+                                          Close
+                                        </Button>
+                                      </ModalFooter>
+                                    </ModalContent>
+                                  </Modal>
                         </motion.div>
+                        
                     )}
                 </ModalBody>
                 <ModalFooter className=' bg-white flex items-center w-full border'>

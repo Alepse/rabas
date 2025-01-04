@@ -13,7 +13,6 @@ import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import wave from '@/assets/wave2.webp'
-import { IoInformationCircleOutline } from "react-icons/io5";
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
@@ -21,7 +20,6 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 import CryptoJS from 'crypto-js';
 import { Skeleton } from "@nextui-org/skeleton";
-import { IoIosInformationCircleOutline } from 'react-icons/io';
 import { MdOutlineKeyboardArrowRight } from 'react-icons/md';
 
 // Animation Variants
