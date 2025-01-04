@@ -267,7 +267,7 @@ const Shop = () => {
 
                 {/* Shop Category Filter */}
                 <div className='mb-6 max-h-[230px] overflow-auto scrollbar-custom'>
-                  <h3 className='text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2'>Shop Category</h3>
+                  <h3 className='text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2'>Shop Type</h3>
                   <CheckboxGroup
                     value={selectedCategories}
                     onChange={handleCategoryChange}

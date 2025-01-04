@@ -359,21 +359,6 @@ const Discover = () => {
         {/* Additional Filters */}
         {additionalFilters}
 
-        {/* Amenities Filter */}
-        <div className="mb-6 max-h-[230px] overflow-auto scrollbar-custom">
-          <h3 className="text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2">Amenities</h3>
-          <CheckboxGroup
-            value={filters.selectedAmenities}
-            onChange={(value) => setFilters(prev => ({ ...prev, selectedAmenities: value }))}
-          >
-            {amenitiesList.map((amenity) => (
-              <Checkbox key={amenity} value={amenity}>
-                {amenity}
-              </Checkbox>
-            ))}
-          </CheckboxGroup>
-        </div>
-
         {/* Price Range Filter */}
         <div className="mb-6">
           <h3 className="text-sm font-medium text-gray-700 mb-2">Price Range (PHP)</h3>
@@ -571,11 +556,42 @@ const Discover = () => {
           {(showFilters || isLargeScreen) && (
             <>
               {activeTab === 'all' && renderFilters(allFilters, setAllFilters, [...activityTypes, ...accommodationTypes, ...foodTypes, ...shopTypes], null, true)}
-              {activeTab === 'activities' && renderFilters(activitiesFilters, setActivitiesFilters, activityTypes)}
-              {activeTab === 'accommodations' && renderFilters(accommodationsFilters, setAccommodationsFilters, accommodationTypes)}
+
+              {activeTab === 'activities' && renderFilters(activitiesFilters, setActivitiesFilters, activityTypes, (
+                <div className="mb-6 max-h-[230px] overflow-auto scrollbar-custom">
+                  <h3 className="text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2">Activity Type</h3>
+                  <CheckboxGroup
+                    value={activitiesFilters.selectedType}
+                    onChange={(value) => setActivitiesFilters(prev => ({ ...prev, selectedType: value }))}
+                  >
+                    {activityTypes.map((type) => (
+                      <Checkbox key={type} value={type}>
+                        {type}
+                      </Checkbox>
+                    ))}
+                  </CheckboxGroup>
+                </div>
+              ))}
+
+              {activeTab === 'accommodations' && renderFilters(accommodationsFilters, setAccommodationsFilters, accommodationTypes, (
+                <div className="mb-6 max-h-[230px] overflow-auto scrollbar-custom">
+                  <h3 className="text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2">Accommodation Type</h3>
+                  <CheckboxGroup
+                    value={accommodationsFilters.selectedType}
+                    onChange={(value) => setAccommodationsFilters(prev => ({ ...prev, selectedType: value }))}
+                  >
+                    {accommodationTypes.map((type) => (
+                      <Checkbox key={type} value={type}>
+                        {type}
+                      </Checkbox>
+                    ))}
+                  </CheckboxGroup>
+                </div>
+              ))}
+
               {activeTab === 'restaurant' && renderFilters(foodFilters, setFoodFilters, foodTypes, (
                 <div className="mb-6 max-h-[230px] overflow-auto scrollbar-custom">
-                  <h3 className="text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2">Cuisine</h3>
+                  <h3 className="text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2">Food Type</h3>
                   <CheckboxGroup
                     value={foodFilters.selectedCuisine}
                     onChange={(value) => setFoodFilters(prev => ({ ...prev, selectedCuisine: value }))}
@@ -588,9 +604,10 @@ const Discover = () => {
                   </CheckboxGroup>
                 </div>
               ))}
+
               {activeTab === 'shop' && renderFilters(shopFilters, setShopFilters, shopTypes, (
                 <div className="mb-6 max-h-[230px] overflow-auto scrollbar-custom">
-                  <h3 className="text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2">Category</h3>
+                  <h3 className="text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2">Shop Type</h3>
                   <CheckboxGroup
                     value={shopFilters.selectedCategory}
                     onChange={(value) => setShopFilters(prev => ({ ...prev, selectedCategory: value }))}

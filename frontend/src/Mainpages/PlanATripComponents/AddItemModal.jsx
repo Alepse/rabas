@@ -41,20 +41,6 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
         'All', 'Bulusan', 'Bulan', 'Barcelona', 'Casiguran', 'Castilla', 'Donsol', 'Gubat', 'Irosin', 'Juban', 'Magallanes', 'Matnog', 'Pilar', 'Prieto Diaz', 'Sta. Magdalena', 'Sorsogon City'
     ];
 
-    const activityTypes = ['Hiking', 'Water Sports', 'Relaxation', 'Adventure'];
-    const accommodationTypes = ['Cabins', 'Resorts', 'Hotels', 'Hostels'];
-    const foodTypes = ['Restaurant', 'Bar', 'Cafe'];
-    const cuisines = ['Filipino', 'International', 'Chinese', 'Japanese', 'Italian', 'Cafe'];
-    const amenitiesList = ['WiFi', 'Outdoor Seating', 'Live Music', 'Happy Hour', 'Family-Friendly', 'Vegan Options'];
-    const shopTypes = ['Souvenir Shop', 'Clothing Store', 'Grocery Store', 'Electronics Store', 'Bookstore'];
-    const categories = ['Handicrafts', 'Fashion', 'Food', 'Electronics', 'Books', 'Home Decor' , 'Souvenir Shop'];
-
-    const [searchQuery, setSearchQuery] = useState('');
-
-    const handleSearchChange = (event) => {
-        setSearchQuery(event.target.value.toLowerCase());
-    };
-
     const [mockData, setMockData] = useState({
     activities: [],
     accommodations: [],
@@ -145,6 +131,72 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
             },
         },
     };
+    // Capitalize each word
+    const capitalizeWords = (str) =>
+        str
+        .split(' ')
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+
+    // Extract, combine, and capitalize all activity types
+    const activityTypes = mockData.activities
+        .flatMap((activity) => activity.category)
+        .filter((type, index, self) => self.indexOf(type) === index) // Remove duplicates
+        .map(capitalizeWords); // Capitalize each type
+
+    // Extract, combine, and capitalize all accommodation types
+    const accommodationTypes = mockData.accommodations
+    .flatMap((accommodation) => accommodation.category)
+    .filter((type, index, self) => self.indexOf(type) === index) // Remove duplicates
+    .map(capitalizeWords); // Capitalize each type
+
+    // Extract, combine, and capitalize all food types
+    const foodTypes = mockData.restaurant
+    .flatMap((restaurant) => restaurant.category)
+    .filter((type, index, self) => self.indexOf(type) === index) // Remove duplicates
+    .map(capitalizeWords); // Capitalize each type
+
+    // Extract, combine, and capitalize all food types
+    const cuisines = mockData.restaurant
+    .flatMap((restaurant) => restaurant.category)
+    .filter((type, index, self) => self.indexOf(type) === index) // Remove duplicates
+    .map(capitalizeWords); // Capitalize each type
+
+    // Extract, combine, and capitalize all amenity items from the entire mockData
+    const amenitiesList = Object.values(mockData) // Get all category arrays
+    .flatMap((category) =>
+        category.flatMap((data) =>
+        data.facilities?.flatMap((facility) =>
+            facility.items.map((item) => item.name)
+        ) || []
+        )
+    )
+    .filter(
+        (item, index, self) =>
+        self.findIndex((i) => i.toLowerCase() === item.toLowerCase()) === index
+    ) // Remove duplicates case-insensitively
+    .map((item) =>
+        item
+        .toLowerCase()
+        .replace(/(^\w|\s\w)/g, (match) => match.toUpperCase()) // Capitalize each word
+    );
+    // Extract, combine, and capitalize all shop types
+    const shopTypes = mockData.shop
+    .flatMap((shop) => shop.category)
+    .filter((type, index, self) => self.indexOf(type) === index) // Remove duplicates
+    .map(capitalizeWords); // Capitalize each type
+
+    // Extract, combine, and capitalize all shop types
+    const categories = mockData.shop
+        .flatMap((shop) => shop.category)
+        .filter((type, index, self) => self.indexOf(type) === index) // Remove duplicates
+        .map(capitalizeWords); // Capitalize each type
+
+    const [searchQuery, setSearchQuery] = useState('');
+
+    const handleSearchChange = (event) => {
+        setSearchQuery(event.target.value.toLowerCase());
+    };
 
     // Functions from Discover.jsx
     const handleRatingClick = (rating, setFilters) => {
@@ -181,9 +233,14 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
           // console.log('selectedCuisine', filters.selectedCuisine);
           // console.log('item.category', item.category);
     
-          const matchesAmenities = filters.selectedAmenities.length === 0 || 
-            filters.selectedAmenities.every(amenity => 
-              item.amenities.map(a => a.toLowerCase().replace(/s$/, '')).includes(amenity.toLowerCase().replace(/s$/, ''))
+          const matchesAmenities =
+            filters.selectedAmenities.length === 0 ||
+            filters.selectedAmenities.every((amenity) =>
+            item.facilities
+                ?.flatMap((facility) =>
+                facility.items.map((a) => a.name.toLowerCase().replace(/s$/, '')) // Normalize item facilities
+                )
+                .includes(amenity.toLowerCase().replace(/s$/, '')) // Normalize selected amenities
             );
     
           const matchesRatings = filters.selectedRatings.length === 0 || 
@@ -198,7 +255,9 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
     };
     
 
-    const renderFilters = (filters, setFilters, types, additionalFilters = null, isAllTab = false) => (
+    const renderFilters = (filters, setFilters, types, additionalFilters = null, isAllTab = false) => {
+        // console.log(types);
+        return (
         <div className="w-full max-h-screen overflow-auto scrollbar-custom  ">
             <div className="bg-white shadow-slate-500  p-6 rounded-lg shadow-lg">
                 <h2 className="text-xl font-semibold mb-4">Filters</h2>
@@ -283,21 +342,6 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                 {/* Additional Filters */}
                 {additionalFilters}
 
-                {/* Amenities Filter */}
-                <div className="mb-6 max-h-[230px] overflow-auto scrollbar-custom">
-                    <h3 className="text-sm font-medium  bg-white z-10 text-gray-700 mb-2">Amenities</h3>
-                    <CheckboxGroup
-                        value={filters.selectedAmenities}
-                        onChange={(value) => setFilters(prev => ({ ...prev, selectedAmenities: value }))}
-                    >
-                        {amenitiesList.map((amenity) => (
-                            <Checkbox key={amenity} value={amenity}>
-                                {amenity}
-                            </Checkbox>
-                        ))}
-                    </CheckboxGroup>
-                </div>
-
                 {/* Price Range Filter */}
                 <div className="mb-6">
                     <h3 className="text-sm font-medium text-gray-700 mb-2">Price Range (PHP)</h3>
@@ -347,7 +391,7 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                 </div>
             </div>
         </div>
-    );
+    )};
 
     // Custom hook to detect if the screen is large
     const useIsLargeScreen = () => {
@@ -563,11 +607,42 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                         {(showFilters || isLargeScreen) && (
                             <div className="w-full lg:w-1/3 max-h-screen lg:sticky lg:top-0 lg:z-30">
                                 {activeTab === 'all' && renderFilters(allFilters, setAllFilters, [...activityTypes, ...accommodationTypes, ...foodTypes, ...shopTypes], null, true)}
-                                {activeTab === 'activities' && renderFilters(activitiesFilters, setActivitiesFilters, activityTypes)}
-                                {activeTab === 'accommodations' && renderFilters(accommodationsFilters, setAccommodationsFilters, accommodationTypes)}
+
+                                {activeTab === 'activities' && renderFilters(activitiesFilters, setActivitiesFilters, activityTypes, (
+                                    <div className="mb-6 max-h-[230px] overflow-auto scrollbar-custom">
+                                        <h3 className="text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2">Activity Type</h3>
+                                        <CheckboxGroup
+                                            value={activitiesFilters.selectedType}
+                                            onChange={(value) => setActivitiesFilters(prev => ({ ...prev, selectedType: value }))}
+                                        >
+                                            {activityTypes.map((type) => (
+                                                <Checkbox key={type} value={type}>
+                                                    {type}
+                                                </Checkbox>
+                                            ))}
+                                        </CheckboxGroup>
+                                    </div>
+                                ))}
+
+                                {activeTab === 'accommodations' && renderFilters(accommodationsFilters, setAccommodationsFilters, accommodationTypes, (
+                                    <div className="mb-6 max-h-[230px] overflow-auto scrollbar-custom">
+                                        <h3 className="text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2">Accommodation Type</h3>
+                                        <CheckboxGroup
+                                            value={accommodationsFilters.selectedType}
+                                            onChange={(value) => setAccommodationsFilters(prev => ({ ...prev, selectedType: value }))}
+                                        >
+                                            {accommodationTypes.map((type) => (
+                                                <Checkbox key={type} value={type}>
+                                                    {type}
+                                                </Checkbox>
+                                            ))}
+                                        </CheckboxGroup>
+                                    </div>
+                                ))}
+
                                 {activeTab === 'restaurant' && renderFilters(foodFilters, setFoodFilters, foodTypes, (
                                     <div className="mb-6 overflow-auto scrollbar-custom">
-                                        <h3 className="text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2">Cuisine</h3>
+                                        <h3 className="text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2">Food Type</h3>
                                         <CheckboxGroup
                                             value={foodFilters.selectedCuisine}
                                             onChange={(value) => setFoodFilters(prev => ({ ...prev, selectedCuisine: value }))}
@@ -580,6 +655,7 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                                         </CheckboxGroup>
                                     </div>
                                 ))}
+
                                 {activeTab === 'shop' && renderFilters(shopFilters, setShopFilters, shopTypes, (
                                     <div className="mb-6 overflow-auto scrollbar-custom">
                                         <h3 className="text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2">Category</h3>
@@ -645,7 +721,7 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
 
                                 const filteredItems = filterData(mockData[category], filters);
 
-                                console.log('filteredItems:', filteredItems);
+                                // console.log('filteredItems:', filteredItems);
 
                                 return filteredItems.map((item, index) => (
                                         <motion.div
