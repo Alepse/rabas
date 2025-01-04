@@ -428,7 +428,8 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn, refreshPro
             </div>
           </div>
 
-          <p className="text-gray-700 text-sm mb-4">{product.description}</p>
+          <p className="text-gray-700 text-sm mb-4 overflow-y-auto h-[120px] max-w-[400px] scrollbar-hide scrollbar-custom p-2 border ring-gray-300 rounded-lg bg-gray-50 shadow-sm leading-relaxed">{product.description}</p>
+
 
           {/* Number of Guests */}
           {product.product_category === 'accommodation' && product.numberOfGuests && (
