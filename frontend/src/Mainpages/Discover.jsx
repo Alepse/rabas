@@ -11,7 +11,6 @@ import "slick-carousel/slick/slick-theme.css";
 import Search from '@/components/Search';
 import MapSection from '@/components/mapsection';
 import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
 import wave from '@/assets/wave2.webp'
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
