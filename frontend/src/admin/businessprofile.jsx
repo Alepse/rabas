@@ -304,7 +304,7 @@ const BusinessProfile = () => {
   // Handle updating the business card
   const handleUpdate = () => {
 
-    if (!cardImage || !description || !location) {
+    if (!cardImage || !location) {
       MySwal.fire({
         title: 'Error',
         text: 'Please fill in all fields for the business card.',
