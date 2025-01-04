@@ -426,7 +426,7 @@ const renderSwiperShopSection = (title, link, spots) => {
 };
 const Irosin = () => {
   const [businesses, setBusinesses] = useState([]);
-  const [currentZoom, setCurrentZoom] = useState(10); // Initial zoom level
+  const [currentZoom, setCurrentZoom] = useState(14); // Initial zoom level
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -498,7 +498,7 @@ const Irosin = () => {
         <div className='flex justify-center'>
           {/* Map Section */}
           <div className="mt-8 z-10  bg-color1 rounded-lg shadow-md p-1 w-full bg-gradient-to-r from-color1 to-color2">
-            <MapSection businesses={businesses} currentZoom={currentZoom} setCurrentZoom={setCurrentZoom} />
+            <MapSection businesses={businesses} initialCenter={[12.703997419528523,124.03177267346597]} currentZoom={currentZoom} setCurrentZoom={setCurrentZoom} />
           </div>
         </div>
       </div>

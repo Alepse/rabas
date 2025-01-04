@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Search from '@/components/Search';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import MapSection from '@/components/mapsection';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import wave from '@/assets/wave2.webp'
@@ -752,65 +752,8 @@ const Discover = () => {
         <div className='flex justify-center '>
        
           {/* Map Section */}
-          <div className="mt-2 z-10  bg-color1 rounded-lg shadow-md p-1 w-full bg-gradient-to-r from-color1 to-color2">
-            
-            <MapContainer center={[12.9738, 123.9807]} zoom={10} className="w-full h-96">
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              />
-              <MapEvents setCurrentZoom={setCurrentZoom} />
-
-              {/* Check if any businesses have valid pin locations */}
-              {businesses.some(business => business.pin_location && business.pin_location.latitude && business.pin_location.longitude) ? (
-                businesses.map((business, index) => {
-                  const { pin_location, businessName, businessLogo } = business;
-
-                  // Skip rendering for businesses without valid latitude or longitude
-                  if (!pin_location || pin_location.latitude == null || pin_location.longitude == null) {
-                    // console.warn(`Business "${businessName}" has invalid pin location:`, pin_location);
-                    return null;
-                  }
-
-                  // Proceed to render marker if pin_location is valid and zoom is sufficient
-                  if (currentZoom >= 7) {
-                    const position = [pin_location.latitude, pin_location.longitude];
-                    const showLogo = currentZoom >= 12; // Set zoom level to show/hide logo
-                    const fontSize = currentZoom >= 12 ? '1rem' : '0.85rem';
-
-                    // Create custom map marker icon
-                    const customDivIcon = L.divIcon({
-                      className: 'custom-icon',
-                      html: `
-                        <div class="custom-popup flex items-center whitespace-nowrap font-bold text-color1" style="font-size: ${fontSize};">
-                          ${showLogo ? `
-                            <div class="pin-container">
-                              <div class="pin-head">
-                                <img src="${BASE_URL}/${businessLogo}" alt="${businessName}" class="pin-logo" />
-                              </div>
-                              <div class="pin-point"></div>
-                            </div>
-                            <span>${businessName}</span>`
-                          : `<div class="business-name">${businessName}</div>`}
-                        </div>
-                      `,
-                      iconSize: [50, 70],
-                      iconAnchor: [25, 70]
-                    });
-
-                    return (
-                      <Marker key={index} position={position} icon={customDivIcon} />
-                    );
-                  }
-
-                  return null; // Skip rendering if zoom level is too low
-                })
-              ) : (
-                <div className="text-center text-gray-500 mt-4">
-                  No businesses have valid pin locations to display on the map.
-                </div>
-              )}
-            </MapContainer>
+          <div className="mt-2 z-10  bg-color1 rounded-lg shadow-md p-1 w-full bg-gradient-to-r from-color1 to-color2">     
+            <MapSection businesses={businesses} initialCenter={[12.901505084198375,123.94763219213431]} currentZoom={currentZoom} setCurrentZoom={setCurrentZoom} />
           </div>
         </div>
       </div>
@@ -867,16 +810,6 @@ const Discover = () => {
 
     </div>
   );
-};
-
-// Component to handle map events
-const MapEvents = ({ setCurrentZoom }) => {
-  useMapEvents({
-    zoomend: (e) => {
-      setCurrentZoom(e.target.getZoom());
-    },
-  });
-  return null;
 };
 
 export default Discover;

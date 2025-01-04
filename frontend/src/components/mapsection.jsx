@@ -19,10 +19,11 @@ const encryptId = (id) => {
   return encodeURIComponent(ciphertext);
 };
 
-const MapSection = ({ businesses, currentZoom, setCurrentZoom }) => {
+const MapSection = ({ businesses, initialCenter, currentZoom, setCurrentZoom }) => {
+    // console.log(businesses);
   return (
     <div className="mt-8 z-10 bg-color1 rounded-lg shadow-md p-1 w-full bg-gradient-to-r from-color1 to-color2">
-      <MapContainer center={[12.9738, 123.9807]} zoom={10} className="w-full h-96">
+      <MapContainer center={initialCenter} zoom={currentZoom} className="w-full h-96 lg:h-[600px]">
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -32,8 +33,9 @@ const MapSection = ({ businesses, currentZoom, setCurrentZoom }) => {
           const { pin_location } = business;
           if (pin_location) { // Adjust zoom level as needed
             const position = [pin_location.latitude, pin_location.longitude];
-            const locationName = business.name;
-            const showName = currentZoom >= 10; // Set zoom level to show/hide logo
+            const name = business.name || business.businessName;
+            const logo = business.image || business.businessLogo || business.cardImage;
+            const showName = currentZoom >= 13; // Set zoom level to show/hide logo
             const fontSize = currentZoom >= 12 ? '1rem' : '0.85rem';
             const customDivIcon = L.divIcon({
               className: 'custom-icon',
@@ -42,14 +44,14 @@ const MapSection = ({ businesses, currentZoom, setCurrentZoom }) => {
                   ${showName ? `
                     <div class="pin-container">
                         <div class="pin-head">
-                            <img src="${BASE_URL}/${business.image}" alt="${business.name}" class="pin-logo" />
+                            <img src="${BASE_URL}/${logo}" alt="${name}" class="pin-logo" />
                         </div>
                         <div class="pin-point"></div>
-                    </div><span>${locationName}</span>
+                    </div><span>${name}</span>
                     ` : `
                     <div class="pin-container">
                         <div class="pin-head">
-                            <img src="${BASE_URL}/${business.image}" alt="${business.name}" class="pin-logo" />
+                            <img src="${BASE_URL}/${logo}" alt="${name}" class="pin-logo" />
                         </div>
                         <div class="pin-point"></div>
                     </div>

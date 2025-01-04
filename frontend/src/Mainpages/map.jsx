@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import MapPicker from '../components/map'; // Adjust the path as per your project structure
+import MapPicker from '../components/mapsection.jsx'; // Adjust the path as per your project structure
 
 function App() {
   const [latitude, setLatitude] = useState(null);
