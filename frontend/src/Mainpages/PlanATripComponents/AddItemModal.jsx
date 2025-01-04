@@ -385,6 +385,7 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
     };
 
     const [selectedItems, setSelectedItems] = useState([]);
+    const [currentTags, setCurrentTags] = useState([]);
 
     const [isSideUIVisible, setIsSideUIVisible] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
@@ -393,42 +394,55 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
     const [checkOutTime, setCheckOutTime] = useState('');
     const [isBookingConfirmed, setIsBookingConfirmed] = useState(false);
     const [notes, setNotes] = useState('');
+    const [isTagsModalVisible, setIsTagsModalVisible] = useState(false);
      const [selectedFilters, setSelectedFilters] = useState([]);
 
-    const renderTags = (tags, selectedFilters) => {
-        const maxVisibleTags = 3;
-        const visibleTags = tags.slice(0, maxVisibleTags);
-        const hiddenTags = tags.slice(maxVisibleTags);
+  
+            const renderTags = (tags = [], selectedFilters = []) => {
+                const maxVisibleTags = 3;
+                const visibleTags = tags.slice(0, maxVisibleTags);
+                const hiddenTags = tags.slice(maxVisibleTags);
+            
+                // Helper function to check if a tag matches any selected filter
+                const isTagHighlighted = (tag) => 
+                    selectedFilters.some(filter =>
+                        tag.toLowerCase().replace(/s$/, '') === filter.toLowerCase().replace(/s$/, '')
+                    );
+            
+                return (
+                    <div className="flex flex-wrap gap-2">
+                        {/* Render visible tags */}
+                        {visibleTags.map((tag, idx) => (
+                            <span
+                                key={idx}
+                                className={`text-xs px-2 py-1 rounded-full ${
+                                    isTagHighlighted(tag)
+                                        ? 'bg-color2 text-white' // Highlighted style
+                                        : 'bg-gray-200 text-gray-700' // Default style
+                                }`}
+                            >
+                                {tag}
+                            </span>
+                        ))}
+            
+                        {/* Render "See More" button for hidden tags */}
+                        {hiddenTags.length > 0 && (
+                            <span
+                                className="text-xs underline cursor-pointer text-color2"
+                                onClick={() => {
+                                    setCurrentTags(tags); // Set all tags (visible + hidden) to `currentTags`
+                                    setIsTagsModalVisible(true); // Open the modal
+                                }}
+                            >
+                                See More
+                            </span>
+                        )}
+                    </div>
+                );
+            };
+            
+            
     
-        return (
-          <div className="flex flex-wrap gap-2">
-            {visibleTags.map((tag, idx) => (
-              <span
-                key={idx}
-                className={`text-xs px-2 py-1 rounded-full ${
-                  selectedFilters.some(filter => filter.toLowerCase() === tag.toLowerCase())
-                    ? 'bg-color2 text-white'
-                    : 'bg-gray-200 text-gray-700'
-                }`}
-              >
-                {tag}
-              </span>
-            ))}
-            {hiddenTags.length > 0 && (
-              <span
-                className="text-xs underline cursor-pointer text-color2"
-                onClick={() => {
-                    setSelectedItems(tags);
-                  setSelectedFilters(selectedFilters);
-                  onOpen();
-                }}
-              >
-                See More
-              </span>
-            )}
-          </div>
-        );
-      };
     
 
     const handleAddItemClick = (item) => {
@@ -710,6 +724,52 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                                                     </Button>
                                                 </div>
                                             </div>
+                                            <Modal
+                                                disableAnimation
+                                                isOpen={isTagsModalVisible}
+                                                onClose={() => setIsTagsModalVisible(false)}
+                                            >
+                                                <ModalContent>
+                                                    <ModalHeader>
+                                                        <h2>All Tags</h2>
+                                                    </ModalHeader>
+                                                    <ModalBody>
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {currentTags.map((tag, idx) => {
+                                                                // Match tag with selected filters using the same logic as filterData
+                                                                const isHighlighted = selectedFilters.some(filter =>
+                                                                    filter.toLowerCase().replace(/s$/, '') === tag.toLowerCase().replace(/s$/, '')
+                                                                );
+
+                                                                return (
+                                                                    <span
+                                                                        key={idx}
+                                                                        className={`text-xs px-2 py-1 rounded-full ${
+                                                                            isHighlighted
+                                                                                ? 'bg-color2 text-white' // Highlight if matched with a filter
+                                                                                : 'bg-gray-200 text-gray-700' // Default style
+                                                                        }`}
+                                                                    >
+                                                                        {tag}
+                                                                    </span>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    </ModalBody>
+                                                    <ModalFooter>
+                                                        <Button
+                                                            color="danger"
+                                                            auto
+                                                            flat
+                                                            onClick={() => setIsTagsModalVisible(false)}
+                                                        >
+                                                            Close
+                                                        </Button>
+                                                    </ModalFooter>
+                                                </ModalContent>
+                                            </Modal>
+
+
                                         </motion.div>
                                     ))
                                 })}
@@ -852,37 +912,6 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                             <Button onClick={handleAddToItinerary} className="w-full bg-color1 text-color3">
                                 Add to Itinerary
                             </Button>
-
-                            
-                                  {/* Modal for displaying all tags */}
-                                  <Modal disableAnimation isOpen={isOpen} onClose={onClose}>
-                                    <ModalContent>
-                                      <ModalHeader>
-                                        <h2>All Tags</h2>
-                                      </ModalHeader>
-                                      <ModalBody>
-                                        <div className="flex flex-wrap gap-2">
-                                          {selectedItems.map((tag, idx) => (
-                                            <span
-                                              key={idx}
-                                              className={`text-xs px-2 py-1 rounded-full ${
-                                                selectedFilters.some(filter => filter.toLowerCase() === tag.toLowerCase())
-                                                  ? 'bg-color2 text-white'
-                                                  : 'bg-gray-200 text-gray-700'
-                                              }`}
-                                            >
-                                              {tag}
-                                            </span>
-                                          ))}
-                                        </div>
-                                      </ModalBody>
-                                      <ModalFooter>
-                                        <Button color='danger' auto flat onClick={onClose}>
-                                          Close
-                                        </Button>
-                                      </ModalFooter>
-                                    </ModalContent>
-                                  </Modal>
                         </motion.div>
                         
                     )}
