@@ -356,9 +356,6 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
                               {/* Enhanced details inside the popup */}
                               <div className="popup-content relative bg-white rounded-lg p-4 w-72 ">
                                 {/* Destination order badge */}
-                                <span className="absolute top-2 left-2 text-white text-sm font-bold bg-color2 -translate-x-[45px] -translate-y-[15px] rounded-full px-3 py-1 z-10">
-                                  {`${destinationOrder}${getOrdinalSuffix(destinationOrder)}`}
-                                </span>
                                 <div className="mb-2 text-gray-500 text-xs">{date}</div>
                                 <div className="flex gap-4">
                                   <div className="flex-1">
