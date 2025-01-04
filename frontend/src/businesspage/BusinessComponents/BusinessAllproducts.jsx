@@ -350,10 +350,10 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn, refreshPro
   
 
   return (
-    <div className="shadow-lg border p-1 hover:shadow-slate-300 rounded-lg overflow-hidden mb-4">
+    <div className="shadow-lg border  p-1 hover:shadow-slate-300 rounded-lg overflow-hidden mb-4">
       <div className="flex flex-col md:flex-row md:flex-wrap">
         {/* Image Section */}
-        <div className="relative w-full   h-[260px] md:w-[400px] md:h-[250px] flex-shrink-0">
+        <div className="relative w-full   h-[260px] md:w-[290px] md:h-[250px] flex-shrink-0">
           {product.images.length > 0 ? (
             <>
             <div className="w-full h-full p-4">
@@ -859,7 +859,7 @@ const BusinessAllproducts = ({isLoggedIn, businessData, userData, openLoginForm}
     <div className="min-h-screen container mx-auto p-4 bg-white rounded-md shadow-md mb-4">
       <div className="text-3xl font-semibold mb-6 text-gray-800">What We Offer</div>
 
-      <div className="flex flex-col lg:flex-row gap-2">
+      <div className="flex flex-col justify-center items-center lg:flex-row gap-2">
         {/* Filter Section */}
         <div className="w-full lg:w-1/4 max-h-screen bg-white p-6 rounded-lg shadow-md">
           <Filters
@@ -873,7 +873,7 @@ const BusinessAllproducts = ({isLoggedIn, businessData, userData, openLoginForm}
         </div>
 
         {/* Main Content Area */}
-        <div className="flex max-h-screen flex-col w-full  p-5 rounded-lg ">
+        <div className="flex max-h-screen flex-col container  p-5 rounded-lg ">
           {/* Tabs */}
           {businessType.length > 0 && (
             <Tabs

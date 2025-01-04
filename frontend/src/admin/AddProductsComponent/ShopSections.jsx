@@ -36,10 +36,6 @@ const ShopSections = () => {
 
   const [options, setOptions] = useState([
     { value: 'souvenir', label: 'Souvenir' },
-    { value: 'clothing', label: 'Clothing' },
-    { value: 'grocery', label: 'Grocery' },
-    { value: 'elctronics', label: 'Electronic' },
-    { value: 'book', label: 'Book' },
     { value: 'custom', label: 'Custom' },
   ]);
   const [newOption, setNewOption] = useState("");
@@ -446,10 +442,10 @@ const ShopSections = () => {
 
               {/* Product Details */}
               <h2 className="text-sm font-bold">Product Name: {product.productName}</h2>
-              <p className="text-sm">
+              <p className="text-sm max-h-[100px] overflow-y-auto scrollbar-custom">
                 <strong>Price:</strong> ₱{product.pricing} {product.pricingUnit}
               </p>
-              <p className="text-sm">
+              <p className="text-sm max-h-[50px] overflow-y-auto scrollbar-custom">
                 <strong>Description:</strong> {product.description}
               </p>
 

@@ -66,8 +66,7 @@ const AccommodationSection = () => {
   // console.log(accommodations);
 
   const [options, setOptions] = useState([
-    { value: 'hotel', label: 'Hotel' },
-    { value: 'resort', label: 'Resort' },
+    { value: 'room', label: 'Room' },
     { value: 'custom', label: 'Custom' },
   ]);
   const [newOption, setNewOption] = useState("");
@@ -576,23 +575,23 @@ const AccommodationSection = () => {
               </div>
 
               {/* Accommodation Details */}
-              <h2 className="text-sm font-bold">Accommodation Name: {accommodation.accommodationName}</h2>
-              <p className="text-sm">
+              <h2 className="text-sm font-bold max-h-[100px] overflow-y-auto scrollbar-custom">Accommodation Name: {accommodation.accommodationName}</h2>
+              <p className="text-sm max-h-[100px] overflow-y-auto scrollbar-custom">
                 <strong>Price:</strong> ₱{accommodation.pricing} {accommodation.pricingUnit}
               </p>
-              <p className="text-sm">
+              <p className="text-sm max-h-[100px] overflow-y-auto scrollbar-custom">
                 <strong>Max guest/room capacity:</strong> {accommodation.numberOfGuests}
               </p>
-              <p className="text-sm">
+              <p className="text-sm max-h-[100px] overflow-y-auto scrollbar-custom">
                 <strong>Description:</strong> {accommodation.description}
               </p>
-              <p className="text-sm">
+              <p className="text-sm max-h-[100px] overflow-y-auto scrollbar-custom">
                 <strong>Booking Option:</strong> {accommodation.hasBooking ? 'Yes' : 'No'}
               </p>
 
               {/* Inclusions */}
-              <h3 className="text-sm font-semibold">Inclusions or Details:</h3>
-              <ul className="list-disc overflow-auto max-h-24 pl-4 text-xs">
+              <h3 className="text-sm font-bold max-h-[50px] overflow-y-auto scrollbar-custom">Inclusions or Details:</h3>
+              <ul className="list-disc   pl-4 text-xs max-h-[100px] overflow-y-auto scrollbar-custom">
                 {accommodation.inclusions && Array.isArray(accommodation.inclusions) && accommodation.inclusions.map((inclusion) => (
                   <li key={inclusion.id}>{inclusion.item}</li> // Accessing item property of the inclusion object
                 ))}
@@ -601,8 +600,8 @@ const AccommodationSection = () => {
               {/* Terms and Conditions */}
               {Array.isArray(accommodation.termsAndConditions) && accommodation.termsAndConditions.length > 0 ? (
                 <>
-                  <h3 className="text-sm font-semibold">Terms and Conditions:</h3>
-                  <ul className="list-disc overflow-auto max-h-24 pl-4 text-xs">
+                  <h3 className="text-sm font-bold">Terms and Conditions:</h3>
+                  <ul className="list-disc max-h-[50px] overflow-y-auto scrollbar-custom pl-4 text-xs">
                     {accommodation.termsAndConditions.map((term) => (
                       <li key={term.id}>{term.item}</li> // Accessing item property of the term object
                     ))}
