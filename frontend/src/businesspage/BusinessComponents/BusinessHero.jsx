@@ -159,7 +159,7 @@ const BusinessHero = (coverPhotos) => {
             <img
               src={previewImage}
               alt="Preview"
-              className="w-auto h-[80vh] object-contain rounded-md shadow-lg"
+              className="w-auto h-[80vh] object-contain "
             />
             {/* Previous Button */}
             <button
