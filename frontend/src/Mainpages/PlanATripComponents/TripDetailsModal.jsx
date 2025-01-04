@@ -356,7 +356,7 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
                               {/* Enhanced details inside the popup */}
                               <div className="popup-content relative bg-white rounded-lg p-4 w-72 ">
                                 {/* Destination order badge */}
-                                <span className="absolute top-2 left-2 text-white text-sm font-bold bg-blue-500 -translate-x-[45px] -translate-y-[15px] rounded-full px-3 py-1 z-10">
+                                <span className="absolute top-2 left-2 text-white text-sm font-bold bg-color2 -translate-x-[45px] -translate-y-[15px] rounded-full px-3 py-1 z-10">
                                   {`${destinationOrder}${getOrdinalSuffix(destinationOrder)}`}
                                 </span>
                                 <div className="mb-2 text-gray-500 text-xs">{date}</div>
@@ -368,11 +368,11 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
                                       className="h-full w-full rounded-md object-cover border border-gray-200"
                                     />
                                   </div>
-                                  <div className="flex-1">
-                                    <h3 className="font-bold text-base text-gray-800 mb-1">{title}</h3>
+                                  <div className="flex flex-col justify-center items-center">
+                                    <h3 className="font-bold text-base text-gray-800 mb-4">{title}</h3>
                                     <Link to={`/business/${encryptId(id)}`}>
                                       <Button className="w-full bg-color1 text-color3 rounded-md hover:bg-color2">
-                                        Explore More
+                                        Visit page
                                       </Button>
                                     </Link>
                                   </div>
