@@ -41,9 +41,7 @@ const RestaurantSection = () => {
   const sliderRefs = useRef({});
 
   const [options, setOptions] = useState([
-    { value: 'restaurant', label: 'Restaurant' },
-    { value: 'bar', label: 'Bar' },
-    { value: 'cafe', label: 'Cafe' },
+    { value: 'buffet', label: 'Buffet' },
     { value: 'custom', label: 'Custom' },
   ]);
   const [newOption, setNewOption] = useState("");
@@ -538,20 +536,20 @@ const RestaurantSection = () => {
               </div>
 
               {/* Restaurant Service Details */}
-              <h2 className="text-sm font-bold">Restaurant Service Name: {restaurant.restaurantName}</h2>
-              <p className="text-sm">
+              <h2 className="text-sm max-h-[100px] overflow-y-auto scrollbar-custom"><strong>Restaurant Service Name: </strong>{restaurant.restaurantName}</h2>
+              <p className="text-sm max-h-[100px] overflow-y-auto scrollbar-custom">
                 <strong>Price:</strong> ₱{restaurant.pricing} {restaurant.pricingUnit}
               </p>
-              <p className="text-sm">
+              <p className="text-sm max-h-[100px] overflow-y-auto scrollbar-custom">
                 <strong>Description:</strong> {restaurant.description}
               </p>
-              <p className="text-sm">
+              <p className="text-sm max-h-[100px] overflow-y-auto scrollbar-custom">
                 <strong>Booking Option:</strong> {restaurant.hasBooking ? 'Yes' : 'No'}
               </p>
 
               {/* Inclusions */}
-              <h1 className='text-sm font-semibold'>Inclusions or Details:</h1>
-              <ul className="list-disc overflow-auto h-24 pl-4 text-xs">
+              <h1 className='text-sm font-semibold '>Inclusions or Details:</h1>
+              <ul className="list-disc max-h-[50px] overflow-y-auto scrollbar-custom pl-4 p-2 text-xs">
                 {restaurant.inclusions && Array.isArray(restaurant.inclusions) && restaurant.inclusions.map((inclusion) => (
                   <li key={inclusion.id}>{inclusion.item}</li> // Accessing item property of the inclusion object
                 ))}
@@ -561,7 +559,7 @@ const RestaurantSection = () => {
               {Array.isArray(restaurant.termsAndConditions) && restaurant.termsAndConditions.length > 0 ? (
                 <>
                   <h3 className="text-sm font-semibold">Terms and Conditions:</h3>
-                  <ul className="list-disc overflow-auto max-h-24 pl-4 text-xs">
+                  <ul className="list-disc max-h-[50px] overflow-y-auto scrollbar-custom pl-4 text-xs">
                     {restaurant.termsAndConditions.map((term) => (
                       <li key={term.id}>{term.item}</li> // Accessing item property of the term object
                     ))}

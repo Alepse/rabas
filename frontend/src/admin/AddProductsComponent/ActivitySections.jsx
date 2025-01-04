@@ -66,7 +66,6 @@ const ActivitySections = () => {
   const [options, setOptions] = useState([
     { value: 'none', label: 'Select an option' },
     { value: 'hiking', label: 'Hiking' },
-    { value: 'adventure', label: 'Adventure' },
     { value: 'custom', label: 'Custom' },
   ]);
   const [newOption, setNewOption] = useState("");
@@ -566,20 +565,20 @@ const ActivitySections = () => {
               </div>
 
               {/* Activity Details */}
-              <h2 className="text-sm font-bold">Activity Name: {activity.activityName}</h2>
-              <p className="text-sm">
+              <h2 className="text-sm font-bold"><strong>Activity Name:</strong> {activity.activityName}</h2>
+              <p className="text-sm max-h-[100px] overflow-y-auto scrollbar-custom">
                 <strong>Price:</strong> ₱{activity.pricing} {activity.pricingUnit}
               </p>
-              <p className="text-sm">
+              <p className="text-sm max-h-[100px] overflow-y-auto scrollbar-custom">
                 <strong>Description:</strong> {activity.description}
               </p>
-              <p className="text-sm">
+              <p className="text-sm max-h-[100px] overflow-y-auto scrollbar-custom">
                 <strong>Booking Option:</strong> {activity.hasBooking ? 'Yes' : 'No'}
               </p>
 
               {/* Inclusions */}
-              <h1 className='text-sm font-semibold'>Inclusions or Details:</h1>
-              <ul className="list-disc overflow-auto h-24 pl-4 text-xs">
+              <h1 className='text-sm font-bold'>Inclusions or Details:</h1>
+              <ul className="list-disc pl-4 text-xs max-h-[50px] overflow-y-auto scrollbar-custom">
                 {activity.inclusions && Array.isArray(activity.inclusions) && activity.inclusions.map((inclusion) => (
                   <li key={inclusion.id}>{inclusion.item}</li> // Accessing item property of the inclusion object
                 ))}
@@ -588,8 +587,8 @@ const ActivitySections = () => {
               {/* Terms and Conditions */}
               {Array.isArray(activity.termsAndConditions) && activity.termsAndConditions.length > 0 ? (
                 <>
-                  <h3 className="text-sm font-semibold">Terms and Conditions:</h3>
-                  <ul className="list-disc overflow-auto max-h-24 pl-4 text-xs">
+                  <h3 className="text-sm font-bold">Terms and Conditions:</h3>
+                  <ul className="list-disc max-h-[50px] overflow-y-auto scrollbar-custom pl-4 text-xs">
                     {activity.termsAndConditions.map((term) => (
                       <li key={term.id}>{term.item}</li> // Accessing item property of the term object
                     ))}
