@@ -415,7 +415,7 @@ const Trip = () => {
         </motion.button>
       )}
 
-      <Modal disableAnimation hideCloseButton isOpen={isOpen} onClose={handleClose} className="rounded-lg shadow-lg mx-auto p-3 max-h-screen max-w-[1200px]">
+      <Modal disableAnimation isDismissable={false} hideCloseButton isOpen={isOpen} onClose={handleClose} className="rounded-lg shadow-lg mx-auto p-3 max-h-screen max-w-[1200px]">
         <ModalContent className="rounded-lg overflow-y-auto scrollbar-custom">
           <ModalHeader className="bg-primary text-white p-4 rounded-t-lg flex justify-between items-center">
             <h2 className="text-2xl font-bold">Let's create your trip in Sorsogon</h2>
@@ -439,31 +439,21 @@ const Trip = () => {
               transition={{ duration: 0.5 }}
               className="p-4 bg-white rounded-lg shadow-md border border-gray-200"
             >
-              {step === 1 && (
-                <>
-                  <h2 className="text-2xl font-semibold text-primary">Introduction</h2>
-                  <p className="text-gray-600 mt-2">Let’s start planning your trip! Answer a few questions to help us tailor the best experience for you.</p>
-                  <div className='flex justify-center flex-col items-center mt-3 '>
-                    <h1 className='text-lg font-medium'>Trip Name</h1>
-                    <Input
-                      placeholder="Name your trip"
-                      value={tripName}
-                      onChange={(e) => setTripName(e.target.value)}
-                      className="mt-4 max-w-[200px]"
-                      style={{ textAlign: 'center', fontSize: '14px',}}
-                    />
-                  </div>
-                </>
-              )}
-              {step === 2 && (
-                <>
-                  <h1 className="text-2xl font-semibold text-primary mb-4">How Many Days Is Your Trip?</h1>
-                  <h1 className='text-center text-lg font-medium mb-2'>Choose Your Start and End Trip Dates</h1>
-                  
-                  <div className='flex justify-center'>
+             {step === 1 && (
+              <>
+                <div className="">
+                  <h2 className="text-xl font-semibold text-primary">Welcome to Trip Planning!</h2>
+                  <p className="text-gray-600 mt-2">
+                    Let's start by tailoring the best experience for you. Fill out each field!
+                  </p>
+                </div>
+                <div className="mt-6">
+                  <h1 className="text-xl font-semibold text-primary text-center mb-3">How Many Days Is Your Trip?</h1>
+                  <p className="text-center text-sm font-small text-gray-500 mb-4">Select your start and end trip dates below:</p>
+                  <div className="flex justify-center">
                     <RangeCalendar
                       visibleMonths={2}
-                      aria-label="Date (Controlled)"
+                      aria-label="Select trip dates"
                       value={value}
                       onChange={(newValue) => {
                         setValue(newValue);
@@ -471,22 +461,47 @@ const Trip = () => {
                       }}
                     />
                   </div>
-                </>
-              )}
-              {step === 3 && (
-                <>
-                  <h1 className="text-2xl font-semibold text-primary mb-4">Plan Your Trip</h1>
-                  <h1 className='text-center text-lg font-medium mb-2'>Set Up Your Itinerary for Each Date</h1>
+                </div>
+              </>
+            )}
+
+            {step === 2 && (
+              <>
+              <h1 className="text-lg font-medium text-primary">Name Your Trip</h1>
+              <p className="text-gray-500 text-sm mt-1">Make it memorable with a personalized name!</p>
+                <div className="flex flex-col justify-center items-center mt-6">
+                <h1 className="text-lg font-medium text-primary">Enter trip name</h1>
+                  <Input
+                    placeholder="e.g., Summer Adventure 2025"
+                    value={tripName}
+                    onChange={(e) => setTripName(e.target.value)}
+                    className="mt-4 max-w-xs text-center"
+                    style={{ fontSize: '14px' }}
+                  />
+                </div>
+              </>
+            )}
+
+            {step === 3 && (
+              <>
+                <div className="mt-6 ">
+                  <h1 className="text-xl font-semibold text-primary mb-2">Plan Your Trip</h1>
+                  <p className="text-sm text-gray-500 mb-4">
+                    Use the itinerary trip planner below to map out your activities for each selected date.
+                  </p>
+                  <p className="text-lg font-medium text-center text-gray-700">Create a  itinerary for your journey!</p>
+  
                   <Planner
-                    startDate={value.start}
-                    endDate={value.end}
+                    startDate={value?.start}
+                    endDate={value?.end}
                     itinerary={itinerary}
                     setItinerary={setItinerary}
                     onItineraryChange={handleItineraryChange}
                   />
-                  {/* {console.log('Planner Dates:', value.start, value.end)} */}
-                </>
-              )}
+                </div>
+              </>
+            )}
+
               {step === 4 && (
                 <>
                   <h2 className="text-xl font-semibold text-primary">Review & Submit</h2>
