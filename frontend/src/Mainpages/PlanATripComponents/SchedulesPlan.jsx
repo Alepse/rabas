@@ -276,11 +276,6 @@ const SchedulesPlan = ({ startDate, endDate, onItineraryChange }) => {
                                                 )}
                                                 <p className="text-sm mb-2"><strong>Booked:</strong> {item.isBooked ? 'Yes' : 'No'}</p>
                                                 <p className="text-sm mb-4"><strong>Notes:</strong> {item.notes}</p>
-                                                <div className='w-full mb-2'>
-                                                    <Link to='/business' target='_blank'>
-                                                        <Button color='primary' className='w-full hover:bg-color2'>Explore</Button>
-                                                    </Link>
-                                                </div>
                                                 <div className="flex space-x-2">
                                                     <Button size="sm" color="danger" className="w-full" onClick={() => handleDelete(date, index)}>Delete</Button>
                                                     <Button size="sm" color='primary' className="w-full" onClick={() => handleEdit(date, index)}>Edit</Button>
