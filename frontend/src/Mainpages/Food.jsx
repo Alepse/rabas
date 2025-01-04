@@ -46,7 +46,6 @@ const Foods = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [showButton, setShowButton] = useState(false);
 
-  const [openTooltip, setOpenTooltip] = useState(null); // Store the ID of the open tooltip
 
    const { isOpen, onOpen, onClose } = useDisclosure();
     const [selectedTags, setSelectedTags] = useState([]);
@@ -74,10 +73,7 @@ const toggleTagFiltering = () => {
 
   
 
-  // Function to toggle a specific tooltip
-  const toggleTooltip = (id) => {
-    setOpenTooltip((prev) => (prev === id ? null : id)); // Toggle the tooltip visibility
-  };
+
 
   useEffect(() => {
     const fetchFoods = async () => {

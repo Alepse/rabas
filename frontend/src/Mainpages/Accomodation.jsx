@@ -46,8 +46,6 @@ const Accommodations = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [showButton, setShowButton] = useState(false);
 
-  const [openTooltip, setOpenTooltip] = useState(null); // Store the ID of the open tooltip
-
    const { isOpen, onOpen, onClose } = useDisclosure();
     const [selectedTags, setSelectedTags] = useState([]);
     const [highlightedTags, setHighlightedTags] = useState([]);
@@ -71,11 +69,7 @@ const Accommodations = () => {
     }
   };
       
-  // Function to toggle a specific tooltip
-  const toggleTooltip = (id) => {
-    setOpenTooltip((prev) => (prev === id ? null : id)); // Toggle the tooltip visibility
-  };
-
+ 
 
   useEffect(() => {
     const fetchAccommodations = async () => {
@@ -465,27 +459,6 @@ const Accommodations = () => {
                         <div className='flex gap-2 items-center flex-wrap'>
                           {/* Business Name */}
                           <h3 className="text-lg sm:text-base lg:text-lg font-semibold text-gray-800 truncate">{accommodation.businessName}</h3>
-
-                          <Tooltip className='bg-color1'
-                            content={
-                              <div className="max-w-[300px] flex justify-center    p-1">
-                                <div className="text-sm flex gap-1  font-light text-white    md:text-md text-start break-words">
-            
-                                <IoInformationCircleOutline className='text-light text-xl'/> {accommodation.description}
-                                </div>
-                              </div>
-                            }
-                            isOpen={openTooltip === accommodation.business_id} // Only open for the active item
-                            onOpenChange={(open) => setOpenTooltip(open ? accommodation.business_id : null)} // Sync state
-                          >
-                            <button
-                              className="bg-transparent"
-                              onClick={() => toggleTooltip(accommodation.business_id)}
-                              aria-expanded={openTooltip === accommodation.business_id}
-                            >
-                              <IoInformationCircleOutline className="text-xl cursor-pointer" />
-                            </button>
-                          </Tooltip>
                         </div>
                            {/* Location */}
                             <div className="text-sm text-gray-500  flex items-center">

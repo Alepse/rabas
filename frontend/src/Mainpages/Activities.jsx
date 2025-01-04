@@ -46,7 +46,7 @@ const Activities = () => {
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
   const [showButton, setShowButton] = useState(false); // State to show/hide button
-  const [openTooltip, setOpenTooltip] = useState(null); // Store the ID of the open tooltip
+
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedTags, setSelectedTags] = useState([]);
@@ -71,10 +71,7 @@ const toggleTagFiltering = () => {
   }
 };
 
-  // Function to toggle a specific tooltip
-  const toggleTooltip = (id) => {
-    setOpenTooltip((prev) => (prev === id ? null : id)); // Toggle the tooltip visibility
-  };
+ 
 
   useEffect(() => {
     const fetchActivities = async () => {
@@ -477,26 +474,6 @@ const toggleTagFiltering = () => {
                         <div className='flex gap-2 items-center flex-wrap'>
                           {/* Business Name */}
                           <h3 className="text-lg sm:text-base lg:text-lg font-semibold text-gray-800 truncate">{activity.businessName}</h3>
-                          <Tooltip className='bg-color1 '
-                            content={
-                              <div className="max-w-[300px] flex justify-center    p-1">
-                                <div className="text-sm flex gap-1  font-light text-white    md:text-md text-start break-words">
-            
-                                <IoInformationCircleOutline className='text-light text-xl'/> {activity.description}
-                                </div>
-                              </div>
-                            }
-                            isOpen={openTooltip === activity.business_id} // Only open for the active item
-                            onOpenChange={(open) => setOpenTooltip(open ? activity.business_id : null)} // Sync state
-                          >
-                            <button
-                              className="bg-transparent z-10"
-                              onClick={() => toggleTooltip(activity.business_id)}
-                              aria-expanded={openTooltip === activity.business_id}
-                            >
-                              <IoInformationCircleOutline className="text-xl cursor-pointer" />
-                            </button>
-                          </Tooltip>
                         </div>
 
                         {/* Location */}

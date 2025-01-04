@@ -227,18 +227,20 @@ const LoginSignup = () => {
         Sign in to explore more in RabaSorsogon
       </h1>
       <div className='w-full flex flex-col gap-2 mt-9'>
+      <div className='border-b-2 py-4 border-gray-300'>
       <Button
-        className="flex items-center justify-center border-2 py-2 hover:bg-color2 hover:text-white transition rounded-lg"
+        className=" border-2 text-center justify-center flex-wrap items-center hover:bg-color2 hover:text-white transition rounded-full"
         onClick={handleGoogleLogin}
         fullWidth
       >
-        <FaGoogle className="mr-2" /> Continue with Google
+        <FaGoogle className="" /> Continue with Google
       </Button>
+      </div>
 
-
+       <div className='p-8 flex flex-col gap-2'>
       <Button
         color="primary"
-        className="hover:bg-color2 rounded-lg"
+        className="hover:bg-color2 rounded-full"
         onClick={() => setView("login")}
         fullWidth
       >
@@ -247,12 +249,13 @@ const LoginSignup = () => {
 
       <Button 
         color="primary"
-        className="hover:bg-color2 rounded-lg"
+        className="hover:bg-color2  rounded-full"
         onClick={() => setView("signup")}
         fullWidth
       >
         Sign Up
       </Button>
+      </div>
       </div>
       
     </div>

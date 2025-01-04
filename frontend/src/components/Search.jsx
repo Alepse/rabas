@@ -26,7 +26,7 @@ const Highlight = ({ content, match }) => {
     <span>
       {content.split(regex).map((part, i) =>
         regex.test(part) ? (
-          <span key={i} className="bg-yellow-200 font-bold text-black rounded">
+          <span key={i} className="bg-color2 text-white font-bold round-md p-1">
             {part}
           </span>
         ) : (

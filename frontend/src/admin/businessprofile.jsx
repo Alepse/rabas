@@ -1185,16 +1185,7 @@ const BusinessProfile = () => {
                           </div>
                         )}
                       </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                        <textarea
-                          value={description || ''}
-                          onChange={(e) => setDescription(e.target.value)}
-                          placeholder="Enter description"
-                          className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-color1"
-                          rows="3"
-                        />
-                      </div>
+                      
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
                           <Select
@@ -1220,32 +1211,15 @@ const BusinessProfile = () => {
                     </div>
                   </div>
 
-                  <div className="mb-6">
-                    <h3 className="text-lg font-bold mb-4">Business Card Preview</h3>
-                    <div className="border border-gray-300 rounded-md p-4">
-                      {cardImage && (
-                        <img
-                          src={cardImage.startsWith('uploads')
-                            ? `${BASE_URL}/${cardImage}`
-                            : cardImage
-                          }
-                          alt="Business Card"
-                          className="w-full h-48 object-cover rounded-md mb-4"
-                        />
-                      )}
-                      <p><strong>Business Name:</strong> {businessData.businessName}</p>
-                      <p><strong>Description:</strong> {description}</p>
-                      <p><strong>Location:</strong> {location}</p>
-                    </div>
-                  </div>
+              
                 </CardBody>
               </Card>
             </Tab>
 
-            <Tab key="hero" title="Cover Photo">
+            <Tab key="hero" title="Photos">
               <Card>
                 <CardBody>
-                  <h2 className="text-lg lg:text-xl font-semibold mb-4 text-gray-700">Cover Photo</h2>
+                  <h2 className="text-lg lg:text-xl font-semibold mb-4 text-gray-700">Photos</h2>
                   <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4'>
                     {/* Rendering the hero images with delete button */}
                     {businessData.heroImages && Array.isArray(businessData.heroImages) && businessData.heroImages.map((image) => (
