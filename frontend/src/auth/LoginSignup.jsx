@@ -32,6 +32,7 @@ const LoginSignup = () => {
   const [otp, setOtp] = useState(''); // OTP state
   const [otpSession, setOtpSession] = useState(null); // Track OTP session
   const [isOtpSent, setIsOtpSent] = useState(false);
+  const [loadingSpinning, setLoadingSpinning] = useState(false);
 
   useEffect(() => {
     document.title = 'Login/Signup';
@@ -55,6 +56,7 @@ const LoginSignup = () => {
 
   const handleLogin = async (event) => {
     event.preventDefault();
+    setLoadingSpinning(true);
     try {
       const response = await fetch(`${BASE_URL}/login`, {
         method: 'POST',
@@ -70,18 +72,21 @@ const LoginSignup = () => {
       });
       const data = await response.json();
       if (data.success) {
+        setLoadingSpinning(false);
         setOtpSession(data.sessionId); // Save OTP session ID
         // console.log('OtpSession saved', data);
         setView("loginotp"); // Redirect to OTP view
         Swal.fire('OTP Sent!', 'Check your email for the OTP.', 'success');
         setIsOtpSent(true); //
       } else {
+        setLoadingSpinning(false);
         showErrorAlert('Login Failed!', data.message);
       }
     } catch (error) {
       console.error('Error:', error); 
       alert('An error occurred while logging in. Please try again later.'); // Display a generic error message to the user      
     }
+    setLoadingSpinning(false);
   };
   
   const [signupData, setSignupData] = useState({
@@ -107,6 +112,7 @@ const LoginSignup = () => {
 
   const handleSignup = async (event) => {
     event.preventDefault();
+    setLoadingSpinning(true);
     try {
       const response = await fetch(`${BASE_URL}/signup`, {
         method: 'POST',
@@ -115,21 +121,25 @@ const LoginSignup = () => {
       });
       const data = await response.json();
       if (data.success) {
+        setLoadingSpinning(false);
         setOtpSession(data.sessionId); // Save OTP session ID
         setView("otp"); // Redirect to OTP view
         Swal.fire('OTP Sent!', 'Check your email for the OTP.', 'success');
         setIsOtpSent(true); //
       } else {
+        setLoadingSpinning(false);
         Swal.fire('Signup Failed!', data.error, 'error');
       }
     } catch (error) {
       console.error(error);
       Swal.fire('Error!', 'An error occurred. Please try again.', 'error');
     }
+    setLoadingSpinning(false);
   };
 
   const handleLoginOtpVerification = async (event) => {
     event.preventDefault();
+    setLoadingSpinning(true);
     try {
       const response = await fetch(`${BASE_URL}/login-verify-otp`, {
         method: 'POST',
@@ -139,20 +149,25 @@ const LoginSignup = () => {
       });
       const data = await response.json();
       if (data.success) {
+        setLoadingSpinning(false);
         Swal.fire('Verification Successful!', 'You are now signed up.', 'success').then(() => {
           window.location.href = '/';
         });
       } else {
+        setLoadingSpinning(false);
         Swal.fire('Verification Failed!', data.error, 'error');
       }
     } catch (error) {
       console.error(error);
+      setLoadingSpinning(false);
       Swal.fire('Error!', 'An error occurred. Please try again.', 'error');
     }
+    setLoadingSpinning(false);
   };
 
   const handleOtpVerification = async (event) => {
     event.preventDefault();
+    setLoadingSpinning(true);
     try {
       const response = await fetch(`${BASE_URL}/verify-otp`, {
         method: 'POST',
@@ -162,16 +177,20 @@ const LoginSignup = () => {
       });
       const data = await response.json();
       if (data.success) {
+        setLoadingSpinning(false);
         Swal.fire('Verification Successful!', 'You are now signed up.', 'success').then(() => {
           window.location.href = '/';
         });
       } else {
+        setLoadingSpinning(false);
         Swal.fire('Verification Failed!', data.error, 'error');
       }
     } catch (error) {
+      setLoadingSpinning(false);
       console.error(error);
       Swal.fire('Error!', 'An error occurred. Please try again.', 'error');
     }
+    setLoadingSpinning(false);
   };
 
   const handleGoogleLogin = () => {
@@ -180,6 +199,7 @@ const LoginSignup = () => {
 
   const handleForgotPassword = async (e) => {
     e.preventDefault();
+    setLoadingSpinning(true);
     try {
       const response = await fetch(`${BASE_URL}/forgot-password`, {
         method: 'POST',
@@ -190,6 +210,7 @@ const LoginSignup = () => {
       });
       const data = await response.json();
       if (data.success) {
+        setLoadingSpinning(false);
         Swal.fire({
           title: 'Email Sent!',
           text: 'Check your email for the password reset link.',
@@ -200,6 +221,7 @@ const LoginSignup = () => {
           window.location.href = '/'; 
         });
       } else {
+        setLoadingSpinning(false);
         Swal.fire({
           title: 'Error!',
           text: data.message || error.message,
@@ -209,7 +231,8 @@ const LoginSignup = () => {
         });
       }
     } catch (error) {
-      console.error('Error:', error);
+      // console.error('Error:', error);
+      setLoadingSpinning(false);
       Swal.fire({
         title: 'Error!',
         text: 'An error occurred while sending the reset link. Please try again later.',
@@ -218,6 +241,7 @@ const LoginSignup = () => {
         confirmButtonColor: '#0BDA51', // Set confirm button color
       });
     }
+    setLoadingSpinning(false);
   };
 
   const renderInitialView = () => (
@@ -441,7 +465,7 @@ const LoginSignup = () => {
 
   // Render OTP form
   const renderOtpForm = () => (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 py-20">
       <h1 className="font-font1 text-center text-2xl mb-4">Enter OTP</h1>
       <form onSubmit={handleOtpVerification} className="flex flex-col gap-4">
         <Input
@@ -539,6 +563,14 @@ const LoginSignup = () => {
 
   return (
     <div className="container mx-auto flex justify-center items-center">
+      {loadingSpinning && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-70 z-50 flex justify-center items-center">
+          <div className="flex flex-col items-center">
+            <div className="spinner"></div>
+            <p className="mt-4 text-lg text-white font-semibold animate-pulse">Loading, please wait...</p>
+          </div>
+        </div>
+      )}
       {view === "otp" ? (
         renderOtpForm()
       ) : view === "loginotp" ? (
