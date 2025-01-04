@@ -354,21 +354,23 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
                           >
                             <Popup closeButton={false}>
                               {/* Enhanced details inside the popup */}
-                              <div className="popup-content relative bg-white rounded-lg p-4 w-72 ">
+                              <div className="popup-content relative bg-white rounded-lg py-4 w-full sm:w-64 md:w-72 max-w-xs">
                                 {/* Destination order badge */}
-                                <div className="mb-2 text-gray-500 text-xs">{date}</div>
-                                <div className="flex gap-4">
-                                  <div className="flex-1">
+                                <div className="mb-2 text-gray-500 text-xs text-center sm:text-left">{date}</div>
+                                <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
+                                  {/* Image Section */}
+                                  <div className="flex-shrink-0">
                                     <img 
                                       src={`${BASE_URL}/${imageUrl}`} 
                                       alt={title} 
-                                      className="h-full w-full rounded-md object-cover border border-gray-200"
+                                      className="w-full max-h-32 md:max-h-40 rounded-md object-cover border border-gray-200"
                                     />
                                   </div>
-                                  <div className="flex flex-col justify-center items-center">
-                                    <h3 className="font-bold text-base text-gray-800 mb-4">{title}</h3>
+                                  {/* Details Section */}
+                                  <div className="flex-1 flex flex-col justify-between items-center sm:items-start text-center sm:text-left">
+                                    <h3 className="font-bold text-sm md:text-base text-gray-800 mb-2">{title}</h3>
                                     <Link to={`/business/${encryptId(id)}`}>
-                                      <Button className="w-full bg-color1 text-color3 rounded-md hover:bg-color2">
+                                      <Button className="w-full bg-color1 text-color3 text-xs md:text-sm py-2 rounded-md hover:bg-color2 transition">
                                         Visit page
                                       </Button>
                                     </Link>
