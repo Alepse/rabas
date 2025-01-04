@@ -14,6 +14,7 @@ import { Button } from '@nextui-org/react';
 import { GiPositionMarker } from 'react-icons/gi';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa'
 import axios from 'axios';
+import MapSection from '@/components/mapsection';
 import CryptoJS from 'crypto-js';
 import { Skeleton } from "@nextui-org/skeleton";
 // Use the environment variable for the base URL
@@ -426,7 +427,7 @@ const renderSwiperShopSection = (title, link, spots) => {
 
 const Castilla = () => {
   const [businesses, setBusinesses] = useState([]);
-  const [currentZoom, setCurrentZoom] = useState(10); // Initial zoom level
+  const [currentZoom, setCurrentZoom] = useState(14); // Initial zoom level
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -496,7 +497,7 @@ const Castilla = () => {
         <div className='flex justify-center'>
           {/* Map Section */}
           <div className="mt-8 z-10  bg-color1 rounded-lg shadow-md p-1 w-full bg-gradient-to-r from-color1 to-color2">
-            <MapSection businesses={businesses} currentZoom={currentZoom} setCurrentZoom={setCurrentZoom} />
+            <MapSection businesses={businesses} initialCenter={[12.953881573672422,123.8751797560467]} currentZoom={currentZoom} setCurrentZoom={setCurrentZoom} />
           </div>
         </div>
       </div>

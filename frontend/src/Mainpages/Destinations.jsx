@@ -88,7 +88,7 @@ const Destinations = () => {
     if (!DestinationComponent) return null;
 
     return (
-      <Suspense fallback={<Spinner size="lg" label="Loading destination..." color="primary" className="flex justify-center items-center h-20" />}>
+      <Suspense fallback={<Spinner size="lg" color="primary" className="flex justify-center items-center h-20" />}>
         <DestinationComponent />
       </Suspense>
     );

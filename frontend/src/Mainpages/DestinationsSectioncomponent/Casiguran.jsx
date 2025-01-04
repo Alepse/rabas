@@ -427,7 +427,7 @@ const renderSwiperShopSection = (title, link, spots) => {
 };
 const Casiguran = () => {
   const [businesses, setBusinesses] = useState([]);
-  const [currentZoom, setCurrentZoom] = useState(10); // Initial zoom level
+  const [currentZoom, setCurrentZoom] = useState(14); // Initial zoom level
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -496,8 +496,8 @@ const Casiguran = () => {
       <h2 className="text-2xl font-semibold mb-4">Locations</h2>
         <div className='flex justify-center'>
           {/* Map Section */}
-          <div className="mt-8 z-10  bg-color1 rounded-lg shadow-md p-1 w-full bg-gradient-to-r from-color1 to-color2">
-            <MapSection businesses={businesses} currentZoom={currentZoom} setCurrentZoom={setCurrentZoom} />
+          <div className="mt-8 z-10  bg-color1 rounded-lg shadow-md h-[200px] p-1 w-full bg-gradient-to-r from-color1 to-color2">
+            <MapSection businesses={businesses} initialCenter={[12.8717273239177,124.00662946258471]} currentZoom={currentZoom} setCurrentZoom={setCurrentZoom} />
           </div>
         </div>
       </div>
