@@ -1702,7 +1702,7 @@ app.put('/updateBusinessDetails/:id', async (req, res) => {
   const businessId = req.params.id;
   const { description, location } = req.body;
 
-  if (!description || !location) {
+  if (!location) {
     return res.status(400).json({ success: false, message: 'All fields are required' });
   }
 
