@@ -9,6 +9,29 @@ import axios from 'axios';
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
+const showSuccessAlert = (message) => {
+  Swal.fire({
+    title: 'Success!',
+    text: message,
+    icon: 'success',
+    confirmButtonText: 'OK',
+    confirmButtonColor: '#0BDA51',
+    cancelButtonColor: '#D33736',
+  });
+};
+
+const showErrorAlert = (message) => {
+  Swal.fire({
+    title: 'Error!',
+    text: message,
+    icon: 'error',
+    confirmButtonText: 'Try Again',
+    confirmButtonColor: '#0BDA51',
+    cancelButtonText: 'Close',
+    cancelButtonColor: '#D33736',
+  });
+};
+
 const ShopDeals = () => {
   const dispatch = useDispatch();
   const shops = useSelector((state) => state.shop.shopProducts);
@@ -38,6 +61,7 @@ const ShopDeals = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [loading, setLoading] = useState(true);
   const [showSelect, setShowSelect] = useState(true);
+  const [loadingSpinning, setLoadingSpinning] = useState(false);
 
   useEffect(() => {
     dispatch(fetchBusinessProducts()).then(() => setLoading(false));
@@ -78,20 +102,24 @@ const ShopDeals = () => {
 
   const handleAddDeal = () => {
     // If editing an existing deal
+    setLoadingSpinning(true);
     if (editingDeal) {
       if (!selectedEditShop || !editDiscount || !editExpirationDate) {
+        setLoadingSpinning(false);
         showAlert("Please fill all fields");
         return;
       }
     
       const discountValue = parseFloat(editDiscount);
       if (isNaN(discountValue) || discountValue <= 0 || discountValue >= 100) {
+        setLoadingSpinning(false);
         showAlert("Please enter a valid discount percentage (0-100)");
         return;
       }
     
       const expiration = new Date(editExpirationDate);
       if (isNaN(expiration.getTime())) {
+        setLoadingSpinning(false);
         showAlert("Please enter a valid expiration date");
         return;
       }
@@ -105,6 +133,7 @@ const ShopDeals = () => {
        
       dispatch(updateShopDeals(dealData));
       setEditingDeal(null);
+      setLoadingSpinning(false);
       Swal.fire({
         title: 'Success!',
         text: 'Deal updated successfully!',
@@ -116,18 +145,21 @@ const ShopDeals = () => {
       resetForm();
     } else {
       if (!selectedShop || !discount || !expirationDate) {
+        setLoadingSpinning(false);
         showAlert("Please fill all fields");
         return;
       }
       
       const discountValue = parseFloat(discount);
       if (isNaN(discountValue) || discountValue <= 0 || discountValue >= 100) {
+        setLoadingSpinning(false);
         showAlert("Please enter a valid discount percentage (0-100)");
         return;
       }
       
       const expiration = new Date(expirationDate);
       if (isNaN(expiration.getTime())) {
+        setLoadingSpinning(false);
         showAlert("Please enter a valid expiration date");
         return;
       }
@@ -146,13 +178,14 @@ const ShopDeals = () => {
       // Clear selectedShop and price values
       // console.log("Before Reset:", selectedShop);
       resetForm();
-      
+      setLoadingSpinning(false);
       Swal.fire({
         title: 'Success!',
         text: 'Deal added successfully!',
         icon: 'success',
         confirmButtonColor: '#0BDA51',
       });      
+      setLoadingSpinning(false);
     }
   };
   
@@ -202,11 +235,13 @@ const ShopDeals = () => {
       cancelButtonColor: '#D33736',
     }).then((result) => {
       if (result.isConfirmed) {
+        setLoadingSpinning(true);
         axios.delete(`${BASE_URL}/delete-deals/${dealId}`, {
           withCredentials: true,
         })
         .then(() => {
           dispatch(deleteDeal(dealId)); // Pass an array with one dealId for consistency
+          setLoadingSpinning(false);
           Swal.fire({
             title: 'Deleted!',
             text: 'The deal has been deleted.',
@@ -215,7 +250,8 @@ const ShopDeals = () => {
           });
         })
         .catch((error) => {
-          console.error("Error deleting deal:", error);
+          // console.error("Error deleting deal:", error);
+          setLoadingSpinning(false);
           Swal.fire({
             title: 'Error!',
             text: 'There was an issue deleting the deal.',
@@ -224,6 +260,7 @@ const ShopDeals = () => {
           });
         });
       }
+      setLoadingSpinning(false);
     });
   };
   
@@ -231,6 +268,14 @@ const ShopDeals = () => {
 
   return (
     <div className="p-4 sm:p-8 w-full">
+      {loadingSpinning && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-70 z-50 flex justify-center items-center">
+          <div className="flex flex-col items-center">
+            <div className="spinner"></div>
+            <p className="mt-4 text-lg text-white font-semibold animate-pulse">Loading, please wait...</p>
+          </div>
+        </div>
+      )}
       <div className="grid grid-cols-1 gap-8 max-w-7xl mx-auto">
         <div className="shadow-lg rounded-lg p-6 bg-white">
           <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Manage Shop Deals</h2>
