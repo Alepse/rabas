@@ -356,8 +356,21 @@ const BusinessInfo = ({businessData, loading, userData, isLoggedIn}) => {
                           >
                             {renderIcon(info.icon)}
                             <span>
-                              {info.label}
-                              {info.value ? `: ${info.value}` : ''}
+                              {info.value && (info.value.startsWith('http://') || info.value.startsWith('https://')) ? (
+                                <a 
+                                  href={info.value} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer" 
+                                  className="text-blue-500 hover:underline"
+                                >
+                                  {info.label}
+                                </a>
+                              ) : (
+                                <>
+                                  {info.label}
+                                  {info.value ? `: ${info.value}` : ''}
+                                </>
+                              )}
                             </span>
                           </li>
                         ))

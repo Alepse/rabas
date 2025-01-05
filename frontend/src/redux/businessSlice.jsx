@@ -153,18 +153,28 @@ const businessSlice = createSlice({
     },
     removePolicyItem: (state, action) => {
       const { policyIndex, itemIndex } = action.payload || {};
+    
+      // Validate indices and ensure the policy and items are valid
       if (
         policyIndex === undefined || 
         itemIndex === undefined || 
+        !Array.isArray(state.policies) || 
         !state.policies[policyIndex] || 
-        !state.policies[policyIndex].items[itemIndex]
+        !Array.isArray(state.policies[policyIndex].items) || 
+        state.policies[policyIndex].items.length <= itemIndex
       ) {
         console.error('Invalid payload or indices for removePolicyItem:', action.payload);
         return;
       }
+    
+      // Remove the item
       state.policies[policyIndex].items.splice(itemIndex, 1);
-    },
-
+    
+      // Remove the policy if it has no items
+      if (state.policies[policyIndex].items.length === 0) {
+        state.policies.splice(policyIndex, 1);
+      }
+    },    
     // Contact Info reducers
     addContactInfo: (state) => {
       if (!state.contactInfo) {

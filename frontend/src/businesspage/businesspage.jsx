@@ -264,11 +264,9 @@ const BusinessPage = () => {
     <div className="mx-auto min-h-screen bg-light font-sans">
       <Nav />
 
-      <div className="container p-1 rounded-md mb-3 flex justify-center">
+      <div className="container p-1 rounded-md mb-3 flex justify-center mt-10 lg:mt-15">
         <Search />
       </div>
-
-    
 
       {/* Business Header Section */}
       <div className="container mx-auto  ">

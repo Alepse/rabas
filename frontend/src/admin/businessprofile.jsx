@@ -75,6 +75,7 @@ const BusinessProfile = () => {
   const fileInputRef = useRef(null);
   const heroImagesInputRef = useRef(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [locationTabHidden, setLocationTabHidden] = useState(true);
   const [address, setAddress] = useState('');
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
@@ -150,23 +151,37 @@ const BusinessProfile = () => {
         const response = await axios.get(`${BASE_URL}/getBusinessLocation`, {
           withCredentials: 'include',
         });
-        // console.log(response.data.businessLocation);
+  
         if (response.data.success) {
           const { location, pin_location } = response.data.businessLocation;
           setAddress(location);
-          setLatitude(pin_location?.latitude);
-          setLongitude(pin_location?.longitude);
+          
+          // Check if latitude and longitude are available immediately after fetching
+          const latitude = pin_location?.latitude;
+          const longitude = pin_location?.longitude;
+  
+          setLatitude(latitude);
+          setLongitude(longitude);
+  
+          // Directly check the pin_location values to set the tab visibility
+          if (latitude && longitude) {
+            setLocationTabHidden(true); // Unhide the tab if both coordinates are available
+            // console.log("true");
+          } else {
+            setLocationTabHidden(false); // Hide the tab if coordinates are missing
+            // console.log("false");
+          }
         }
-        
       } catch (error) {
         console.error('Error fetching location data:', error);
       }
     };
-
+  
     if (isLoggedIn) {
       fetchLocation();
     }
-  }, [isLoggedIn]);
+  }, [isLoggedIn]);  // The effect will run again if the `isLoggedIn` status changes
+  
 
   // Fetch business data and set initial state
   useEffect(() => {
@@ -981,6 +996,7 @@ const BusinessProfile = () => {
   // Example of dispatching removePolicyItem
   const handleRemovePolicyItem = (policyIndex, itemIndex) => {
     dispatch(removePolicyItem({ policyIndex, itemIndex }));
+    // console.log('Removing policy item', policyIndex, itemIndex);
   };
 
   // Ensure tempOpeningHours is initialized with default values if null or empty
@@ -1010,8 +1026,8 @@ const BusinessProfile = () => {
 
   const handleSaveLocation = async () => {
     MySwal.fire({
-      title: 'Are you sure?',
-      text: 'Do you want to save the updated location?',
+      title: 'Are you sure you provided the correct pin location?',
+      text: "After this changes you can't change your location anymore.",
       icon: 'question',
       showCancelButton: true,
       confirmButtonColor: '#32CD32',
@@ -1054,6 +1070,7 @@ const BusinessProfile = () => {
           });
         }
       }
+      setLocationTabHidden(true);
     });
   };  
   
@@ -1548,66 +1565,91 @@ const BusinessProfile = () => {
                 
               </Card>
             </Tab>
+            
+            {!locationTabHidden &&(
+              <Tab key="Location" title="Location">
+                <Card>
+                  <CardBody>
+                    {/* Header  */}
+                    <div className="flex flex-col bg-gray-200 p-4 rounded-lg gap-4">
+                      {/* Header */}
+                      <h2 className="text-xl font-semibold text-gray-800">
+                        Location Details Unavailable
+                      </h2>
 
-            <Tab key="Location" title="Location">
-              <Card>
-                <CardBody>
-                  <div className="flex flex-col gap-4">
-                    <h2 className="text-lg lg:text-xl font-semibold text-gray-700">Business Location</h2>
-                    
-                    {/* Map Container */}
-                    <div className="w-full h-full rounded-lg">
-                      {/* Placeholder for the actual map implementation */}
-                        <MapPicker
-                          setLatitude={handleLatitudeChange}
-                          setLongitude={handleLongitudeChange}
-                        />
-                    </div>
-
-                    {/* Location Controls */}
-                    <div className="flex flex-col gap-3">
-                      <div className="flex gap-3">
-                      <Select
-                        label="Address"
-                        placeholder="Select address"
-                        className="flex-1"
-                        selectedKeys={new Set([address])} // Use `selectedKeys` for controlled selection
-                        onSelectionChange={(key) => setAddress(key.currentKey)} // Update state with the selected key
-                      >
-                        {municipalities.map((municipality) => (
-                          <SelectItem key={municipality} value={municipality}>
-                            {municipality}
-                          </SelectItem>
-                        ))}
-                      </Select>
-                      </div>
+                      {/* Explanation Text */}
                       
-                      <div className="flex gap-3">
-                        <Button 
-                          className="flex-1 bg-color1 text-white hover:bg-color2 transition"
-                          onClick={() => handleSaveLocation()}
-                        >
-                          Save Location
-                        </Button>
-                      </div>
-                    </div>
+                      {/* Info Icon */}
+                      <div className="flex items-start space-x-2 mb-6">
+                        {/* Info Icon */}
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="text-yellow-500 w-24 lg:w-7">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
 
-                    {/* Location Preview */}
-                    <div className="mt-4">
-                      <h3 className="text-md font-semibold mb-2">Current Coordinate Location</h3>
-                      <div className="p-3 bg-gray-50 rounded-lg">
-                        <p className="text-sm text-gray-600">
-                          Latitude: {latitude}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          Longitude: {longitude}
-                        </p>
+                        {/* Explanation Text */}
+                        <span className="text-sm text-gray-600">
+                          This feature is currently available because some required location information is missing. 
+                          Please ensure that your business location details are fully updated for accurate mapping and location-based services.
+                        </span>
                       </div>
                     </div>
-                  </div>
-                </CardBody>
-              </Card>
-            </Tab>
+                    <div className="flex flex-col gap-4">
+                      <h2 className="text-lg lg:text-xl font-semibold text-gray-700">Business Location</h2>
+                      
+                      {/* Map Container */}
+                      <div className="w-full h-full rounded-lg">
+                        {/* Placeholder for the actual map implementation */}
+                          <MapPicker
+                            setLatitude={handleLatitudeChange}
+                            setLongitude={handleLongitudeChange}
+                          />
+                      </div>
+
+                      {/* Location Controls */}
+                      <div className="flex flex-col gap-3">
+                        <div className="flex gap-3">
+                        <Select
+                          label="Address"
+                          placeholder="Select address"
+                          className="flex-1"
+                          selectedKeys={new Set([address])} // Use `selectedKeys` for controlled selection
+                          onSelectionChange={(key) => setAddress(key.currentKey)} // Update state with the selected key
+                        >
+                          {municipalities.map((municipality) => (
+                            <SelectItem key={municipality} value={municipality}>
+                              {municipality}
+                            </SelectItem>
+                          ))}
+                        </Select>
+                        </div>
+                        
+                        <div className="flex gap-3">
+                          <Button 
+                            className="flex-1 bg-color1 text-white hover:bg-color2 transition"
+                            onClick={() => handleSaveLocation()}
+                          >
+                            Save Location
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Location Preview */}
+                      <div className="mt-4">
+                        <h3 className="text-md font-semibold mb-2">Current Coordinate Location</h3>
+                        <div className="p-3 bg-gray-50 rounded-lg">
+                          <p className="text-sm text-gray-600">
+                            Latitude: {latitude}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Longitude: {longitude}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </CardBody>
+                </Card>
+              </Tab>
+            )}
           </Tabs>
           
         )}
