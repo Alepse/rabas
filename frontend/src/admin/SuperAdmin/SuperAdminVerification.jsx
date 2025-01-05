@@ -61,6 +61,7 @@ const Highlight = ({ content, match }) => {
 const VerificationTable = ({ data, title, onUpdateStatus, searchTerm }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [selectedItem, setSelectedItem] = useState(null);
+  const [loadingSpinning, setLoadingSpinning] = useState(false);
 
   const handleViewClick = (item) => {
     setSelectedItem(item);
@@ -68,6 +69,7 @@ const VerificationTable = ({ data, title, onUpdateStatus, searchTerm }) => {
   };
 
   const updateStatus = async (item, newStatus) => {
+    setLoadingSpinning(true);
     try {
       const response = await fetch(`${BASE_URL}/updateStatus-businessApplications/${item.application_id}`, {
         method: 'PUT',
@@ -80,13 +82,16 @@ const VerificationTable = ({ data, title, onUpdateStatus, searchTerm }) => {
       const data = await response.json();
   
       if (response.ok) {
+        setLoadingSpinning(false);
         console.log('Status updated:', data.message);
         return true;
       } else {
+        setLoadingSpinning(false);
         console.error('Error updating status:', data.message);
         return false;
       }
     } catch (error) {
+      setLoadingSpinning(false);
       console.error('Error sending request:', error);
       return false;
     }
@@ -103,6 +108,7 @@ const VerificationTable = ({ data, title, onUpdateStatus, searchTerm }) => {
       confirmButtonText: 'Yes, approve it!',
     }).then(async (result) => {
       if (result.isConfirmed) {
+        setLoadingSpinning(true);
         const updateSuccessful = await updateStatus(item, 1);
         if (updateSuccessful) {
           Swal.fire({
@@ -135,6 +141,7 @@ const VerificationTable = ({ data, title, onUpdateStatus, searchTerm }) => {
       confirmButtonText: 'Yes, reject it!',
     }).then(async (result) => {
       if (result.isConfirmed) {
+        setLoadingSpinning(true);
         const updateSuccessful = await updateStatus(item, -1);
         if (updateSuccessful) {
           Swal.fire({
@@ -158,6 +165,14 @@ const VerificationTable = ({ data, title, onUpdateStatus, searchTerm }) => {
 
   return (
     <div className="overflow-x-auto mb-8">
+      {loadingSpinning && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-70 z-50 flex justify-center items-center">
+          <div className="flex flex-col items-center">
+            <div className="spinner"></div>
+            <p className="mt-4 text-lg text-white font-semibold animate-pulse">Loading, please wait...</p>
+          </div>
+        </div>
+      )}
       <h2 className="text-2xl font-bold mb-4">{title}</h2>
       <table className="min-w-full bg-white shadow-md rounded-lg">
         <thead className="bg-gray-200">
@@ -334,6 +349,7 @@ const SuperAdminVerification = () => {
   const [searchTermRejected, setSearchTermRejected] = useState('');
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [selectedItem, setSelectedItem] = useState(null);
+  const [loadingSpinning, setLoadingSpinning] = useState(false);
 
   const handleViewClick = (item) => {
     setSelectedItem(item);
@@ -402,6 +418,7 @@ const SuperAdminVerification = () => {
   };
 
   const submitUpdateStatus = async (item, newStatus) => {
+    setLoadingSpinning(true);
     try {
       const response = await fetch(`${BASE_URL}/updateStatus-businessApplications/${item.application_id}`, {
         method: 'PUT',
@@ -414,13 +431,16 @@ const SuperAdminVerification = () => {
       const data = await response.json();
   
       if (response.ok) {
+        setLoadingSpinning(false);
         console.log('Status updated:', data.message);
         return true;
       } else {
+        setLoadingSpinning(false);
         console.error('Error updating status:', data.message);
         return false;
       }
     } catch (error) {
+      setLoadingSpinning(false);
       console.error('Error sending request:', error);
       return false;
     }
@@ -521,6 +541,14 @@ const SuperAdminVerification = () => {
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
       <SuperAdminSidebar />
+      {loadingSpinning && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-70 z-50 flex justify-center items-center">
+          <div className="flex flex-col items-center">
+            <div className="spinner"></div>
+            <p className="mt-4 text-lg text-white font-semibold animate-pulse">Loading, please wait...</p>
+          </div>
+        </div>
+      )}
 
       <div className="flex-1 p-4 md:p-8 max-h-screen overflow-y-auto">
         <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6">Verification</h1>
