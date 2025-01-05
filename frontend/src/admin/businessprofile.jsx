@@ -79,6 +79,7 @@ const BusinessProfile = () => {
   const [address, setAddress] = useState('');
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
+  const [loadingSpinning, setLoadingSpinning] = useState(false);
     
   // Title Tab
   useEffect(() => {
@@ -194,6 +195,7 @@ const BusinessProfile = () => {
 
   // Handle saving the edited name
   const handleSaveName = async () => {
+    setLoadingSpinning(true);
     if (!tempBusinessName) {
       MySwal.fire({
         title: 'Error',
@@ -218,6 +220,8 @@ const BusinessProfile = () => {
       const data = await response.json();
 
       if (data.success) {
+        
+        setLoadingSpinning(false);
         dispatch(updateBusinessData({ businessName: tempBusinessName })); // Update Redux state with the new name
         setIsEditingName(false); // Exit editing mode
 
@@ -229,16 +233,30 @@ const BusinessProfile = () => {
           cancelButtonColor: '#FF7F7F',
         });
       } else {
-        throw new Error(data.message);
+        setLoadingSpinning(false);
+        Swal.fire({
+          title: 'Failed!',
+          text: 'Please check you internet connection and try again.',
+          icon: 'error',
+          confirmButtonColor: '#D33736'
+        }).then(() => {
+          setTimeout(() => {
+            window.location.reload();
+          });
+        });
       }
     } catch (error) {
-      console.error('Error updating business name:', error);
-      MySwal.fire({
-        title: 'Error',
-        text: 'Failed to update business name.',
+      // console.error('Error updating business name:', error);
+      setLoadingSpinning(false);
+      Swal.fire({
+        title: 'Failed!',
+        text: 'Please check you internet connection and try again.',
         icon: 'error',
-        confirmButtonColor: '#32CD32',
-        cancelButtonColor: '#FF7F7F',
+        confirmButtonColor: '#D33736'
+      }).then(() => {
+        setTimeout(() => {
+          window.location.reload();
+        });
       });
     }
   };
@@ -254,7 +272,9 @@ const BusinessProfile = () => {
 
   // Handle saving the edited about us
   const handleSaveAboutUs = async () => {
+    setLoadingSpinning(true);
     if (!tempAboutUs) {
+      setLoadingSpinning(false);
       MySwal.fire({
         title: 'Error',
         text: 'Field cannot be empty.',
@@ -278,6 +298,7 @@ const BusinessProfile = () => {
       const data = await response.json();
 
       if (data.success) {
+        setLoadingSpinning(false);
         dispatch(updateBusinessData({ aboutUs: tempAboutUs })); // Update Redux state with the new about us
         setIsEditingAboutUs(false); // Exit editing mode
 
@@ -289,16 +310,29 @@ const BusinessProfile = () => {
           cancelButtonColor: '#FF7F7F',
         });
       } else {
-        throw new Error(data.message);
+        setLoadingSpinning(false);
+        Swal.fire({
+          title: 'Failed!',
+          text: 'Please check you internet connection and try again.',
+          icon: 'error',
+          confirmButtonColor: '#D33736'
+        }).then(() => {
+          setTimeout(() => {
+            window.location.reload();
+          });
+        });
       }
     } catch (error) {
-      console.error('Error updating about us:', error);
-      MySwal.fire({
-        title: 'Error',
-        text: 'Failed to update about us.',
+      setLoadingSpinning(false);
+      Swal.fire({
+        title: 'Failed!',
+        text: 'Please check you internet connection and try again.',
         icon: 'error',
-        confirmButtonColor: '#32CD32',
-        cancelButtonColor: '#FF7F7F',
+        confirmButtonColor: '#D33736'
+      }).then(() => {
+        setTimeout(() => {
+          window.location.reload();
+        });
       });
     }
   };
@@ -318,8 +352,9 @@ const BusinessProfile = () => {
 
   // Handle updating the business card
   const handleUpdate = () => {
-
+    setLoadingSpinning(true);
     if (!cardImage || !location) {
+      setLoadingSpinning(false);
       MySwal.fire({
         title: 'Error',
         text: 'Please fill in all fields for the business card.',
@@ -348,6 +383,7 @@ const BusinessProfile = () => {
       .then(response => response.json())
       .then(data => {
         if (data.success) {
+          setLoadingSpinning(false);
           // Assuming there's a function to fetch and update the business data in state
           fetchBusinessData(); // Update local state with new business details
           dispatch(updateBusinessCard({ description, location })); // Update Redux state with the new details
@@ -363,6 +399,7 @@ const BusinessProfile = () => {
         }
       })
       .catch(error => console.error('Error updating business details:', error));
+      setLoadingSpinning(false);
   };
 
   // Function to handle image upload and confirmation
@@ -391,6 +428,7 @@ const BusinessProfile = () => {
           cancelButtonColor: '#FF7F7F',
         }).then((result) => {
           if (result.isConfirmed) {
+            setLoadingSpinning(true);
             const formData = new FormData();
             formData.append('businessCardImage', file); // Append the file to FormData
 
@@ -402,6 +440,7 @@ const BusinessProfile = () => {
               .then(response => response.json())
               .then(data => {
                 if (data.success) {
+                  setLoadingSpinning(false);
                   fetchBusinessData(); // Fetch the updated business data
                   dispatch(updateBusinessData({ cardImage: data.updatedBusinessCard.cardImage })); // Update Redux state with the new card image
                   Swal.fire({
@@ -411,11 +450,23 @@ const BusinessProfile = () => {
                     confirmButtonColor: '#90EE90', // Light green color
                   }); // Success message
                 } else {
-                  Swal.fire('Error!', data.message, 'error'); // Error message
+                  setLoadingSpinning(false);
+                  setLoadingSpinning(false);
+                  Swal.fire({
+                    title: 'Failed!',
+                    text: 'Please check you internet connection and try again.',
+                    icon: 'error',
+                    confirmButtonColor: '#D33736'
+                  }).then(() => {
+                    setTimeout(() => {
+                      window.location.reload();
+                    });
+                  });
                 }
               })
-              .catch(error => Swal.fire('Error!', 'Failed to upload the image.', 'error')); // Catch any errors
+              .catch(error => Swal.fire('Error!', 'Failed to upload the image.', error)); // Catch any errors
           }
+          setLoadingSpinning(false);
         });
       };
 
@@ -435,6 +486,7 @@ const BusinessProfile = () => {
       confirmButtonText: 'Yes, remove it!',
     }).then((result) => {
       if (result.isConfirmed) {
+        setLoadingSpinning(true);
         // Make API call to delete the card image on the server
         fetch(`${BASE_URL}/businessCardImage/${businessData.business_id}`, {
           method: 'DELETE',
@@ -446,6 +498,7 @@ const BusinessProfile = () => {
         .then((response) => response.json())
         .then((data) => {
           if (data.success) {
+            setLoadingSpinning(false);
             setCardImage(null); // Clear local state
             dispatch(updateBusinessCard({ cardImage: null })); // Update Redux state to remove the image
             MySwal.fire({
@@ -456,23 +509,30 @@ const BusinessProfile = () => {
               cancelButtonColor: '#FF7F7F',
             });
           } else {
-            MySwal.fire({
-              title: 'Error!',
-              text: data.message,
+            setLoadingSpinning(false);
+            Swal.fire({
+              title: 'Failed!',
+              text: 'Please check you internet connection and try again.',
               icon: 'error',
-              confirmButtonColor: '#32CD32',
-              cancelButtonColor: '#FF7F7F',
+              confirmButtonColor: '#D33736'
+            }).then(() => {
+              setTimeout(() => {
+                window.location.reload();
+              });
             });
           }
         })
         .catch((error) => {
-          console.error('Error deleting card image:', error);
-          MySwal.fire({
-            title: 'Error!',
-            text: 'Failed to remove the card image.',
+          setLoadingSpinning(false);
+          Swal.fire({
+            title: 'Failed!',
+            text: 'Please check you internet connection and try again.',
             icon: 'error',
-            confirmButtonColor: '#32CD32',
-            cancelButtonColor: '#FF7F7F',
+            confirmButtonColor: '#D33736'
+          }).then(() => {
+            setTimeout(() => {
+              window.location.reload();
+            });
           });
         });
       }
@@ -504,6 +564,7 @@ const BusinessProfile = () => {
           cancelButtonColor: '#FF7F7F',
         }).then((result) => {
           if (result.isConfirmed) {
+            setLoadingSpinning(true);
             const formData = new FormData();
             formData.append('businessLogo', file); // Append the logo file
 
@@ -515,6 +576,7 @@ const BusinessProfile = () => {
               .then(response => response.json())
               .then(data => {
                 if (data.success) {
+                  setLoadingSpinning(false);
                   fetchBusinessData(); // Fetch the updated business data
                   dispatch(updateBusinessData({ businessLogo: data.updatedLogoPath })); // Update Redux state with the logo path
                   Swal.fire({
@@ -524,16 +586,32 @@ const BusinessProfile = () => {
                     confirmButtonColor: '#32CD32', // Light green color
                   });
                 } else {
-                  console.error('Error updating logo:', data.message);
-                  Swal.fire('Error!', data.message, 'error'); // Error message
+                  setLoadingSpinning(false);
+                  Swal.fire({
+                    title: 'Failed!',
+                    text: 'Please check you internet connection and try again.',
+                    icon: 'error',
+                    confirmButtonColor: '#D33736'
+                  }).then(() => {
+                    setTimeout(() => {
+                      window.location.reload();
+                    });
+                  });
                 }
               })
               .catch(error => {
-                console.error('Error uploading logo:', error);
-                Swal.fire('Error!', 'There was an error uploading the logo.', 'error'); // General error message
+                setLoadingSpinning(false);
+                Swal.fire({
+                  title: 'Failed!',
+                  text: 'Please check you internet connection and try again.',
+                  icon: 'error',
+                  confirmButtonColor: '#D33736'
+                }).then(() => {
+                  setTimeout(() => {
+                    window.location.reload();
+                  });
+                });
               });
-          } else {
-            // Swal.fire('Cancelled', 'Your logo upload was cancelled.', 'info'); // Cancel message
           }
         });
       };
@@ -544,6 +622,7 @@ const BusinessProfile = () => {
 
   // Handle file upload for hero images
   const handleHeroImagesUpload = (event) => {
+    setLoadingSpinning(true);
     const files = Array.from(event.target.files);
 
     if (files.length === 0) return; // Exit if no files are selected
@@ -564,6 +643,7 @@ const BusinessProfile = () => {
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
+          setLoadingSpinning(false);
           // Update Redux store with the new hero images and initialize titles
           dispatch(updateBusinessData({
             heroImages: data.updatedHeroImages
@@ -577,24 +657,30 @@ const BusinessProfile = () => {
             cancelButtonColor: '#FF7F7F',
           });
         } else {
-          console.error('Error updating hero images:', data.message);
-          MySwal.fire({
-            title: 'Error',
-            text: 'Failed to update hero images.',
+          setLoadingSpinning(false);
+          Swal.fire({
+            title: 'Failed!',
+            text: 'Please check you internet connection and try again.',
             icon: 'error',
-            confirmButtonColor: '#32CD32',
-            cancelButtonColor: '#FF7F7F',
+            confirmButtonColor: '#D33736'
+          }).then(() => {
+            setTimeout(() => {
+              window.location.reload();
+            });
           });
         }
       })
       .catch((error) => {
-        console.error('Error uploading hero images:', error);
-        MySwal.fire({
-          title: 'Error',
-          text: 'An error occurred while uploading hero images.',
+        setLoadingSpinning(false);
+        Swal.fire({
+          title: 'Failed!',
+          text: 'Please check you internet connection and try again.',
           icon: 'error',
-          confirmButtonColor: '#32CD32',
-          cancelButtonColor: '#FF7F7F',
+          confirmButtonColor: '#D33736'
+        }).then(() => {
+          setTimeout(() => {
+            window.location.reload();
+          });
         });
       });
   };
@@ -613,6 +699,7 @@ const BusinessProfile = () => {
       confirmButtonText: 'Yes, remove it!',
     }).then((result) => {
       if (result.isConfirmed) {
+        setLoadingSpinning(true);
         // Make DELETE request to remove the image from the backend
         fetch(`${BASE_URL}/businessCoverPhoto/${businessData.business_id}`, {
           method: 'DELETE',
@@ -624,6 +711,7 @@ const BusinessProfile = () => {
           .then((response) => response.json())
           .then((data) => {
             if (data.success) {
+              setLoadingSpinning(false);
               // Remove the image from Redux store after successful deletion
               dispatch(removeHeroImage({ id }));
 
@@ -635,24 +723,30 @@ const BusinessProfile = () => {
                 cancelButtonColor: '#FF7F7F',
               });
             } else {
-              console.error('Error removing image:', data.message);
-              MySwal.fire({
-                title: 'Error',
-                text: 'Failed to remove the image.',
+              setLoadingSpinning(false);
+              Swal.fire({
+                title: 'Failed!',
+                text: 'Please check you internet connection and try again.',
                 icon: 'error',
-                confirmButtonColor: '#32CD32',
-                cancelButtonColor: '#FF7F7F',
+                confirmButtonColor: '#D33736'
+              }).then(() => {
+                setTimeout(() => {
+                  window.location.reload();
+                });
               });
             }
           })
           .catch((error) => {
-            console.error('Error:', error);
-            MySwal.fire({
-              title: 'Error',
-              text: 'An error occurred while removing the image.',
+            setLoadingSpinning(false);
+            Swal.fire({
+              title: 'Failed!',
+              text: 'Please check you internet connection and try again.',
               icon: 'error',
-              confirmButtonColor: '#32CD32',
-              cancelButtonColor: '#FF7F7F',
+              confirmButtonColor: '#D33736'
+            }).then(() => {
+              setTimeout(() => {
+                window.location.reload();
+              });
             });
           });
       }
@@ -666,6 +760,7 @@ const BusinessProfile = () => {
 
   // Save edited title for a hero image
   const handleSaveImageTitle = async (imageId) => {
+    setLoadingSpinning(true);
     try {
       const response = await fetch(`${BASE_URL}/updateBusinessCoverImagesTitle/${businessData.business_id}`, {
         method: 'PUT',
@@ -681,6 +776,7 @@ const BusinessProfile = () => {
       const data = await response.json();
   
       if (data.success) {
+        setLoadingSpinning(false);
         dispatch(updateHeroImageTitle({ id: imageId, title: tempImageTitles[imageId] }));
         setEditingImageTitles((prev) => ({ ...prev, [imageId]: false }));
   
@@ -692,16 +788,29 @@ const BusinessProfile = () => {
           cancelButtonColor: '#FF7F7F',
         });
       } else {
-        throw new Error(data.message);
+        setLoadingSpinning(false);
+        Swal.fire({
+          title: 'Failed!',
+          text: 'Please check you internet connection and try again.',
+          icon: 'error',
+          confirmButtonColor: '#D33736'
+        }).then(() => {
+          setTimeout(() => {
+            window.location.reload();
+          });
+        });
       }
     } catch (error) {
-      console.error('Error updating image title:', error);
-      MySwal.fire({
-        title: 'Error',
-        text: 'Failed to update image title.',
+      setLoadingSpinning(false);
+      Swal.fire({
+        title: 'Failed!',
+        text: 'Please check you internet connection and try again.',
         icon: 'error',
-        confirmButtonColor: '#32CD32',
-        cancelButtonColor: '#FF7F7F',
+        confirmButtonColor: '#D33736'
+      }).then(() => {
+        setTimeout(() => {
+          window.location.reload();
+        });
       });
     }
   };
@@ -714,6 +823,7 @@ const BusinessProfile = () => {
   };
 
   const handleSaveContact = async () => {
+    setLoadingSpinning(true);
     try {
       // Send PUT request to update contact info in the backend
       const response = await fetch(`${BASE_URL}/updateBusinessContactInfo/${businessData.business_id}`, {
@@ -727,6 +837,7 @@ const BusinessProfile = () => {
       const data = await response.json();
 
       if (data.success) {
+        setLoadingSpinning(false);
         MySwal.fire({
           title: 'Success',
           text: 'Contact information updated successfully!',
@@ -735,16 +846,29 @@ const BusinessProfile = () => {
           cancelButtonColor: '#FF7F7F',
         });
       } else {
-        throw new Error(data.message);
+        setLoadingSpinning(false);
+        Swal.fire({
+          title: 'Failed!',
+          text: 'Please check you internet connection and try again.',
+          icon: 'error',
+          confirmButtonColor: '#D33736'
+        }).then(() => {
+          setTimeout(() => {
+            window.location.reload();
+          });
+       });
       }
     } catch (error) {
-      console.error('Error updating contact info:', error);
-      MySwal.fire({
-        title: 'Error',
-        text: 'Failed to update contact information.',
+      setLoadingSpinning(false);
+      Swal.fire({
+        title: 'Failed!',
+        text: 'Please check you internet connection and try again.',
         icon: 'error',
-        confirmButtonColor: '#32CD32',
-        cancelButtonColor: '#FF7F7F',
+        confirmButtonColor: '#D33736'
+      }).then(() => {
+        setTimeout(() => {
+          window.location.reload();
+        });
       });
     }
   };
@@ -761,6 +885,7 @@ const BusinessProfile = () => {
       confirmButtonText: 'Yes, remove it!',
     }).then((result) => {
       if (result.isConfirmed) {
+        setLoadingSpinning(true);
         dispatch(removeContactInfo({ id }));
         MySwal.fire({
           title: 'Removed!',
@@ -770,6 +895,7 @@ const BusinessProfile = () => {
           cancelButtonColor: '#FF7F7F',
         });
       }
+      setLoadingSpinning(false);
     });
   };
 
@@ -785,6 +911,7 @@ const BusinessProfile = () => {
   };
 
   const handleSaveHours = async () => {
+    setLoadingSpinning(true);
     try {
       const response = await fetch(`${BASE_URL}/update-opening-hours/${businessData.business_id}`, {
         method: 'PUT',
@@ -800,6 +927,7 @@ const BusinessProfile = () => {
       const data = await response.json();
 
       if (data.success) {
+        setLoadingSpinning(false);
         // Optionally update your Redux state here with new data
         dispatch(updateBusinessData({ openingHours: tempOpeningHours }));
 
@@ -815,25 +943,29 @@ const BusinessProfile = () => {
         // Exit editing mode
         setIsEditingHours(false);
       } else {
-        console.error('Error saving opening hours:', data.message);
-        // Show error alert
+        setLoadingSpinning(false);
         Swal.fire({
+          title: 'Failed!',
+          text: 'Please check you internet connection and try again.',
           icon: 'error',
-          title: 'Error!',
-          text: data.message || 'Failed to save opening hours.',
-          confirmButtonText: 'Okay',
-          confirmButtonColor: '#32CD32',
+          confirmButtonColor: '#D33736'
+        }).then(() => {
+          setTimeout(() => {
+            window.location.reload();
+          });
         });
       }
     } catch (error) {
-      console.error('Error while saving opening hours:', error);
-      // Show error alert
+      setLoadingSpinning(false);
       Swal.fire({
+        title: 'Failed!',
+        text: 'Please check you internet connection and try again.',
         icon: 'error',
-        title: 'Error!',
-        text: 'An error occurred while saving opening hours.',
-        confirmButtonText: 'Okay',
-        confirmButtonColor: '#32CD32',
+        confirmButtonColor: '#D33736'
+      }).then(() => {
+        setTimeout(() => {
+          window.location.reload();
+        });
       });
     }
   };
@@ -850,6 +982,7 @@ const BusinessProfile = () => {
   };
 
   const handleSaveFacilities = async () => {
+    setLoadingSpinning(true);
     try {
       const response = await fetch(`${BASE_URL}/updateBusinessFacilities/${businessData.business_id}`, {
         method: 'PUT',
@@ -862,6 +995,7 @@ const BusinessProfile = () => {
       const data = await response.json();
 
       if (data.success) {
+        setLoadingSpinning(false);
         MySwal.fire({
           title: 'Success',
           text: 'Facilities updated successfully!',
@@ -870,16 +1004,29 @@ const BusinessProfile = () => {
           cancelButtonColor: '#FF7F7F',
         });
       } else {
-        throw new Error(data.message);
+        setLoadingSpinning(false);
+        Swal.fire({
+          title: 'Failed!',
+          text: 'Please check you internet connection and try again.',
+          icon: 'error',
+          confirmButtonColor: '#D33736'
+        }).then(() => {
+          setTimeout(() => {
+            window.location.reload();
+          });
+        });
       }
     } catch (error) {
-      console.error('Error updating facilities:', error);
-      MySwal.fire({
-        title: 'Error',
-        text: 'Failed to update facilities.',
+      setLoadingSpinning(false);
+      Swal.fire({
+        title: 'Failed!',
+        text: 'Please check you internet connection and try again.',
         icon: 'error',
-        confirmButtonColor: '#32CD32',
-        cancelButtonColor: '#FF7F7F',
+        confirmButtonColor: '#D33736'
+      }).then(() => {
+        setTimeout(() => {
+          window.location.reload();
+        });
       });
     }
   };
@@ -896,6 +1043,7 @@ const BusinessProfile = () => {
       confirmButtonText: 'Yes, remove it!',
     }).then((result) => {
       if (result.isConfirmed) {
+        setLoadingSpinning(true);
         dispatch(removeFacility({ index }));
         MySwal.fire({
           title: 'Removed!',
@@ -905,11 +1053,13 @@ const BusinessProfile = () => {
           cancelButtonColor: '#FF7F7F',
         });
       }
+      setLoadingSpinning(false);
     });
   };
 
   // Function to handle saving policies
   const handleSavePolicies = async () => {
+    setLoadingSpinning(true);
     try {
       const response = await fetch(`${BASE_URL}/updateBusinessPolicies/${businessData.business_id}`, {
         method: 'PUT',
@@ -922,6 +1072,7 @@ const BusinessProfile = () => {
       const data = await response.json();
 
       if (data.success) {
+        setLoadingSpinning(false);
         MySwal.fire({
           title: 'Success',
           text: 'Policies updated successfully!',
@@ -930,16 +1081,29 @@ const BusinessProfile = () => {
           cancelButtonColor: '#FF7F7F',
         });
       } else {
-        throw new Error(data.message);
+        setLoadingSpinning(false);
+        Swal.fire({
+          title: 'Failed!',
+          text: 'Please check you internet connection and try again.',
+          icon: 'error',
+          confirmButtonColor: '#D33736'
+        }).then(() => {
+          setTimeout(() => {
+            window.location.reload();
+          });
+        });
       }
     } catch (error) {
-      console.error('Error updating policies:', error);
-      MySwal.fire({
-        title: 'Error',
-        text: 'Failed to update policies.',
+      setLoadingSpinning(false);
+      Swal.fire({
+        title: 'Failed!',
+        text: 'Please check you internet connection and try again.',
         icon: 'error',
-        confirmButtonColor: '#32CD32',
-        cancelButtonColor: '#FF7F7F',
+        confirmButtonColor: '#D33736'
+      }).then(() => {
+        setTimeout(() => {
+          window.location.reload();
+        });
       });
     }
   };
@@ -1035,6 +1199,7 @@ const BusinessProfile = () => {
       confirmButtonText: 'Yes, save it!',
     }).then(async (result) => {
       if (result.isConfirmed) {
+        setLoadingSpinning(true);
         try {
           const requestData = {
             location: address,
@@ -1046,6 +1211,7 @@ const BusinessProfile = () => {
           });
   
           if (response.data.success) {
+            setLoadingSpinning(false);
             MySwal.fire({
               title: 'Success!',
               text: 'Location updated successfully.',
@@ -1053,23 +1219,33 @@ const BusinessProfile = () => {
               confirmButtonColor: '#32CD32',
             });
           } else {
-            MySwal.fire({
-              title: 'Error!',
-              text: response.data.message,
+            setLoadingSpinning(false);
+            Swal.fire({
+              title: 'Failed!',
+              text: 'Please check you internet connection and try again.',
               icon: 'error',
-              confirmButtonColor: '#FF7F7F',
+              confirmButtonColor: '#D33736'
+            }).then(() => {
+              setTimeout(() => {
+                window.location.reload();
+              });
             });
           }
         } catch (error) {
-          console.error('Error updating location:', error);
-          MySwal.fire({
+          setLoadingSpinning(false);
+          Swal.fire({
             title: 'Failed!',
-            text: 'Failed to update location. Please try again later.',
+            text: 'Please check you internet connection and try again.',
             icon: 'error',
-            confirmButtonColor: '#FF7F7F',
+            confirmButtonColor: '#D33736'
+          }).then(() => {
+            setTimeout(() => {
+              window.location.reload();
+            });
           });
         }
       }
+      setLoadingSpinning(false);
       setLocationTabHidden(true);
     });
   };  
@@ -1077,6 +1253,15 @@ const BusinessProfile = () => {
   return (
     <div className="flex flex-col lg:flex-row min-h-screen mx-auto bg-gray-100 font-sans">
       <Sidebar />
+
+      {loadingSpinning && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-70 z-50 flex justify-center items-center">
+          <div className="flex flex-col items-center">
+            <div className="spinner"></div>
+            <p className="mt-4 text-lg text-white font-semibold animate-pulse">Loading, please wait...</p>
+          </div>
+        </div>
+      )}
 
       <div className="flex-1 px-8 py-4 lg:p-8 max-h-screen overflow-y-auto">
         <div className='flex justify-between items-center mb-3'>
