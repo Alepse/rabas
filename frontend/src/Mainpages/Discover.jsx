@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import Nav from '@/components/nav';
 import Hero from '@/components/herodiscover';
 import Footer from '@/components/Footer';
-import { Button, Checkbox, CheckboxGroup,Tooltip, Select, SelectItem, Slider, Tabs, Tab, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from '@nextui-org/react';
+import { Button, Checkbox, CheckboxGroup, Pagination, PaginationItemType, Select, SelectItem, Slider, Tabs, Tab, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from '@nextui-org/react';
 import { GiPositionMarker } from 'react-icons/gi';
 import { Link } from 'react-router-dom';
 import "slick-carousel/slick/slick.css";
@@ -30,6 +30,29 @@ const containerVariants = {
       staggerChildren: 0.1,
     },
   },
+};
+
+const ChevronIcon = (props) => {
+  return (
+    <svg
+      aria-hidden="true"
+      fill="none"
+      focusable="false"
+      height="1em"
+      role="presentation"
+      viewBox="0 0 24 24"
+      width="1em"
+      {...props}
+    >
+      <path
+        d="M15.5 19l-7-7 7-7"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
+    </svg>
+  );
 };
 
 
@@ -61,6 +84,9 @@ const Discover = () => {
   //for maps
   const [currentZoom, setCurrentZoom] = useState(10); // Initial zoom level
 
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 9; // Adjust this value based on your grid layout
+
   const [mockData, setMockData] = useState({
     activities: [],
     accommodations: [],
@@ -77,6 +103,90 @@ const Discover = () => {
     
   const businesscategories = ['activity', 'accommodation', 'restaurant', 'shop'];
 
+
+  const renderPaginationItem = ({ref, key, value, isActive, onNext, onPrevious, setPage, className}) => {
+    if (value === PaginationItemType.NEXT) {
+      return (
+        <button
+          key={key}
+          className={`${className} bg-default-200/50 min-w-8 w-8 h-8`}
+          onClick={onNext}
+        >
+          <ChevronIcon className="rotate-180" />
+        </button>
+      );
+    }
+
+    if (value === PaginationItemType.PREV) {
+      return (
+        <button
+          key={key}
+          className={`${className} bg-default-200/50 min-w-8 w-8 h-8`}
+          onClick={onPrevious}
+        >
+          <ChevronIcon />
+        </button>
+      );
+    }
+
+    if (value === PaginationItemType.DOTS) {
+      return (
+        <button key={key} className={className}>
+          ...
+        </button>
+      );
+    }
+
+    return (
+      <button
+        key={key}
+        ref={ref}
+        className={`${className} ${isActive ? "text-white bg-gradient-to-br from-color1 to-color2 font-bold" : ""}`}
+        onClick={() => setPage(value)}
+      >
+        {value}
+      </button>
+    );
+  };
+
+  const getCurrentPageItems = () => {
+    const activeData =
+      activeTab === 'all' ? Object.values(mockData).flat() : mockData[activeTab] || [];
+    const filteredItems = filterData(activeData, getActiveFilters());
+    const startIndex = currentPage * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredItems.slice(startIndex, endIndex);
+  };
+  
+  
+ 
+    // Helper function to get active filters based on the current tab
+    const getActiveFilters = () => {
+      switch (activeTab) {
+        case 'restaurant':
+          return foodFilters;
+        case 'shop':
+          return shopFilters;
+        case 'activities':
+          return activitiesFilters;
+        case 'accommodations':
+          return accommodationsFilters;
+        default:
+          return allFilters;
+      }
+    };
+  
+    const getTotalPagesForActiveTab = () => {
+      const activeData = activeTab === 'all' ? Object.values(mockData).flat() : mockData[activeTab] || [];
+      const filteredItems = filterData(activeData, getActiveFilters());
+      return Math.ceil(filteredItems.length / itemsPerPage);
+    };
+    
+
+    const getTotalPages = (items) => {
+      return Math.ceil(items.length / itemsPerPage);
+    };
+    
 
 
   // Fetch businesses from the backend
@@ -233,46 +343,49 @@ const Discover = () => {
 
   const filterData = (data, filters) => {
     return data.filter(item => {
-      const matchesType = filters.selectedType.length === 0 || 
-        filters.selectedType.every(type => 
-          item.category.map(cat => cat.toLowerCase().replace(/s$/, '')).includes(type.toLowerCase().replace(/s$/, ''))
+      const matchesType = !filters.selectedType || filters.selectedType.length === 0 || 
+        filters.selectedType.some(type => 
+          item.category && item.category.some(cat => 
+            cat.toLowerCase().replace(/s$/, '') === type.toLowerCase().replace(/s$/, '')
+          )
         );
      
-      const matchesCategory = filters.selectedCategory?.length === 0 || 
-        filters.selectedCategory.every(category => 
-          item.category.map(cat => cat.toLowerCase().replace(/s$/, '')).includes(category.toLowerCase().replace(/s$/, ''))
+      const matchesCategory = !filters.selectedCategory || filters.selectedCategory.length === 0 || 
+        filters.selectedCategory.some(category => 
+          item.category && item.category.some(cat => 
+            cat.toLowerCase().replace(/s$/, '') === category.toLowerCase().replace(/s$/, '')
+          )
         );
       
-      const matchesCuisine = filters.selectedCuisine?.length === 0 || 
-        filters.selectedCuisine.every(cuisine => 
-          item.category.map(cat => cat.toLowerCase().replace(/s$/, '')).includes(cuisine.toLowerCase().replace(/s$/, ''))
+      const matchesCuisine = !filters.selectedCuisine || filters.selectedCuisine.length === 0 || 
+        filters.selectedCuisine.some(cuisine => 
+          item.category && item.category.some(cat => 
+            cat.toLowerCase().replace(/s$/, '') === cuisine.toLowerCase().replace(/s$/, '')
+          )
         );
-
-      // console.log('selectedCuisine', filters.selectedCuisine);
-      // console.log('item.category', item.category);
-      // console.log(item.facilities);
-      
-      const matchesAmenities =
-        filters.selectedAmenities.length === 0 ||
-        filters.selectedAmenities.every((amenity) =>
-          item.facilities
-            ?.flatMap((facility) =>
-              facility.items.map((a) => a.name.toLowerCase().replace(/s$/, '')) // Normalize item facilities
+  
+      const matchesAmenities = !filters.selectedAmenities || filters.selectedAmenities.length === 0 ||
+        filters.selectedAmenities.every(amenity =>
+          item.facilities && item.facilities.some(facility =>
+            facility.items && facility.items.some(a => 
+              a.name.toLowerCase().replace(/s$/, '') === amenity.toLowerCase().replace(/s$/, '')
             )
-            .includes(amenity.toLowerCase().replace(/s$/, '')) // Normalize selected amenities
+          )
         );
       
-      const matchesRatings = filters.selectedRatings.length === 0 || 
+      const matchesRatings = !filters.selectedRatings || filters.selectedRatings.length === 0 || 
         filters.selectedRatings.includes(Math.floor(item.rating || 0));
-
-      const matchesDestination = filters.selectedDestination === 'All' || filters.selectedDestination === item.destination;
+  
+      const matchesDestination = !filters.selectedDestination || filters.selectedDestination === 'All' || 
+        filters.selectedDestination === item.destination;
       
-      const matchesPriceRange = item.lowest_price <= filters.priceRange[1] && item.highest_price >= filters.priceRange[0];
-
-      return matchesType && matchesCategory && matchesCuisine && matchesAmenities && matchesRatings && matchesDestination && matchesPriceRange;
+      const matchesPriceRange = !filters.priceRange || 
+        (item.lowest_price <= filters.priceRange[1] && item.highest_price >= filters.priceRange[0]);
+  
+      return matchesType && matchesCategory && matchesCuisine && matchesAmenities && 
+             matchesRatings && matchesDestination && matchesPriceRange;
     });
   };
-
   const renderFilters = (filters, setFilters, types, additionalFilters = null, isAllTab = false) => (
     <div className="w-full lg:w-1/4  ">
       <div className="bg-white p-4 rounded-lg shadow-md  overflow-y-auto scrollbar-custom">
@@ -638,212 +751,217 @@ const Discover = () => {
             </>
           )}
 
-          {/* Content Section */}
-          <div className="w-full lg:w-3/4 max-h-[1300px]  overflow-y-auto scrollbar-custom p-2">
-            <motion.div 
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              {loading ? (
-                Array.from({ length: 4 }).map((_, index) => {
-                  const opacity = 1 - index * 0.25; // Adjust the values as needed (1, 0.8, 0.6, 0.4)
-                  return (
-                    <div key={index} style={{ opacity }}>
-                      <div className="bg-white rounded-lg shadow-lg p-2 duration-300 flex flex-col justify-between">
-                        <Skeleton className="w-full h-56 md:h-64 bg-gray-200 rounded-t-lg overflow-hidden" />
-                        <div className="flex-grow flex flex-col justify-between mt-4 px-2">
-                          <div className="p-2 flex-grow">
-                            <Skeleton className="h-3 mb-4" />
-                            <Skeleton className="h-6 mb-4" />
-                            <Skeleton className="h-4 mb-4" />
-                            <Skeleton className="h-5 mb-3" /> 
-                            <Skeleton className="h-10" />
+                        {/* Content Section */}
+                <div className="w-full lg:w-3/4 max-h-[1280px] overflow-y-auto scrollbar-custom p-2">
+                  <motion.div
+                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="visible"
+                  >
+                    {loading ? (
+                      Array.from({ length: 4 }).map((_, index) => {
+                        const opacity = 1 - index * 0.25; // Adjust the values as needed (1, 0.8, 0.6, 0.4)
+                        return (
+                          <div key={index} style={{ opacity }}>
+                            <div className="bg-white rounded-lg shadow-lg p-2 duration-300 flex flex-col justify-between">
+                              <Skeleton className="w-full h-56 md:h-64 bg-gray-200 rounded-t-lg overflow-hidden" />
+                              <div className="flex-grow flex flex-col justify-between mt-4 px-2">
+                                <div className="p-2 flex-grow">
+                                  <Skeleton className="h-3 mb-4" />
+                                  <Skeleton className="h-6 mb-4" />
+                                  <Skeleton className="h-4 mb-4" />
+                                  <Skeleton className="h-5 mb-3" />
+                                  <Skeleton className="h-10" />
+                                </div>
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      </div>
+                        );
+                      })
+                    ) : (
+                      // Render actual content once loaded
+                      (() => {
+                        // Combine all data for the active tab
+                        const activeData =
+                          activeTab === 'all'
+                            ? Object.values(mockData).flat()
+                            : mockData[activeTab] || [];
+                        // Apply filters
+                        const filteredItems = filterData(activeData, getActiveFilters());
+                        // Paginate the filtered data
+                        const paginatedItems = filteredItems.slice(
+                          currentPage * itemsPerPage,
+                          (currentPage + 1) * itemsPerPage
+                        );
+
+                        return paginatedItems.map((item, index) => (
+                          <motion.div
+                            key={index}
+                            className="bg-white rounded-lg shadow-lg p-2 hover:shadow-slate-500 hover:scale-105 h-[400px] duration-300 flex flex-col justify-between"
+                            variants={cardVariants}
+                          >
+                            <div className="w-full h-40 border bg-gray-200 mb-2 rounded-t-lg overflow-hidden">
+                              {item.cardImage ? (
+                                <img
+                                  src={item.cardImage ? `${BASE_URL}/${item.cardImage}` : `${BASE_URL}/${item.businessLogo}`}
+                                  alt={item.businessName}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center">
+                                  <span>No Image</span>
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="p-2">
+                              <div className="flex justify-between items-center mb-2">
+                                {renderTags(item.category, getActiveFilters().selectedType)}
+                              </div>
+                              <div>
+                                <div className="flex gap-2 items-center flex-wrap">
+                                  <h3 className="text-lg sm:text-base lg:text-lg font-semibold text-gray-800 truncate">
+                                    {item.businessName}
+                                  </h3>
+                                </div>
+                              </div>
+                              <div className="text-sm text-gray-500 flex items-center">
+                                <GiPositionMarker className="mr-1" />
+                                {item.destination}
+                              </div>
+                            </div>
+
+                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-2">
+                              {/* Rating Section */}
+                              <div className="flex items-center gap-1 mb-2 sm:mb-0">
+                                {item.rating ? (
+                                  <>
+                                    <span className="text-[12px] sm:text-sm">
+                                      {parseFloat(item.rating).toFixed(1)}
+                                    </span>
+                                    <span className="text-yellow-500 text-[12px] sm:text-sm">
+                                      {'★'.repeat(Math.floor(item.rating))}
+                                      {'☆'.repeat(5 - Math.floor(item.rating))}
+                                    </span>
+                                  </>
+                                ) : (
+                                  <span className="text-gray-500 text-[12px] sm:text-sm">
+                                    No ratings
+                                  </span>
+                                )}
+                              </div>
+
+                              {/* Price Range Section */}
+                              <div className="text-md sm:text-sm font-semibold text-black">
+                                {item.lowest_price && item.highest_price ? (
+                                  `₱${item.lowest_price} - ₱${item.highest_price}`
+                                ) : (
+                                  <span className="text-gray-400 italic text-[12px] sm:text-sm">
+                                    Price Range Not Available
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            <Link to={`/business/${encryptId(item.business_id)}`}>
+                              <Button
+                                className="w-full bg-color1 text-color3 rounded-md hover:bg-color2"
+                                aria-label={`Explore more about ${item.businessName}`}
+                              >
+                                Explore More
+                              </Button>
+                            </Link>
+                          </motion.div>
+                        ));
+                      })()
+                    )}
+                  </motion.div>
+                </div>
+
+          
+                  </div>
+                  <div className='flex justify-end'>
+                    {/* Pagination component */}
+                    {!loading && (
+                      <Pagination
+                    disableCursorAnimation
+                    showControls
+                    className="gap-2 mt-4"
+                    total={Math.ceil(filterData(
+                      activeTab === 'all' ? Object.values(mockData).flat() : mockData[activeTab] || [],
+                      getActiveFilters()
+                    ).length / itemsPerPage)}
+                    page={currentPage + 1}
+                    onChange={(page) => setCurrentPage(page - 1)}
+                    renderItem={renderPaginationItem}
+                    variant="light"
+                  />
+
+
+                  )}
+                  </div>
+                  <h2 className="text-2xl font-semibold mb-4 mt-7">Locations</h2>
+                  <div className='flex justify-center '>
+                
+                    {/* Map Section */}
+                    <div className="mt-2 z-10  bg-color1 rounded-lg shadow-md p-1 w-full bg-gradient-to-r from-color1 to-color2">     
+                      <MapSection businesses={businesses} initialCenter={[12.901505084198375,123.94763219213431]} currentZoom={currentZoom} setCurrentZoom={setCurrentZoom} />
                     </div>
-                  );
-                })
-              ) : (
-                // Render actual content once loaded
-                Object.keys(mockData).map((category) => {
-                  if (activeTab !== 'all' && activeTab !== category) return null;
+                  </div>
+                </div>
+            
 
-                  const filters = {
-                    selectedType: activeTab === 'restaurant' ? foodFilters.selectedType :
-                                  activeTab === 'shop' ? shopFilters.selectedType :
-                                  activeTab === 'activities' ? activitiesFilters.selectedType :
-                                  activeTab === 'accommodations' ? accommodationsFilters.selectedType :
-                                  allFilters.selectedType,
-                    selectedCategory: activeTab === 'shop' ? shopFilters.selectedCategory : [],
-                    selectedAmenities: activeTab === 'restaurant' ? foodFilters.selectedAmenities :
-                                       activeTab === 'shop' ? shopFilters.selectedAmenities :
-                                       activeTab === 'activities' ? activitiesFilters.selectedAmenities :
-                                       activeTab === 'accommodations' ? accommodationsFilters.selectedAmenities :
-                                       allFilters.selectedAmenities,
-                    selectedRatings: activeTab === 'restaurant' ? foodFilters.selectedRatings :
-                                     activeTab === 'shop' ? shopFilters.selectedRatings :
-                                     activeTab === 'activities' ? activitiesFilters.selectedRatings :
-                                     activeTab === 'accommodations' ? accommodationsFilters.selectedRatings :
-                                     allFilters.selectedRatings,
-                    selectedDestination: activeTab === 'restaurant' ? foodFilters.selectedDestination :
-                                         activeTab === 'shop' ? shopFilters.selectedDestination :
-                                         activeTab === 'activities' ? activitiesFilters.selectedDestination :
-                                         activeTab === 'accommodations' ? accommodationsFilters.selectedDestination :
-                                         allFilters.selectedDestination,
-                    priceRange: activeTab === 'restaurant' ? foodFilters.priceRange :
-                                activeTab === 'shop' ? shopFilters.priceRange :
-                                activeTab === 'activities' ? activitiesFilters.priceRange :
-                                activeTab === 'accommodations' ? accommodationsFilters.priceRange :
-                                allFilters.priceRange,
-                    selectedCuisine: activeTab === 'restaurant' ? foodFilters.selectedCuisine : [],
-                  };
+                <Footer />
 
-                  const filteredItems = filterData(mockData[category], filters);
-                  // console.log(filteredItems);
-                  return filteredItems.map((item, index) => (
-                    <motion.div
-                      key={index}
-                      className="bg-white rounded-lg shadow-lg p-2 hover:shadow-slate-500 hover:scale-105 h-[400px]  duration-300 flex flex-col justify-between"
-                      variants={cardVariants}
-                    >
-                      <div className="w-full h-40 border bg-gray-200 mb-2 rounded-t-lg overflow-hidden">
-                        {item.cardImage ? (
-                          <img
-                            src={item.cardImage ? `${BASE_URL}/${item.cardImage}` : `${BASE_URL}/${item.businessLogo}`}
-                            alt={item.businessName}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <span>No Image</span>
-                          </div>
-                        )}        
-                      </div>  
+                {showButton && (
+                  <motion.button
+                    className="fixed bottom-5 right-2 p-3 rounded-full shadow-lg z-10"
+                    onClick={scrollToTop}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    animate={{ y: [0, -10, 0] }}
+                    transition={{ duration: 0.6, repeat: Infinity, repeatType: "loop" }}
+                    style={{
+                      background: 'linear-gradient(135deg, #688484  0%, #092635 100%)', // Gradient color
+                      color: 'white',
+                    }}
+                  >
+                    ↑
+                  </motion.button>
+                )}
 
-                      <div className="p-2 ">
-                        <div className="flex justify-between  items-center mb-2">
-                          {renderTags(item.category, filters.selectedType)}
-                        </div>
-                        <div>
-                          <div className='flex gap-2 items-center flex-wrap'>
-                            <h3 className="text-lg sm:text-base lg:text-lg font-semibold text-gray-800 truncate">
-                              {item.businessName} 
-                            </h3>
-                          </div>
-                        </div>
-                        <div className="text-sm text-gray-500  flex items-center">
-                          <GiPositionMarker className="mr-1" />
-                          {item.destination}
-                        </div>
+                {/* Modal for displaying all tags */}
+                <Modal disableAnimation isOpen={isOpen} onClose={onClose}>
+                  <ModalContent>
+                    <ModalHeader>
+                      <h2>All Tags</h2>
+                    </ModalHeader>
+                    <ModalBody>
+                      <div className="flex flex-wrap gap-2">
+                        {currentTags.map((tag, idx) => (
+                          <span
+                            key={idx}
+                            className={`text-xs px-2 py-1 rounded-full ${
+                              selectedFilters.some(filter => filter.toLowerCase() === tag.toLowerCase())
+                                ? 'bg-color2 text-white'
+                                : 'bg-gray-200 text-gray-700'
+                            }`}
+                          >
+                            {tag}
+                          </span>
+                        ))}
                       </div>
+                    </ModalBody>
+                    <ModalFooter>
+                      <Button color='danger' auto flat onClick={onClose}>
+                        Close
+                      </Button>
+                    </ModalFooter>
+                  </ModalContent>
+                </Modal>
 
-                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-2">
-                        {/* Rating Section */}
-                        <div className="flex items-center gap-1 mb-2 sm:mb-0">
-                          {item.rating ? (
-                            <>
-                              <span className="text-[12px] sm:text-sm">{parseFloat(item.rating).toFixed(1)}</span>
-                              <span className="text-yellow-500 text-[12px] sm:text-sm">
-                                {'★'.repeat(Math.floor(item.rating))}
-                                {'☆'.repeat(5 - Math.floor(item.rating))}
-                              </span>
-                            </>
-                          ) : (
-                            <span className="text-gray-500 text-[12px] sm:text-sm">No ratings</span>
-                          )}
-                        </div>
-
-                        {/* Price Range Section */}
-                        <div className="text-md sm:text-sm font-semibold text-black">
-                          {item.lowest_price && item.highest_price ? (
-                            `₱${item.lowest_price} - ₱${item.highest_price}`
-                          ) : (
-                            <span className="text-gray-400 italic text-[12px] sm:text-sm">
-                              Price Range Not Available
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <Link to={`/business/${encryptId(item.business_id)}`}>
-                        <Button 
-                          className="w-full bg-color1 text-color3 rounded-md hover:bg-color2"
-                          aria-label={`Explore more about ${item.businessName}`} // Adding the aria-label dynamically
-                        >
-                          Explore More
-                        </Button>
-                      </Link>
-                    </motion.div>
-                  ));
-                })
-              )}
-            </motion.div>
-          </div>
-        </div>
-        <h2 className="text-2xl font-semibold mb-4 mt-7">Locations</h2>
-        <div className='flex justify-center '>
-       
-          {/* Map Section */}
-          <div className="mt-2 z-10  bg-color1 rounded-lg shadow-md p-1 w-full bg-gradient-to-r from-color1 to-color2">     
-            <MapSection businesses={businesses} initialCenter={[12.901505084198375,123.94763219213431]} currentZoom={currentZoom} setCurrentZoom={setCurrentZoom} />
-          </div>
-        </div>
-      </div>
-   
-
-      <Footer />
-
-      {showButton && (
-        <motion.button
-          className="fixed bottom-5 right-2 p-3 rounded-full shadow-lg z-10"
-          onClick={scrollToTop}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          animate={{ y: [0, -10, 0] }}
-          transition={{ duration: 0.6, repeat: Infinity, repeatType: "loop" }}
-          style={{
-            background: 'linear-gradient(135deg, #688484  0%, #092635 100%)', // Gradient color
-            color: 'white',
-          }}
-        >
-          ↑
-        </motion.button>
-      )}
-
-      {/* Modal for displaying all tags */}
-      <Modal disableAnimation isOpen={isOpen} onClose={onClose}>
-        <ModalContent>
-          <ModalHeader>
-            <h2>All Tags</h2>
-          </ModalHeader>
-          <ModalBody>
-            <div className="flex flex-wrap gap-2">
-              {currentTags.map((tag, idx) => (
-                <span
-                  key={idx}
-                  className={`text-xs px-2 py-1 rounded-full ${
-                    selectedFilters.some(filter => filter.toLowerCase() === tag.toLowerCase())
-                      ? 'bg-color2 text-white'
-                      : 'bg-gray-200 text-gray-700'
-                  }`}
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </ModalBody>
-          <ModalFooter>
-            <Button color='danger' auto flat onClick={onClose}>
-              Close
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-
-    </div>
-  );
-};
+              </div>
+            );
+          };
 
 export default Discover;
