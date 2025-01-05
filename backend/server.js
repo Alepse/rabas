@@ -1136,11 +1136,7 @@ app.post('/logout', async (req, res) => {
       return res.status(500).json({ success: false, message: 'Error checking session in database' });
     }
   } else {
-    // Session not found in the database, clear cache and expire session
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-    res.setHeader('Expires', '0');
-    res.setHeader('Set-Cookie', 'session_id=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; HttpOnly; SameSite=Strict');
-    // Optionally, you can delete session from the session store here if necessary
+    res.status(400).json({ success: false, message: 'No user session found to log out' });
   }
 });
 
