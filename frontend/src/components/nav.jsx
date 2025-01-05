@@ -375,10 +375,20 @@ const Nav = () => {
 
   const handleLogout = (e) => {
     e.preventDefault();
+  
     axios.post(`${BASE_URL}/logout`, {}, { withCredentials: true })
       .then(response => {
         if (response.status === 200) {
           console.log('Logout successful');
+  
+          // Clear cookies and cache on client-side
+          document.cookie = 'session_id=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; HttpOnly; SameSite=Strict';
+          
+          // Clear cache and force a fresh reload
+          window.localStorage.clear();  // If you're using localStorage for persistent sessions
+          window.sessionStorage.clear();  // Clear sessionStorage if used
+  
+          // Redirect to home page
           window.location.href = '/';
         } else {
           console.error('Logout failed');
@@ -387,7 +397,7 @@ const Nav = () => {
       .catch(error => {
         console.error('Error logging out:', error.response ? error.response.data.message : 'An unknown error occurred');
       });
-  };
+  };  
 
   const fetchUserData = () => {
     axios
