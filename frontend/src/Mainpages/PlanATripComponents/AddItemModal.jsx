@@ -336,6 +336,21 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                                 ))}
                             </CheckboxGroup>
                         </div>
+
+                        {/* Amenities Filter */}
+                        <div className="mb-6 max-h-[230px] overflow-auto scrollbar-custom">
+                            <h3 className="text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2">Amenities</h3>
+                            <CheckboxGroup
+                            value={filters.selectedAmenities}
+                            onChange={(value) => setFilters(prev => ({ ...prev, selectedAmenities: value }))}
+                            >
+                            {amenitiesList.map((amenity) => (
+                                <Checkbox key={amenity} value={amenity}>
+                                {amenity}
+                                </Checkbox>
+                            ))}
+                            </CheckboxGroup>
+                        </div>
                     </>
                 )}
 

@@ -41,26 +41,34 @@ const MapSection = ({ businesses, initialCenter, currentZoom, setCurrentZoom }) 
               className: 'custom-icon',
               html: `
                 <div class="custom-popup flex items-center whitespace-nowrap font-bold text-color1" style="font-size: ${fontSize};">
-                  ${showName ? `
-                    <div class="pin-container">
+                  ${
+                    showName
+                      ? `
+                      <div class="pin-container">
                         <div class="pin-head">
-                            <img src="${BASE_URL}/${logo}" alt="${name}" class="pin-logo" />
+                          <img src="${
+                            logo ? `${BASE_URL}/${logo}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(name.charAt(0).toUpperCase())}`
+                          }" alt="${name}" class="pin-logo" />
                         </div>
                         <div class="pin-point"></div>
-                    </div><span>${name}</span>
-                    ` : `
-                    <div class="pin-container">
+                      </div><span>${name}</span>
+                      `
+                      : `
+                      <div class="pin-container">
                         <div class="pin-head">
-                            <img src="${BASE_URL}/${logo}" alt="${name}" class="pin-logo" />
+                          <img src="${
+                            logo ? `${BASE_URL}/${logo}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(name.charAt(0).toUpperCase())}`
+                          }" alt="${name}" class="pin-logo" />
                         </div>
                         <div class="pin-point"></div>
-                    </div>
-                  `}
+                      </div>
+                      `
+                  }
                 </div>
               `,
               iconSize: [50, 70],
               iconAnchor: [25, 70],
-            });
+            });            
             return (
                 <Marker
                   key={`${index}`}
@@ -74,8 +82,8 @@ const MapSection = ({ businesses, initialCenter, currentZoom, setCurrentZoom }) 
                             {/* Image Section */}
                             <div className="w-full sm:w-auto flex-shrink-0">
                                 <img 
-                                src={`${BASE_URL}/${business.image}`} 
-                                alt={business.name} 
+                                src={logo ? `${BASE_URL}/${logo}` : `https://ui-avatars.com/api/?name=${name.charAt(0).toUpperCase()}`} 
+                                alt={name} 
                                 className="w-full sm:w-16 md:w-20 h-16 md:h-24 rounded-md object-cover border border-gray-200"
                                 />
                             </div>
@@ -83,7 +91,7 @@ const MapSection = ({ businesses, initialCenter, currentZoom, setCurrentZoom }) 
                             {/* Details Section */}
                             <div className="flex-1 flex flex-col justify-between">
                                 <h3 className="font-bold text-xs md:text-sm text-gray-800 mb-1 sm:mb-2 text-center sm:text-left">
-                                {business.name}
+                                {name}
                                 </h3>
                                 <div className="flex justify-center sm:justify-start">
                                 <Link to={`/business/${encryptId(business.business_id)}`}>
