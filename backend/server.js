@@ -4023,7 +4023,73 @@ app.put('/updateStatus-businessApplications/:id', async (req, res) => {
 // ************************************************************
 
 // Endpoint to get messages
-// Endpoint to get messages for users using specific userId 
+
+
+// const crypto = require('crypto');
+const algorithm = 'aes-256-ctr'; // You can use any algorithm you'd like
+const secretKey = 'your-secret-key'; // This key should be securely stored (e.g., in environment variables)
+const iv = crypto.randomBytes(16); // Initialization vector
+
+// Hash the secretKey to ensure it's always 32 bytes
+const key = crypto.createHash('sha256').update(secretKey).digest();
+
+// Encrypt function
+function encrypt(text) {
+  const cipher = crypto.createCipheriv(algorithm, key, iv);
+  let encrypted = cipher.update(text, 'utf8', 'hex');
+  encrypted += cipher.final('hex');
+  return { iv: iv.toString('hex'), encryptedData: encrypted };
+}
+
+// Decrypt function
+function decrypt(encryptedText, iv) {
+  const decipher = crypto.createDecipheriv(algorithm, key, Buffer.from(iv, 'hex'));
+  let decrypted = decipher.update(encryptedText, 'hex', 'utf8');
+  decrypted += decipher.final('utf8');
+  return decrypted;
+}
+
+// Example usage of encryption and decryption:
+const encryptedMessage = encrypt('This is a secret message.');
+console.log('Encrypted:', encryptedMessage);
+
+const decryptedMessage = decrypt(encryptedMessage.encryptedData, encryptedMessage.iv);
+console.log('Decrypted:', decryptedMessage);
+
+// Endpoint to send messages
+app.post('/sendMessage', upload.single('photo'), async (req, res) => {
+  const { sender_id, sender_account, receiver_id, receiver_account, text, formType, form_details } = req.body;
+  const photoPath = req.file ? req.file.path : null; // Get the uploaded photo path if it exists
+
+  // Encrypt the message text
+  const encryptedMessage = encrypt(text);
+
+  // Construct the message object
+  const message = {
+    sender_id,
+    sender_account,
+    receiver_id,
+    receiver_account,
+    text: encryptedMessage.encryptedData, // Store encrypted message
+    formType,
+    form_details,
+    image: photoPath, // Include the photo path in the message
+    iv: encryptedMessage.iv, // Store the IV used for encryption
+    time: new Date() // Add a timestamp
+  };
+
+  try {
+    // Insert the message into the database using the connection pool
+    const [result] = await pool.query('INSERT INTO messages SET ?', message);
+
+    res.json({ success: true, message: 'Message sent successfully', messageId: result.insertId });
+  } catch (err) {
+    console.error('Error sending message:', err);
+    res.status(500).json({ success: false, message: 'Failed to send message' });
+  }
+});
+
+// Endpoint to get messages for users
 app.get('/userMessages/:userId', async (req, res) => {
   const { userId } = req.params; // Extract userId from URL parameters
   const account = 'user';
@@ -4032,12 +4098,14 @@ app.get('/userMessages/:userId', async (req, res) => {
     // Query the database for messages where either sender_id or receiver_id matches the userId
     const [results] = await pool.query(
       'SELECT * FROM messages WHERE (sender_id = ? AND sender_account = ?) OR (receiver_id = ? AND receiver_account = ?) ORDER BY time ASC',
-      [userId, account, userId, account] // Pass userId twice for both sender_id and receiver_id
+      [userId, account, userId, account]
     );
 
     // Group messages by businessId
     const groupedMessages = results.reduce((acc, message) => {
       const businessId = message.sender_id === parseInt(userId) ? message.receiver_id : message.sender_id;
+      const decryptedText = decrypt(message.text, message.iv); // Decrypt the message text
+
       if (!acc[businessId]) {
         acc[businessId] = [];
       }
@@ -4047,7 +4115,7 @@ app.get('/userMessages/:userId', async (req, res) => {
         senderAccount: message.sender_account,
         receiverId: message.receiver_id,
         receiverAccount: message.receiver_account,
-        text: message.text,
+        text: decryptedText, // Store decrypted text
         time: message.time,
         image: message.image,
         formType: message.formType,
@@ -4071,6 +4139,7 @@ app.get('/userMessages/:userId', async (req, res) => {
   }
 });
 
+// Endpoint to get messages for businesses
 app.get('/businessMessages/:businessId', async (req, res) => {
   const { businessId } = req.params; // Extract businessId from URL parameters
   const account = 'business';
@@ -4089,6 +4158,8 @@ app.get('/businessMessages/:businessId', async (req, res) => {
     // Group messages by userId
     const groupedMessages = results.reduce((acc, message) => {
       const userId = message.sender_id === parseInt(businessId) ? message.receiver_id : message.sender_id;
+      const decryptedText = decrypt(message.text, message.iv); // Decrypt the message text
+
       if (!acc[userId]) {
         acc[userId] = [];
       }
@@ -4098,7 +4169,7 @@ app.get('/businessMessages/:businessId', async (req, res) => {
         senderAccount: message.sender_account,
         receiverId: message.receiver_id,
         receiverAccount: message.receiver_account,
-        text: message.text,
+        text: decryptedText, // Store decrypted text
         time: message.time,
         image: message.image,
         formType: message.formType,
@@ -4122,34 +4193,6 @@ app.get('/businessMessages/:businessId', async (req, res) => {
   }
 });
 
-// Endpoint to send messages
-app.post('/sendMessage', upload.single('photo'), async (req, res) => {
-  const { sender_id, sender_account, receiver_id, receiver_account, text, formType, form_details } = req.body;
-  const photoPath = req.file ? req.file.path : null; // Get the uploaded photo path if it exists
-
-  // Construct the message object
-  const message = {
-    sender_id,
-    sender_account,
-    receiver_id,
-    receiver_account,
-    text,
-    formType,
-    form_details,
-    image: photoPath, // Include the photo path in the message
-    time: new Date() // Add a timestamp
-  };
-
-  try {
-    // Insert the message into the database using the connection pool
-    const [result] = await pool.query('INSERT INTO messages SET ?', message);
-
-    res.json({ success: true, message: 'Message sent successfully', messageId: result.insertId });
-  } catch (err) {
-    console.error('Error sending message:', err);
-    res.status(500).json({ success: false, message: 'Failed to send message' });
-  }
-});
 
 app.get('/businessesInChat/:userId', async (req, res) => {
   const { userId } = req.params;
