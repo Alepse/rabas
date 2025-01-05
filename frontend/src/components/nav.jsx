@@ -391,10 +391,22 @@ const Nav = () => {
           // Redirect to home page
           window.location.href = '/';
         } else {
+          // Clear cookies and cache on client-side
+          document.cookie = 'session_id=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; HttpOnly; SameSite=Strict';
+          
+          // Clear cache and force a fresh reload
+          window.localStorage.clear();  // If you're using localStorage for persistent sessions
+          window.sessionStorage.clear();  // Clear sessionStorage if used
           console.error('Logout failed');
         }
       })
       .catch(error => {
+        // Clear cookies and cache on client-side
+        document.cookie = 'session_id=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; HttpOnly; SameSite=Strict';
+          
+        // Clear cache and force a fresh reload
+        window.localStorage.clear();  // If you're using localStorage for persistent sessions
+        window.sessionStorage.clear();  // Clear sessionStorage if used
         console.error('Error logging out:', error.response ? error.response.data.message : 'An unknown error occurred');
       });
   };  
