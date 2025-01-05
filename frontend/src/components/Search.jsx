@@ -135,7 +135,7 @@ const Search = () => {
   }, [searchQuery, debouncedSearch]);
 
   return (
-    <div className="flex flex-col items-center p-5 w-full max-w-4xl mx-auto">
+    <div className="flex mt-16 flex-col items-center p-5 w-full max-w-4xl mx-auto">
       <h1 className="font-semibold text-2xl mb-4">Explore Everything</h1>
       <div className="flex items-center w-full mb-4">
         <FaSearch className="text-gray-500 mr-2" />

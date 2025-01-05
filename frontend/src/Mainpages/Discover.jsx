@@ -752,7 +752,7 @@ const Discover = () => {
           )}
 
                         {/* Content Section */}
-                <div className="w-full lg:w-3/4 max-h-[1280px] overflow-y-auto scrollbar-custom p-2">
+                <div className="w-full lg:w-3/4 max-h-[1300px] overflow-y-auto scrollbar-custom p-2">
                   <motion.div
                     className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
                     variants={containerVariants}

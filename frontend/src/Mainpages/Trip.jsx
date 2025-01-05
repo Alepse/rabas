@@ -342,7 +342,7 @@ const Trip = () => {
       </div>
       </div>
 
-      <div className="container mx-auto p-4 md:p-9 bg-white max-h-screen mb-2 border rounded-lg shadow-md">
+      <div className="container mx-auto p-4 md:p-9 bg-white max-h-screen  mb-2 border rounded-lg shadow-md">
         <div className='flex justify-between items-center mb-2'>
           <h1 className='text-2xl md:text-4xl font-semibold mb-4'>My Trips</h1>
           <Button onClick={onOpen} className='bg-light hover:border-color2 text-black border-2 border-color1 text-lg md:text-xl flex gap-3 text-center'>
