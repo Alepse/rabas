@@ -457,7 +457,7 @@ const Trip = () => {
                       value={value}
                       onChange={(newValue) => {
                         setValue(newValue);
-                        console.log('Selected Dates:', newValue); // Log the selected dates
+                        // console.log('Selected Dates:', newValue); // Log the selected dates
                       }}
                     />
                   </div>

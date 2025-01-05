@@ -89,7 +89,7 @@ const SchedulesPlan = ({ startDate, endDate, onItineraryChange }) => {
             ...prevItems,
             [date]: [...prevItems[date], item],
         }));
-        console.log('Item added to itinerary:', date, item);
+        // console.log('Item added to itinerary:', date, item);
     };
 
     const handleAdd = (date) => {
@@ -209,7 +209,7 @@ const SchedulesPlan = ({ startDate, endDate, onItineraryChange }) => {
     };
 
     useEffect(() => {
-        console.log('Updated Itinerary Items:', itineraryItems);
+        // console.log('Updated Itinerary Items:', itineraryItems);
         onItineraryChange(itineraryItems);
     }, [itineraryItems, onItineraryChange]);
 
