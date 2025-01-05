@@ -15,8 +15,9 @@ const { v4: uuidv4 } = require('uuid');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const cookieParser = require('cookie-parser'); // Import cookie-parser
-
 const app = express();
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Enable CORS with credentials
 const allowedOrigins = [
