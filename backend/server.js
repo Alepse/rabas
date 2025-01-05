@@ -4051,10 +4051,10 @@ function decrypt(encryptedText, iv) {
 
 // Example usage of encryption and decryption:
 const encryptedMessage = encrypt('This is a secret message.');
-console.log('Encrypted:', encryptedMessage);
+// console.log('Encrypted:', encryptedMessage);
 
 const decryptedMessage = decrypt(encryptedMessage.encryptedData, encryptedMessage.iv);
-console.log('Decrypted:', decryptedMessage);
+// console.log('Decrypted:', decryptedMessage);
 
 // Endpoint to send messages
 app.post('/sendMessage', upload.single('photo'), async (req, res) => {
