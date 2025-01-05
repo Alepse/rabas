@@ -3090,33 +3090,94 @@ app.put('/cancel-booking/:id', async (req, res) => {
   }
 });
 
+// Fetch booking dates for a specific product
+app.get('/product-booking-dates/:productId', async (req, res) => {
+  const productId = req.params.productId;
+  console.log(productId);
+  if (!productId) {
+    return res.status(400).json({
+      success: false,
+      message: 'Product ID is required',
+    });
+  }
+
+  const sql = `
+    SELECT 
+        b.dateIn, 
+        b.dateOut, 
+        b.customerName, 
+        b.productName, 
+        b.numberOfGuests, 
+        b.status,
+        p.name AS productName,
+        p.product_category,
+        p.price,
+        p.pricing_unit
+    FROM 
+        bookings b
+    LEFT JOIN 
+        products p ON b.product_id = p.product_id
+    WHERE 
+        b.product_id = ?
+    ORDER BY 
+        b.dateIn ASC;
+  `;
+
+  try {
+    const [results] = await pool.query(sql, [productId]);
+
+    return res.json({
+      success: true,
+      bookings: results,
+    });
+  } catch (err) {
+    console.error('Error fetching booking dates:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to fetch booking dates',
+    });
+  }
+});
+
 // Get business bookings
 app.get('/business-bookings', async (req, res) => {
-  const businessId = req.session?.user?.business_id;
+  const userId = req.session?.user?.user_id;
 
-  if (!businessId) {
+  if (!userId) {
     return res.status(401).json({
       success: false,
       message: 'Not authorized',
     });
   }
 
-  const sql = `
-    SELECT b.*, 
-      p.product_category AS reservationType
-    FROM bookings b
-    LEFT JOIN products p ON b.product_id = p.product_id
-    WHERE b.business_id = ?
-    ORDER BY b.dateIn DESC
-  `;
-
   try {
-    // Use the connection pool to execute the query
-    const [results] = await pool.query(sql, [businessId]);
-    
-    res.json({
+    // Fetch the business ID associated with the user ID
+    const businessQuery = `SELECT business_id FROM businesses WHERE user_id = ?`;
+    const [businessResult] = await pool.query(businessQuery, [userId]);
+
+    if (!businessResult.length) {
+      return res.status(404).json({
+        success: false,
+        message: 'Business not found for this user',
+      });
+    }
+
+    const businessId = businessResult[0].business_id;
+
+    // Query to fetch bookings for the business
+    const bookingsQuery = `
+      SELECT b.*, 
+        p.product_category AS reservationType
+      FROM bookings b
+      LEFT JOIN products p ON b.product_id = p.product_id
+      WHERE b.business_id = ?
+      ORDER BY b.dateIn DESC
+    `;
+    const [bookings] = await pool.query(bookingsQuery, [businessId]);
+
+    return res.json({
       success: true,
-      bookings: results,
+      bookings: bookings,
     });
   } catch (err) {
     console.error('Error fetching business bookings:', err);

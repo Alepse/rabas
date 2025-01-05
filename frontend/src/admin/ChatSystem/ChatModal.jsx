@@ -43,17 +43,30 @@ const useUnavailableDates = () => {
   let now = today(getLocalTimeZone());
   let { locale } = useLocale();
 
+  // Define custom disabled date ranges
   let disabledRanges = [
-    [now, now.add({ days: 5 })],
-    [now.add({ days: 14 }), now.add({ days: 16 })],
-    [now.add({ days: 23 }), now.add({ days: 24 })],
+    [now, now.add({ days: 5 })], // Example range 1
+    [now.add({ days: 14 }), now.add({ days: 16 })], // Example range 2
+    [now.add({ days: 23 }), now.add({ days: 24 })], // Example range 3
   ];
 
-  return (date) =>
-    isWeekend(date, locale) ||
-    disabledRanges.some(
+  // Return a function to determine if a date is unavailable
+  return (date) => {
+    // Disable all past dates
+    if (date.compare(now) < 0) {
+      return true;
+    }
+
+    // Disable weekends
+    if (isWeekend(date, locale)) {
+      return true;
+    }
+
+    // Disable dates in custom ranges
+    return disabledRanges.some(
       (interval) => date.compare(interval[0]) >= 0 && date.compare(interval[1]) <= 0
     );
+  };
 };
 
 // AvailabilityModal for table reservation

@@ -14,11 +14,12 @@ import Swal from 'sweetalert2';
 import { FaUserPen } from "react-icons/fa6";
 import { MdEditCalendar } from "react-icons/md";
 import { CgNotes } from "react-icons/cg";
+import { today, isWeekend, getLocalTimeZone } from "@internationalized/date";
+import { useLocale } from "@react-aria/i18n";
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
-  console.log(product);
   const [userId, setUserId] = useState(null);
   const [userData, setUserData] = useState(null);
   const [showTooltip, setShowTooltip] = useState(false);
@@ -44,6 +45,52 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
     specialRequests: '',
     numberOfGuests: 1,
   });
+
+  const [disabledDates, setDisabledDates] = useState([]);
+  console.log(product);
+
+  useEffect(() => {
+    const fetchUnavailableDates = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/product-booking-dates/${product.product_id}`);
+        const data = await response.json();
+  
+        if (data.success) {
+          const transformedDates = data.bookings.flatMap((booking) => {
+            const startDate = new Date(booking.dateIn);
+            const endDate = new Date(booking.dateOut);
+  
+            const dateArray = [];
+            // Loop through the range and get each date in the range
+            for (let d = startDate; d <= endDate; d.setDate(d.getDate() + 1)) {
+              dateArray.push({
+                year: d.getFullYear(),
+                month: d.getMonth() + 1,  // Add 1 to convert to 1-indexed month
+                day: d.getDate(),
+              });
+            }
+            return dateArray;
+          });
+  
+          // Remove duplicates by converting to a Set and back to an array
+          const uniqueDates = Array.from(new Set(transformedDates.map(date => JSON.stringify(date))))
+            .map(date => JSON.parse(date));
+  
+          setDisabledDates(uniqueDates);
+        } else {
+          console.error('Failed to fetch unavailable dates:', data.message);
+        }
+      } catch (err) {
+        console.error('Error fetching unavailable dates:', err);
+      }
+    };
+  
+    if (product.product_id) {
+      fetchUnavailableDates();
+    }
+  }, [product.product_id]);
+  
+  console.log('Unavailable dates', disabledDates);
 
   // Fetching user data
   const fetchUserData = async () => {
@@ -264,12 +311,34 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
       />
     </div>,
     <div key="step2" className="space-y-4">
-       <h1 className='p-1 text-lg border-b flex gap-2 items-center '><MdEditCalendar/>Select Check-in/Check-out Dates   </h1>
+      <h1 className='p-1 text-lg border-b flex gap-2 items-center '><MdEditCalendar/>Select Check-in/Check-out Dates   </h1>
       <div className='flex justify-center'>
       <RangeCalendar
         aria-label="Select Check-in and Check-out Dates"
         visibleMonths={2}
-        value={formData.checkInOutDates} 
+        value={formData.checkInOutDates}
+        isDateUnavailable={(date) => {
+          // Get today's date
+          const today = new Date();
+          today.setHours(0, 0, 0, 0); // Set time to midnight to compare only the date part
+
+          // Create a Date object for the current date in the calendar
+          const dateToCheck = new Date(date.year, date.month - 1, date.day); // Adjust for 0-indexed month
+
+          // Check if the date is today or earlier
+          if (dateToCheck <= today) {
+            return true; // Disable dates before or equal to today
+          }
+
+          // Check if the date is in the list of unavailable dates
+          return disabledDates.some((disabledDate) => {
+            return (
+              date.year === disabledDate.year &&
+              date.month === disabledDate.month &&
+              date.day === disabledDate.day
+            );
+          });
+        }}
         onChange={(dates) => {
           const updatedAmount = calculateAmountToPay(dates, formData.discountedPrice);
           setFormData({

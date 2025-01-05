@@ -28,6 +28,7 @@ const formatDate = (date) => {
 };
 
 const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
+  console.log(product);
   const [userId, setUserId] = useState(null);
   const [userData, setUserData] = useState(null);
   const [formData, setFormData] = useState({
@@ -51,6 +52,47 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
     specialRequests: '',
     numberOfGuests: 1, // Default to 1 guest
   });
+
+  const [disabledDates, setDisabledDates] = useState([]);
+  
+
+  useEffect(() => {
+      const fetchUnavailableDates = async () => {
+        try {
+          const response = await fetch(`${BASE_URL}/product-booking-dates/${product.product_id}`);
+          const data = await response.json();
+    
+          if (data.success) {
+            // Extract the dateIn and mark those dates as unavailable
+            const unavailableDates = data.bookings.map((booking) => {
+              const dateIn = new Date(booking.dateIn);
+    
+              return {
+                year: dateIn.getFullYear(),
+                month: dateIn.getMonth() + 1,  // Add 1 to convert to 1-indexed month
+                day: dateIn.getDate(),
+              };
+            });
+    
+            // Remove duplicates by converting to a Set and back to an array
+            const uniqueDates = Array.from(new Set(unavailableDates.map(date => JSON.stringify(date))))
+              .map(date => JSON.parse(date));
+    
+            setDisabledDates(uniqueDates);
+          } else {
+            console.error('Failed to fetch unavailable dates:', data.message);
+          }
+        } catch (err) {
+          console.error('Error fetching unavailable dates:', err);
+        }
+      };
+    
+      if (product.product_id) {
+        fetchUnavailableDates();
+      }
+    }, [product.product_id]);  
+
+    // console.log('Unavailable dates', disabledDates);
 
   // Fetching user data
   const fetchUserData = async () => {
@@ -105,20 +147,6 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
   const [isPolicyModalOpen, setPolicyModalOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
 
-  let now = today(getLocalTimeZone());
-  let disabledRanges = [
-    [now, now.add({ days: 5 })],
-    [now.add({ days: 14 }), now.add({ days: 16 })],
-    [now.add({ days: 23 }), now.add({ days: 24 })],
-  ];
-  let { locale } = useLocale();
-
-  let isDateUnavailable = (date) =>
-    isWeekend(date, locale) ||
-    disabledRanges.some(
-      (interval) => date.compare(interval[0]) >= 0 && date.compare(interval[1]) <= 0,
-    );
-
   // Define unavailable times
   const unavailableTimes = ['12:00', '15:00', '20:00'];
 
@@ -165,12 +193,12 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
     }
 
     try {
-      console.log('Sending booking data:', {
-        ...formData,
-        originalPrice: Number(formData.originalPrice),
-        discount: Number(formData.discount),
-        discountedPrice: Number(formData.discountedPrice)
-      });
+      // console.log('Sending booking data:', {
+      //   ...formData,
+      //   originalPrice: Number(formData.originalPrice),
+      //   discount: Number(formData.discount),
+      //   discountedPrice: Number(formData.discountedPrice)
+      // });
 
       const response = await fetch(`${BASE_URL}/book-activity`, {
         method: 'POST',
@@ -267,7 +295,28 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
       <div className='flex justify-center'>
         <DatePicker
           aria-label="Select Visit Date"
-          isDateUnavailable={isDateUnavailable} // Use the isDateUnavailable function
+          isDateUnavailable={(date) => {
+            // Get today's date
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Set time to midnight to compare only the date part
+  
+            // Create a Date object for the current date in the calendar
+            const dateToCheck = new Date(date.year, date.month - 1, date.day); // Adjust for 0-indexed month
+  
+            // Check if the date is today or earlier
+            if (dateToCheck <= today) {
+              return true; // Disable dates before or equal to today
+            }
+  
+            // Check if the date is in the list of unavailable dates
+            return disabledDates.some((disabledDate) => {
+              return (
+                date.year === disabledDate.year &&
+                date.month === disabledDate.month &&
+                date.day === disabledDate.day
+              );
+            });
+          }} // Use the isDateUnavailable function
           minValue={today(getLocalTimeZone())}
           value={formData.visitDate}
           onChange={(date) => setFormData({ ...formData, visitDate: date })}
