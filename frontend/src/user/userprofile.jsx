@@ -18,6 +18,7 @@ import { FaCamera, FaBusinessTime } from 'react-icons/fa';
 import { FaCalendarAlt, FaClock, FaUser, FaEnvelope, FaPhone, FaMoneyBillWave , FaComment, } from 'react-icons/fa';
 import { BsFillPersonLinesFill } from "react-icons/bs";
 import { MdOutlineKeyboardArrowRight } from 'react-icons/md';
+import { Skeleton } from "@nextui-org/skeleton";
 
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
@@ -145,7 +146,6 @@ const renderLikedPages = (likedPages, handleUnlikePage) => {
     </div>
   );
 };
-
 
 // Simplified component for the "My Booking" tab
 const MyBookingTab = ({ bookings, onCancelBooking }) => {
@@ -448,8 +448,6 @@ const UserProfile = ({ activities = [] }) => {
   });
 
   useEffect(() => {
-    setTimeout(() => setLoading(false), 1000);
-
     const handleScroll = () => {
       if (window.scrollY > 300) {
         setShowButton(true);
@@ -478,6 +476,8 @@ const UserProfile = ({ activities = [] }) => {
       cancelButtonText: 'No, keep it'
     });
 
+    setLoadingSpinning(true);
+
     if (result.isConfirmed) {
       try {
         const response = await fetch(`${BASE_URL}/cancel-booking/${bookingId}`, {
@@ -488,6 +488,7 @@ const UserProfile = ({ activities = [] }) => {
         const data = await response.json();
 
         if (data.success) {
+          setLoadingSpinning(false);
           setBookings(prevBookings => 
             prevBookings.map(booking => 
               booking.booking_id === bookingId 
@@ -503,15 +504,29 @@ const UserProfile = ({ activities = [] }) => {
             confirmButtonColor: '#0BDA51'
           });
         } else {
-          throw new Error(data.message);
+          setLoadingSpinning(false);
+          Swal.fire({
+            title: 'Failed!',
+            text: 'Please check you internet connection and try again.',
+            icon: 'error',
+            confirmButtonColor: '#D33736'
+          }).then(() => {
+            setTimeout(() => {
+              window.location.reload();
+            });
+          });
         }
       } catch (error) {
-        console.error('Error cancelling booking:', error);
+        setLoadingSpinning(false);
         Swal.fire({
-          title: 'Error!',
-          text: 'Failed to cancel booking',
+          title: 'Failed!',
+          text: 'Please check you internet connection and try again.',
           icon: 'error',
           confirmButtonColor: '#D33736'
+        }).then(() => {
+          setTimeout(() => {
+            window.location.reload();
+          });
         });
       }
     }
@@ -631,7 +646,9 @@ const UserProfile = ({ activities = [] }) => {
   };
   
   const updateProfilePic = async (file) => {
+    setLoadingSpinning(true);
     if (!file) {
+      setLoadingSpinning(false);
       Swal.fire({
         title: 'Error!',
         text: 'No file selected for upload',
@@ -653,6 +670,7 @@ const UserProfile = ({ activities = [] }) => {
       });
   
       if (response.data.success) {
+        setLoadingSpinning(false);
         Swal.fire({
           title: 'Success!',
           text: 'Profile picture updated successfully!',
@@ -664,8 +682,17 @@ const UserProfile = ({ activities = [] }) => {
           });
         });
       } else {
-        console.error('Failed to update profile picture:', response.data.message);
-        throw new Error('Failed to update profile picture');
+        setLoadingSpinning(false);
+        Swal.fire({
+          title: 'Failed!',
+          text: 'Please check your internet connection and try again.',
+          icon: 'error',
+          confirmButtonColor: '#D33736'
+        }).then(() => {
+          setTimeout(() => {
+            window.location.reload();
+          });
+        });
       }
     } catch (error) {
       console.error('Error updating profile picture:', error);
@@ -674,11 +701,16 @@ const UserProfile = ({ activities = [] }) => {
         text: 'Failed to update profile picture',
         icon: 'error',
         confirmButtonColor: '#D33736'
+      }).then(() => {
+        setTimeout(() => {
+          window.location.reload();
+        });
       });
     }
   };
 
   const handleUpdateProfile = async () => {
+    setLoadingSpinning(true);
     try {
       const formData = new FormData();
       formData.append('username', username);
@@ -692,9 +724,19 @@ const UserProfile = ({ activities = [] }) => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update profile');
+        setLoadingSpinning(false);
+        Swal.fire({
+          title: 'Failed!',
+          text: 'Please check you internet connection and try again.',
+          icon: 'error',
+          confirmButtonColor: '#D33736'
+        }).then(() => {
+          setTimeout(() => {
+            window.location.reload();
+          });
+        });
       }
-
+      setLoadingSpinning(false);
       Swal.fire({
         title: 'Success!',
         text: 'Profile updated successfully!',
@@ -711,12 +753,17 @@ const UserProfile = ({ activities = [] }) => {
       }));
 
     } catch (error) {
-      console.error(error);
+      // console.error(error);
+      setLoadingSpinning(false);
       Swal.fire({
-        title: 'Error!',
-        text: 'There was an error updating the profile',
+        title: 'Failed!',
+        text: 'Please check you internet connection and try again.',
         icon: 'error',
         confirmButtonColor: '#D33736'
+      }).then(() => {
+        setTimeout(() => {
+          window.location.reload();
+        });
       });
     }
   };
@@ -731,10 +778,12 @@ const UserProfile = ({ activities = [] }) => {
       cancelButtonColor: '#D33736',
       confirmButtonText: 'Yes, unlike it!'
     }).then(async (result) => {
+      setLoadingSpinning(true);
       if (result.isConfirmed) {
         try {
           const response = await axios.delete(`${BASE_URL}/unlike-businessInProfile/${id}`, { withCredentials: true });
           if (response.data.success) {
+            setLoadingSpinning(false);
             setLikedPages((prevLikedPages) => {
               // Filter out the page with the specified businessId
               const updatedPages = prevLikedPages.filter(page => page.id !== id);
@@ -747,6 +796,7 @@ const UserProfile = ({ activities = [] }) => {
               confirmButtonColor: '#0BDA51',
             });
           } else {
+            setLoadingSpinning(false);
             Swal.fire({
               title: 'Error!',
               text: response.data.message || 'Failed to unlike the page.',
@@ -755,10 +805,11 @@ const UserProfile = ({ activities = [] }) => {
             });
           }
         } catch (error) {
-          console.error('Error unliking page:', error);
+          setLoadingSpinning(false);
+          // console.error('Error unliking page:', error);
           Swal.fire({
-            title: 'Error!',
-            text: 'Failed to unlike the page.',
+            title: 'Failed!',
+            text: 'Please check your internet connection and try again.',
             icon: 'error',
             confirmButtonColor: '#D33736'
           });
@@ -789,6 +840,7 @@ const UserProfile = ({ activities = [] }) => {
   }, []);
 
   const handleBusinessClick = async (businessId) => {
+    setLoadingSpinning(true);
     try {
       const response = await fetch(`${BASE_URL}/set-business-id`, {
         method: 'POST',
@@ -799,269 +851,310 @@ const UserProfile = ({ activities = [] }) => {
         body: JSON.stringify({ businessId })
       });
 
-      console.log(businessId);
+      // console.log(businessId);
 
       const data = await response.json();
       if (!data.success) {
-        throw new Error(data.message || 'Failed to set business ID');
+        setLoadingSpinning(false);
+        Swal.fire({
+          title: 'Failed!',
+          text: 'Please check you internet connection and try again.',
+          icon: 'error',
+          confirmButtonColor: '#D33736'
+        }).then(() => {
+          setTimeout(() => {
+            window.location.reload();
+          });
+        });
       }
 
       window.location.href = '/businessprofileadmin';
     } catch (error) {
-      console.error('Error setting business ID:', error);
+      setLoadingSpinning(false);
+      Swal.fire({
+        title: 'Failed!',
+        text: 'Please check you internet connection and try again.',
+        icon: 'error',
+        confirmButtonColor: '#D33736'
+      }).then(() => {
+        setTimeout(() => {
+          window.location.reload();
+        });
+      });
     }
   };
 
   return (
     <div className='mx-auto min-h-screen font-sans bg-light' style={{ backgroundImage: `url(${wave})`, backgroundSize: 'auto', backgroundRepeat: 'repeat', backgroundPosition: 'center' }}>
       <Nav />
-      <div className='container p-3 rounded-md mt-[7.2rem] flex justify-center'>
-        <Search />
-      </div>
 
-      {/* {loadingSpinning && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 z-50 flex justify-center items-center">
-          <Spinner size="lg" label="Loading..." />
+      {loading ?
+      (
+      <>
+        <div className="px-16 lg:px-24">
+          <Skeleton className='container p-3 rounded-md mt-[7.2rem] h-12 flex justify-center' />
         </div>
-      )} */}
-
-
-        <div className="container w-full flex justify-start mx-auto overflow-x-auto scrollbar-custom scrollbar-hide mb-4">
-        <nav className="text-sm text-gray-500 whitespace-nowrap">
-          <ol className="list-none p-0 inline-flex">
-            <li className="flex items-center">
-              <Link to="/" className="hover:text-color1 truncate">Home</Link>
-              <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
-            </li>
-            <li className="flex items-center text-gray-700 truncate">
-              <p className="truncate">Profile</p>
-            </li>
-          </ol>
-        </nav>
-      </div>
-
-      {/* Header Section */}
-      <div className='container mx-auto flex flex-col items-center mb-8 bg-white mt-2 shadow-md rounded-xl shadow-gray-400 p-5 ' >
-        <div className='relative flex items-center w-36 h-36 mb-4'>
-          <Avatar className='w-full h-full object-cover rounded-full border-4 border-color1' 
-            src={profilePic 
-              ? profilePic 
-              : (userData?.image_path 
-                ? `${BASE_URL}/${userData.image_path}`
-                : userData?.google_id
-                  ? userData.image
-                  : `https://ui-avatars.com/api/?name=${username?.charAt(0).toUpperCase()}`)}  
-          />
-          <input type='file' className='hidden' accept='image/*' onChange={handleFileChange} id='fileInput' />
-          <div
-            onClick={() => document.getElementById('fileInput').click()}
-            className='absolute bottom-0 right-0 bg-color1 text-white rounded-full w-10 h-10 hover:bg-color2 flex justify-center items-center cursor-pointer'
-          >
-            +
+        <div className="w-full gap-4">
+          <div className="py-8 px-4">
+            <Skeleton className="container w-full flex justify-start mx-auto h-96 mb-4 rounded-lg"/> 
+          </div>
+          <div className="px-4">
+            <Skeleton className="flex flex-col h-[600px] lg:flex-row items-center mb-6 shadow-lg p-3 rounded-sm shadow-slate-400" />
           </div>
         </div>
-        <div className='text-3xl font-semibold mb-4'>
-          {userData?.username ? userData.username : 'Loading...'}
-        </div>
-        {businessApplications.length > 0 ? (
-          businessApplications.some(application => application.status === 1) ? (
-            // Show only the accepted application
-            businessApplications
-              .filter(application => application.status === 1)
-              .map(application => (
-                <div
-                  key={`approved-${application.application_id}`}
-                  className="mb-4 flex justify-center items-center flex-col"
-                >
-                  <h1 className="font-bold mb-2">Switch to Business:</h1>
-                  <button
-                    className="text-gray-500 hover:bg-color2 hover:text-white flex items-center p-2 rounded-md gap-1 border-1 border-color1 shadow-md transition duration-300 ease-in-out transform hover:scale-105"
-                    onClick={() => handleBusinessClick(businessData?.business_id)} // Use optional chaining
-                  >
-                    {businessData && businessData.businessLogo ? (
-                      <Avatar
-                        src={`${BASE_URL}/${businessData.businessLogo}`}
-                        alt={businessData.businessName}
-                      />
-                    ) : (
-                      <div className="flex items-center justify-center w-10 h-10 bg-gray-200 rounded-full">
-                        <FaBusinessTime className="text-gray-500" size={24} />
-                      </div>
-                    )}
-                    <p>{businessData ? businessData.businessName : 'Loading...'}</p>
-                  </button>
-                </div>
-              ))
-          ) : (
-            // Otherwise, process pending or rejected applications
-            businessApplications.map(application => {
-              if (application.status === 0) {
-                return (
-                  <Button
-                    key={`pending-${application.application_id}`}
-                    className="text-white bg-yellow-500 hover:bg-yellow-600 mb-4"
-                  >
-                    Pending Application
-                  </Button>
-                );
-              } else if (application.status === -1) {
-                return (
-                  <div key={`denied-${application.application_id}`} className="mb-4">
-                    <div className="text-white bg-red-500 hover:bg-red-600 p-4 rounded-md">
-                      Your application with business application ID {application.application_id} has been denied.
-                    </div>
-                    <Button
-                      className="text-white bg-color1 hover:bg-color2 mt-4"
-                      onPress={onBusinessOpen}
+      </>
+      ) : ( 
+        <>
+        {loadingSpinning && (
+            <div className="fixed inset-0 bg-gray-800 bg-opacity-70 z-50 flex justify-center items-center">
+              <div className="flex flex-col items-center">
+                <div className="spinner"></div>
+                <p className="mt-4 text-lg text-white font-semibold animate-pulse">Loading, please wait...</p>
+              </div>
+            </div>
+          )}
+
+          <div className='container p-3 rounded-md mt-2 flex justify-center'>
+            <Search />
+          </div>
+            <div className="container w-full flex justify-start mx-auto overflow-x-auto scrollbar-custom scrollbar-hide mb-4">
+              <nav className="text-sm text-gray-500 whitespace-nowrap">
+                <ol className="list-none p-0 inline-flex">
+                  <li className="flex items-center">
+                    <Link to="/" className="hover:text-color1 truncate">Home</Link>
+                    <span className="mx-2"><MdOutlineKeyboardArrowRight /></span>
+                  </li>
+                  <li className="flex items-center text-gray-700 truncate">
+                    <p className="truncate">Profile</p>
+                  </li>
+                </ol>
+              </nav>
+            </div>
+
+          {/* Header Section */}
+          <div className='container mx-auto flex flex-col items-center mb-8 bg-white mt-2 shadow-md rounded-xl shadow-gray-400 p-5 ' >
+            <div className='relative flex items-center w-36 h-36 mb-4'>
+              <Avatar className='w-full h-full object-cover rounded-full border-4 border-color1' 
+                src={profilePic 
+                  ? profilePic 
+                  : (userData?.image_path 
+                    ? `${BASE_URL}/${userData.image_path}`
+                    : userData?.google_id
+                      ? userData.image
+                      : `https://ui-avatars.com/api/?name=${username?.charAt(0).toUpperCase()}`)}  
+              />
+              <input type='file' className='hidden' accept='image/*' onChange={handleFileChange} id='fileInput' />
+              <div
+                onClick={() => document.getElementById('fileInput').click()}
+                className='absolute bottom-0 right-0 bg-color1 text-white rounded-full w-10 h-10 hover:bg-color2 flex justify-center items-center cursor-pointer'
+              >
+                +
+              </div>
+            </div>
+            <div className='text-3xl font-semibold mb-4'>
+              {userData?.username ? userData.username : 'Loading...'}
+            </div>
+            {businessApplications.length > 0 ? (
+              businessApplications.some(application => application.status === 1) ? (
+                // Show only the accepted application
+                businessApplications
+                  .filter(application => application.status === 1)
+                  .map(application => (
+                    <div
+                      key={`approved-${application.application_id}`}
+                      className="mb-4 flex justify-center items-center flex-col"
                     >
-                      + Send another application
-                    </Button>
-                  </div>
-                );
-              }
-              return null;
-            })
-          )
-        ) : (
-          // If no applications exist, show the "Apply Business Account" button
-          <Button
-            className="text-white bg-color1 hover:bg-color2 mb-4"
-            onPress={onBusinessOpen}
-          >
-            + Apply Business Account
-          </Button>
-        )}
-      </div>
-
-      {/* Main content */}
-      <div className='container mx-auto'>
-        <Tabs aria-label="Options" selectedKey={selected} onSelectionChange={setSelected}    variant="underlined"  
-        classNames={{
-          base: "w-full overflow-x-auto mb-4",
-          tabList: "gap-6 w-full p-0 flex  container",
-          tab: "max-w-fit px-0 h-12",
-          tabContent: "text-color1 "
-        }}>
-          {/* Profile Tab */}
-          <Tab key="profile" title="Profile">
-            <Card className='p-4 shadow-lg'>
-              <CardBody className='p-6'>
-                <h1 className='text-4xl font-bold mb-6'>User Profile</h1>
-                <div className='bg-gray-300 w-full h-[1px] mb-8'></div>
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-                  {/* Username field */}
-                  <div>
-                    <h1 className='text-slate-500 mb-2'>Username</h1>
-                    <input
-                      className='border-[.5px] rounded-md p-3 w-full focus:border-gray-500 focus:outline-none'
-                      placeholder='Enter your username'
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                    />
-                  </div>
-                  
-                  {/* Email field */}
-                  <div>
-                    <h1 className='text-slate-500 mb-2'>Email</h1>
-                    <div className="flex items-center">
-                      <input
-                        className='border-[.5px] rounded-md p-3 w-full focus:border-gray-500 focus:outline-none'
-                        placeholder='Enter your email'
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        type='email'
-                      />
-                      <span className="ml-2 text-green-500">Verified</span>
+                      <h1 className="font-bold mb-2">Switch to Business:</h1>
+                      <button
+                        className="text-gray-500 hover:bg-color2 hover:text-white flex items-center p-2 rounded-md gap-1 border-1 border-color1 shadow-md transition duration-300 ease-in-out transform hover:scale-105"
+                        onClick={() => handleBusinessClick(businessData?.business_id)} // Use optional chaining
+                      >
+                        {businessData && businessData.businessLogo ? (
+                          <Avatar
+                            src={`${BASE_URL}/${businessData.businessLogo}`}
+                            alt={businessData.businessName}
+                          />
+                        ) : (
+                          <div className="flex items-center justify-center w-10 h-10 bg-gray-200 rounded-full">
+                            <FaBusinessTime className="text-gray-500" size={24} />
+                          </div>
+                        )}
+                        <p>{businessData ? businessData.businessName : 'Loading...'}</p>
+                      </button>
                     </div>
-                  </div>
+                  ))
+              ) : (
+                // Otherwise, process pending or rejected applications
+                businessApplications.map(application => {
+                  if (application.status === 0) {
+                    return (
+                      <Button
+                        key={`pending-${application.application_id}`}
+                        className="text-white bg-yellow-500 hover:bg-yellow-600 mb-4"
+                      >
+                        Pending Application
+                      </Button>
+                    );
+                  } else if (application.status === -1) {
+                    return (
+                      <div key={`denied-${application.application_id}`} className="mb-4">
+                        <div className="text-white bg-red-500 hover:bg-red-600 p-4 rounded-md">
+                          Your application with business application ID {application.application_id} has been denied.
+                        </div>
+                        <Button
+                          className="text-white bg-color1 hover:bg-color2 mt-4"
+                          onPress={onBusinessOpen}
+                        >
+                          + Send another application
+                        </Button>
+                      </div>
+                    );
+                  }
+                  return null;
+                })
+              )
+            ) : (
+              // If no applications exist, show the "Apply Business Account" button
+              <Button
+                className="text-white bg-color1 hover:bg-color2 mb-4"
+                onPress={onBusinessOpen}
+              >
+                + Apply Business Account
+              </Button>
+            )}
+          </div>
 
-                  {/* Phone number field */}
-                  <div>
-                    <h1 className='text-slate-500 mb-2'>Phone Number</h1>
-                    <input
-                      className='border-[.5px] rounded-md p-3 w-full focus:border-gray-500 focus:outline-none'
-                      placeholder='Add your phone number'
-                      value={phoneNumber}
-                      onChange={(e) => setPhoneNumber(e.target.value)}
-                      type='tel'
-                    />
-                  </div>
+          {/* Main content */}
+          <div className='container mx-auto'>
+            <Tabs aria-label="Options" selectedKey={selected} onSelectionChange={setSelected}    variant="underlined"  
+            classNames={{
+              base: "w-full overflow-x-auto mb-4",
+              tabList: "gap-6 w-full p-0 flex  container",
+              tab: "max-w-fit px-0 h-12",
+              tabContent: "text-color1 "
+            }}>
+              {/* Profile Tab */}
+              <Tab key="profile" title="Profile">
+                <Card className='p-4 shadow-lg'>
+                  <CardBody className='p-6'>
+                    <h1 className='text-4xl font-bold mb-6'>User Profile</h1>
+                    <div className='bg-gray-300 w-full h-[1px] mb-8'></div>
+                    <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+                      {/* Username field */}
+                      <div>
+                        <h1 className='text-slate-500 mb-2'>Username</h1>
+                        <input
+                          className='border-[.5px] rounded-md p-3 w-full focus:border-gray-500 focus:outline-none'
+                          placeholder='Enter your username'
+                          value={username}
+                          onChange={(e) => setUsername(e.target.value)}
+                        />
+                      </div>
+                      
+                      {/* Email field */}
+                      <div>
+                        <h1 className='text-slate-500 mb-2'>Email</h1>
+                        <div className="flex items-center">
+                          <input
+                            className='border-[.5px] rounded-md p-3 w-full focus:border-gray-500 focus:outline-none'
+                            placeholder='Enter your email'
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            type='email'
+                          />
+                          <span className="ml-2 text-green-500">Verified</span>
+                        </div>
+                      </div>
 
-                  {/* Address field */}
-                  <div>
-                    <h1 className='text-slate-500 mb-2'>Address</h1>
-                    <input
-                      className='border-[.5px] rounded-md p-3 w-full focus:border-gray-500 focus:outline-none'
-                      placeholder='Enter your address'
-                      value={address}
-                      onChange={(e) => setAddress(e.target.value)}
-                    />
-                  </div>      
-                </div>
-                <Button className='mt-6 bg-color1 text-white hover:bg-color2 w-full md:w-auto' onPress={handleUpdateProfile}>Update Profile</Button>
-              </CardBody>
-            </Card>
-          </Tab>
-          {/* Liked Pages Tab */}
-          <Tab key="likedPages" title="Liked Pages">
-            <Card >
-              <CardBody className="p-4 sm:p-6 ">
-                {/* Header */}
-                <h1 className="text-2xl sm:text-3xl font-bold mb-4 text-center sm:text-left">
-                  Liked Pages
-                </h1>
-                <div className="bg-gray-300 w-full h-[1px] mb-6"></div>
+                      {/* Phone number field */}
+                      <div>
+                        <h1 className='text-slate-500 mb-2'>Phone Number</h1>
+                        <input
+                          className='border-[.5px] rounded-md p-3 w-full focus:border-gray-500 focus:outline-none'
+                          placeholder='Add your phone number'
+                          value={phoneNumber}
+                          onChange={(e) => setPhoneNumber(e.target.value)}
+                          type='tel'
+                        />
+                      </div>
 
-                {/* Content Container */}
-                <div className="overflow-y-auto  max-h-[600px] p-4 scrollbar-custom">
-                  {likedPages.length > 0 ? (
-                    <div className="flex flex-col gap-4 items-center">
-                      {renderLikedPages(likedPages, handleUnlikePage)}
+                      {/* Address field */}
+                      <div>
+                        <h1 className='text-slate-500 mb-2'>Address</h1>
+                        <input
+                          className='border-[.5px] rounded-md p-3 w-full focus:border-gray-500 focus:outline-none'
+                          placeholder='Enter your address'
+                          value={address}
+                          onChange={(e) => setAddress(e.target.value)}
+                        />
+                      </div>      
                     </div>
-                  ) : (
-                    <p className="text-slate-500 text-center mt-4">
-                      You haven't liked any pages yet.
-                    </p>
-                  )}
-                </div>
-              </CardBody>
-            </Card>
-          </Tab>
+                    <Button className='mt-6 bg-color1 text-white hover:bg-color2 w-full md:w-auto' onPress={handleUpdateProfile}>Update Profile</Button>
+                  </CardBody>
+                </Card>
+              </Tab>
+              {/* Liked Pages Tab */}
+              <Tab key="likedPages" title="Liked Pages">
+                <Card >
+                  <CardBody className="p-4 sm:p-6 ">
+                    {/* Header */}
+                    <h1 className="text-2xl sm:text-3xl font-bold mb-4 text-center sm:text-left">
+                      Liked Pages
+                    </h1>
+                    <div className="bg-gray-300 w-full h-[1px] mb-6"></div>
 
-          {/* My Booking Tab */}
-          <Tab key="myBookings" title="My Bookings">
-            <Card>
-              <CardBody className='p-6 min-h-[700px]'>
-                <MyBookingTab bookings={bookings} onCancelBooking={handleCancelBooking} />
-              </CardBody>
-            </Card>
-          </Tab>
-        </Tabs>
-      </div>
+                    {/* Content Container */}
+                    <div className="overflow-y-auto  max-h-[600px] p-4 scrollbar-custom">
+                      {likedPages.length > 0 ? (
+                        <div className="flex flex-col gap-4 items-center">
+                          {renderLikedPages(likedPages, handleUnlikePage)}
+                        </div>
+                      ) : (
+                        <p className="text-slate-500 text-center mt-4">
+                          You haven't liked any pages yet.
+                        </p>
+                      )}
+                    </div>
+                  </CardBody>
+                </Card>
+              </Tab>
 
-      <BusinessApplicationModal
-        isBusinessOpen={isBusinessOpen}
-        onBusinessOpenChange={onBusinessOpenChange}
-        userData={userData}
-      />
+              {/* My Booking Tab */}
+              <Tab key="myBookings" title="My Bookings">
+                <Card>
+                  <CardBody className='p-6 min-h-[700px]'>
+                    <MyBookingTab bookings={bookings} onCancelBooking={handleCancelBooking} />
+                  </CardBody>
+                </Card>
+              </Tab>
+            </Tabs>
+          </div>
 
-      <Footer />
+          <BusinessApplicationModal
+            isBusinessOpen={isBusinessOpen}
+            onBusinessOpenChange={onBusinessOpenChange}
+            userData={userData}
+          />
 
-      {showButton && (
-        <motion.button
-          className="fixed bottom-5 right-2 p-3 rounded-full shadow-lg z-10"
-          onClick={scrollToTop}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          animate={{ y: [0, -10, 0] }}
-          transition={{ duration: 0.6, repeat: Infinity, repeatType: "loop" }}
-          style={{
-            background: 'linear-gradient(135deg, #688484  0%, #092635 100%)',
-            color: 'white',
-          }}
-        >
-          ↑
-        </motion.button>
+          <Footer />
+
+          {showButton && (
+            <motion.button
+              className="fixed bottom-5 right-2 p-3 rounded-full shadow-lg z-10"
+              onClick={scrollToTop}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              animate={{ y: [0, -10, 0] }}
+              transition={{ duration: 0.6, repeat: Infinity, repeatType: "loop" }}
+              style={{
+                background: 'linear-gradient(135deg, #688484  0%, #092635 100%)',
+                color: 'white',
+              }}
+            >
+              ↑
+            </motion.button>
+          )}
+        </>
       )}
     </div>
   );
