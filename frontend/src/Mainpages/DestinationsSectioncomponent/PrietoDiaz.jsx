@@ -427,7 +427,7 @@ const renderSwiperShopSection = (title, link, spots) => {
 };
 const PrietoDiaz = () => {
   const [businesses, setBusinesses] = useState([]);
-  const [currentZoom, setCurrentZoom] = useState(14); // Initial zoom level
+  const [currentZoom, setCurrentZoom] = useState(12); // Initial zoom level
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
