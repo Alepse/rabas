@@ -189,10 +189,10 @@ const BusinessProducts = () => {
 
           {/* Sections of business products and services */}
           <div className="w-full flex flex-wrap gap-6">
-            {showActivities && <ActivitySections />}
-            {showAccommodation && <AccommodationSection />}
-            {showRestaurantServices && <RestaurantServicesSection />}
-            {showShop && <ShopSections />}
+            {<ActivitySections />}
+            { <AccommodationSection />}
+            { <RestaurantServicesSection />}
+            { <ShopSections />}
           </div>
         </>
         )}

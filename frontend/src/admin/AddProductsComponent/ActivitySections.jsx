@@ -482,19 +482,20 @@ const ActivitySections = () => {
   const uniqueActivityTypes = [...new Set(activities.map((activity) => activity.activityType))];
 
   return (
-    <div className="max-h-[620px] p-3 w-full h-full rounded-xl shadow-gray-400 shadow-lg bg-white">
+    <div className="max-h-[720px] p-3 w-full h-full rounded-xl shadow-gray-400 shadow-lg bg-white">
       {/* Header Section */}
-      <div className="flex justify-between p-3 items-center">
-        <div className="font-semibold text-xl mb-3 p-3 items-center gap-4 flex">
+      <div className="flex flex-wrap justify-between p-3 items-center gap-4">
+        <div className="w-full sm:w-auto flex flex-wrap items-center gap-4">
           <h1>Activities</h1>
-          <div className="relative">
+          <div className="relative flex-grow sm:flex-grow-0 w-full sm:w-auto">
             <Input
               placeholder="Search ..."
-              className="w-72 pl-10 placeholder:text-gray-400 placeholder:italic focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full sm:w-72 pl-10 placeholder:text-gray-400 placeholder:italic focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
             <FaSearch className="absolute top-2 left-3 text-gray-500" />
           </div>
         </div>
+
         {/* Buttons */}
         <div className="flex flex-wrap justify-start sm:justify-end gap-3 w-full sm:w-auto">
           {selectedActivities.length > 0 && (
@@ -518,7 +519,7 @@ const ActivitySections = () => {
       </div>
 
       {/* Tabs Section */}
-      <div className="tabs flex justify-start gap-3 mb-4">
+      <div className="tabs flex flex-wrap justify-start gap-3 mb-4 p-3">
         <Button
           onClick={() => setSelectedType('')}
           className={`border p-2 rounded-md transition duration-300 ease-in-out ${

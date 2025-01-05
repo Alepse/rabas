@@ -362,30 +362,33 @@ const ShopSections = () => {
   const uniqueShopProductTypes = [...new Set(products.map((product) => product.productType))];
 
   return (
-    <div className="max-h-[620px] p-3 w-full h-full rounded-xl shadow-gray-400 shadow-lg bg-white">
+    <div className="max-h-[720px] p-3 w-full h-full rounded-xl shadow-gray-400 shadow-lg bg-white">
       {/* Header Section */}
-      <div className="flex justify-between p-3 items-center">
-        <div className="font-semibold text-xl mb-3 p-3 items-center gap-4 flex">
+      <div className="flex flex-wrap justify-between p-3 items-center gap-4">
+        <div className="w-full sm:w-auto flex flex-wrap items-center gap-4">
           <h1>Products</h1>
-          <div className='relative'>
+          <div className="relative flex-grow sm:flex-grow-0 w-full sm:w-auto">
             <Input
               placeholder='Search ...'
-              className='w-72 pl-10 placeholder:text-gray-400 placeholder:italic focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+              className="w-full sm:w-72 pl-10 placeholder:text-gray-400 placeholder:italic focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
             <FaSearch className='absolute top-2 left-3 text-gray-500' />
           </div>
         </div>
-        <div className="flex space-x-3">
-          <Button
-            color="danger"
-            onClick={handleDeleteSelected}
-            disabled={!selectedShopProducts.length} // Disable delete button if no products are selected
-          >
-            Delete Selected
-          </Button>
+        <div className="flex flex-wrap justify-start sm:justify-end gap-3 w-full sm:w-auto">
+          {selectedShopProducts.length > 0 && (
+            <Button
+              color="danger"
+              onClick={handleDeleteSelected}
+              disabled={!selectedShopProducts.length}
+              className="w-32 px-4 py-2 text-sm sm:text-base text-center"
+            >
+              Delete Selected
+            </Button>
+          )}
           <Button
             color="primary"
-            className="text-white hover:bg-color2"
+            className="w-32 px-4 py-2 text-sm sm:text-base text-white hover:bg-color2 text-center"
             onPress={() => setModalOpen(true)}
           >
             Add
@@ -394,7 +397,7 @@ const ShopSections = () => {
       </div>
 
       {/* Tabs Section */}
-      <div className="tabs flex justify-start gap-3 mb-4">
+      <div className="tabs flex flex-wrap justify-start gap-3 mb-4 p-3">
         <Button
           onClick={() => setSelectedType('')}
           className={`border p-2 rounded-md transition duration-300 ease-in-out ${

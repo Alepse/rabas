@@ -488,7 +488,7 @@ const AccommodationSection = () => {
   const uniqueAccommodationTypes = [...new Set(accommodations.map((accommodation) => accommodation.accommodationType))];
 
   return (
-    <div className="max-h-[620px] p-3 w-full h-full rounded-xl shadow-gray-400 shadow-lg bg-white">
+    <div className="max-h-[720px] p-3 w-full h-full rounded-xl shadow-gray-400 shadow-lg bg-white">
       {/* Header Section */}
       <div className="flex flex-wrap justify-between p-3 items-center gap-4">
         {/* Title and Search */}
@@ -528,7 +528,7 @@ const AccommodationSection = () => {
       </div>
 
       {/* Tabs Section */}
-      <div className="tabs flex justify-start gap-3 mb-4">
+      <div className="tabs flex flex-wrap justify-start gap-3 mb-4 p-3">
         <Button
           onClick={() => setSelectedType('')}
           className={`border p-2 rounded-md transition duration-300 ease-in-out ${
