@@ -768,7 +768,10 @@ const Discover = () => {
                         </div>
                       </div>
                       <Link to={`/business/${encryptId(item.business_id)}`}>
-                        <Button className="w-full bg-color1 text-color3 rounded-md hover:bg-color2">
+                        <Button 
+                          className="w-full bg-color1 text-color3 rounded-md hover:bg-color2"
+                          aria-label={`Explore more about ${item.businessName}`} // Adding the aria-label dynamically
+                        >
                           Explore More
                         </Button>
                       </Link>
