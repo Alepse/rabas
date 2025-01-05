@@ -7,6 +7,7 @@ import { addProduct, handleUpdateShopProduct, deleteShopProducts, fetchBusinessP
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { FaSearch, FaChevronLeft, FaChevronRight, FaImage, FaPlus } from 'react-icons/fa';
+import Swal from 'sweetalert2';
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
