@@ -8,8 +8,32 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { FaSearch, FaChevronLeft, FaChevronRight, FaImage } from 'react-icons/fa';
 import { FaPlus } from "react-icons/fa";
+import Swal from 'sweetalert2';
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
+
+const showSuccessAlert = (message) => {
+  Swal.fire({
+    title: 'Success!',
+    text: message,
+    icon: 'success',
+    confirmButtonText: 'OK',
+    confirmButtonColor: '#0BDA51',
+    cancelButtonColor: '#D33736',
+  });
+};
+
+const showErrorAlert = (message) => {
+  Swal.fire({
+    title: 'Error!',
+    text: message,
+    icon: 'error',
+    confirmButtonText: 'Try Again',
+    confirmButtonColor: '#0BDA51',
+    cancelButtonText: 'Close',
+    cancelButtonColor: '#D33736',
+  });
+};
 
 const RestaurantSection = () => {
   // State Management
@@ -29,6 +53,7 @@ const RestaurantSection = () => {
   const [selectedType, setSelectedType] = useState('');
   const [termsAndConditions, setTermsAndConditions] = useState([]);
   const [termsList, setTermsList] = useState([]); // New state for terms list
+  const [loadingSpinning, setLoadingSpinning] = useState(false);
 
 
   const dispatch = useDispatch();
@@ -233,6 +258,7 @@ const RestaurantSection = () => {
   // Handlers for Deleting Selected Restaurants
   const handleDeleteSelected = async () => {
     if (selectedRestaurants.length > 0) {
+      setLoadingSpinning(true);
       try {
         // Create a request to delete selected restaurants
         const response = await fetch(`${BASE_URL}/delete-product`, {
@@ -246,16 +272,18 @@ const RestaurantSection = () => {
         const data = await response.json();
   
         if (data.success) {
+          setLoadingSpinning(false);
           // Dispatch Redux action to remove restaurants from the state
           dispatch(deleteRestaurants(selectedRestaurants));
-          
+          showSuccessAlert('Selected Products Delete Successfully')
           // Optionally reset the selection
           setSelectedRestaurants([]);
         } else {
-          console.error('Failed to delete products:', data.message);
+          setLoadingSpinning(false);
+          showErrorAlert('Failed to delete products:', data.message);
         }
       } catch (error) {
-        console.error('Error deleting products:', error);
+        showErrorAlert('Error deleting products:', error);
       }
     } else {
       // console.log('No restaurants selected for deletion.');
@@ -276,6 +304,7 @@ const RestaurantSection = () => {
   
     // Check that all required fields are filled
     if (restaurantName && pricing && pricingUnit && restaurantType) {
+      setLoadingSpinning(true);
       // Construct the new restaurant object
       const newRestaurant = {
         category: 'restaurant',
@@ -375,7 +404,7 @@ const RestaurantSection = () => {
           const data = await response.json();
           existingImages = data.images || [];
         } catch (error) {
-          console.error('Error fetching existing images:', error);
+          showErrorAlert('Error fetching existing images:', error);
         }
       }    
       
@@ -393,22 +422,26 @@ const RestaurantSection = () => {
         let result;
         // Check if we are in editing mode or adding a new restaurant
         if (isEditing) {
+          setLoadingSpinning(false);
           result = dispatch(handleUpdateRestaurant(formData));
-          // console.log('Restaurant updated successfully:', result);
+          showSuccessAlert('Product updated successfully:', result);
         } else {
+          setLoadingSpinning(false);
           result = dispatch(addProduct(formData));
-          // console.log('Restaurant added successfully:', result.payload);
+          showSuccessAlert('Product added successfully:', result.payload);
         }
   
         // Close modal and reset form after successful submission
         setModalOpen(false);
         resetForm();
       } catch (error) {
+        setLoadingSpinning(false);
         // console.error('Failed to submit restaurant:', error);
-        alert('An error occurred while saving the restaurant. Please try again.');
+        showErrorAlert('An error occurred while saving the restaurant. Please try again.');
       }
     } else {
-      alert('Please fill in all required fields.'); // Alert if required fields are missing
+      setLoadingSpinning(false);
+      showErrorAlert('Please fill in all required fields.'); // Alert if required fields are missing
     }
   }; 
 

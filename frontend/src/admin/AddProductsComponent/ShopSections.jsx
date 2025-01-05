@@ -33,13 +33,14 @@ const ShopSections = () => {
   const [errorTextTerms, setErrorTextTerms] = useState("");
   const [errorTextInclusions, setErrorTextInclusions] = useState("");
   const sliderRefs = useRef({});
+  const [loadingSpinning, setLoadingSpinning] = useState(false);
 
   const [options, setOptions] = useState([
     { value: 'souvenir', label: 'Souvenir' },
     { value: 'custom', label: 'Custom' },
   ]);
   const [newOption, setNewOption] = useState("");
-  console.log(pricingUnit);
+  // console.log(pricingUnit);
   // Sync restaurant with options and remove duplicates
   useEffect(() => {
   
@@ -167,6 +168,7 @@ const ShopSections = () => {
   // Handlers for Deleting Selected Products
   const handleDeleteSelected = async () => {
     if (selectedShopProducts.length > 0) {
+      setLoadingSpinning(true);
       try {
         // Create a request to delete selected products
         const response = await fetch(`${BASE_URL}/delete-product`, {
@@ -180,20 +182,39 @@ const ShopSections = () => {
         const data = await response.json();
 
         if (data.success) {
+          setLoadingSpinning(false);
           // Dispatch Redux action to remove products from the state
           dispatch(deleteShopProducts(selectedShopProducts));
           
           // Optionally reset the selection
           setSelectedShopProducts([]);
         } else {
-          console.error('Failed to delete products:', data.message);
+          setLoadingSpinning(false);
+          Swal.fire({
+            title: 'Failed!',
+            text: 'Please check you internet connection and try again.',
+            icon: 'error',
+            confirmButtonColor: '#D33736'
+          }).then(() => {
+            setTimeout(() => {
+              window.location.reload();
+            });
+          });
         }
       } catch (error) {
-        console.error('Error deleting products:', error);
+        setLoadingSpinning(false);
+        Swal.fire({
+          title: 'Failed!',
+          text: 'Please check you internet connection and try again.',
+          icon: 'error',
+          confirmButtonColor: '#D33736'
+        }).then(() => {
+          setTimeout(() => {
+            window.location.reload();
+          });
+        });
       }
-    } else {
-      // console.log('No products selected for deletion.');
-    }
+    } 
   };
 
   // Handlers for Checkbox Changes
@@ -211,6 +232,7 @@ const ShopSections = () => {
   
     // Check that all required fields are filled
     if (productName && pricing && pricingUnit && productType) {
+      setLoadingSpinning(true);
       // Construct the new shopProducts object
       const newShopProduct = {
         category: 'shop',
@@ -286,7 +308,13 @@ const ShopSections = () => {
           const data = await response.json();
           existingImages = data.images || [];
         } catch (error) {
-          console.error('Error fetching existing images:', error);
+          setLoadingSpinning(false);
+          Swal.fire({
+            title: 'Failed!',
+            text: 'Please check you internet connection and try again.',
+            icon: 'error',
+            confirmButtonColor: '#D33736'
+          });
         }
       }    
       
@@ -314,12 +342,28 @@ const ShopSections = () => {
         // Close modal and reset form after successful submission
         setModalOpen(false);
         resetForm();
+        setLoadingSpinning(false);
       } catch (error) {
-        // console.error('Failed to submit product:', error);
-        alert('An error occurred while saving the product. Please try again.');
+        setLoadingSpinning(false);
+        Swal.fire({
+          title: 'Failed!',
+          text: 'Please check you internet connection and try again.',
+          icon: 'error',
+          confirmButtonColor: '#D33736'
+        }).then(() => {
+          setTimeout(() => {
+            window.location.reload();
+          });
+        });
       }
     } else {
-      alert('Please fill in all required fields.'); // Alert if required fields are missing
+      setLoadingSpinning(false);
+      Swal.fire({
+        title: 'Failed!',
+        text: 'Please fill in all required fields.',
+        icon: 'error',
+        confirmButtonColor: '#D33736'
+      });
     }
   };  
 
@@ -364,6 +408,14 @@ const ShopSections = () => {
   return (
     <div className="max-h-[720px] p-3 w-full h-full rounded-xl shadow-gray-400 shadow-lg bg-white">
       {/* Header Section */}
+      {loadingSpinning && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-70 z-50 flex justify-center items-center">
+          <div className="flex flex-col items-center">
+            <div className="spinner"></div>
+            <p className="mt-4 text-lg text-white font-semibold animate-pulse">Loading, please wait...</p>
+          </div>
+        </div>
+      )}
       <div className="flex flex-wrap justify-between p-3 items-center gap-4">
         <div className="w-full sm:w-auto flex flex-wrap items-center gap-4">
           <h1>Products</h1>

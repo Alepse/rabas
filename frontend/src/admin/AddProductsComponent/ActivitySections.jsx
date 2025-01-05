@@ -62,6 +62,8 @@ const ActivitySections = () => {
   const [errorTextTerms, setErrorTextTerms] = useState("");
   const [errorTextInclusions, setErrorTextInclusions] = useState("");
   const sliderRefs = useRef({});
+  const [loadingSpinning, setLoadingSpinning] = useState(false);
+
 
   const [options, setOptions] = useState([
     { value: 'none', label: 'Select an option' },
@@ -257,6 +259,7 @@ const ActivitySections = () => {
   // Handlers for Deleting Selected Activities
   const handleDeleteSelected = async () => {
     if (selectedActivities.length > 0) {
+      setLoadingSpinning(true);
       try {
         // Create a request to delete selected activities
         const response = await fetch(`${BASE_URL}/delete-product`, {
@@ -270,6 +273,7 @@ const ActivitySections = () => {
         const data = await response.json();
 
         if (data.success) {
+          setLoadingSpinning(false);
           // Dispatch Redux action to remove activities from the state
           dispatch(deleteActivities(selectedActivities));
           
@@ -277,12 +281,15 @@ const ActivitySections = () => {
           // reset the selection
           setSelectedActivities([]);
         } else {
+          setLoadingSpinning(false);
           showErrorAlert('Failed to delete products:', data.message);
         }
       } catch (error) {
+        setLoadingSpinning(false);
         showErrorAlert('Error deleting products:', error);
       }
     } else {
+      setLoadingSpinning(false);
       showErrorAlert('No activities selected for deletion.');
     }
   };
@@ -301,6 +308,7 @@ const ActivitySections = () => {
   
     // Check that all required fields are filled
     if (activityName && pricing && pricingUnit && activityType) {
+      setLoadingSpinning(true);
       // Construct the new activity object
       const newActivity = {
         category: 'activity',
@@ -418,9 +426,11 @@ const ActivitySections = () => {
         let result;
         // Check if we are in editing mode or adding a new activity
         if (isEditing) {
+          setLoadingSpinning(false);
           result = dispatch(handleUpdateActivity(formData));
           showSuccessAlert('Activity updated successfully:', result);
         } else {
+          setLoadingSpinning(false);
           result = dispatch(addProduct(formData));
           showSuccessAlert('Activity added successfully:', result.payload);
         }
@@ -429,10 +439,12 @@ const ActivitySections = () => {
         setModalOpen(false);
         resetForm();
       } catch (error) {
+        setLoadingSpinning(false);
         // console.error('Failed to submit activity:', error);
         showErrorAlert('An error occurred while saving the activity. Please try again.');
       }
     } else {
+      setLoadingSpinning(false); // Hide loading spinner if form submission fails
       showErrorAlert('Please fill in all required fields.'); // Alert if required fields are missing
     }
   };  
@@ -484,6 +496,14 @@ const ActivitySections = () => {
   return (
     <div className="max-h-[720px] p-3 w-full h-full rounded-xl shadow-gray-400 shadow-lg bg-white">
       {/* Header Section */}
+      {loadingSpinning && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-70 z-50 flex justify-center items-center">
+          <div className="flex flex-col items-center">
+            <div className="spinner"></div>
+            <p className="mt-4 text-lg text-white font-semibold animate-pulse">Loading, please wait...</p>
+          </div>
+        </div>
+      )}
       <div className="flex flex-wrap justify-between p-3 items-center gap-4">
         <div className="w-full sm:w-auto flex flex-wrap items-center gap-4">
           <h1>Activities</h1>
