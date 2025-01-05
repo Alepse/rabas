@@ -1108,17 +1108,33 @@ app.post('/reset-password/:token', async (req, res) => {
   }
 });
 
-// Endpoint for user logout
-app.post('/logout', (req, res) => {
+app.post('/logout', async (req, res) => {
   if (req.session && req.session.user) {
-    delete req.session.user; // Remove only the user data from the session
+    try {
+      // Check if session exists in the database
+      const userSession = await db.query('SELECT * FROM sessions WHERE session_id = ?', [req.sessionID]);
 
-    req.session.save((err) => {
-      if (err) {
-        return res.status(500).json({ success: false, message: 'Could not log out the user session' });
+      if (userSession.length === 0) {
+        // Session not found in the database, clear cache and expire session
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+        res.setHeader('Expires', '0');
+        res.setHeader('Set-Cookie', 'session_id=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; HttpOnly; SameSite=Strict');
+        // Optionally, you can delete session from the session store here if necessary
       }
-      res.json({ success: true, message: 'User logout successful' });
-    });
+
+      // Clear the session data
+      delete req.session.user;
+
+      req.session.save((err) => {
+        if (err) {
+          return res.status(500).json({ success: false, message: 'Could not log out the user session' });
+        }
+        res.json({ success: true, message: 'User logout successful' });
+      });
+    } catch (error) {
+      console.error('Error checking session in DB:', error);
+      return res.status(500).json({ success: false, message: 'Error checking session in database' });
+    }
   } else {
     res.status(400).json({ success: false, message: 'No user session found to log out' });
   }
