@@ -3,7 +3,7 @@ import { updateBusinessData } from '@/redux/businessSlice';
 import { Tabs, Tab, Card, CardBody, Textarea, Button, Avatar } from "@nextui-org/react";
 import { businessIcons } from './businessIcons';
 import DOMPurify from 'dompurify';
-import MapSection from '@/components/mapsection';
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import { FaClipboardList, FaInfoCircle, FaConciergeBell, FaStar, FaClock, FaMapMarkerAlt } from 'react-icons/fa';
 import { AiOutlineEdit } from "react-icons/ai";
 import Swal from 'sweetalert2';
@@ -304,6 +304,10 @@ const BusinessInfo = ({businessData, loading, userData, isLoggedIn}) => {
     const IconComponent = businessIcons.find(icon => icon.name === iconName)?.icon;
     return IconComponent ? <IconComponent className="inline-block mr-2" /> : null;
   };
+
+  const { pin_location } = businessData;
+  const initialCenter = pin_location ? [pin_location.latitude, pin_location.longitude] : [12.9738, 123.9807];
+  const defaultCenter = [12.9738, 123.9807]; // Fallback location if data is invalid
   
   const handleGetDirections = () => {
     if (businessData.pin_location) {
@@ -418,12 +422,53 @@ const BusinessInfo = ({businessData, loading, userData, isLoggedIn}) => {
                   </h2>
                   <p className="mb-4 text-gray-600">{businessData.completeAddress}</p>
                   <div className="w-full h-96 rounded-md shadow-lg overflow-hidden relative z-10">
-                    <MapSection 
-                      businesses={[businessData]} 
-                      currentZoom={16} 
-                      setCurrentZoom={setCurrentZoom} 
-                      initialCenter={[businessData.pin_location.latitude - 0.002, businessData.pin_location.longitude]} 
-                    />
+                  <MapContainer
+                      center={
+                        initialCenter && initialCenter.lat != null && initialCenter.lng != null
+                          ? [initialCenter.lat, initialCenter.lng]
+                          : defaultCenter
+                      }
+                      zoom={currentZoom}
+                      className="w-full h-full"
+                      style={{ zIndex: 0 }} // Ensures the map stays at the correct level
+                    >
+                      <TileLayer
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                      />
+                      <MapEvents setCurrentZoom={setCurrentZoom} />
+
+                      {pin_location && pin_location.latitude != null && pin_location.longitude != null ? (
+                        (() => {
+                          const { businessName, businessLogo } = businessData;
+                          const position = [pin_location.latitude, pin_location.longitude];
+                          const showLogo = currentZoom >= 10; // Set zoom level to show/hide logo
+
+                          const customDivIcon = L.divIcon({
+                            className: 'custom-icon',
+                            html: `
+                              <div class="custom-popup flex items-center whitespace-nowrap font-bold text-color1">
+                                ${showLogo ? `
+                                  <div class="pin-container">
+                                    <div class="pin-head">
+                                      <img src="${BASE_URL}/${businessLogo}" alt="${businessName}" class="pin-logo" />
+                                    </div>
+                                    <div class="pin-point"></div>
+                                  </div>
+                                  <span>${businessName}</span>
+                                ` : `<div class="business-name">${businessName}</div>`}
+                              </div>
+                            `,
+                            iconSize: [50, 70],
+                            iconAnchor: [25, 70],
+                          });
+
+                          return <Marker key={businessData.business_id} position={position} icon={customDivIcon} />;
+                        })()
+                      ) : (
+                        <div className="text-center text-gray-500 mt-4">No valid pin location available for this business.</div>
+                      )}
+                    </MapContainer>
                   </div>
                   <Button
                     color="primary"
@@ -593,6 +638,16 @@ const BusinessInfo = ({businessData, loading, userData, isLoggedIn}) => {
     </div>
   )
 }
+
+// Component to handle map events
+const MapEvents = ({ setCurrentZoom }) => {
+  useMapEvents({
+    zoomend: (e) => {
+      setCurrentZoom(e.target.getZoom());
+    },
+  });
+  return null;
+};
 
 
 export default BusinessInfo;

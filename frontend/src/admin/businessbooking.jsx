@@ -899,7 +899,7 @@ const BusinessBooking = () => {
 
               <Tab title="Declined Bookings" className="flex-1 min-w-[150px]">
                 <BookingSection
-                  title="Current Bookings"
+                  title="Declined Bookings"
                   bookings={declinedBookings}
                   searchQuery={searchQuery}
                   setSearchQuery={setSearchQuery}
@@ -998,43 +998,53 @@ const BusinessBooking = () => {
 
 // Booking section component
 const BookingSection = ({ title, bookings, openChatModal, onMarkAsCompleted, onAcceptBooking }) => {
-  // Create separate search states for each type
-  const [accommodationSearch, setAccommodationSearch] = useState('');
-  const [tableSearch, setTableSearch] = useState('');
-  const [attractionSearch, setAttractionSearch] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [businessType, setBusinessType] = useState('');
 
-  // Map of type to its search state and setter
-  const searchStates = {
-    'Accommodation': {
-      value: accommodationSearch,
-      setter: setAccommodationSearch
-    },
-    'Table Reservation': {
-      value: tableSearch,
-      setter: setTableSearch
-    },
-    'Attraction': {
-      value: attractionSearch,
-      setter: setAttractionSearch
-    }
+  // Mapping businessType values to user-friendly labels
+  const typeMapping = {
+    accommodation: 'Accommodation',
+    restaurant: 'Table Reservation',
+    attraction: 'Attraction',
   };
+
+  useEffect(() => {
+    const fetchBusinessType = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/get-businessData`, {
+          withCredentials: true,
+        });
+        if (response.status === 200 && response.data) {
+          const type = response.data.businessData[0].businessType; // Backend value
+          setBusinessType(type || ''); // Ensure type is set or default to empty string
+        }
+      } catch (error) {
+        console.error('Error fetching business data:', error);
+      }
+    };
+
+    fetchBusinessType();
+  }, []);
+
+  // Determine the label for the current business type
+  const businessLabel = typeMapping[businessType] || '';
 
   return (
     <div>
       <div className="text-xl font-bold mb-4 text-gray-700">{title}</div>
-      <div className="p-4 grid lg:grid-cols-2 xl:grid-cols-3 md:grid-cols-1 mt-3 gap-4">
-        {['Accommodation', 'Table Reservation', 'Attraction'].map((type) => (
+      <div className="p-4 mt-3 gap-4">
+        {businessLabel && (
           <BookingTypeSection
-            key={type}
-            type={type}
+            key={businessType}
+            type={businessLabel} // Pass the label to BookingTypeSection
             bookings={bookings}
-            searchQuery={searchStates[type].value}
-            setSearchQuery={searchStates[type].setter}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
             openChatModal={openChatModal}
             onMarkAsCompleted={onMarkAsCompleted}
             onAcceptBooking={onAcceptBooking}
           />
-        ))}
+        )}
       </div>
     </div>
   );
