@@ -342,50 +342,57 @@ const Discover = () => {
   };
 
   const filterData = (data, filters) => {
-    return data.filter(item => {
-      const matchesType = !filters.selectedType || filters.selectedType.length === 0 || 
-        filters.selectedType.some(type => 
-          item.category && item.category.some(cat => 
-            cat.toLowerCase().replace(/s$/, '') === type.toLowerCase().replace(/s$/, '')
-          )
-        );
-     
-      const matchesCategory = !filters.selectedCategory || filters.selectedCategory.length === 0 || 
-        filters.selectedCategory.some(category => 
-          item.category && item.category.some(cat => 
-            cat.toLowerCase().replace(/s$/, '') === category.toLowerCase().replace(/s$/, '')
-          )
-        );
-      
-      const matchesCuisine = !filters.selectedCuisine || filters.selectedCuisine.length === 0 || 
-        filters.selectedCuisine.some(cuisine => 
-          item.category && item.category.some(cat => 
-            cat.toLowerCase().replace(/s$/, '') === cuisine.toLowerCase().replace(/s$/, '')
-          )
+    return data.filter((item) => {
+      // Normalize strings for comparison
+      const normalize = (str) => str.toLowerCase().replace(/s$/, '');
+  
+      // Match activity type
+      const matchesType =
+        filters.selectedType.length === 0 ||
+        filters.selectedType.every((selected) =>
+          item.category
+            ?.map((cat) => normalize(cat))
+            .includes(normalize(selected))
         );
   
-      const matchesAmenities = !filters.selectedAmenities || filters.selectedAmenities.length === 0 ||
-        filters.selectedAmenities.every(amenity =>
-          item.facilities && item.facilities.some(facility =>
-            facility.items && facility.items.some(a => 
-              a.name.toLowerCase().replace(/s$/, '') === amenity.toLowerCase().replace(/s$/, '')
+      // Match amenities
+      const matchesAmenities =
+        filters.selectedAmenities.length === 0 ||
+        filters.selectedAmenities.every((amenity) =>
+          item.facilities
+            ?.flatMap((facility) =>
+              facility.items.map((a) => normalize(a.name))
             )
-          )
+            .includes(normalize(amenity))
         );
-      
-      const matchesRatings = !filters.selectedRatings || filters.selectedRatings.length === 0 || 
+  
+      // Match rating
+      const matchesRatings =
+        filters.selectedRatings.length === 0 ||
         filters.selectedRatings.includes(Math.floor(item.rating || 0));
   
-      const matchesDestination = !filters.selectedDestination || filters.selectedDestination === 'All' || 
-        filters.selectedDestination === item.destination;
-      
-      const matchesPriceRange = !filters.priceRange || 
-        (item.lowest_price <= filters.priceRange[1] && item.highest_price >= filters.priceRange[0]);
+      // Match destination
+      const matchesDestination =
+        filters.selectedDestination === 'All' ||
+        item.destination === filters.selectedDestination;
   
-      return matchesType && matchesCategory && matchesCuisine && matchesAmenities && 
-             matchesRatings && matchesDestination && matchesPriceRange;
+      // Match budget range
+      const minBudget = parseFloat(item.lowest_price) || 0;
+      const maxBudget = parseFloat(item.highest_price) || Infinity;
+  
+      const matchesPriceRange =
+        minBudget <= filters.priceRange[1] && maxBudget >= filters.priceRange[0];
+  
+      return (
+        matchesType &&
+        matchesAmenities &&
+        matchesRatings &&
+        matchesDestination &&
+        matchesPriceRange
+      );
     });
   };
+  
   const renderFilters = (filters, setFilters, types, additionalFilters = null, isAllTab = false) => (
     <div className="w-full lg:w-1/4  ">
       <div className="bg-white p-4 rounded-lg shadow-md  overflow-y-auto scrollbar-custom">
@@ -751,132 +758,133 @@ const Discover = () => {
             </>
           )}
 
-                        {/* Content Section */}
-                <div className="w-full lg:w-3/4 max-h-[1300px] overflow-y-auto scrollbar-custom p-2">
-                  <motion.div
-                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-                    variants={containerVariants}
-                    initial="hidden"
-                    animate="visible"
-                  >
-                    {loading ? (
-                      Array.from({ length: 4 }).map((_, index) => {
-                        const opacity = 1 - index * 0.25; // Adjust the values as needed (1, 0.8, 0.6, 0.4)
-                        return (
-                          <div key={index} style={{ opacity }}>
-                            <div className="bg-white rounded-lg shadow-lg p-2 duration-300 flex flex-col justify-between">
-                              <Skeleton className="w-full h-56 md:h-64 bg-gray-200 rounded-t-lg overflow-hidden" />
-                              <div className="flex-grow flex flex-col justify-between mt-4 px-2">
-                                <div className="p-2 flex-grow">
-                                  <Skeleton className="h-3 mb-4" />
-                                  <Skeleton className="h-6 mb-4" />
-                                  <Skeleton className="h-4 mb-4" />
-                                  <Skeleton className="h-5 mb-3" />
-                                  <Skeleton className="h-10" />
+                       
+               {/* Content Section */}
+                  <div className="w-full lg:w-3/4 max-h-[1300px] overflow-y-auto scrollbar-custom p-2">
+                    <motion.div
+                      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                      variants={containerVariants}
+                      initial="hidden"
+                      animate="visible"
+                    >
+                      {loading ? (
+                        Array.from({ length: 4 }).map((_, index) => {
+                          const opacity = 1 - index * 0.25; // Adjust the values as needed (1, 0.8, 0.6, 0.4)
+                          return (
+                            <div key={index} style={{ opacity }}>
+                              <div className="bg-white rounded-lg shadow-lg p-2 duration-300 flex flex-col justify-between">
+                                <Skeleton className="w-full h-56 md:h-64 bg-gray-200 rounded-t-lg overflow-hidden" />
+                                <div className="flex-grow flex flex-col justify-between mt-4 px-2">
+                                  <div className="p-2 flex-grow">
+                                    <Skeleton className="h-3 mb-4" />
+                                    <Skeleton className="h-6 mb-4" />
+                                    <Skeleton className="h-4 mb-4" />
+                                    <Skeleton className="h-5 mb-3" />
+                                    <Skeleton className="h-10" />
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        );
-                      })
-                    ) : (
-                      // Render actual content once loaded
-                      (() => {
-                        // Combine all data for the active tab
+                          );
+                        })
+                      ) : (() => {
                         const activeData =
                           activeTab === 'all'
                             ? Object.values(mockData).flat()
                             : mockData[activeTab] || [];
-                        // Apply filters
                         const filteredItems = filterData(activeData, getActiveFilters());
-                        // Paginate the filtered data
                         const paginatedItems = filteredItems.slice(
                           currentPage * itemsPerPage,
                           (currentPage + 1) * itemsPerPage
                         );
 
-                        return paginatedItems.map((item, index) => (
-                          <motion.div
-                            key={index}
-                            className="bg-white rounded-lg shadow-lg p-2 hover:shadow-slate-500 hover:scale-105 h-[400px] duration-300 flex flex-col justify-between"
-                            variants={cardVariants}
-                          >
-                            <div className="w-full h-40 border bg-gray-200 mb-2 rounded-t-lg overflow-hidden">
-                              {item.cardImage ? (
-                                <img
-                                  src={item.cardImage ? `${BASE_URL}/${item.cardImage}` : `${BASE_URL}/${item.businessLogo}`}
-                                  alt={item.businessName}
-                                  className="w-full h-full object-cover"
-                                />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center">
-                                  <span>No Image</span>
-                                </div>
-                              )}
-                            </div>
-
-                            <div className="p-2">
-                              <div className="flex justify-between items-center mb-2">
-                                {renderTags(item.category, getActiveFilters().selectedType)}
-                              </div>
-                              <div>
-                                <div className="flex gap-2 items-center flex-wrap">
-                                  <h3 className="text-lg sm:text-base lg:text-lg font-semibold text-gray-800 truncate">
-                                    {item.businessName}
-                                  </h3>
-                                </div>
-                              </div>
-                              <div className="text-sm text-gray-500 flex items-center">
-                                <GiPositionMarker className="mr-1" />
-                                {item.destination}
-                              </div>
-                            </div>
-
-                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-2">
-                              {/* Rating Section */}
-                              <div className="flex items-center gap-1 mb-2 sm:mb-0">
-                                {item.rating ? (
-                                  <>
-                                    <span className="text-[12px] sm:text-sm">
-                                      {parseFloat(item.rating).toFixed(1)}
-                                    </span>
-                                    <span className="text-yellow-500 text-[12px] sm:text-sm">
-                                      {'★'.repeat(Math.floor(item.rating))}
-                                      {'☆'.repeat(5 - Math.floor(item.rating))}
-                                    </span>
-                                  </>
+                        return filteredItems.length === 0 ? (
+                          <div className=" md:ml-[18rem] w-full text-center text-gray-500">
+                            No businesses match your selected filters.
+                          </div>
+                        ) : (
+                          paginatedItems.map((item, index) => (
+                            <motion.div
+                              key={index}
+                              className="bg-white rounded-lg shadow-lg p-2 hover:shadow-slate-500 hover:scale-105 h-[400px] duration-300 flex flex-col justify-between"
+                              variants={cardVariants}
+                            >
+                              <div className="w-full h-40 border bg-gray-200 mb-2 rounded-t-lg overflow-hidden">
+                                {item.cardImage ? (
+                                  <img
+                                    src={item.cardImage ? `${BASE_URL}/${item.cardImage}` : `${BASE_URL}/${item.businessLogo}`}
+                                    alt={item.businessName}
+                                    className="w-full h-full object-cover"
+                                  />
                                 ) : (
-                                  <span className="text-gray-500 text-[12px] sm:text-sm">
-                                    No ratings
-                                  </span>
+                                  <div className="w-full h-full flex items-center justify-center">
+                                    <span>No Image</span>
+                                  </div>
                                 )}
                               </div>
 
-                              {/* Price Range Section */}
-                              <div className="text-md sm:text-sm font-semibold text-black">
-                                {item.lowest_price && item.highest_price ? (
-                                  `₱${item.lowest_price} - ₱${item.highest_price}`
-                                ) : (
-                                  <span className="text-gray-400 italic text-[12px] sm:text-sm">
-                                    Price Range Not Available
-                                  </span>
-                                )}
+                              <div className="p-2">
+                                <div className="flex justify-between items-center mb-2">
+                                  {renderTags(item.category, getActiveFilters().selectedType)}
+                                </div>
+                                <div>
+                                  <div className="flex gap-2 items-center flex-wrap">
+                                    <h3 className="text-lg sm:text-base lg:text-lg font-semibold text-gray-800 truncate">
+                                      {item.businessName}
+                                    </h3>
+                                  </div>
+                                </div>
+                                <div className="text-sm text-gray-500 flex items-center">
+                                  <GiPositionMarker className="mr-1" />
+                                  {item.destination}
+                                </div>
                               </div>
-                            </div>
-                            <Link to={`/business/${encryptId(item.business_id)}`}>
-                              <Button
-                                className="w-full bg-color1 text-color3 rounded-md hover:bg-color2"
-                                aria-label={`Explore more about ${item.businessName}`}
-                              >
-                                Explore More
-                              </Button>
-                            </Link>
-                          </motion.div>
-                        ));
-                      })()
-                    )}
-                  </motion.div>
-                </div>
+
+                              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-2">
+                                {/* Rating Section */}
+                                <div className="flex items-center gap-1 mb-2 sm:mb-0">
+                                  {item.rating ? (
+                                    <>
+                                      <span className="text-[12px] sm:text-sm">
+                                        {parseFloat(item.rating).toFixed(1)}
+                                      </span>
+                                      <span className="text-yellow-500 text-[12px] sm:text-sm">
+                                        {'★'.repeat(Math.floor(item.rating))}
+                                        {'☆'.repeat(5 - Math.floor(item.rating))}
+                                      </span>
+                                    </>
+                                  ) : (
+                                    <span className="text-gray-500 text-[12px] sm:text-sm">
+                                      No ratings
+                                    </span>
+                                  )}
+                                </div>
+
+                                {/* Price Range Section */}
+                                <div className="text-md sm:text-sm font-semibold text-black">
+                                  {item.lowest_price && item.highest_price ? (
+                                    `₱${item.lowest_price} - ₱${item.highest_price}`
+                                  ) : (
+                                    <span className="text-gray-400 italic text-[12px] sm:text-xs">
+                                      Price Range Not Available
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              <Link to={`/business/${encryptId(item.business_id)}`}>
+                                <Button
+                                  className="w-full bg-color1 text-color3 rounded-md hover:bg-color2"
+                                  aria-label={`Explore more about ${item.businessName}`}
+                                >
+                                  Explore More
+                                </Button>
+                              </Link>
+                            </motion.div>
+                          ))
+                        );
+                      })()}
+                    </motion.div>
+                  </div>
 
           
                   </div>
