@@ -118,7 +118,7 @@ const TableReservationForm = ({ isOpen, onClose, product = {} }) => {
   const [disabledTimes, setDisabledTimes] = useState([]); 
   const [bookedDates, setBookedDates] = useState([]);
   
-  console.log(disabledDates, disabledTimes, bookedDates);
+  // console.log(disabledDates, disabledTimes, bookedDates);
   useEffect(() => {
     const fetchUnavailableDates = async () => {
       try {
@@ -525,13 +525,17 @@ const TableReservationForm = ({ isOpen, onClose, product = {} }) => {
             Terms & Conditions
           </ModalHeader>
           <ModalBody className="space-y-4">
-            <p>By making a reservation, you agree to the following terms and conditions:</p>
-            <ul className="list-disc pl-5">
-              <li>All reservations are subject to availability.</li>
-              <li>Cancellations must be made 24 hours in advance.</li>
-              <li>Payment is required at the time of booking.</li>
-              <li>Guests must adhere to the dress code policy.</li>
-            </ul>
+          {product.termsAndConditions && (
+            <>
+              <p>By making a reservation, you agree to the following terms and conditions:</p>
+              <ul className="list-disc pl-5">
+                {/* Map through the terms and render each item */}
+                {product.termsAndConditions.map((term, index) => (
+                  <li key={term.id}>{term.item}</li>  // Render 'item' of each term
+                ))}
+              </ul>
+            </>
+          )}
           </ModalBody>
           <ModalFooter>
             <Button auto onClick={() => setPolicyModalOpen(false)}>
