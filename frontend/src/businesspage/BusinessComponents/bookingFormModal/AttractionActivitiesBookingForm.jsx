@@ -27,6 +27,13 @@ const formatDate = (date) => {
   return date.toString();
 };
 
+function formatTo12Hour(time24) {
+  const [hour, minute] = time24.split(":").map(Number); // Split and convert to numbers
+  const period = hour < 12 ? "AM" : "PM"; // Determine AM/PM
+  const hour12 = hour % 12 === 0 ? 12 : hour % 12; // Convert to 12-hour format
+  return `${hour12}:${String(minute).padStart(2, "0")} ${period}`; // Format with leading zero
+}
+
 const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
   console.log(product);
   const [userId, setUserId] = useState(null);
@@ -39,8 +46,8 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
     lastName: '',
     email: '',
     phone: '',
-    visitDate: null, // Change to store a single date
-    activityTime: '10:00', // Default to 10:00 AM
+    visitDate: null, 
+    activityTime: '', 
     originalPrice: Number(product.price) || 0,
     discount: Number(product.discount) || 0,
     discountedPrice: product.discount ? 
@@ -52,47 +59,6 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
     specialRequests: '',
     numberOfGuests: 1, // Default to 1 guest
   });
-
-  const [disabledDates, setDisabledDates] = useState([]);
-  
-
-  useEffect(() => {
-      const fetchUnavailableDates = async () => {
-        try {
-          const response = await fetch(`${BASE_URL}/product-booking-dates/${product.product_id}`);
-          const data = await response.json();
-    
-          if (data.success) {
-            // Extract the dateIn and mark those dates as unavailable
-            const unavailableDates = data.bookings.map((booking) => {
-              const dateIn = new Date(booking.dateIn);
-    
-              return {
-                year: dateIn.getFullYear(),
-                month: dateIn.getMonth() + 1,  // Add 1 to convert to 1-indexed month
-                day: dateIn.getDate(),
-              };
-            });
-    
-            // Remove duplicates by converting to a Set and back to an array
-            const uniqueDates = Array.from(new Set(unavailableDates.map(date => JSON.stringify(date))))
-              .map(date => JSON.parse(date));
-    
-            setDisabledDates(uniqueDates);
-          } else {
-            console.error('Failed to fetch unavailable dates:', data.message);
-          }
-        } catch (err) {
-          console.error('Error fetching unavailable dates:', err);
-        }
-      };
-    
-      if (product.product_id) {
-        fetchUnavailableDates();
-      }
-    }, [product.product_id]);  
-
-    // console.log('Unavailable dates', disabledDates);
 
   // Fetching user data
   const fetchUserData = async () => {
@@ -147,28 +113,134 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
   const [isPolicyModalOpen, setPolicyModalOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
 
-  // Define unavailable times
-  const unavailableTimes = ['12:00', '15:00', '20:00'];
-
   const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
   const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 0));
 
+
+  const [disabledDates, setDisabledDates] = useState([]);
+  const [disabledTimes, setDisabledTimes] = useState([]); 
+  const [bookedDates, setBookedDates] = useState([]);
+
+  useEffect(() => {
+    const fetchUnavailableDates = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/product-booking-dates/${product.product_id}`);
+        const data = await response.json();
+  
+        if (data.success) {
+          const dateBookings = {};
+  
+          // Group bookings by day (year-month-day)
+          data.bookings.forEach((booking) => {
+            const dateIn = new Date(booking.dateIn);
+            const day = `${dateIn.getFullYear()}-${dateIn.getMonth() + 1}-${dateIn.getDate()}`;
+  
+            if (!dateBookings[day]) {
+              dateBookings[day] = [];
+            }
+  
+            // Store each booking's time for that day
+            dateBookings[day].push(dateIn.getHours());
+          });
+  
+          // Find days where all 24 hours are booked (fully booked)
+          const unavailableDates = Object.keys(dateBookings).filter((day) => {
+            const hoursBooked = dateBookings[day];
+            return new Set(hoursBooked).size === 24; // All 24 hours are booked
+          }).map((day) => {
+            const [year, month, dayOfMonth] = day.split('-');
+            return {
+              year: parseInt(year),
+              month: parseInt(month),
+              day: parseInt(dayOfMonth),
+              unavailableTimes: dateBookings[day], // Store unavailable times for this day
+            };
+          });
+  
+          // Set unavailable dates
+          setDisabledDates(unavailableDates);
+  
+          // Find partially booked dates (not fully booked)
+          const bookedDates = Object.keys(dateBookings).filter((day) => {
+            const hoursBooked = dateBookings[day];
+            return new Set(hoursBooked).size < 24; // Partially booked
+          }).map((day) => {
+            const [year, month, dayOfMonth] = day.split('-');
+            return {
+              year: parseInt(year),
+              month: parseInt(month),
+              day: parseInt(dayOfMonth),
+              unavailableTimes: dateBookings[day], // Store unavailable times for this day
+            };
+          });
+  
+          // Set booked dates
+          setBookedDates(bookedDates);
+  
+          // Check if today is partially booked
+          const today = new Date();
+          const todayKey = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+          const todayUnavailable = bookedDates.find((date) => `${date.year}-${date.month}-${date.day}` === todayKey);
+  
+          if (todayUnavailable) {
+            setDisabledTimes(todayUnavailable.unavailableTimes); // Set unavailable times for today
+          }
+  
+        } else {
+          console.error('Failed to fetch unavailable dates:', data.message);
+        }
+      } catch (err) {
+        console.error('Error fetching unavailable dates:', err);
+      }
+    };
+  
+    if (product.product_id) {
+      fetchUnavailableDates();
+    }
+  }, [product.product_id]);
+  
   const handleTimeChange = (e) => {
     const selectedTime = e.target.value;
-    setFormData({ ...formData, activityTime: selectedTime });
-
-    if (unavailableTimes.includes(selectedTime)) {
-      Swal.fire({
-        title: 'Time Unavailable',
-        text: 'The selected activity time is unavailable. Please choose a different time.',
-        icon: 'error',
-        confirmButtonColor: '#0BDA51'
-      }).then(() => {
-        // Reset the time to a default or previous valid time
-        setFormData((prevData) => ({ ...prevData, activityTime: '10:00' }));
-      });
-    }
+    // Split the time into hours and minutes
+    const [hours, minutes] = selectedTime.split(':');
+    
+    setFormData((prevData) => ({
+      ...prevData,
+      activityTime: `${hours}:${minutes}`, // Keep the format as "HH:MM"
+    }));
   };
+  
+  // Get the selected date from formData or default to today
+  const selectedDate = formData.visitDate ? new Date(formData.visitDate) : new Date();
+  const selectedDateKey = `${selectedDate.getFullYear()}-${selectedDate.getMonth() + 1}-${selectedDate.getDate()}`;
+
+  const unavailableTimesForDate = bookedDates.find(
+    (date) => `${date.year}-${date.month}-${date.day}` === selectedDateKey
+  )?.unavailableTimes || [];
+  
+  // Determine if the selected time (HH) is available
+  const isTimeDisabled = (time) => {
+    const hours = Number(time.split(':')[0]);
+    return unavailableTimesForDate.includes(hours);
+  };
+  
+  // Format the value properly (keep the minutes intact)
+  const formatTime = (time) => {
+    if (!time) return '00:00'; // Default value if no time is selected
+    const [hours, minutes] = time.split(':');
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+  };
+
+  // Generate available times with label-value pairs
+  const availableTimes = [];
+  for (let i = 0; i < 24; i++) {
+    if (!unavailableTimesForDate.includes(i)) {
+      const value = `${String(i).padStart(2, '0')}:00`; // 24-hour format
+      const label = `${i % 12 === 0 ? 12 : i % 12}:00 ${i < 12 ? 'AM' : 'PM'}`; // 12-hour format
+      availableTimes.push({ value, label });
+    }
+  }
+
 
   const handleSubmit = async () => {
     if (!formData.firstName || !formData.lastName || !formData.email || 
@@ -193,12 +265,6 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
     }
 
     try {
-      // console.log('Sending booking data:', {
-      //   ...formData,
-      //   originalPrice: Number(formData.originalPrice),
-      //   discount: Number(formData.discount),
-      //   discountedPrice: Number(formData.discountedPrice)
-      // });
 
       const response = await fetch(`${BASE_URL}/book-activity`, {
         method: 'POST',
@@ -299,15 +365,15 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
             // Get today's date
             const today = new Date();
             today.setHours(0, 0, 0, 0); // Set time to midnight to compare only the date part
-  
+
             // Create a Date object for the current date in the calendar
             const dateToCheck = new Date(date.year, date.month - 1, date.day); // Adjust for 0-indexed month
-  
+
             // Check if the date is today or earlier
             if (dateToCheck <= today) {
               return true; // Disable dates before or equal to today
             }
-  
+
             // Check if the date is in the list of unavailable dates
             return disabledDates.some((disabledDate) => {
               return (
@@ -319,24 +385,61 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
           }} // Use the isDateUnavailable function
           minValue={today(getLocalTimeZone())}
           value={formData.visitDate}
-          onChange={(date) => setFormData({ ...formData, visitDate: date })}
-        />
+          onChange={(date) => {
+            const newDateKey = `${date.year}-${date.month}-${date.day}`;
+            const unavailableTimesForNewDate =
+              bookedDates.find(
+                (bookedDate) =>
+                  `${bookedDate.year}-${bookedDate.month}-${bookedDate.day}` === newDateKey
+              )?.unavailableTimes || [];
+
+            const availableTimesForNewDate = [];
+            for (let i = 0; i < 24; i++) {
+              if (!unavailableTimesForNewDate.includes(i)) {
+                availableTimesForNewDate.push(`${String(i).padStart(2, "0")}:00`);
+              }
+            }
+
+            // Reset activityTime if it's no longer available
+            setFormData({
+              ...formData,
+              visitDate: date,
+              activityTime:
+                availableTimesForNewDate.includes(formData.activityTime)
+                  ? formData.activityTime
+                  : "", // Reset if the selected time is not available
+            });
+          }}
+        />  
       </div>
       <div className="mb-4">
-        <input
-          type="time"
-          id="activityTime"
-          value={formData.activityTime}
-          onChange={handleTimeChange}
-          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-color1 focus:border-color1 sm:text-sm"
-          style={{
-            padding: '0.5rem',
-            borderRadius: '0.375rem',
-            borderColor: '#d1d5db',
-            boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
-            transition: 'border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out',
-          }}
-        />
+      <select
+        value={formData.activityTime}
+        onChange={handleTimeChange}
+        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-color1 focus:border-color1 sm:text-sm"
+        style={{
+          padding: "0.5rem",
+          borderRadius: "0.375rem",
+          borderColor: "#d1d5db",
+          boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05)",
+          transition: "border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out",
+        }}
+        disabled={availableTimes.length === 0}
+      >
+        {/* Default option */}
+        <option value="" disabled>
+          Select Time
+        </option>
+        {availableTimes.length === 0 ? (
+          <option value="">No times available</option>
+        ) : (
+          availableTimes.map(({ value, label }) => (
+            <option key={value} value={value} disabled={isTimeDisabled(value)}>
+              {label} {/* Display 12-hour format */}
+            </option>
+          ))
+        )}
+      </select>
       </div>
       <Input
         type="number"
@@ -366,7 +469,9 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
         {formData.visitDate && (
           <p><strong>Visit Date:</strong> {formatDate(formData.visitDate)}</p>
         )}
-        <p><strong>Activity Time:</strong> {formData.activityTime}</p>
+        <p>
+          <strong>Activity Time:</strong> {formData.activityTime ? formatTo12Hour(formData.activityTime) : "No Selected Time"}
+        </p>
         <p><strong>Number of Guests:</strong> {formData.numberOfGuests}</p>
         <p><strong>Special Requests:</strong> {formData.specialRequests || 'None'}</p>
         
