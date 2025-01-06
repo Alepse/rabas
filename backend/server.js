@@ -2514,6 +2514,59 @@ app.get('/getMostReviewedProducts', async (req, res) => {
   }
 });
 
+app.get('/getBusinessRatings', async (req, res) => {
+  const userId = req.session?.user?.user_id;  // Get user_id from the session
+  // console.log('userId:', userId);
+
+  if (!userId) {
+    return res.status(400).json({ success: false, message: 'User not logged in or user ID missing' });
+  }
+
+  try {
+    // Query to get the business associated with the user
+    const businessQuery = `
+      SELECT business_id
+      FROM businesses
+      WHERE user_id = ?
+      LIMIT 1
+    `;
+    
+    // Execute the query to find the business for the given user
+    const [businessResult] = await pool.query(businessQuery, [userId]);
+    console.log(businessResult);
+
+    if (businessResult.length === 0) {
+      return res.status(404).json({ success: false, message: 'No business found for the user' });
+    }
+
+    const businessId = businessResult[0].business_id;  // Get the business_id from the result
+
+    // Query to get the count of reviews and average rating for the business
+    const reviewQuery = `
+      SELECT 
+        AVG(br.ratings) AS rating,
+        COUNT(br.ratings_id) AS rateCount
+      FROM 
+        business_ratings br
+      WHERE 
+        br.business_id = ?
+    `;
+
+    // Execute the query to get the review count and average rating
+    const [reviewResult] = await pool.query(reviewQuery, [businessId]);
+
+    // Return the review count and rating
+    return res.json({
+      success: true,
+      rating: reviewResult[0].rating || 0,  // Default to 0 if no reviews exist
+      rateCount: reviewResult[0].rateCount || 0  // Default to 0 if no reviews exist
+    });
+
+  } catch (err) {
+    console.error('Error executing SQL query:', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
 
 // Endpoint to get business deals
 app.get('/getDeals', async (req, res) => {

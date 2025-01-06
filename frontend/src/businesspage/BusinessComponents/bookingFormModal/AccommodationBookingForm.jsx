@@ -14,8 +14,6 @@ import Swal from 'sweetalert2';
 import { FaUserPen } from "react-icons/fa6";
 import { MdEditCalendar } from "react-icons/md";
 import { CgNotes } from "react-icons/cg";
-import { today, isWeekend, getLocalTimeZone } from "@internationalized/date";
-import { useLocale } from "@react-aria/i18n";
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
@@ -47,7 +45,7 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
   });
 
   const [disabledDates, setDisabledDates] = useState([]);
-  console.log(product);
+  // console.log(product);
 
   useEffect(() => {
     const fetchUnavailableDates = async () => {
@@ -90,7 +88,7 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
     }
   }, [product.product_id]);
   
-  console.log('Unavailable dates', disabledDates);
+  // console.log('Unavailable dates', disabledDates);
 
   // Fetching user data
   const fetchUserData = async () => {
