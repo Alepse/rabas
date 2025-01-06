@@ -142,7 +142,7 @@ const BusinessProducts = () => {
         ) : (
           <>
             <div className="mb-6">
-              <h2 className="text-md font-semibold text-gray-700 mb-4">Switch on Sections to Add Products and Services:</h2>
+          
               <div className="flex flex-col sm:flex-row gap-4">
                 {renderSwitches()}
               </div>
