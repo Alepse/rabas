@@ -216,8 +216,8 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
     } catch (error) {
       console.error('Error submitting reservation:', error);
       Swal.fire({
-        title: 'Reservation Failed',
-        text: 'There was an issue completing your reservation. Please try again later.',
+        title: 'Missing Information',
+        text: 'Please fill out all required with (*) fields before submitting.',
         icon: 'error',
         confirmButtonColor: '#0BDA51'
       });
@@ -274,15 +274,15 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
     <div key="step1" className="space-y-4">
     <h1 className='p-1 text-lg border-b flex gap-2 items-center'><FaUserPen/>Personl Details</h1>
       <Input 
-        label="First Name" 
+        label="First Name *" 
         required 
         fullWidth 
-        placeholder="Enter your first name" 
+        placeholder="Enter your first name " 
         value={formData.firstName} 
         onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} 
       />
       <Input 
-        label="Last Name" 
+        label="Last Name *" 
         required 
         fullWidth 
         placeholder="Enter your last name" 
@@ -291,7 +291,7 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
       />
       <Input 
         type="tel" 
-        label="Phone Number" 
+        label="Phone Number *" 
         required 
         fullWidth 
         placeholder="Enter your phone number" 
@@ -300,7 +300,7 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
       />
       <Input 
         type="email" 
-        label="Email Address" 
+        label="Email Address *" 
         required 
         fullWidth 
         placeholder="Enter your email" 
@@ -309,7 +309,7 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
       />
     </div>,
     <div key="step2" className="space-y-4">
-      <h1 className='p-1 text-lg border-b flex gap-2 items-center '><MdEditCalendar/>Select Check-in/Check-out Dates   </h1>
+      <h1 className='p-1 text-lg border-b flex gap-2 items-center '><MdEditCalendar/>Select Check-in/Check-out Dates *   </h1>
       <div className='flex justify-center'>
       <RangeCalendar
         aria-label="Select Check-in and Check-out Dates"

@@ -242,16 +242,15 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
 
 
   const handleSubmit = async () => {
-    if (!formData.firstName || !formData.lastName || !formData.email || 
-        !formData.phone || !formData.visitDate || !formData.activityTime) {
-      Swal.fire({
-        title: 'Missing Information',
-        text: 'Please fill in all required fields.',
-        icon: 'warning',
-        confirmButtonColor: '#0BDA51'
-      });
-      return;
-    }
+    if (!formData.agreeToTerms) {
+          Swal.fire({
+            title: 'Terms Not Agreed',
+            text: 'Please agree to the terms and conditions before booking.',
+            icon: 'warning',
+            confirmButtonColor: '#0BDA51'
+          });
+          return;
+        }
 
     if (!formData.agreeToTerms) {
       Swal.fire({
@@ -331,8 +330,8 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
     } catch (error) {
       console.error('Error submitting reservation:', error);
       Swal.fire({
-        title: 'Reservation Failed',
-        text: error.message || 'There was an issue completing your reservation. Please try again later.',
+        title: 'Missing Information',
+        text: 'Please fill out all required with (*) fields before submitting.',
         icon: 'error',
         confirmButtonColor: '#0BDA51'
       });
@@ -350,16 +349,16 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
   const steps = [
     <div key="step1" className="space-y-4">
       <h1 className='p-1 text-lg border-b flex gap-2 items-center'><FaUserPen/>Personl Details</h1>
-      <Input label="First Name" required fullWidth placeholder="Enter your first name" value={formData.firstName} onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} />
-      <Input label="Last Name" required fullWidth placeholder="Enter your last name" value={formData.lastName} onChange={(e) => setFormData({ ...formData, lastName: e.target.value })} />
-      <Input type="tel" label="Phone Number" required fullWidth placeholder="Enter your phone number" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
-      <Input type="email" label="Email Address" required fullWidth placeholder="Enter your email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
+      <Input label="First Name *" required fullWidth placeholder="Enter your first name" value={formData.firstName} onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} />
+      <Input label="Last Name *" required fullWidth placeholder="Enter your last name" value={formData.lastName} onChange={(e) => setFormData({ ...formData, lastName: e.target.value })} />
+      <Input type="tel" label="Phone Number *" required fullWidth placeholder="Enter your phone number" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
+      <Input type="email" label="Email Address *" required fullWidth placeholder="Enter your email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
     </div>,
     <div key="step2" className="space-y-4">
       <h1 className='p-1 text-lg border-b flex gap-2 items-center '><MdEditCalendar/> Appointment Date/Time </h1>
       <div className='flex justify-center'>
         <DatePicker
-          aria-label="Select Visit Date"
+          label="Select Visit Date *"
           isDateUnavailable={(date) => {
             // Get today's date
             const today = new Date();
@@ -427,7 +426,7 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
       >
         {/* Default option */}
         <option value="" disabled>
-          Select Time
+          Select Time *
         </option>
         {availableTimes.length === 0 ? (
           <option value="">No times available</option>
@@ -442,7 +441,7 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
       </div>
       <Input
         type="number"
-        label="Number of Guests"
+        label="Number of Guests "
         required
         fullWidth
         min={1}
