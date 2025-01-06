@@ -112,7 +112,7 @@ const BusinessDeals = () => {
       <Sidebar />
 
       {/* Main content */}
-      <div className="flex-1 px-8 py-4 md:p-6 lg:p-8 max-h-screen overflow-y-auto">
+      <div className="flex-1 p-2 md:p-6 lg:p-8 max-h-screen overflow-y-auto">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-8">
           <h1 className="text-2xl md:text-3xl font-semibold text-gray-800 mb-4 md:mb-0">
@@ -132,9 +132,9 @@ const BusinessDeals = () => {
         ) : (
         <>
           {/* Deals Toggle */}
-          <div className="mb-6">
+          <div className="mb-6 flex flex-col justify-center items-center">
             <h2 className="text-lg font-semibold text-gray-700 mb-4">Switch on Deals to Add Your Deals:</h2>
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4  sm:flex-row gap-4">
               {/* Activity Deals Switch */}
               <Switch
                 color="success"
@@ -190,7 +190,7 @@ const BusinessDeals = () => {
           </div>
 
           {/* Deals of business products and services */}
-          <div className="w-full flex flex-wrap gap-6">
+          <div className="w-fullring flex flex-wrap gap-6">
             {/* Conditionally render deal components based on toggle states */}
             {showActivities && <ActivityDeals />}
             {showAccommodation && <AccommodationDeals />}
