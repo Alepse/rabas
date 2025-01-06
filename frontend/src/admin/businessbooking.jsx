@@ -132,7 +132,8 @@ const BookingCard = ({ booking, onOpenChatModal, onMarkAsCompleted, onAcceptBook
     <div className="flex justify-between items-center">
       {booking.status === 'Pending' ? (
         <>
-        <Button
+        {/* Nasira kaya tinanggal muna HAHHAHHAHAAAH */}
+        {/* <Button
             auto
             color="danger" // Red color for decline
             onClick={() => onDeclineBooking(booking.id)} // Pass the booking ID for decline
@@ -151,7 +152,7 @@ const BookingCard = ({ booking, onOpenChatModal, onMarkAsCompleted, onAcceptBook
             <div className="flex items-center gap-2">
               Accept Booking
             </div>
-          </Button>
+          </Button> */}
         </>
       ) : booking.status === 'Active' && (
         <Button

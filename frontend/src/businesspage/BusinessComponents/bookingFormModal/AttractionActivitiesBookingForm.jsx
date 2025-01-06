@@ -11,8 +11,7 @@ import {
   DatePicker // Import DatePicker
 } from '@nextui-org/react';
 import Swal from 'sweetalert2';
-import { today, isWeekend, getLocalTimeZone } from '@internationalized/date';
-import { useLocale } from '@react-aria/i18n';
+import { today, getLocalTimeZone } from '@internationalized/date';
 import { FaUserPen } from "react-icons/fa6";
 import { MdEditCalendar } from "react-icons/md";
 import { CgNotes } from "react-icons/cg";

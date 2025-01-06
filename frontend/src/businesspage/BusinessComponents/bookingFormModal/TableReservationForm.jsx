@@ -226,13 +226,6 @@ const TableReservationForm = ({ isOpen, onClose, product = {} }) => {
     const hours = Number(time.split(':')[0]);
     return unavailableTimesForDate.includes(hours);
   };
-  
-  // Format the value properly (keep the minutes intact)
-  const formatTime = (time) => {
-    if (!time) return '00:00'; // Default value if no time is selected
-    const [hours, minutes] = time.split(':');
-    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-  };
 
   // Generate available times with label-value pairs
   const availableTimes = [];

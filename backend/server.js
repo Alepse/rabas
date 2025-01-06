@@ -3153,7 +3153,8 @@ app.put('/cancel-booking/:id', async (req, res) => {
 // Fetch booking dates for a specific product
 app.get('/product-booking-dates/:productId', async (req, res) => {
   const productId = req.params.productId;
-  console.log(productId);
+  // console.log(productId);
+  const declined = "-1";
   if (!productId) {
     return res.status(400).json({
       success: false,
@@ -3178,13 +3179,13 @@ app.get('/product-booking-dates/:productId', async (req, res) => {
     LEFT JOIN 
         products p ON b.product_id = p.product_id
     WHERE 
-        b.product_id = ?
+        b.product_id = ? AND b.status != ?
     ORDER BY 
         b.dateIn ASC;
   `;
 
   try {
-    const [results] = await pool.query(sql, [productId]);
+    const [results] = await pool.query(sql, [productId, declined]);
 
     return res.json({
       success: true,
@@ -3252,9 +3253,10 @@ app.get('/business-bookings', async (req, res) => {
 app.put('/update-booking-status/:id', async (req, res) => {
   const bookingId = req.params.id;
   const { status } = req.body;
-  const businessId = req.session?.user?.business_id;
 
-  if (!businessId) {
+  const userId = req.session?.user?.user_id;
+
+  if (!userId) {
     return res.status(401).json({ 
       success: false, 
       message: 'Not authorized' 
@@ -3262,11 +3264,29 @@ app.put('/update-booking-status/:id', async (req, res) => {
   }
 
   try {
+    // Query to get the business associated with the user
+    const businessQuery = `
+      SELECT business_id
+      FROM businesses
+      WHERE user_id = ?
+      LIMIT 1
+    `;
+    
+    // Execute the query to find the business for the given user
+    const [businessResult] = await pool.query(businessQuery, [userId]);
+    // console.log(businessResult);
+
+    if (businessResult.length === 0) {
+      return res.status(404).json({ success: false, message: 'No business found for the user' });
+    }
+
+    const businessId = businessResult[0].business_id;  // Get the business_id from the result
+
     // Update the booking status
     const [updateResult] = await pool.query(
       `
       UPDATE bookings 
-      SET status = ?
+      SET status = ? 
       WHERE booking_id = ? AND business_id = ?
       `,
       [status, bookingId, businessId]
@@ -3312,7 +3332,7 @@ app.put('/update-booking-status/:id', async (req, res) => {
       });
     }
 
-    const { user_id: userId, product, email, firstName, lastName, businessName } = bookingDetails[0];
+    const { user_id: receiverId, product, email, firstName, lastName, businessName } = bookingDetails[0];
 
     // Configure email transporter
     const transporter = nodemailer.createTransport({
@@ -3350,7 +3370,7 @@ app.put('/update-booking-status/:id', async (req, res) => {
     return res.json({ 
       success: true, 
       message: 'Booking status updated and email notification sent successfully',
-      receiver_id: userId,
+      receiver_id: receiverId,
       title: product,
     });
   } catch (err) {

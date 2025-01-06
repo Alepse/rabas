@@ -860,7 +860,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
   const handleAcceptBooking = async (bookingDetails, customMessage) => {
     const baseMessage = `Booking for ${bookingDetails.formDetails.productName} has been accepted.`;
   
-    console.log('customMessage', customMessage);
+    // console.log('customMessage', customMessage);
     console.log('Booking details', bookingDetails);
   
     const formData = new FormData();
@@ -934,6 +934,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
   const handleDeclineBooking = async (bookingDetails, customMessage) => {
     const baseMessage = `Booking for ${bookingDetails.formDetails.productName} has been declined.`;
     
+    console.log(bookingDetails);
     const formData = new FormData();
     formData.append('sender_id', user_id);
     formData.append('sender_account', 'business');
@@ -1034,7 +1035,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
   const renderMessages = (messages) => {
     let lastMessageTime = null;
     const lastMessage = messages && messages[messages.length - 1]; // Get the last message
-    console.log(messages);
+    // console.log(messages);
     return messages?.map((message, index) => {
       const isSenderYou = ((message.senderId === user_id) && (message.senderAccount === 'business'));
       const imageUrl = message.image

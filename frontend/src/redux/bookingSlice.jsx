@@ -133,6 +133,7 @@ const bookingsSlice = createSlice({
       }
     },
     markBookingAsDeclined: (state, action) => {
+      const bookingId = action.payload;
       const booking = state.pendingBookings.find(b => b.id === action.payload);
       if (booking) {
         booking.status = 'Declined';  // Use string status
