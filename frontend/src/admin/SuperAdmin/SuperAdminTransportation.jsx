@@ -35,6 +35,7 @@ const SuperAdminTransportation = () => {
   const [transportData, setTransportData] = useState([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isTerminalModalOpen, setIsTerminalModalOpen] = useState(false);
+  const [isAddRouteModalOpen, setIsAddRouteModalOpen] = useState(false);
   const [currentRoute, setCurrentRoute] = useState(null);
   const [currentTerminalIndex, setCurrentTerminalIndex] = useState(null);
   const [currentRouteIndex, setCurrentRouteIndex] = useState(null);
@@ -112,7 +113,7 @@ const SuperAdminTransportation = () => {
     setCurrentRoute({ origin: '', destination: '', schedule: '', fare: '', mode: '' });
     setCurrentTerminalIndex(terminalIndex);
     setCurrentRouteIndex(null);
-    onOpen();
+    setIsAddRouteModalOpen(true);
   };
 
   const handleSaveNewRoute = async () => {
@@ -368,6 +369,43 @@ const SuperAdminTransportation = () => {
               <Button className="bg-color1 text-white" onClick={handleSave}>
                 Save Changes
               </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+        <Modal isOpen={isAddRouteModalOpen} onClose={() => setIsAddRouteModalOpen(false)}>
+          <ModalContent>
+            <ModalHeader>Add New Route</ModalHeader>
+            <ModalBody>
+              <RouteInput
+                label="Origin"
+                value={currentRoute?.origin || ''}
+                onChange={(e) => setCurrentRoute({ ...currentRoute, origin: e.target.value })}
+              />
+              <RouteInput
+                label="Destination"
+                value={currentRoute?.destination || ''}
+                onChange={(e) => setCurrentRoute({ ...currentRoute, destination: e.target.value })}
+              />
+              <RouteInput
+                label="Schedule"
+                value={currentRoute?.schedule || ''}
+                onChange={(e) => setCurrentRoute({ ...currentRoute, schedule: e.target.value })}
+              />
+              <RouteInput
+                label="Fare"
+                type="number"
+                value={currentRoute?.fare || ''}
+                onChange={(e) => setCurrentRoute({ ...currentRoute, fare: e.target.value })}
+              />
+              <RouteInput
+                label="Mode"
+                value={currentRoute?.mode || ''}
+                onChange={(e) => setCurrentRoute({ ...currentRoute, mode: e.target.value })}
+              />
+            </ModalBody>
+            <ModalFooter>
+              <Button color="default" onnClick={() => setIsTerminalModalOpen(false)}>Cancel</Button>
+              <Button className="bg-color1 text-white" onClick={handleSaveNewRoute}>Save Route</Button>
             </ModalFooter>
           </ModalContent>
         </Modal>
