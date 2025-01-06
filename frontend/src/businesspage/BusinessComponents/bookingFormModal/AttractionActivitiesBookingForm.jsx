@@ -295,6 +295,7 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
         text: `You have successfully reserved: ${product.name} for ₱${Number(formData.discountedPrice).toFixed(2)}.`,
         formType: 'activityBooking',
         form_details: JSON.stringify({
+          product_id: product.product_id,
           booking_id: bookingId, // Use the extracted booking ID
           email: formData.email,
           phone: formData.phone,

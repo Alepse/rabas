@@ -181,6 +181,7 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
         text: `You have successfully reserved: ${product.name} for ₱${Number(formData.discountedPrice).toFixed(2)}.`,
         formType: 'accommodationBooking',
         form_details: JSON.stringify({
+          product_id: product.product_id,
           booking_id: bookingId,
           email: formData.email,
           phone: formData.phone,

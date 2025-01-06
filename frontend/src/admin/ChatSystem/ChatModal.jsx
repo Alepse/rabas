@@ -39,39 +39,56 @@ const showErrorAlert = (message) => {
 };
 
 // Function to determine unavailable dates
-const useUnavailableDates = () => {
-  let now = today(getLocalTimeZone());
-  let { locale } = useLocale();
+const useUnavailableDates = (productId) => {
+  const [disabledDates, setDisabledDates] = useState([]);
+  // console.log(productId);
+  useEffect(() => {
+    const fetchUnavailableDates = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/product-booking-dates/${productId}`);
+        const data = await response.json();
 
-  // Define custom disabled date ranges
-  let disabledRanges = [
-    [now, now.add({ days: 5 })], // Example range 1
-    [now.add({ days: 14 }), now.add({ days: 16 })], // Example range 2
-    [now.add({ days: 23 }), now.add({ days: 24 })], // Example range 3
-  ];
+        if (data.success) {
+          const transformedDates = data.bookings.flatMap((booking) => {
+            const startDate = new Date(booking.dateIn);
+            const endDate = new Date(booking.dateOut);
 
-  // Return a function to determine if a date is unavailable
-  return (date) => {
-    // Disable all past dates
-    if (date.compare(now) < 0) {
-      return true;
+            const dateArray = [];
+            // Loop through the range and get each date in the range
+            for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+              dateArray.push({
+                year: d.getFullYear(),
+                month: d.getMonth() + 1, // Add 1 to convert to 1-indexed month
+                day: d.getDate(),
+              });
+            }
+            return dateArray;
+          });
+
+          // Remove duplicates by converting to a Set and back to an array
+          const uniqueDates = Array.from(new Set(transformedDates.map(date => JSON.stringify(date))))
+            .map(date => JSON.parse(date));
+
+          setDisabledDates(uniqueDates);
+        } else {
+          console.error('Failed to fetch unavailable dates:', data.message);
+        }
+      } catch (err) {
+        console.error('Error fetching unavailable dates:', err);
+      }
+    };
+
+    if (productId) {
+      fetchUnavailableDates();
     }
+  }, [productId]);
 
-    // Disable weekends
-    if (isWeekend(date, locale)) {
-      return true;
-    }
-
-    // Disable dates in custom ranges
-    return disabledRanges.some(
-      (interval) => date.compare(interval[0]) >= 0 && date.compare(interval[1]) <= 0
-    );
-  };
+  return disabledDates;
 };
 
 // AvailabilityModal for table reservation
 const AvailabilityModalTable = ({ isOpen, onClose, currentBookingDetails, onAcceptBooking, onDeclineBooking }) => {
-  const isDateUnavailable = useUnavailableDates();
+  const isDateUnavailable = useUnavailableDates(currentBookingDetails.formDetails.product_id);
   const [message, setMessage] = useState('');
 
   if (!currentBookingDetails) return null;
@@ -97,7 +114,28 @@ const AvailabilityModalTable = ({ isOpen, onClose, currentBookingDetails, onAcce
             aria-label="Date (Visible Month)"
             visibleMonths={2}
             isReadOnly
-            isDateUnavailable={isDateUnavailable}
+            isDateUnavailable={(date) => {
+              // Get today's date
+              const today = new Date();
+              today.setHours(0, 0, 0, 0); // Set time to midnight to compare only the date part
+  
+              // Create a Date object for the current date in the calendar
+              const dateToCheck = new Date(date.year, date.month - 1, date.day); // Adjust for 0-indexed month
+  
+              // Check if the date is today or earlier
+              if (dateToCheck <= today) {
+                return true; // Disable dates before or equal to today
+              }
+  
+              // Check if the date is in the list of unavailable dates
+              return isDateUnavailable.some((disabledDate) => {
+                return (
+                  date.year === disabledDate.year &&
+                  date.month === disabledDate.month &&
+                  date.day === disabledDate.day
+                );
+              });
+            }}
           />
           <Textarea
             placeholder="Add message"
@@ -116,9 +154,7 @@ const AvailabilityModalTable = ({ isOpen, onClose, currentBookingDetails, onAcce
 
 // AvailabilityModal for accommodation booking
 const AvailabilityModalAccommodation = ({ isOpen, onClose, currentBookingDetails, onAcceptBooking, onDeclineBooking }) => {
-  const isDateUnavailable = useUnavailableDates();
-  const [checkInTime, setCheckInTime] = useState(new Time(14, 0));
-  const [checkOutTime, setCheckOutTime] = useState(new Time(11, 0));
+  const isDateUnavailable = useUnavailableDates(currentBookingDetails.formDetails.product_id);
   const [message, setMessage] = useState('');
 
   if (!currentBookingDetails) return null;
@@ -144,12 +180,29 @@ const AvailabilityModalAccommodation = ({ isOpen, onClose, currentBookingDetails
             aria-label="Date (Visible Month)"
             visibleMonths={2}
             isReadOnly
-            isDateUnavailable={isDateUnavailable}
+            isDateUnavailable={(date) => {
+              // Get today's date
+              const today = new Date();
+              today.setHours(0, 0, 0, 0); // Set time to midnight to compare only the date part
+  
+              // Create a Date object for the current date in the calendar
+              const dateToCheck = new Date(date.year, date.month - 1, date.day); // Adjust for 0-indexed month
+  
+              // Check if the date is today or earlier
+              if (dateToCheck <= today) {
+                return true; // Disable dates before or equal to today
+              }
+  
+              // Check if the date is in the list of unavailable dates
+              return isDateUnavailable.some((disabledDate) => {
+                return (
+                  date.year === disabledDate.year &&
+                  date.month === disabledDate.month &&
+                  date.day === disabledDate.day
+                );
+              });
+            }}
           />
-          <div className="flex space-x-4">
-            <TimeInput label="Check-in Time" value={checkInTime} onChange={setCheckInTime} />
-            <TimeInput label="Check-out Time" value={checkOutTime} onChange={setCheckOutTime} />
-          </div>
           <Textarea
             placeholder="Add your acceptance message"
             value={message}
@@ -167,7 +220,7 @@ const AvailabilityModalAccommodation = ({ isOpen, onClose, currentBookingDetails
 
 // AvailabilityModal for activity booking
 const AvailabilityModalActivity = ({ isOpen, onClose, currentBookingDetails, onAcceptBooking, onDeclineBooking }) => {
-  const isDateUnavailable = useUnavailableDates();
+  const isDateUnavailable = useUnavailableDates(currentBookingDetails.formDetails.product_id);
   const [message, setMessage] = useState('');
 
   if (!currentBookingDetails) return null;
@@ -193,7 +246,28 @@ const AvailabilityModalActivity = ({ isOpen, onClose, currentBookingDetails, onA
             aria-label="Date (Visible Month)"
             visibleMonths={2}
             isReadOnly
-            isDateUnavailable={isDateUnavailable}
+            isDateUnavailable={(date) => {
+              // Get today's date
+              const today = new Date();
+              today.setHours(0, 0, 0, 0); // Set time to midnight to compare only the date part
+  
+              // Create a Date object for the current date in the calendar
+              const dateToCheck = new Date(date.year, date.month - 1, date.day); // Adjust for 0-indexed month
+  
+              // Check if the date is today or earlier
+              if (dateToCheck <= today) {
+                return true; // Disable dates before or equal to today
+              }
+  
+              // Check if the date is in the list of unavailable dates
+              return isDateUnavailable.some((disabledDate) => {
+                return (
+                  date.year === disabledDate.year &&
+                  date.month === disabledDate.month &&
+                  date.day === disabledDate.day
+                );
+              });
+            }}
           />
           <Textarea
             placeholder="Add your acceptance message"
@@ -316,7 +390,7 @@ const BookingDetailsCard = ({ message, onCheckAvailability, isSenderYou }) => {
           <li><strong>Total Amount:</strong> ₱{message.formDetails?.amount || '0'}</li>
         </ul>
 
-        {message.formType !== 'bookingAccepted' && (
+        {message.formType !== 'bookingAccepted' && message.formType !== 'bookingDeclined' && (
           <Button size='sm' auto color="primary" onClick={() => onCheckAvailability(message)} className="mt-2">
             Check Availability
           </Button>
@@ -861,7 +935,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
     const baseMessage = `Booking for ${bookingDetails.formDetails.productName} has been accepted.`;
   
     // console.log('customMessage', customMessage);
-    console.log('Booking details', bookingDetails);
+    // console.log('Booking details', bookingDetails);
   
     const formData = new FormData();
     formData.append('sender_id', user_id);
@@ -934,7 +1008,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
   const handleDeclineBooking = async (bookingDetails, customMessage) => {
     const baseMessage = `Booking for ${bookingDetails.formDetails.productName} has been declined.`;
     
-    console.log(bookingDetails);
+    // console.log(bookingDetails);
     const formData = new FormData();
     formData.append('sender_id', user_id);
     formData.append('sender_account', 'business');
