@@ -325,50 +325,93 @@ const RestaurantDeals = () => {
           <Button onClick={handleAddDeal} className="mb-6 rounded-md bg-color1 hover:bg-color2 text-white w-full">
             Add Deal
           </Button>
-
-          {/*  Active Deals */}
-          <h3 className="text-xl font-semibold mb-4 text-gray-700">Active Deals</h3>
-          <div className="grid grid-cols-1 gap-4 max-h-80 overflow-y-auto">
-            {activeDeals.map(deal => {
-              const restaurant = restaurants.find(restaurant => restaurant.id === parseInt(deal.productId));
-              return (
-                <div key={`${deal.id}-${deal.productId}`} className="bg-white shadow-md rounded-lg p-4 hover:shadow-xl transition-shadow duration-300">
-                  <div className="flex justify-between items-center">
-                    <h4 className="font-semibold text-lg">{restaurant?.restaurantName}</h4>
-                    <div className="flex space-x-2">
-                      <Button onClick={() => handleEditDeal(deal, false)} className="rounded-md bg-color2 hover:bg-color1 text-white">Edit</Button>
-                      <Button onClick={() => handleDeleteDeal(deal.id)} className="rounded-md bg-red-500 hover:bg-red-600 text-white">Delete</Button>
+      {/* Active Deals Section */}
+      <div className="mb-10 ">
+            <h3 className="text-xl font-semibold mb-4 text-gray-700">Active Deals</h3>
+            <div className="grid grid-cols-1 p-2 md:grid-cols-2 gap-4 max-h-80 overflow-y-auto">
+              {activeDeals.map((deal) => {
+                const restaurant = restaurants.find(
+                  (restaurant) => restaurant.id === parseInt(deal.productId)
+                );
+                return (
+                  <div
+                    key={`${deal.id}-${deal.productId}`}
+                    className="bg-white shadow-md rounded-lg p-4 duration-300"
+                  >
+                    <div className="flex justify-between items-center mb-2">
+                      <h4 className="font-semibold text-lg truncate">
+                        {restaurant?.restaurantName}
+                      </h4>
+                      
                     </div>
+                    <p>Discount: {deal.discount}%</p>
+                    <p>Expiration: {new Date(deal.expirationDate).toLocaleDateString()}</p>
+
+                    <div className="flex justify-between mt-2 space-x-2">
+                        <Button
+                          onClick={() => handleEditDeal(deal, false)}
+                          className="rounded-md bg-color2 hover:bg-color1 text-white"
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          onClick={() => handleDeleteDeal(deal.id)}
+                          className="rounded-md bg-red-500 hover:bg-red-600 text-white"
+                        >
+                          Delete
+                        </Button>
+                      </div>
                   </div>
-                  <p>Discount: {deal.discount}%</p>
-                  <p>Expiration: {new Date(deal.expirationDate).toLocaleDateString()}</p>
-                </div>
-              );
-            })}
+                  
+                );
+              })}
+            </div>
           </div>
 
-          {/* Expired Deals */}
+          {/* Expired Deals Section */}
+          <div>
           <h3 className="text-xl font-semibold mb-4 text-gray-700">Expired Deals</h3>
-          <div className="grid grid-cols-1 gap-4 max-h-80 overflow-y-auto">
-            {expiredDeals.map(deal => {
-              const restaurant = restaurants.find(restaurant => restaurant.id === parseInt(deal.productId));
-              return (
-                <div key={`${deal.id}-${deal.productId}`} className="bg-white shadow-md rounded-lg p-4 hover:shadow-xl transition-shadow duration-300">
-                  <div className="flex justify-between items-center">
-                    <h4 className="font-semibold text-lg">{restaurant?.restaurantName}</h4>
-                    <div className="flex space-x-2">
-                      <Button onClick={() => handleEditDeal(deal, true)} className="rounded-md bg-color2 hover:bg-color1 text-white">Edit</Button>
-                      <Button onClick={() => handleDeleteDeal(deal.id)} className="rounded-md bg-red-500 hover:bg-red-600 text-white">Delete</Button>
+          <div className="grid grid-cols-1 p-2 md:grid-cols-2 gap-4 max-h-80 overflow-y-auto">
+              {expiredDeals.map((deal) => {
+                const restaurant = restaurants.find(
+                  (restaurant) => restaurant.id === parseInt(deal.productId)
+                );
+                return (
+                  <div
+                    key={`${deal.id}-${deal.productId}`}
+                    className="bg-white shadow-md rounded-lg p-4 hover:shadow-xl transition-shadow duration-300"
+                  >
+                    <div className="flex justify-between items-center mb-2">
+                      <h4 className="font-semibold text-lg truncate">
+                        {restaurant?.restaurantName}
+                      </h4>
+                      
                     </div>
+                    <p>Discount: {deal.discount}%</p>
+                    <p>Expiration: {new Date(deal.expirationDate).toLocaleDateString()}</p>
+
+                    
+                    <div className="flex justify-between mt-2 space-x-2">
+                        <Button
+                          onClick={() => handleEditDeal(deal, true)}
+                          className="rounded-md bg-color2 hover:bg-color1 text-white"
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          onClick={() => handleDeleteDeal(deal.id)}
+                          className="rounded-md bg-red-500 hover:bg-red-600 text-white"
+                        >
+                          Delete
+                        </Button>
+                      </div>
                   </div>
-                  <p>Discount: {deal.discount}%</p>
-                  <p>Expiration: {new Date(deal.expirationDate).toLocaleDateString()}</p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
+                );
+              })}
+            </div>
+            </div>
+              </div>
+            </div>
 
       {/* Edit Deal Modal */}
       <Modal isOpen={isOpen} onClose={onClose}>
