@@ -319,6 +319,7 @@ const ShopDeals = () => {
               aria-label="Expiration date"
               value={expirationDate} // For adding deals
               onChange={(e) => setExpirationDate(e.target.value)}
+              min={new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0]} // Calculate tomorrow's date
               className="flex-1"
             />
           </div>
@@ -419,6 +420,7 @@ const ShopDeals = () => {
                 type="date"
                 value={editingDeal ? editExpirationDate : expirationDate} // Use editExpirationDate for editing
                 onChange={(e) => editingDeal ? setEditExpirationDate(e.target.value) : setExpirationDate(e.target.value)}
+                min={new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0]} // Calculate tomorrow's date
                 className="flex-1"
               />
             </div>
