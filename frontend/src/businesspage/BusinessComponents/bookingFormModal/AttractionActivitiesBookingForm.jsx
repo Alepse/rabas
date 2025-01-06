@@ -27,6 +27,13 @@ const formatDate = (date) => {
   return date.toString();
 };
 
+function formatTo12Hour(time24) {
+  const [hour, minute] = time24.split(":").map(Number); // Split and convert to numbers
+  const period = hour < 12 ? "AM" : "PM"; // Determine AM/PM
+  const hour12 = hour % 12 === 0 ? 12 : hour % 12; // Convert to 12-hour format
+  return `${hour12}:${String(minute).padStart(2, "0")} ${period}`; // Format with leading zero
+}
+
 const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
   console.log(product);
   const [userId, setUserId] = useState(null);
@@ -223,15 +230,17 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
     const [hours, minutes] = time.split(':');
     return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
   };
-  
-  // Generate a list of all available times
+
+  // Generate available times with label-value pairs
   const availableTimes = [];
   for (let i = 0; i < 24; i++) {
     if (!unavailableTimesForDate.includes(i)) {
-      console.log('Unavailable times', unavailableTimesForDate);
-      availableTimes.push(`${String(i).padStart(2, '0')}:00`);
+      const value = `${String(i).padStart(2, '0')}:00`; // 24-hour format
+      const label = `${i % 12 === 0 ? 12 : i % 12}:00 ${i < 12 ? 'AM' : 'PM'}`; // 12-hour format
+      availableTimes.push({ value, label });
     }
   }
+
 
   const handleSubmit = async () => {
     if (!formData.firstName || !formData.lastName || !formData.email || 
@@ -350,87 +359,87 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
     <div key="step2" className="space-y-4">
       <h1 className='p-1 text-lg border-b flex gap-2 items-center '><MdEditCalendar/> Appointment Date/Time </h1>
       <div className='flex justify-center'>
-      <DatePicker
-        aria-label="Select Visit Date"
-        isDateUnavailable={(date) => {
-          // Get today's date
-          const today = new Date();
-          today.setHours(0, 0, 0, 0); // Set time to midnight to compare only the date part
+        <DatePicker
+          aria-label="Select Visit Date"
+          isDateUnavailable={(date) => {
+            // Get today's date
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Set time to midnight to compare only the date part
 
-          // Create a Date object for the current date in the calendar
-          const dateToCheck = new Date(date.year, date.month - 1, date.day); // Adjust for 0-indexed month
+            // Create a Date object for the current date in the calendar
+            const dateToCheck = new Date(date.year, date.month - 1, date.day); // Adjust for 0-indexed month
 
-          // Check if the date is today or earlier
-          if (dateToCheck <= today) {
-            return true; // Disable dates before or equal to today
-          }
-
-          // Check if the date is in the list of unavailable dates
-          return disabledDates.some((disabledDate) => {
-            return (
-              date.year === disabledDate.year &&
-              date.month === disabledDate.month &&
-              date.day === disabledDate.day
-            );
-          });
-        }} // Use the isDateUnavailable function
-        minValue={today(getLocalTimeZone())}
-        value={formData.visitDate}
-        onChange={(date) => {
-          const newDateKey = `${date.year}-${date.month}-${date.day}`;
-          const unavailableTimesForNewDate =
-            bookedDates.find(
-              (bookedDate) =>
-                `${bookedDate.year}-${bookedDate.month}-${bookedDate.day}` === newDateKey
-            )?.unavailableTimes || [];
-
-          const availableTimesForNewDate = [];
-          for (let i = 0; i < 24; i++) {
-            if (!unavailableTimesForNewDate.includes(i)) {
-              availableTimesForNewDate.push(`${String(i).padStart(2, "0")}:00`);
+            // Check if the date is today or earlier
+            if (dateToCheck <= today) {
+              return true; // Disable dates before or equal to today
             }
-          }
 
-          // Reset activityTime if it's no longer available
-          setFormData({
-            ...formData,
-            visitDate: date,
-            activityTime:
-              availableTimesForNewDate.includes(formData.activityTime)
-                ? formData.activityTime
-                : "", // Reset if the selected time is not available
-          });
-        }}
-      />
+            // Check if the date is in the list of unavailable dates
+            return disabledDates.some((disabledDate) => {
+              return (
+                date.year === disabledDate.year &&
+                date.month === disabledDate.month &&
+                date.day === disabledDate.day
+              );
+            });
+          }} // Use the isDateUnavailable function
+          minValue={today(getLocalTimeZone())}
+          value={formData.visitDate}
+          onChange={(date) => {
+            const newDateKey = `${date.year}-${date.month}-${date.day}`;
+            const unavailableTimesForNewDate =
+              bookedDates.find(
+                (bookedDate) =>
+                  `${bookedDate.year}-${bookedDate.month}-${bookedDate.day}` === newDateKey
+              )?.unavailableTimes || [];
+
+            const availableTimesForNewDate = [];
+            for (let i = 0; i < 24; i++) {
+              if (!unavailableTimesForNewDate.includes(i)) {
+                availableTimesForNewDate.push(`${String(i).padStart(2, "0")}:00`);
+              }
+            }
+
+            // Reset activityTime if it's no longer available
+            setFormData({
+              ...formData,
+              visitDate: date,
+              activityTime:
+                availableTimesForNewDate.includes(formData.activityTime)
+                  ? formData.activityTime
+                  : "", // Reset if the selected time is not available
+            });
+          }}
+        />  
       </div>
       <div className="mb-4">
       <select
-    value={formData.activityTime}
-    onChange={handleTimeChange}
-    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-color1 focus:border-color1 sm:text-sm"
-    style={{
-      padding: "0.5rem",
-      borderRadius: "0.375rem",
-      borderColor: "#d1d5db",
-      boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05)",
-      transition: "border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out",
-    }}
-    disabled={availableTimes.length === 0}
-  >
-    {/* Default option */}
-    <option value="" disabled>
-      Select Time
-    </option>
-    {availableTimes.length === 0 ? (
-      <option value="">No times available</option>
-    ) : (
-      availableTimes.map((time) => (
-        <option key={time} value={time} disabled={isTimeDisabled(time)}>
-          {time}
+        value={formData.activityTime}
+        onChange={handleTimeChange}
+        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-color1 focus:border-color1 sm:text-sm"
+        style={{
+          padding: "0.5rem",
+          borderRadius: "0.375rem",
+          borderColor: "#d1d5db",
+          boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05)",
+          transition: "border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out",
+        }}
+        disabled={availableTimes.length === 0}
+      >
+        {/* Default option */}
+        <option value="" disabled>
+          Select Time
         </option>
-      ))
-    )}
-  </select>
+        {availableTimes.length === 0 ? (
+          <option value="">No times available</option>
+        ) : (
+          availableTimes.map(({ value, label }) => (
+            <option key={value} value={value} disabled={isTimeDisabled(value)}>
+              {label} {/* Display 12-hour format */}
+            </option>
+          ))
+        )}
+      </select>
       </div>
       <Input
         type="number"
@@ -460,7 +469,9 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
         {formData.visitDate && (
           <p><strong>Visit Date:</strong> {formatDate(formData.visitDate)}</p>
         )}
-        <p><strong>Activity Time:</strong> {formData.activityTime}</p>
+        <p>
+          <strong>Activity Time:</strong> {formData.activityTime ? formatTo12Hour(formData.activityTime) : "No Selected Time"}
+        </p>
         <p><strong>Number of Guests:</strong> {formData.numberOfGuests}</p>
         <p><strong>Special Requests:</strong> {formData.specialRequests || 'None'}</p>
         

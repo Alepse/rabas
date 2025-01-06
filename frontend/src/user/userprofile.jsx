@@ -208,13 +208,19 @@ const MyBookingTab = ({ bookings, onCancelBooking }) => {
                           month: 'long',
                           day: 'numeric',
                           year: 'numeric',
+                          timeZone: 'Asia/Manila', 
                         })}
                       </p>
                     </div>
                     <div className="flex items-center space-x-3">
                       <FaClock className="text-gray-500" />
                       <p>
-                        <strong>Time:</strong> {new Date(booking.dateIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        <strong>Time:</strong>{' '}
+                        {new Date(booking.dateIn).toLocaleTimeString('en-US', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          timeZone: 'Asia/Manila', // Explicitly set timezone
+                        })}
                       </p>
                     </div>
                     <div className="flex items-center space-x-3">
