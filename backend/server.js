@@ -16,6 +16,7 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const cookieParser = require('cookie-parser'); // Import cookie-parser
 const app = express();
+const { exec } = require('child_process');
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
@@ -4803,6 +4804,96 @@ app.put('/business-editReviewAndRating', async (req, res) => {
   }
 });
 
+
+
+//////////////////////////////
+/////////////////////////////
+/////////////////////////////
+//Download Database/////////
+///////////////////////////
+//////////////////////////
+// app.get('/download-database', (req, res) => {
+//   const dumpFile = path.join(__dirname, 'dumpfile.sql');
+
+//   // Command to dump the database
+//   const dumpCommand = `mysqldump -u username -p'password' database_name > ${dumpFile}`;
+  
+//   exec(dumpCommand, (error) => {
+//       if (error) {
+//           console.error('Error creating database dump:', error);
+//           return res.status(500).send('Failed to create database dump');
+//       }
+
+//       // Send the dump file as a download
+//       res.download(dumpFile, 'database_dump.sql', (err) => {
+//           if (err) {
+//               console.error('Error sending file:', err);
+//           }
+
+//           // Optional: Delete the dump file after sending it
+//           fs.unlink(dumpFile, (unlinkErr) => {
+//               if (unlinkErr) console.error('Error deleting dump file:', unlinkErr);
+//           });
+//       });
+//   });
+// });
+
+app.get('/download-database', async (req, res) => {
+  adminId = req.session?.admin?.admin_id;
+
+  if (!adminId) {
+    return res.status(400).json({ success: false, message: "You don't have access to this file" });
+  }
+  
+  console.log(adminId);
+  try {
+    // Get all tables in the database
+    const [tables] = await pool.query("SHOW TABLES");
+
+    // Prepare a string to hold the SQL dump
+    let sqlDump = '';
+
+    for (const tableRow of tables) {
+      const tableName = Object.values(tableRow)[0];
+
+      // Get table creation schema
+      const [[createTable]] = await pool.query(`SHOW CREATE TABLE \`${tableName}\``);
+      sqlDump += `${createTable['Create Table']};\n\n`;
+
+      // Get table data
+      const [rows] = await pool.query(`SELECT * FROM \`${tableName}\``);
+
+      if (rows.length > 0) {
+        const columns = Object.keys(rows[0]);
+        rows.forEach(row => {
+          const values = columns.map(col => pool.escape(row[col])).join(', ');
+          sqlDump += `INSERT INTO \`${tableName}\` (${columns.join(', ')}) VALUES (${values});\n`;
+        });
+        sqlDump += '\n';
+      }
+    }
+
+    // Save the SQL dump to a file
+    const dumpFile = path.join(__dirname, 'database_dump.sql');
+    fs.writeFileSync(dumpFile, sqlDump);
+
+    // Send the dump file as a download
+    res.download(dumpFile, 'database_dump.sql', (err) => {
+      if (err) {
+        console.error('Error sending file:', err);
+      }
+
+      // Delete the dump file after sending it
+      fs.unlink(dumpFile, (unlinkErr) => {
+        if (unlinkErr) console.error('Error deleting dump file:', unlinkErr);
+      });
+    });
+
+  } catch (error) {
+    console.error('Error generating database dump:', error);
+    res.status(500).send('Failed to generate database dump');
+  }
+});
 
 // Middleware for headers and logging
 app.use((req, res, next) => {
