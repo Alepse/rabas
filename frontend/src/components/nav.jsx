@@ -52,7 +52,7 @@ const Highlight = ({ content, match }) => {
     <span>
       {parts.map((part, i) =>
         part.toLowerCase() === match.toLowerCase().trim() ? (
-          <span key={i} className="bg-yellow-200 font-bold text-black rounded">
+          <span key={i} className=" font-extrabold text-color2/80 rounded">
             {part.trim()}
           </span>
         ) : (
