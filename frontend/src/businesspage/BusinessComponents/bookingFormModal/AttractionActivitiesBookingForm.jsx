@@ -299,7 +299,7 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
           booking_id: bookingId, // Use the extracted booking ID
           email: formData.email,
           phone: formData.phone,
-          amount: `${Number(formData.discountedPrice).toFixed(2)}`,
+          amount: `${Number(formData.amountToPay).toFixed(2)}`,
           visitDate: formData.visitDate,
           activityTime: formData.activityTime,
           productName: product.name,

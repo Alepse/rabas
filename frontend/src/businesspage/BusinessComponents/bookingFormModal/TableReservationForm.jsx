@@ -55,6 +55,7 @@ const TableReservationForm = ({ isOpen, onClose, product = {} }) => {
     discountedPrice: product.discount ? 
       Number(product.price) - (Number(product.price) * Number(product.discount) / 100) : 
       Number(product.price) || 0,
+    amountToPay: 0,
     type: product.type || '',
     agreeToTerms: false,
     specialRequests: '',
@@ -95,15 +96,18 @@ const TableReservationForm = ({ isOpen, onClose, product = {} }) => {
   }, [userId]);
 
   useEffect(() => {
+    const discountedPrice = product.discount
+      ? Number(product.price) - (Number(product.price) * Number(product.discount) / 100)
+      : Number(product.price) || 0;
+
     setFormData((prevFormData) => ({
       ...prevFormData,
       business_id: product.business_id || null,
       productName: product.name || '',
       originalPrice: Number(product.price) || 0,
       discount: Number(product.discount) || 0,
-      discountedPrice: product.discount ? 
-        Number(product.price) - (Number(product.price) * Number(product.discount) / 100) : 
-        Number(product.price) || 0,
+      discountedPrice: discountedPrice,
+      amountToPay: discountedPrice * Number(formData.numberOfGuests) || 0,
       type: product.type || '',
     }));
   }, [product]);
@@ -283,7 +287,7 @@ const TableReservationForm = ({ isOpen, onClose, product = {} }) => {
           booking_id: bookingId,
           email: formData.email,
           phone: formData.phone,
-          amount: `${Number(formData.discountedPrice).toFixed(2)}`,
+          amount: `${Number(formData.amountToPay).toFixed(2)}`,
           reservationDate: formData.reservationDate,
           reservationTime: formData.reservationTime,
           productName: product.name,
@@ -474,11 +478,16 @@ const TableReservationForm = ({ isOpen, onClose, product = {} }) => {
                   <span className="ml-2">{Number(formData.discount).toFixed(0)}% OFF</span>
                 </p>
                 <p className="font-bold text-lg">
-                  <strong>Final Price:</strong> 
+                  <strong>Discounted Price:</strong> 
                   <span className="ml-2 text-green-600">₱{Number(formData.discountedPrice).toFixed(2)}</span>
+                  <span className="ml-2 text-gray-500">(x{Number(formData.numberOfGuests).toFixed(0)})</span>
                 </p>
               </>
             )}
+            <p className="font-bold text-lg">
+              <strong>Amount To Pay:</strong> 
+              <span className="ml-2 text-green-600">₱{Number(formData.amountToPay).toFixed(2)}</span>
+            </p>
           </div>
         </div>
         <Checkbox
