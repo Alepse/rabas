@@ -639,6 +639,25 @@ const BusinessBooking = () => {
   const [walkInTableReservationSearchQuery, setWalkInTableReservationSearchQuery] = useState('');
   const [walkInActivitiesSearchQuery, setWalkInActivitiesSearchQuery] = useState('');
   const walkInHistory = useSelector(state => state.bookings.walkInHistory);
+  const [businessType, setBusinessType] = useState([]);
+
+  useEffect(() => {
+    const fetchBusinessType = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/get-businessData`, {
+          withCredentials: true,
+        });
+        if (response.status === 200 && response.data) {
+          const type = response.data.businessData[0].businessType; // Adjust based on API structure
+          setBusinessType(type);
+        }
+      } catch (error) {
+        console.error('Error fetching business data:', error);
+      } 
+    };
+
+    fetchBusinessType();
+  }, []);
   // console.log('walkinhistoryyyyy', walkInHistory);
   // Title Tab
   useEffect(() => {
@@ -920,24 +939,30 @@ const BusinessBooking = () => {
                 />
                 {walkInHistory && (
                   <>
+                  {businessType === 'accommodation' &&(
                     <WalkInHistorySection
                       title="Walk-In Accommodation History"
                       history={walkInHistory}
                       type="Accommodation"
                       searchQuery={walkInSearchQuery}
                     />
+                  )}
+                  {businessType === 'restaurant' &&(
                     <WalkInHistorySection
                       title="Walk-In Table Reservation History"
                       history={walkInHistory}
                       type="Table Reservation"
                       searchQuery={walkInSearchQuery}
                     />
+                  )}
+                  {businessType === 'attraction' &&(
                     <WalkInHistorySection
                       title="Walk-In Attraction History"
                       history={walkInHistory}
                       type="Attraction"
                       searchQuery={walkInSearchQuery}
                     />
+                  )}
                   </>
                 )}
               </Tab>
@@ -1130,22 +1155,58 @@ const WalkInCustomersSection = ({
   const [walkInSearchQuery, setWalkInSearchQuery] = useState('');
   const activeWalkInCustomers = useSelector(state => state.bookings.activeWalkInCustomers);
   // console.log('walkInCustomerssssssssss', activeWalkInCustomers);
+  const [businessType, setBusinessType] = useState('');
+
+  // Mapping businessType values to user-friendly labels
+  const typeMapping = {
+    accommodation: 'Accommodation',
+    restaurant: 'Table Reservation',
+    attraction: 'Attraction',
+  };
+
+  useEffect(() => {
+    const fetchBusinessType = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/get-businessData`, {
+          withCredentials: true,
+        });
+        if (response.status === 200 && response.data) {
+          const type = response.data.businessData[0].businessType; // Backend value
+          setBusinessType(type || ''); // Ensure type is set or default to empty string
+        }
+      } catch (error) {
+        console.error('Error fetching business data:', error);
+      }
+    };
+
+    fetchBusinessType();
+  }, []);
+
+  // Determine the label for the current business type
+  const businessLabel = typeMapping[businessType] || '';
+
   return (
     <div className="w-full space-y-4">
       <div className="text-xl font-bold mb-4 text-gray-700">Walk In Customers</div>
 
       {/* Form Buttons */}
       <div className="flex flex-wrap gap-4 mb-4 items-center font-medium text-color2">
-        <h1>Select Forms for Walk In Customers:</h1>
-        <Button color="primary" onClick={() => setAccommodationFormOpen(true)}>
-          Book Accommodation <span className="ml-2">📝</span>
-        </Button>
-        <Button color="primary" onClick={() => setTableReservationFormOpen(true)}>
-          Reserve Table <span className="ml-2">📝</span>
-        </Button>
-        <Button color="primary" onClick={() => setAttractionActivitiesFormOpen(true)}>
-          Book Activity <span className="ml-2">📝</span>
-        </Button>
+        <h1>Book Walk In Customers:</h1>
+        {businessType === 'accommodation' &&(
+          <Button color="primary" onClick={() => setAccommodationFormOpen(true)}>
+            Book Accommodation <span className="ml-2">📝</span>
+          </Button>
+        )}
+        {businessType === 'restaurant' &&(
+          <Button color="primary" onClick={() => setTableReservationFormOpen(true)}>
+            Reserve Table <span className="ml-2">📝</span>
+          </Button>
+        )}
+        {businessType === 'attraction' &&(
+          <Button color="primary" onClick={() => setAttractionActivitiesFormOpen(true)}>
+            Book Activity <span className="ml-2">📝</span>
+          </Button>
+        )}
       </div>
 
       {/* Search Bar */}
@@ -1158,14 +1219,14 @@ const WalkInCustomersSection = ({
         className="mb-4"
       />
 
-      {['Accommodation', 'Table Reservation', 'Attraction'].map((type) => (
+      {businessLabel && (
         <WalkInTypeSection
-          key={type}
-          type={type}
+          key={businessLabel}
+          type={businessLabel}
           customers={activeWalkInCustomers}
           searchQuery={walkInSearchQuery}
         />
-      ))}
+      )}
     </div>
   );
 };
