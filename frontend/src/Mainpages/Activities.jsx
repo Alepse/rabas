@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import Nav from '../components/nav';
 import Hero from '../components/heroactivity';
 import Footer from '@/components/Footer';
-import { Button, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/react";
+import { Button, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter,Pagination, PaginationItemType, useDisclosure ,} from "@nextui-org/react";
 import { Checkbox, CheckboxGroup, Select, SelectItem, Slider , Tooltip} from "@nextui-org/react";
 import { GiPositionMarker } from "react-icons/gi";
 import { Link } from 'react-router-dom';
@@ -33,7 +33,28 @@ const useIsLargeScreen = () => {
 
   return isLargeScreen;
 };
-
+const ChevronIcon = (props) => {
+  return (
+    <svg
+      aria-hidden="true"
+      fill="none"
+      focusable="false"
+      height="1em"
+      role="presentation"
+      viewBox="0 0 24 24"
+      width="1em"
+      {...props}
+    >
+      <path
+        d="M15.5 19l-7-7 7-7"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
+    </svg>
+  );
+};
 const Activities = () => {
   // State Variables
   const [activityDetails, setActivityDetails] = useState([]);
@@ -46,12 +67,67 @@ const Activities = () => {
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
   const [showButton, setShowButton] = useState(false); // State to show/hide button
-
+  
+  const [currentPage, setCurrentPage] = useState(0); 
+  const itemsPerPage = 9; 
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedTags, setSelectedTags] = useState([]);
   const [highlightedTags, setHighlightedTags] = useState([]);
   const [isFilteringByTags, setIsFilteringByTags] = useState(false);
+
+    // Function to get current page items
+    const getCurrentPageItems = () => {
+      const startIndex = currentPage * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      return filteredActivities.slice(startIndex, endIndex);
+    };
+
+ const renderPaginationItem = ({ref, key, value, isActive, onNext, onPrevious, setPage, className}) => {
+    if (value === PaginationItemType.NEXT) {
+      return (
+        <button
+          key={key}
+          className={`${className} bg-default-200/50 min-w-8 w-8 h-8`}
+          onClick={onNext}
+        >
+          <ChevronIcon className="rotate-180" />
+        </button>
+      );
+    }
+
+    if (value === PaginationItemType.PREV) {
+      return (
+        <button
+          key={key}
+          className={`${className} bg-default-200/50 min-w-8 w-8 h-8`}
+          onClick={onPrevious}
+        >
+          <ChevronIcon />
+        </button>
+      );
+    }
+
+    if (value === PaginationItemType.DOTS) {
+      return (
+        <button key={key} className={className}>
+          ...
+        </button>
+      );
+    }
+
+    return (
+      <button
+        key={key}
+        ref={ref}
+        className={`${className} ${isActive ? "text-white bg-gradient-to-br from-color1 to-color2 font-bold" : ""}`}
+        onClick={() => setPage(value)}
+      >
+        {value}
+      </button>
+    );
+  };
+  
 
  const handleSeeMoreTags = (tags) => {
   setSelectedTags(tags);
@@ -391,6 +467,7 @@ const toggleTagFiltering = () => {
             </div>
           )}
           {/* Activity List */}
+         
           <div className="w-full lg:w-3/4 max-h-[1300px] overflow-y-auto scrollbar-custom p-2">
             <motion.div
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
@@ -402,50 +479,51 @@ const toggleTagFiltering = () => {
                 Array.from({ length: 2 }).map((_, index) => {
                   const opacity = 1 - index * 0.25;
                   return (
-                    <SwiperSlide key={index} className="flex justify-center" style={{ opacity }}>
-                      <div className="bg-white rounded-lg shadow-lg duration-300 flex flex-col justify-between w-full mx-auto h-[400px] p-2 relative gap-2">
-                        <Skeleton className="w-full h-56 rounded-t-lg" />
-                        <div className="flex-grow flex flex-col justify-between mt-4 px-2">
-                          <div className="p-2">
-                            <Skeleton className="h-3 mb-4" />
-                            <Skeleton className="h-6 mb-4" />
-                            <Skeleton className="h-4 mb-4" />
-                            <Skeleton className="h-5 mb-3" />
-                            <Skeleton className="h-10" />
-                          </div>
-                        </div>
-                      </div>
-                    </SwiperSlide>
-                  );
-                })
-              ) : (
-                filteredActivities.length > 0 ? (
-                  filteredActivities.map((activity, index) => (
                     <motion.div
                       key={index}
-                      className="bg-white rounded-lg shadow-lg p-2 hover:shadow-slate-500 hover:scale-105 h-[400px]  duration-300 flex flex-col justify-between"
-                      variants={cardVariants}
+                      className="bg-white rounded-lg shadow-lg duration-300 flex flex-col justify-between w-full mx-auto h-[400px] p-2 relative gap-2"
+                      style={{ opacity }}
                     >
-                      {/* Card Image */}
-                      <div className="w-full h-40 border bg-gray-200 rounded-t-lg mb-2 overflow-hidden">
-                        {activity.cardImage ? (
-                          <img
-                            src={activity.cardImage ? `${BASE_URL}/${activity.cardImage}` : `${BASE_URL}/${activity.businessLogo}`}
-                            alt={activity.businessName}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <span>No Image</span>
-                          </div>
-                        )}
+                      <Skeleton className="w-full h-56 rounded-t-lg" />
+                      <div className="flex-grow flex flex-col justify-between mt-4 px-2">
+                        <div className="p-2">
+                          <Skeleton className="h-3 mb-4" />
+                          <Skeleton className="h-6 mb-4" />
+                          <Skeleton className="h-4 mb-4" />
+                          <Skeleton className="h-5 mb-3" />
+                          <Skeleton className="h-10" />
+                        </div>
                       </div>
+                    </motion.div>
+                  );
+                })
+              ) : getCurrentPageItems().length > 0 ? (
+                getCurrentPageItems().map((activity, index) => (
+                  <motion.div
+                    key={index}
+                    className="bg-white rounded-lg shadow-lg p-2 hover:shadow-slate-500 hover:scale-105 h-[400px] duration-300 flex flex-col justify-between"
+                    variants={cardVariants}
+                  >
+                    {/* Card Image */}
+                    <div className="w-full h-40 border bg-gray-200 rounded-t-lg mb-2 overflow-hidden">
+                      {activity.cardImage ? (
+                        <img
+                          src={activity.cardImage ? `${BASE_URL}/${activity.cardImage}` : `${BASE_URL}/${activity.businessLogo}`}
+                          alt={activity.businessName}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <span>No Image</span>
+                        </div>
+                      )}
+                    </div>
 
-                      {/* Card Content */}
-                      <div className="p-2 ">
-                        {/* Tags */}
-                        <div className="flex justify-between  items-center mb-2">  
-                          <div className="flex flex-wrap gap-2"> 
+                    {/* Card Content */}
+                    <div className="p-2">
+                      {/* Tags */}
+                      <div className="flex justify-between items-center mb-2">
+                        <div className="flex flex-wrap gap-2">
                           {activity.category.slice(0, 3).map((tag, index) => (
                             <span
                               key={index}
@@ -456,75 +534,97 @@ const toggleTagFiltering = () => {
                                   ? 'bg-color2 text-white'
                                   : 'bg-gray-200 text-gray-700'
                               }`}
-                              >
-                                {tag}
-                              </span> 
-                            ))}
-                            {activity.category.length > 3 && (
-                              <button
-                                onClick={() => handleSeeMoreTags(activity.category)}
-                                className="text-xs underline cursor-pointer text-color2"
-                              >
-                                See More
-                              </button>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className='flex gap-2 items-center flex-wrap'>
-                          {/* Business Name */}
-                          <h3 className="text-lg sm:text-base lg:text-lg font-semibold text-gray-800 truncate">{activity.businessName}</h3>
-                        </div>
-
-                        {/* Location */}
-                        <div className="text-sm text-gray-500  flex items-center">
-                          <GiPositionMarker className="mr-1" /> {activity.destination}
-                        </div>
-
-                      </div>
-                      
-                      {/* Ratings & Price */}
-                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-2">                       
-                        <div className="flex items-center gap-1 mb-2 sm:mb-0">
-                          {activity.rating ? (
-                            <>
-                              <span className="text-black text-[12px]">{activity.rating}</span>
-                              <span className="text-yellow-500">
-                                {'★'.repeat(Math.floor(activity.rating))}
-                                {'☆'.repeat(5 - Math.floor(activity.rating))}
-                              </span>
-                            </>
-                          ) : (
-                            <span className="text-gray-500 text-[12px] sm:text-sm">No ratings</span>
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                          {activity.category.length > 3 && (
+                            <button
+                              onClick={() => handleSeeMoreTags(activity.category)}
+                              className="text-xs underline cursor-pointer text-color2"
+                            >
+                              See More
+                            </button>
                           )}
                         </div>
-                        
-
-                        <p className="text-md sm:text-sm font-semibold text-black">
-                          {activity.lowest_price && activity.highest_price ? (
-                            `₱${activity.lowest_price} - ₱${activity.highest_price}`
-                          ) : (
-                            <span className="text-gray-400 italic text-[12px] sm:text-sm">Price Range Not available</span>
-                          )}
-                        </p>
                       </div>
-                      {/* Explore More Button */}
-                      <Link to={`/business/${encryptId(activity.business_id)}`} >
-                          <Button className="w-full bg-color1 text-color3 rounded-md hover:bg-color2">
-                            Explore More
-                          </Button>
-                      </Link>
-                    </motion.div>
-                  ))
-                ) : (
-                  <p className="col-span-full text-center text-gray-500">No activities match your selected filters.</p>
-                )
+
+                      <div className="flex gap-2 items-center flex-wrap">
+                        {/* Business Name */}
+                        <h3 className="text-lg sm:text-base lg:text-lg font-semibold text-gray-800 truncate">
+                          {activity.businessName}
+                        </h3>
+                      </div>
+
+                      {/* Location */}
+                      <div className="text-sm text-gray-500 flex items-center">
+                        <GiPositionMarker className="mr-1" /> {activity.destination}
+                      </div>
+                    </div>
+
+                    {/* Ratings & Price */}
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-2">
+                      <div className="flex items-center gap-1 mb-2 sm:mb-0">
+                        {activity.rating ? (
+                          <>
+                            <span className="text-black text-[12px]">{parseFloat(activity.rating).toFixed(1)}</span>
+                            <span className="text-yellow-500">
+                              {'★'.repeat(Math.floor(activity.rating))}
+                              {'☆'.repeat(5 - Math.floor(activity.rating))}
+                            </span>
+                          </>
+                        ) : (
+                          <span className="text-gray-500 text-[12px] sm:text-sm">No ratings</span>
+                        )}
+                      </div>
+
+                      <p className="text-md sm:text-sm font-semibold text-black">
+                        {activity.lowest_price && activity.highest_price ? (
+                          `₱${activity.lowest_price} - ₱${activity.highest_price}`
+                        ) : (
+                          <span className="text-gray-400 italic text-[12px] sm:text-xs">
+                            Price Range Not available
+                          </span>
+                        )}
+                      </p>
+                    </div>
+
+                    {/* Explore More Button */}
+                    <Link to={`/business/${encryptId(activity.business_id)}`}>
+                      <Button className="w-full bg-color1 text-color3 rounded-md hover:bg-color2">
+                        Explore More
+                      </Button>
+                    </Link>
+                  </motion.div>
+                ))
+              ) : (
+                <p className="col-span-full text-center text-gray-500">
+                  No activities match your selected filters.
+                </p>
               )}
             </motion.div>
           </div>
 
         </div>
-      </div>
+          {/* Pagination */}
+            <div className='flex justify-end'>
+                              
+               {!loading && (
+               <Pagination
+                disableCursorAnimation
+               showControls
+              className="gap-2 mt-4"
+              total={Math.ceil(filteredActivities.length / itemsPerPage)}
+              page={currentPage + 1}
+              onChange={(page) => setCurrentPage(page - 1)}
+              renderItem={renderPaginationItem}
+              variant="light"
+               />
+            
+            
+              )}
+         </div>
+        </div>
 
       <Footer />
 
