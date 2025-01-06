@@ -585,7 +585,7 @@ const AccommodationSection = () => {
             >
               {/* Accommodation Header */}
               <div className="flex mb-3 items-center gap-2 justify-between">
-                <Button size="sm" color="success" onClick={() => handleEdit(accommodation)}>
+                <Button  className="rounded-md bg-color2 hover:bg-color1 text-white" size="sm"  onClick={() => handleEdit(accommodation)}>
                   Edit
                 </Button>
                 <Checkbox
