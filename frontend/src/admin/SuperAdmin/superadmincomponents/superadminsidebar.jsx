@@ -4,6 +4,7 @@ import { MdDashboard } from 'react-icons/md';
 import { RiUserLine } from 'react-icons/ri';
 import { FaBox, FaCar, FaBars, FaTimes } from 'react-icons/fa';
 import { MdDomainVerification } from "react-icons/md";
+import { TbReport } from "react-icons/tb";
 import { Button } from '@nextui-org/react';
 import { CgLogOut } from "react-icons/cg";
 import axios from 'axios';
@@ -23,6 +24,7 @@ const SuperAdminSidebar = () => {
     { icon: <FaBox className="text-2xl" />, label: 'Products & Businesses', path: '/superadminproducts' },
     { icon: <FaCar className="text-2xl" />, label: 'Transportation', path: '/superadmintransportation' },
     { icon: <MdDomainVerification  className="text-2xl" />, label: 'Verification', path: '/superadminverification' },
+    { icon: <TbReport className="text-2xl" />, label: 'Reports', path: '/superadminreports' },
   ];
 
   // Update active navigation item based on current route

@@ -36,9 +36,9 @@ const Footer = () => {
             <h2 className="text-lg font-bold mb-4">Reach Us Out Here</h2>
             <form className="flex mb-4">
               <input
-                type="email"
-                placeholder="Email"
-                className="border-b-2 border-gray-300 focus:border-light flex-grow px-2 py-1 text-black placeholder-gray-500 transition duration-300"
+                type="test"
+                placeholder=" message here"
+                className="border-b-2 border-gray-300 focus:border-light flex-grow px-5 py-2 text-black placeholder-gray-500 transition duration-300"
               />
               <button
                 type="submit"
