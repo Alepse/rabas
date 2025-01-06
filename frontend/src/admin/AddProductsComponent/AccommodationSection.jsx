@@ -526,7 +526,7 @@ const AccommodationSection = () => {
         </div>
 
         {/* Buttons */}
-        <div className="flex flex-wrap justify-start sm:justify-end gap-3 w-full sm:w-auto">
+        <div className="flex  justify-between sm:justify-end gap-3 w-full ">
           {selectedAccommodations.length > 0 && (
             <Button
               color="danger"
@@ -548,7 +548,7 @@ const AccommodationSection = () => {
       </div>
 
       {/* Tabs Section */}
-      <div className="tabs flex flex-wrap justify-start gap-3 mb-4 p-3">
+      <div className="tabs flex w-full overflow-x-auto justify-start gap-3 mb-4 p-3">
         <Button
           onClick={() => setSelectedType('')}
           className={`border p-2 rounded-md transition duration-300 ease-in-out ${
@@ -575,7 +575,7 @@ const AccommodationSection = () => {
       </div>
 
       {/* Accommodations List */}
-      <div className="border-2 max-h-[430px] h-full flex flex-wrap overflow-auto p-4 gap-4">
+      <div className="border-2 max-h-[230px] md:max-h-[400px] h-full flex flex-wrap overflow-auto p-4 gap-4">
         {accommodations
           .filter((accommodation) => !selectedType || accommodation.accommodationType === selectedType)
           .map((accommodation) => (

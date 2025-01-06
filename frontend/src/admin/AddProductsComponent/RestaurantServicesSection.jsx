@@ -503,7 +503,7 @@ const RestaurantSection = () => {
             <FaSearch className='absolute top-2 left-3 text-gray-500' />
           </div>
         </div>
-        <div className="flex flex-wrap justify-start sm:justify-end gap-3 w-full sm:w-auto">
+        <div className="flex  justify-between sm:justify-end gap-3 w-full ">
           {selectedRestaurants.length > 0 && (
             <Button
               color="danger"
@@ -525,7 +525,7 @@ const RestaurantSection = () => {
       </div>
 
       {/* Tabs Section */}
-      <div className="tabs flex flex-wrap justify-start gap-3 mb-4 p-3">
+      <div className="tabs flex w-full overflow-x-auto justify-start gap-3 mb-4 p-3">
         <Button
           onClick={() => setSelectedType('')}
           className={`border p-2 rounded-md transition duration-300 ease-in-out ${
@@ -552,7 +552,7 @@ const RestaurantSection = () => {
       </div>
 
       {/* Restaurant Services List */}
-      <div className="border-2 max-h-[430px] h-full flex flex-wrap overflow-auto p-4 gap-4">
+      <div className="border-2 max-h-[230px] md:max-h-[400px] h-full flex flex-wrap overflow-auto p-4 gap-4">
         {restaurants
           .filter((restaurant) => !selectedType || restaurant.restaurantType === selectedType)
           .map((restaurant) => (
