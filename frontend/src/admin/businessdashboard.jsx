@@ -159,10 +159,10 @@ const BusinessDashboard = () => {
         </div>
 
         
-        <div className="grid grid-cols-1  gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2  gap-8 mb-8">
           <div className='flex justify-center'>
             <ChartSection title="Page Visitation">
-              <div className="h-[400px] md:h-[500px] w-full flex items-center justify-center">
+              <div className=" w-full flex items-center justify-center">
                 <LineChart 
                    width={window.innerWidth < 868 ? 850 : 1000}
                    height={window.innerWidth < 768 ? 300 : 500} 
@@ -192,11 +192,15 @@ const BusinessDashboard = () => {
                 </LineChart>
               </div>
             </ChartSection>
+
+           
           </div>
+
+          <MostReviewedProducts products={mostReviewedProducts} />
          
         </div>
-        <div className="grid grid-cols-1 gap-8">
-          <MostReviewedProducts products={mostReviewedProducts} />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+         
           <OngoingDeals deals={productsWithActiveDeals} />
           <AllProducts products={businessProducts} />
         </div>
@@ -260,57 +264,45 @@ const MostReviewedProducts = ({ products }) => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+    <div className="bg-white  p-6 rounded-lg shadow-md border border-gray-200">
       <h2 className="text-xl font-semibold mb-4 text-gray-800">Most Reviewed Products</h2>
-      <Slider {...settings}>
-        {products.map((product) => {
-        // Configure settings for product images dynamically
-          const settingsImages = {
-            dots: product.images.length > 0,
-            infinite: product.images.length > 1,
-            speed: 400,
-            slidesToShow: 1,
-            slidesToScroll: 1,
-            arrows: product.images.length > 1,
-          };
-          
-          return (
-          <div key={product.product_id} className="p-4">
-            <div className="bg-gray-50 p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow flex flex-col h-full">
-              {product.images && Array.isArray(product.images) && product.images.length > 0 ? (
-                <div className="mb-4">
-                  <Slider {...settingsImages}>
-                    {product.images.map((image) => (
-                      <div key={image.id} className="flex justify-center">
-                        <img
-                          src={`${BASE_URL}/${image.path}`}
-                          alt={image.title}
-                          className="w-full h-40 object-cover rounded-md"
-                        />
-                      </div>
-                    ))}
-                  </Slider>
-                </div>
-              ) : (
-                <div className="mb-4">
-                  <div className="w-full h-40 flex items-center justify-center rounded-md bg-gray-300">
-                    <p className="text-sm text-gray-500">No images available</p>
-                  </div>
-                </div>
-              )}
-              <h3 className="text-lg font-bold mb-1 text-gray-700 flex-grow">{product.name}</h3>
-              <p className="text-sm text-gray-600 min-h-[40px] mb-2 flex-grow">{product.description}</p>
-              <div className="flex items-center mb-2">
-                <span className="text-yellow-500 font-bold">{parseFloat(product.rating).toFixed(1)}</span>
-                <AiFillStar className="text-yellow-500 ml-1" />
-              </div>
-              <p className="text-sm text-gray-600">Price: ₱{product.price}</p>
-              <p className="text-sm text-gray-600">{product.review_count} review/s</p>
-            </div>
+      <div className="p-4">
+  <div className="space-y-4 max-h-[420px] scrollbar-custom overflow-y-auto">
+    {products.map((product) => (
+      <div
+        key={product.product_id}
+        className="bg-gray-50 p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow flex flex-col sm:flex-row items-start"
+      >
+        {/* Image Section */}
+        {product.images && Array.isArray(product.images) && product.images.length > 0 ? (
+          <img
+            src={`${BASE_URL}/${product.images[0].path}`}
+            alt={product.images[0].title}
+            className="w-full sm:w-40 h-40 object-cover rounded-md sm:mr-4 mb-4 sm:mb-0"
+          />
+        ) : (
+          <div className="w-full sm:w-40 h-40 flex items-center justify-center rounded-md bg-gray-300 sm:mr-4 mb-4 sm:mb-0">
+            <p className="text-sm text-gray-500">No images available</p>
           </div>
-          );
-        })}
-      </Slider>
+        )}
+
+        {/* Content Section */}
+        <div className="flex-grow">
+          <h3 className="text-lg font-bold mb-1 text-gray-700">{product.name}</h3>
+          <p className="text-sm text-gray-600 mb-2">{product.description}</p>
+          <div className="flex items-center mb-2">
+            <span className="text-yellow-500 font-bold">{parseFloat(product.rating).toFixed(1)}</span>
+            <AiFillStar className="text-yellow-500 ml-1" />
+          </div>
+          <p className="text-sm text-gray-600">Price: ₱{product.price}</p>
+          <p className="text-sm text-gray-600">{product.review_count} review/s</p>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
+
+
     </div>
   );
 };
@@ -344,62 +336,56 @@ const OngoingDeals = ({ deals }) => {
   return (
     <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
       <h2 className="text-xl font-semibold mb-4 text-gray-800">Active Deals</h2>
-      <Slider {...settings}>
-        {deals.map((deal) => {
-          // Configure settings for product images dynamically
-          const settingsImages = {
-            dots: true,
-            infinite: deal.images.length > 1,
-            speed: 400,
-            slidesToShow: 1,
-            slidesToScroll: 1,
-            arrows: deal.images.length > 1,
-          };
+      <div className="p-4">
+      <div className="space-y-4 max-h-[420px] scrollbar-custom overflow-y-auto ">
+    {deals.map((deal) => (
+      <div
+        key={deal.product_id}
+        className="bg-gray-50 p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow flex flex-col sm:flex-row items-start"
+      >
+        {/* Image Section */}
+        {deal.images && Array.isArray(deal.images) && deal.images.length > 0 ? (
+          <img
+            src={`${BASE_URL}/${deal.images[0].path}`}
+            alt={deal.images[0].title}
+            className="w-full sm:w-40 h-40 object-cover rounded-md sm:mr-4 mb-4 sm:mb-0"
+          />
+        ) : (
+          <div className="w-full sm:w-40 h-40 flex items-center justify-center rounded-md bg-gray-300 sm:mr-4 mb-4 sm:mb-0">
+            <p className="text-sm text-gray-500">No images available</p>
+          </div>
+        )}
 
-          return (
-            <div key={deal.product_id} className="p-4">
-              <div className="bg-gray-50 p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                {deal.images && Array.isArray(deal.images) && deal.images.length > 0 ? (
-                  <div className="mb-4">
-                    <Slider {...settingsImages}>
-                      {deal.images.map((image) => (
-                        <div key={image.id} className="flex justify-center">
-                          <img
-                            src={`${BASE_URL}/${image.path}`}
-                            alt={image.title}
-                            className="w-full h-40 object-cover rounded-md"
-                          />
-                        </div>
-                      ))}
-                    </Slider>
-                  </div>
-                ) : (
-                  <div className="w-full h-40 flex items-center justify-center">
-                    <p className="text-sm text-gray-500">No images available</p>
-                  </div>
-                )}
-                <h3 className="text-lg font-bold text-gray-700">{deal.name}</h3>
-                <p className="text-sm text-gray-600">{deal.description}</p>
-                <p className="text-sm text-gray-600">Price: ₱{deal.price} {deal.pricingUnit}</p>
-                {deal.discount && (
-                  <p className="text-sm text-gray-600">
-                    Discount: {deal.discount}% off
-                  </p>
-                )}
-                {deal.discount && (
-                  <p className="text-sm text-gray-600">
-                    Discounted Price: ₱{(deal.price - (deal.price * deal.discount / 100)).toFixed(2)} {deal.pricingUnit}
-                  </p>
-                )}
-                <p className="text-sm text-gray-600">
-                  Valid Until: {new Date(deal.expirationDate).toLocaleDateString('en-US')}
-                </p>
-                <p className="text-sm text-gray-600">Booking Option: {deal.hasBookingOption ? "Yes" : "No"}</p>
-              </div>
-            </div>
-          );
-        })}
-      </Slider>
+        {/* Content Section */}
+        <div className="flex-grow">
+          <h3 className="text-lg font-bold text-gray-700 mb-2">{deal.name}</h3>
+          <p className="text-sm text-gray-600 mb-2">{deal.description}</p>
+          <p className="text-sm text-gray-600 mb-1">
+            Price: ₱{deal.price} {deal.pricingUnit}
+          </p>
+          {deal.discount && (
+            <>
+              <p className="text-sm text-gray-600 mb-1">
+                Discount: {deal.discount}% off
+              </p>
+              <p className="text-sm text-gray-600 mb-1">
+                Discounted Price: ₱{(deal.price - (deal.price * deal.discount / 100)).toFixed(2)} {deal.pricingUnit}
+              </p>
+            </>
+          )}
+          <p className="text-sm text-gray-600 mb-1">
+            Valid Until: {new Date(deal.expirationDate).toLocaleDateString('en-US')}
+          </p>
+          <p className="text-sm text-gray-600">
+            Booking Option: {deal.hasBookingOption ? "Yes" : "No"}
+          </p>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
+
+
     </div>
   );
 };
@@ -433,53 +419,43 @@ const AllProducts = ({ products }) => {
   return (
     <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
       <h2 className="text-xl font-semibold mb-4 text-gray-800">All Products</h2>
-      <Slider {...settings}>
-        {products.map((product) => {
-          // Configure settings for product images dynamically
-          const settingsImages = {
-            dots: true,
-            infinite: product.images.length > 1,
-            speed: 400,
-            slidesToShow: 1,
-            slidesToScroll: 1,
-            arrows: product.images.length > 1,
-          };
+      <div className="p-4">
+      <div className="space-y-4 max-h-[420px] scrollbar-custom overflow-y-auto ">
+    {products.map((product) => (
+      <div
+        key={product.product_id}
+        className="bg-gray-50 p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow flex flex-col sm:flex-row items-start"
+      >
+        {/* Image Section */}
+        {product.images && Array.isArray(product.images) && product.images.length > 0 ? (
+          <img
+            src={`${BASE_URL}/${product.images[0].path}`}
+            alt={product.images[0].title}
+            className="w-full sm:w-40 h-40 object-cover rounded-md sm:mr-4 mb-4 sm:mb-0"
+          />
+        ) : (
+          <div className="w-full sm:w-40 h-40 flex items-center justify-center rounded-md bg-gray-300 sm:mr-4 mb-4 sm:mb-0">
+            <p className="text-sm text-gray-500">No images available</p>
+          </div>
+        )}
 
-          return (
-            <div key={product.product_id} className="p-4">
-              <div className="bg-gray-50 p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                {product.images && Array.isArray(product.images) && product.images.length > 0 ? (
-                  <div className="mb-4">
-                    <Slider {...settingsImages}>
-                      {product.images.map((image) => (
-                        <div key={image.id} className="flex justify-center">
-                          <img
-                            src={`${BASE_URL}/${image.path}`}
-                            alt={image.title}
-                            className="w-full h-40 object-cover rounded-md"
-                          />
-                        </div>
-                      ))}
-                    </Slider>
-                  </div>
-                ) : (
-                  <div className="w-full h-40 flex items-center justify-center">
-                    <p className="text-sm text-gray-500">No images available</p>
-                  </div>
-                )}
-                <h3 className="text-lg font-bold text-gray-700">{product.name}</h3>
-                <p className="text-sm text-gray-600">{product.description}</p>
-                <p className="text-sm text-gray-600">
-                  Price: ₱{product.price} {product.pricing_unit}
-                </p>
-                <p className="text-sm text-gray-600">
-                  Booking Option: {product.booking_operation ? "Yes" : "No"}
-                </p>
-              </div>
-            </div>
-          );
-        })}
-      </Slider>
+        {/* Content Section */}
+        <div className="flex-grow">
+          <h3 className="text-lg font-bold text-gray-700 mb-2">{product.name}</h3>
+          <p className="text-sm text-gray-600 mb-2">{product.description}</p>
+          <p className="text-sm text-gray-600 mb-1">
+            Price: ₱{product.price} {product.pricing_unit}
+          </p>
+          <p className="text-sm text-gray-600">
+            Booking Option: {product.booking_operation ? "Yes" : "No"}
+          </p>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
+
+
     </div>
   );
 };
