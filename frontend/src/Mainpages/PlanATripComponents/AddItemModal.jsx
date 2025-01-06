@@ -584,7 +584,7 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                         Your Travel Itinerary: Must-Do Activities, Stay Options, Food Spots & Shopping Spots
                     </h1>
                     {/* Search Input */}
-                    <div className="mb-4 relative">
+                    {/* <div className="mb-4 relative">
                         <input
                             type="text"
                             placeholder="Search..."
@@ -593,7 +593,7 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                             className="w-full p-2 pl-10 border border-gray-300 rounded"
                         />
                         <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                    </div>
+                    </div> */}
 
                     {/* Tabs and Filters */}
                     <Tabs
