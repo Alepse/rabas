@@ -116,6 +116,28 @@ const BusinessDashboard = () => {
     fetchAllData();
   }, [isLoggedIn]);
   
+  const [businessRating, setBusinessRating] = useState(0);
+
+const fetchBusinessRating = async () => {
+  try {
+    const response = await axios.get(`${BASE_URL}/getBusinessRating`, { withCredentials: true });
+    setBusinessRating(response.data.rating); // Assuming the API returns the rating
+  } catch (error) {
+    console.error('Error fetching business rating:', error);
+  }
+};
+
+useEffect(() => {
+  fetchBusinessRating();
+}, []);
+
+  const calculateBusinessRating = () => {
+    // Example calculation logic (replace with real logic or data fetching)
+    const totalRating = businessProducts.reduce((sum, product) => sum + product.rating, 0);
+    const businessRating = businessProducts.length ? totalRating / businessProducts.length : 0;
+    return businessRating.toFixed(1); // Example output
+  };
+  
 
   // console.log("produysss", businessProducts);
 
@@ -146,20 +168,21 @@ const BusinessDashboard = () => {
       ) : (     
       <div className="flex-1 px-8 py-4 md:p-6 lg:p-8 max-h-screen overflow-y-auto">
         <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-8 text-gray-800">Dashboard</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <DashboardCard title="Products" value={businessProducts.length} icon="📦" />
           <DashboardCard title="Active Deals" value={productsWithActiveDeals.length} icon="💼" />
-          {/* udi na averageRating ang naga cause error */}
-          <DashboardCard title="Products Average Rate" value={averageRating.toFixed(1)} icon="⭐" /> {/* Display average rating */}
+          <DashboardCard title="Products Average Rate" value={averageRating.toFixed(1)} icon="⭐" />
+          <DashboardCard title="Business Rating" value={calculateBusinessRating()} icon="📈" /> {/* New Card */}
         </div>
+
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <div className="grid grid-cols-1  gap-8 mb-8">
           <div className='flex justify-center'>
             <ChartSection title="Page Visitation">
               <div className="h-[400px] md:h-[500px] w-full flex items-center justify-center">
                 <LineChart 
-                  width={window.innerWidth < 768 ? 350 : 600} 
-                  height={window.innerWidth < 768 ? 300 : 400} 
+                   width={window.innerWidth < 868 ? 850 : 1000}
+                   height={window.innerWidth < 768 ? 300 : 500} 
                   data={data}
                   margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
                 >
@@ -187,38 +210,7 @@ const BusinessDashboard = () => {
               </div>
             </ChartSection>
           </div>
-          <div className='flex justify-center'>
-            <ChartSection title="Tourist Statistical Review">
-              <div className="h-[400px] md:h-[500px] w-full flex items-center justify-center">
-                <BarChart 
-                  width={window.innerWidth < 768 ? 350 : 600} 
-                  height={window.innerWidth < 768 ? 300 : 400} 
-                  data={reviewData}
-                  margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-                >
-                  <Bar 
-                    dataKey="reviews" 
-                    fill="#10b981" 
-                    radius={[4, 4, 0, 0]}
-                  />
-                  <CartesianGrid stroke="#e5e7eb" />
-                  <XAxis 
-                    dataKey="year" 
-                    tick={{ fontSize: window.innerWidth < 768 ? 12 : 14 }}
-                  />
-                  <YAxis 
-                    tick={{ fontSize: window.innerWidth < 768 ? 12 : 14 }}
-                  />
-                  <Tooltip 
-                    contentStyle={{ 
-                      fontSize: window.innerWidth < 768 ? 12 : 14,
-                      backgroundColor: 'rgba(255, 255, 255, 0.9)'
-                    }} 
-                  />
-                </BarChart>
-              </div>
-            </ChartSection>
-          </div>
+         
         </div>
         <div className="grid grid-cols-1 gap-8">
           <MostReviewedProducts products={mostReviewedProducts} />

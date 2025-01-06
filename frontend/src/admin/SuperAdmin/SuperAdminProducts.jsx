@@ -15,6 +15,7 @@ import { CheckboxGroup, Checkbox } from "@nextui-org/checkbox";
 import SuperAdminSidebar from './superadmincomponents/superadminsidebar';
 import SearchBar from './superadmincomponents/SearchBar'; // Import the SearchBar component
 import { Bar } from 'react-chartjs-2';
+import Swal from 'sweetalert2'; // Ensure SweetAlert is imported
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
@@ -23,7 +24,7 @@ const Dashboard = ({ productCounts }) => (
   <div>
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 py-4 md:py-6">
       <div className="bg-red-400 text-white p-4 flex flex-col justify-center items-center rounded-lg shadow-lg hover:shadow-xl transition-shadow">
-        <p className="text-base md:text-lg">Attractions</p>
+        <p className="text-base md:text-lg">Activities</p>
         <p className="text-2xl md:text-4xl font-bold">{productCounts.activities}</p>
       </div>
       <div className="bg-teal-400 text-white p-4 flex flex-col justify-center items-center rounded-lg shadow-lg hover:shadow-xl transition-shadow">
@@ -50,7 +51,7 @@ const Dashboard = ({ productCounts }) => (
       <div className="w-full max-w-4xl h-[400px] md:h-[500px]">
         <Bar 
           data={{
-            labels: ['Attractions', 'Accommodations', 'Foods', 'Shops', 'Total'],
+            labels: ['Activities', 'Accommodations', 'Foods', 'Shops', 'Total'],
             datasets: [{
               label: '# of Products',
               data: [
@@ -109,7 +110,7 @@ const Dashboard = ({ productCounts }) => (
 const BusinessDashboard = ({ businessCounts }) => (
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 py-4 md:py-6">
     <div className="bg-blue-400 text-white p-4 flex flex-col justify-center text-center items-center rounded-lg shadow-lg hover:shadow-xl transition-shadow">
-      <p className="text-base md:text-lg">Activities & Attractions</p>
+      <p className="text-base md:text-lg">Activities</p>
       <p className="text-2xl md:text-4xl font-bold">{businessCounts.activitiesAndAttractions}</p>
     </div>
     <div className="bg-green-400 text-white p-4 flex flex-col justify-center items-center rounded-lg shadow-lg hover:shadow-xl transition-shadow">
@@ -131,6 +132,79 @@ const BusinessDashboard = ({ businessCounts }) => (
   </div>
 );
 
+const handleDelete = (productId) => {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: "This action will permanently delete the product!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Yes, delete it!',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // Call your delete API or perform deletion logic here
+      fetch(`${BASE_URL}/deleteProduct/${productId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      })
+        .then((response) => {
+          if (response.ok) {
+            Swal.fire('Deleted!', 'Your product has been deleted.', 'success');
+            // Optionally, refresh the product list or state here
+            setProducts((prevProducts) =>
+              prevProducts.filter((product) => product.id !== productId)
+            );
+          } else {
+            Swal.fire('Error!', 'There was an issue deleting the product.', 'error');
+          }
+        })
+        .catch(() => {
+          Swal.fire('Error!', 'Could not delete the product.', 'error');
+        });
+    }
+  });
+};
+
+const handleDeleteBusiness = (businessId) => {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: "This action will permanently delete the business!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Yes, delete it!',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // Call your delete API or perform deletion logic here
+      fetch(`${BASE_URL}/deleteBusiness/${businessId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      })
+        .then((response) => {
+          if (response.ok) {
+            Swal.fire('Deleted!', 'The business has been deleted.', 'success');
+            // Optionally, refresh the business list or state here
+            setBusinessListings((prevListings) => {
+              const updatedListings = { ...prevListings };
+              for (const key in updatedListings) {
+                updatedListings[key] = updatedListings[key].filter(
+                  (business) => business.id !== businessId
+                );
+              }
+              return updatedListings;
+            });
+          } else {
+            Swal.fire('Error!', 'There was an issue deleting the business.', 'error');
+          }
+        })
+        .catch(() => {
+          Swal.fire('Error!', 'Could not delete the business.', 'error');
+        });
+    }
+  });
+};
 // Remove the Highlight import and add this custom component
 const Highlight = ({ content, match }) => {
   if (!match.trim() || !content) return content;
@@ -509,126 +583,85 @@ const SuperAdminProducts = () => {
   };
 
   const renderProductCards = (productList) => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {productList.map((product, index) => (
-        <Card key={index} className="shadow-lg rounded-lg hover:scale-105 transition-transform">
-          <CardBody className="p-3 md:p-4">
-            <img
-              src={product.imageUrl}
-              alt={product.title}
-              className="object-cover w-full h-32 md:h-40 rounded-lg mb-2"
-            />
-            <h3 className="font-bold text-base md:text-lg">
-              <Highlight content={product.title} match={searchTerm} />
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {productList.map((product) => (
+      <Card
+        key={product.id}
+        className="shadow-lg rounded-lg transition-transform hover:scale-105 flex flex-col"
+      >
+        {/* Product Image */}
+        <div className="relative h-40 md:h-48 overflow-hidden rounded-t-lg">
+          <img
+            src={product.imageUrl}
+            alt={product.title}
+            className="object-cover w-full h-full"
+          />
+        </div>
+
+        {/* Product Details */}
+        <CardBody className="p-4 flex flex-col justify-between flex-1">
+          <div className="mb-4">
+            {/* Title */}
+            <h3 className="font-semibold text-lg text-gray-800 truncate">
+              {product.title}
             </h3>
-            <p className="text-gray-700 text-sm md:text-base">
-              <Highlight content={product.description} match={searchTerm} />
+
+            {/* Description */}
+            <p className="text-sm text-gray-600 mt-2 line-clamp-2">
+              {product.description || 'No description available.'}
             </p>
-            {product.businessName && (
-              <p className="text-sm text-gray-600 mt-1">
-                Business: <Highlight
-                  content={product.businessName}
-                  match={searchTerm}
-                />
-              </p>
-            )}
-            {product.ownerName && (
-              <p className="text-sm text-gray-600">
-                Owner: <Highlight
-                  content={product.ownerName}
-                  match={searchTerm}
-                />
-              </p>
-            )}
-            {product.discount > 0 && (
-              <p className="text-sm text-green-600">Discount: {product.discount}%</p>
-            )}
-            <div className="flex justify-between items-center mt-2">
-              <span className="text-lg font-semibold">₱{product.price}</span>
-              <HiOutlineDotsVertical
-                className="cursor-pointer"
-                onClick={() => handleOpenModal(product)}
-              />
-            </div>
-          </CardBody>
-        </Card>
-      ))}
-    </div>
-  );
+          </div>
+
+          {/* Additional Info */}
+          <div className="mt-auto">
+            <p className="text-sm text-gray-500 mb-2">
+              <span className="font-semibold">Business:</span> {product.businessName || 'N/A'}
+            </p>
+            <p className="text-sm text-gray-500">
+              <span className="font-semibold">Owner:</span> {product.ownerName || 'N/A'}
+            </p>
+          </div>
+        </CardBody>
+
+        {/* Footer */}
+        <div className="p-4 flex justify-between items-center border-t border-gray-200">
+          {/* Price */}
+          <span className="text-lg font-semibold text-gray-800">
+            ₱{product.price.toFixed(2)}
+          </span>
+
+          {/* Delete Button */}
+          <button
+            className="text-red-500 hover:text-red-700"
+            onClick={() => handleDelete(product.id)}
+          >
+            Delete
+          </button>
+        </div>
+      </Card>
+    ))}
+  </div>
+);
 
   const renderBusinessCards = (businessList) => (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {businessList.map((business, index) => (
-        <Card key={index} className="shadow-lg rounded-lg hover:scale-105 transition-transform">
+      {businessList.map((business) => (
+        <Card key={business.id} className="shadow-lg rounded-lg hover:scale-105 transition-transform">
           <CardBody className="p-3 md:p-4">
             <img
               src={business.imageUrl}
               alt={business.title}
               className="object-cover w-full h-32 md:h-40 rounded-lg mb-2"
             />
-            <h3 className="font-bold text-base md:text-lg">
-              <Highlight content={business.title} match={businessSearchTerm} />
-            </h3>
-            <p className="text-gray-700 text-sm md:text-base mb-2">
-              <Highlight content={business.description} match={businessSearchTerm} />
-            </p>
-            <div className="text-sm space-y-1">
-              <p className="text-gray-600">
-                Type: <Highlight content={business.type} match={businessSearchTerm} />
-              </p>
-              <p className="text-gray-600">
-                Owner: <Highlight content={business.owner.name} match={businessSearchTerm} />
-              </p>
-              <p className="text-gray-600">
-                Email: <Highlight content={business.owner.email} match={businessSearchTerm} />
-              </p>
-              {business.businessInfo.category && (
-                <p className="text-gray-600">
-                  Category: <Highlight 
-                    content={Array.isArray(business.businessInfo.category) 
-                      ? business.businessInfo.category.join(', ') 
-                      : business.businessInfo.category} 
-                    match={businessSearchTerm} 
-                  />
-                </p>
-              )}
-              {business.businessInfo.businessCard?.priceRange && (
-                <p className="text-gray-600">
-                  Price Range: <Highlight 
-                    content={business.businessInfo.businessCard.priceRange} 
-                    match={businessSearchTerm} 
-                  />
-                </p>
-              )}
-              <p className="text-gray-600">
-                Status: <span className={`px-2 py-1 rounded-full text-xs ${
-                  business.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                }`}>
-                  {business.status}
-                </span>
-              </p>
-            </div>
-            {/* Display hero images */}
-            {business.heroImages && business.heroImages.length > 0 && (
-              <div className="mt-4">
-                <h4 className="font-semibold text-sm mb-2">Hero Images:</h4>
-                <div className="flex space-x-2 overflow-x-auto">
-                  {business.heroImages.map((img, idx) => (
-                    <img
-                      key={idx}
-                      src={`${BASE_URL}/${img.path}`}
-                      alt={`Hero ${idx + 1}`}
-                      className="w-20 h-20 object-cover rounded"
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-            <div className="flex justify-end mt-2">
-              <HiOutlineDotsVertical
-                className="cursor-pointer"
-                onClick={() => handleOpenBusinessModal(business)}
-              />
+            <h3 className="font-bold text-base md:text-lg">{business.title}</h3>
+            <div className="flex justify-between items-center mt-2">
+              <span className="text-sm text-gray-600">{business.type}</span>
+              <button
+                className="text-red-500 hover:text-red-700"
+                onClick={() => handleDeleteBusiness(business.id)}
+              >
+                Delete
+              </button>
             </div>
           </CardBody>
         </Card>
@@ -658,22 +691,7 @@ const SuperAdminProducts = () => {
           <Tab title="Products List">
             <Dashboard productCounts={productCounts} />
             <div className="mb-4 space-y-2">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                <label htmlFor="productFilter" className="text-sm md:text-base">
-                  Filter Products:
-                </label>
-                <select
-                  id="productFilter"
-                  value={selectedProductFilter}
-                  onChange={(e) => setSelectedProductFilter(e.target.value)}
-                  className="p-2 rounded border text-sm md:text-base"
-                >
-                  <option value="all">All Products</option>
-                  <option value="topRated">Top Rated</option>
-                  <option value="budgetFriendly">Budget Friendly</option>
-                  <option value="luxury">Luxury</option>
-                </select>
-              </div>
+            
               <SearchBar
                 placeholder="Search products..."
                 onSearch={setSearchTerm}
@@ -688,8 +706,12 @@ const SuperAdminProducts = () => {
                   product.type === 'Hiking' || product.type === 'Water Sports'))}
               </Tab>
               <Tab title="Accommodations">
-                {renderProductCards(filteredProducts.filter((product) => product.type === 'Cabins' || product.type === 'Resorts'))}
-              </Tab>
+              {renderProductCards(filteredProducts.filter((product) => 
+                product.type.toLowerCase().includes('accommodation') || 
+                product.type.toLowerCase().includes('hotel') || 
+                product.type.toLowerCase().includes('resort')
+              ))}
+            </Tab>
               <Tab title="Restaurant Service">
                 {renderProductCards(filteredProducts.filter((product) => product.type === 'Fine Dining' || product.type === 'Buffet'))}
               </Tab>
@@ -701,19 +723,7 @@ const SuperAdminProducts = () => {
 
           <Tab title="Business List">
             <BusinessDashboard businessCounts={businessCounts} />
-            <div className="mb-4">
-              <label htmlFor="businessFilter" className="mr-2">Filter Businesses: </label>
-              <select
-                id="businessFilter"
-                value={selectedBusinessFilter}
-                onChange={(e) => setSelectedBusinessFilter(e.target.value)}
-              >
-                <option value="all">All Businesses</option>
-                <option value="topRated">Top Rated</option>
-                <option value="budgetFriendly">Budget Friendly</option>
-                <option value="luxury">Luxury</option>
-              </select>
-            </div>
+           
             <SearchBar
               placeholder="Search businesses..."
               onSearch={setBusinessSearchTerm}
@@ -738,79 +748,7 @@ const SuperAdminProducts = () => {
           </Tab>
         </Tabs>
 
-        <Modal 
-          isOpen={isOpen} 
-          onClose={onClose}
-          className="max-w-[90%] md:max-w-[500px] mx-auto"
-        >
-          <ModalContent>
-            <ModalHeader>
-              <h2 className="text-xl md:text-2xl font-bold">{selectedProduct?.title}</h2>
-            </ModalHeader>
-            <ModalBody className="text-sm md:text-base">
-              <p className="mb-4">{selectedProduct?.description}</p>
-              <p className="mb-2 font-semibold">
-                Price: {new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(selectedProduct?.price || 0)}
-              </p>
-              {selectedProduct && (
-                <p className="mb-4">Ranking based on rating: #{getProductRank(selectedProduct)}</p>
-              )}
-              <CheckboxGroup
-                label="Add to Section"
-                className="mb-4"
-                onChange={handleSectionChange}
-                value={selectedSections}
-              >
-                <Checkbox value="topProducts">Top Products</Checkbox>
-                <Checkbox value="featuredProducts">Featured Products</Checkbox>
-                <Checkbox value="popularProducts">Popular Products</Checkbox>
-                <Checkbox value="budgetFriendly">Budget Friendly</Checkbox>
-                <Checkbox value="luxurySpots">Luxury Spots</Checkbox>
-                <Checkbox value="ecoFriendly">Eco Friendly Spots</Checkbox>
-              </CheckboxGroup>
-            </ModalBody>
-            <ModalFooter>
-              <button className="bg-blue-500 text-white px-4 py-2 rounded text-sm md:text-base" onClick={onClose}>
-                Close
-              </button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
 
-        <Modal isOpen={isBusinessModalOpen} onClose={onBusinessModalClose}>
-          <ModalContent>
-            <ModalHeader>
-              <h2 className="text-xl md:text-2xl font-bold">{selectedBusiness?.title}</h2>
-            </ModalHeader>
-            <ModalBody className="text-sm md:text-base">
-              <p className="mb-4">{selectedBusiness?.description}</p>
-              <p className="mb-2 font-semibold">
-                Price Range: {selectedBusiness?.businessInfo?.businessCard?.priceRange || 'Price range not available'}
-              </p>
-              {selectedBusiness && (
-                <p className="mb-4">Ranking based on rating: #{getProductRank(selectedBusiness)}</p>
-              )}
-              <CheckboxGroup
-                label="Add to Section"
-                className="mb-4"
-                onChange={handleSectionChange}
-                value={selectedSections}
-              >
-                <Checkbox value="popular">Popular</Checkbox>
-                <Checkbox value="topRated">Top Rated</Checkbox>
-                <Checkbox value="newArrivals">New Arrivals</Checkbox>
-                <Checkbox value="bestValue">Best Value</Checkbox>
-                <Checkbox value="familyFriendly">Family Friendly</Checkbox>
-                <Checkbox value="luxury">Luxury</Checkbox>
-              </CheckboxGroup>
-            </ModalBody>
-            <ModalFooter>
-              <button className="bg-blue-500 text-white px-4 py-2 rounded text-sm md:text-base" onClick={onBusinessModalClose}>
-                Close
-              </button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
       </div>
     </div>
   );

@@ -517,7 +517,7 @@ const ActivitySections = () => {
         </div>
 
         {/* Buttons */}
-        <div className="flex flex-wrap justify-start sm:justify-end gap-3 w-full sm:w-auto">
+        <div className="flex  justify-between sm:justify-end gap-3 w-full ">
           {selectedActivities.length > 0 && (
             <Button
               color="danger"
@@ -539,7 +539,7 @@ const ActivitySections = () => {
       </div>
 
       {/* Tabs Section */}
-      <div className="tabs flex flex-wrap justify-start gap-3 mb-4 p-3">
+      <div className="tabs flex w-full overflow-x-auto justify-start gap-3 mb-4 p-3">
         <Button
           onClick={() => setSelectedType('')}
           className={`border p-2 rounded-md transition duration-300 ease-in-out ${
@@ -566,7 +566,7 @@ const ActivitySections = () => {
       </div>
 
       {/* Activities List */}
-      <div className="border-2 max-h-[430px] h-full flex flex-wrap overflow-auto p-4 gap-4">
+      <div className="border-2 max-h-[230px] md:max-h-[400px] h-full flex flex-wrap overflow-auto p-4 gap-4">
         {activities
           .filter((activity) => !selectedType || activity.activityType === selectedType)
           .map((activity) => (
