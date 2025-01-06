@@ -487,7 +487,7 @@ const ShopSections = () => {
             >
               {/* Product Header */}
               <div className="flex mb-3 items-center gap-2 justify-between">
-                <Button size="sm" color="success" onClick={() => handleEdit(product)}>
+                <Button size="sm"  className="rounded-md bg-color2 hover:bg-color1 text-white" onClick={() => handleEdit(product)}>
                   Edit
                 </Button>
                 <Checkbox
