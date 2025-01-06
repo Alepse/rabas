@@ -4809,8 +4809,164 @@ app.put('/business-editReviewAndRating', async (req, res) => {
 ////////Transportation//////
 ///////////////////////////
 //////////////////////////
+// Endpoint to add a new terminal
+app.post('/add-terminal', async (req, res) => {
+  const { terminal_name } = req.body;
+
+  if (!terminal_name) {
+    return res.status(400).json({ success: false, message: 'Terminal name is required.' });
+  }
+
+  const sql = `
+    INSERT INTO terminals (name)
+    VALUES (?)
+  `;
+  const values = [terminal_name];
+
+  try {
+    // Use pooled connection to insert a new terminal
+    const [result] = await pool.query(sql, values);
+
+    // Send the response with the new terminal's details
+    res.status(201).json({
+      success: true,
+      message: 'Terminal added successfully',
+      terminalId: result.insertId,  // Get the inserted terminal's ID
+      terminalName: terminal_name,  // Return the terminal's name
+    });
+  } catch (err) {
+    console.error('Error adding terminal:', err);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+// Delete a route
+app.delete('/delete-terminal/:id', async (req, res) => {
+  const { id } = req.params;
+
+  const sql = `DELETE FROM terminals WHERE id = ?`;
+
+  try {
+    // Use pooled connection to execute the query
+    const [result] = await pool.query(sql, [id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: 'Route not found.' });
+    }
+
+    res.status(200).json({ success: true, message: 'Route deleted successfully.' });
+  } catch (error) {
+    console.error('Error deleting route:', error);
+    res.status(500).json({ success: false, message: 'Failed to delete route.' });
+  }
+});
 
 
+// Endpoint to fetch transport data
+app.get('/get-transport-data', async (req, res) => {
+  try {
+    // Fetch terminals
+    const [terminals] = await pool.query('SELECT * FROM terminals');
+
+    // Fetch routes and group them by terminal
+    const transportData = await Promise.all(
+      terminals.map(async (terminal) => {
+        const [routes] = await pool.query(
+          'SELECT id, origin, destination, schedule, fare, mode FROM routes WHERE terminal_id = ?',
+          [terminal.id]
+        );
+        return {
+          terminal_id: terminal.id, 
+          terminal: terminal.name,
+          routes,
+        };
+      })
+    );
+
+    res.status(200).json(transportData);
+  } catch (error) {
+    console.error('Error fetching transport data:', error);
+    res.status(500).json({ message: 'Failed to fetch transport data' });
+  }
+});
+
+// Add a new route
+app.post('/add-route', async (req, res) => {
+  const { terminal_id, origin, destination, schedule, fare, mode } = req.body;
+
+  // Validate required fields
+  if (!terminal_id || !origin || !destination || !schedule || fare == null || !mode) {
+    return res.status(400).json({ success: false, message: 'All fields are required.' });
+  }
+
+  const sql = `
+    INSERT INTO routes (terminal_id, origin, destination, schedule, fare, mode)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `;
+  const values = [terminal_id, origin, destination, schedule, fare, mode];
+
+  try {
+    // Use pooled connection to execute the query
+    const [result] = await pool.query(sql, values);
+    res.status(201).json({ success: true, message: 'Route added successfully.', routeId: result.insertId });
+  } catch (error) {
+    console.error('Error adding route:', error);
+    res.status(500).json({ success: false, message: 'Failed to add route.' });
+  }
+});
+
+// Edit an existing route
+app.put('/edit-route/:id', async (req, res) => {
+  const { id } = req.params;
+  const { origin, destination, schedule, fare, mode } = req.body;
+
+  // Validate required fields
+  if (!origin || !destination || !schedule || fare == null || !mode) {
+    return res.status(400).json({ success: false, message: 'All fields are required.' });
+  }
+
+  const sql = `
+    UPDATE routes
+    SET origin = ?, destination = ?, schedule = ?, fare = ?, mode = ?
+    WHERE id = ?
+  `;
+  const values = [origin, destination, schedule, fare, mode, id];
+
+  try {
+    // Use pooled connection to execute the query
+    const [result] = await pool.query(sql, values);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: 'Route not found.' });
+    }
+
+    res.status(200).json({ success: true, message: 'Route updated successfully.' });
+  } catch (error) {
+    console.error('Error updating route:', error);
+    res.status(500).json({ success: false, message: 'Failed to update route.' });
+  }
+});
+
+// Delete a route
+app.delete('/delete-route/:id', async (req, res) => {
+  const { id } = req.params;
+  console.log(id);
+  const sql = `DELETE FROM routes WHERE id = ?`;
+
+  try {
+    // Use pooled connection to execute the query
+    const [result] = await pool.query(sql, [id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: 'Route not found.' });
+    }
+
+    res.status(200).json({ success: true, message: 'Route deleted successfully.' });
+  } catch (error) {
+    console.error('Error deleting route:', error);
+    res.status(500).json({ success: false, message: 'Failed to delete route.' });
+  }
+});
 
 
 //////////////////////////////
