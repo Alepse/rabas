@@ -35,6 +35,8 @@ const BusinessDashboard = () => {
   const [productsWithActiveDeals, setProductsWithActiveDeals] = useState([]);
   const [mostReviewedProducts, setMostReviewedProducts] = useState([]);
   const [averageRating, setAverageRating] = useState(0); // State to hold the average rating
+  const [businessRating, setBusinessRating] = useState(0);
+  
 
   // Function to calculate the average rating
   const calculateAverageRating = (products) => {
@@ -85,21 +87,24 @@ const BusinessDashboard = () => {
         try {
   
           // Execute all fetch operations concurrently
-          const [productsResponse, activeDealsResponse, mostReviewedResponse] = await Promise.all([
+          const [productsResponse, activeDealsResponse, mostReviewedResponse, businessData] = await Promise.all([
             axios.get(`${BASE_URL}/getProducts`, { withCredentials: true }),
             axios.get(`${BASE_URL}/getProductsWithActiveDeals`, { withCredentials: true }),
             axios.get(`${BASE_URL}/getMostReviewedProducts`, { withCredentials: true }),
+            axios.get(`${BASE_URL}/getBusinessRatings`, { withCredentials: true }),
           ]);
   
           // Process the fetched data
           const products = productsResponse.data.businessProducts;
           const activeDeals = activeDealsResponse.data.productsWithDeals;
           const mostReviewed = mostReviewedResponse.data.products;
-          // console.log(products);
+          const businessRating = businessData.data.rating;
+          // console.log(businessRating);
           // Update state with the fetched data
           setBusinessProducts(products);
           setProductsWithActiveDeals(activeDeals);
           setMostReviewedProducts(mostReviewed);
+          setBusinessRating(businessRating); // Update business rating
   
           // Calculate and set average rating for most reviewed products
           const avgRating = calculateAverageRating(mostReviewed);
@@ -115,28 +120,6 @@ const BusinessDashboard = () => {
   
     fetchAllData();
   }, [isLoggedIn]);
-  
-  const [businessRating, setBusinessRating] = useState(0);
-
-const fetchBusinessRating = async () => {
-  try {
-    const response = await axios.get(`${BASE_URL}/getBusinessRating`, { withCredentials: true });
-    setBusinessRating(response.data.rating); // Assuming the API returns the rating
-  } catch (error) {
-    console.error('Error fetching business rating:', error);
-  }
-};
-
-useEffect(() => {
-  fetchBusinessRating();
-}, []);
-
-  const calculateBusinessRating = () => {
-    // Example calculation logic (replace with real logic or data fetching)
-    const totalRating = businessProducts.reduce((sum, product) => sum + product.rating, 0);
-    const businessRating = businessProducts.length ? totalRating / businessProducts.length : 0;
-    return businessRating.toFixed(1); // Example output
-  };
   
 
   // console.log("produysss", businessProducts);
@@ -172,7 +155,7 @@ useEffect(() => {
           <DashboardCard title="Products" value={businessProducts.length} icon="📦" />
           <DashboardCard title="Active Deals" value={productsWithActiveDeals.length} icon="💼" />
           <DashboardCard title="Products Average Rate" value={averageRating.toFixed(1)} icon="⭐" />
-          <DashboardCard title="Business Rating" value={calculateBusinessRating()} icon="📈" /> {/* New Card */}
+          <DashboardCard title="Business Rating" value={businessRating.toFixed(1)} icon="📈" /> {/* New Card */}
         </div>
 
         
@@ -235,7 +218,7 @@ const DashboardCard = ({ title, value, icon }) => (
 
 DashboardCard.propTypes = {
   title: PropTypes.string.isRequired,
-  value: PropTypes.number.isRequired,
+  value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   icon: PropTypes.string.isRequired,
 };
 
