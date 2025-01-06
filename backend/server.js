@@ -57,6 +57,7 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10, // Adjust this based on your needs
   queueLimit: 0,
+  timezone: '+08:00', 
 });
 
 // Test the connection pool
