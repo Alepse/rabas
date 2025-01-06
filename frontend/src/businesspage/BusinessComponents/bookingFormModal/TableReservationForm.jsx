@@ -118,6 +118,7 @@ const TableReservationForm = ({ isOpen, onClose, product = {} }) => {
   const [disabledTimes, setDisabledTimes] = useState([]); 
   const [bookedDates, setBookedDates] = useState([]);
   
+  console.log(disabledDates, disabledTimes, bookedDates);
   useEffect(() => {
     const fetchUnavailableDates = async () => {
       try {
