@@ -527,8 +527,7 @@ const SuperAdminVerification = () => {
       `${item.firstName} ${item.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.businessType.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (Array.isArray(item.category) ? item.category.join(', ').toLowerCase().includes(searchTerm.toLowerCase()) : item.category.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      item.certNumber.includes(searchTerm) ||
-      item.location.toLowerCase().includes(searchTerm.toLowerCase())
+      item.certNumber.includes(searchTerm)
     );
   };
 
