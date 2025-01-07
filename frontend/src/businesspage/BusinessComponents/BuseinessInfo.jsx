@@ -424,9 +424,7 @@ const BusinessInfo = ({businessData, loading, userData, isLoggedIn}) => {
                   <div className="w-full h-96 rounded-md shadow-lg overflow-hidden relative z-10">
                   <MapContainer
                       center={
-                        initialCenter && initialCenter.lat != null && initialCenter.lng != null
-                          ? [initialCenter.lat, initialCenter.lng]
-                          : defaultCenter
+                        initialCenter
                       }
                       zoom={currentZoom}
                       className="w-full h-full"
