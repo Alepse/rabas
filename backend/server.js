@@ -4804,6 +4804,40 @@ app.put('/business-editReviewAndRating', async (req, res) => {
   }
 });
 
+//////////////////////////////////////
+//////////////////////////////////////
+//// Delete Product and business /////
+/////////////////////////////////////
+/////////////////////////////////////
+// Delete a route
+app.delete('/deleteProduct/:id', async (req, res) => {
+  const { id } = req.params;
+
+  console.log('Received ID in request:', id);
+
+  if (!id || isNaN(id)) {
+    console.error('Invalid or missing product ID:', id);
+    return res.status(400).json({ success: false, message: 'Invalid product ID.' });
+  }
+
+  const sql = `DELETE FROM products WHERE product_id = ?`;
+
+  try {
+    const [result] = await pool.query(sql, [id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: 'Product not found.' });
+    }
+
+    console.log('Product deleted successfully:', id);
+    res.status(200).json({ success: true, message: 'Product deleted successfully.' });
+  } catch (error) {
+    console.error('Error deleting product:', error);
+    res.status(500).json({ success: false, message: 'An error occurred while deleting the product.' });
+  }
+});
+
+
 ////////////////////////////
 ////////////////////////////
 ////////Transportation//////

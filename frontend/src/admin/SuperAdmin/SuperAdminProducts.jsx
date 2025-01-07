@@ -133,6 +133,11 @@ const BusinessDashboard = ({ businessCounts }) => (
 );
 
 const handleDelete = (productId) => {
+  if (!productId) {
+    console.error('Error: productId is undefined or invalid.');
+    return Swal.fire('Error!', 'Invalid product ID.', 'error');
+  }
+
   Swal.fire({
     title: 'Are you sure?',
     text: "This action will permanently delete the product!",
@@ -143,7 +148,9 @@ const handleDelete = (productId) => {
     confirmButtonText: 'Yes, delete it!',
   }).then((result) => {
     if (result.isConfirmed) {
-      // Call your delete API or perform deletion logic here
+      // Log the product ID being deleted
+      console.log('Deleting product with ID:', productId);
+
       fetch(`${BASE_URL}/deleteProduct/${productId}`, {
         method: 'DELETE',
         credentials: 'include',
@@ -151,7 +158,6 @@ const handleDelete = (productId) => {
         .then((response) => {
           if (response.ok) {
             Swal.fire('Deleted!', 'Your product has been deleted.', 'success');
-            // Optionally, refresh the product list or state here
             setProducts((prevProducts) =>
               prevProducts.filter((product) => product.id !== productId)
             );
@@ -165,6 +171,7 @@ const handleDelete = (productId) => {
     }
   });
 };
+
 
 const handleDeleteBusiness = (businessId) => {
   Swal.fire({
@@ -586,7 +593,7 @@ const SuperAdminProducts = () => {
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
     {productList.map((product) => (
       <Card
-        key={product.id}
+        key={product.product_id}
         className="shadow-lg rounded-lg transition-transform hover:scale-105 flex flex-col"
       >
         {/* Product Image */}
@@ -631,12 +638,12 @@ const SuperAdminProducts = () => {
           </span>
 
           {/* Delete Button */}
-          <button
+          {/* <button
             className="text-red-500 hover:text-red-700"
-            onClick={() => handleDelete(product.id)}
+            onClick={() => handleDelete(product.product_id)}
           >
             Delete
-          </button>
+          </button> */}
         </div>
       </Card>
     ))}
@@ -656,12 +663,12 @@ const SuperAdminProducts = () => {
             <h3 className="font-bold text-base md:text-lg">{business.title}</h3>
             <div className="flex justify-between items-center mt-2">
               <span className="text-sm text-gray-600">{business.type}</span>
-              <button
+              {/* <button
                 className="text-red-500 hover:text-red-700"
                 onClick={() => handleDeleteBusiness(business.id)}
               >
                 Delete
-              </button>
+              </button> */}
             </div>
           </CardBody>
         </Card>
