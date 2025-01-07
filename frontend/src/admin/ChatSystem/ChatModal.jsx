@@ -1079,7 +1079,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
   const renderUserList = () => {
     // Flatten the nested array structure
     const flattenedUsers = users.flat();  // Merge nested arrays into a single array
-    // console.log('flattenedUsers', flattenedUsers);
+    console.log('flattenedUsers', flattenedUsers);
     return flattenedUsers.map((user) => (
       <li key={user.user_id}
         className={`p-3 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-300 ${
@@ -1099,7 +1099,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
             />
             {/* <UnreadBadge count={unreadMessages[user.user_id] || 0} />  Handle missing counts */}
           </div>
-          <span className="text-black">{user.name}</span>
+          <span className="text-black">{user.name || user.username}</span>
         </div>
         <span className={`w-3 h-3 rounded-full ${user?.status === 'online' ? 'bg-green-500' : 'bg-gray-400'}`}></span>
       </li>

@@ -4372,6 +4372,7 @@ app.get('/usersInChat/:userId', async (req, res) => {
       u.user_id,
       CONCAT(u.Fname, ' ', u.Lname) AS name,
       u.email,
+      u.username,
       u.image,
       u.image_path,
       u.contact
