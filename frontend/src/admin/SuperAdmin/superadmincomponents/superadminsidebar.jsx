@@ -24,7 +24,7 @@ const SuperAdminSidebar = () => {
     { icon: <FaBox className="text-2xl" />, label: 'Products & Businesses', path: '/superadminproducts' },
     { icon: <FaCar className="text-2xl" />, label: 'Transportation', path: '/superadmintransportation' },
     { icon: <MdDomainVerification  className="text-2xl" />, label: 'Verification', path: '/superadminverification' },
-    { icon: <TbReport className="text-2xl" />, label: 'Reports', path: '/superadminreports' },
+
   ];
 
   // Update active navigation item based on current route
