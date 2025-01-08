@@ -1000,7 +1000,7 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                                 onChange={(e) => setNotes(e.target.value)}
                                 fullWidth
                             />
-                            <Button onClick={handleAddToItinerary} className="w-full bg-color1 text-color3">
+                            <Button onClick={handleAddToItinerary} className="w-full  bg-color1 text-color3">
                                 Add to Itinerary
                             </Button>
                         </motion.div>
