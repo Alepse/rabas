@@ -149,6 +149,7 @@ const renderLikedPages = (likedPages, handleUnlikePage) => {
 };
 
 const PaymentModal = ({ booking, show, onClose, refreshBookings }) => {
+  const [loadingSpinning, setLoadingSpinning] = useState(false);
   const [paymentDetails, setPaymentDetails] = useState({
     accountName: '',
     accountNumber: '',
@@ -192,6 +193,8 @@ const PaymentModal = ({ booking, show, onClose, refreshBookings }) => {
       });
       return;
     }
+
+    setLoadingSpinning(true);
   
     try {
       // Prepare FormData for file upload (for /sendPayment)
@@ -210,6 +213,7 @@ const PaymentModal = ({ booking, show, onClose, refreshBookings }) => {
       });
   
       if (!paymentResponse.ok) {
+        setLoadingSpinning(false);
         throw new Error('Failed to send payment details');
       }
   
@@ -245,11 +249,13 @@ const PaymentModal = ({ booking, show, onClose, refreshBookings }) => {
       });
   
       if (!messageResponse.ok) {
+        setLoadingSpinning(false);
         throw new Error('Failed to send message');
       }
   
       const messageResult = await messageResponse.json();
   
+      setLoadingSpinning(false);
       // Show success message
       Swal.fire({
         icon: 'success',
@@ -263,12 +269,14 @@ const PaymentModal = ({ booking, show, onClose, refreshBookings }) => {
       onClose();
   
     } catch (error) {
+      setLoadingSpinning(false);
       Swal.fire({
         icon: 'error',
         title: 'Submission Failed',
         text: 'An error occurred while submitting payment details. Please try again.',
       });
     }
+    setLoadingSpinning(false);
   };
   
   return (
@@ -292,6 +300,14 @@ const PaymentModal = ({ booking, show, onClose, refreshBookings }) => {
       >
         <ModalHeader>Payment for Booking ID: {booking?.booked_id}</ModalHeader>
         <ModalBody style={{ padding: '1rem' }}>
+        {loadingSpinning && (
+            <div className="fixed inset-0 bg-gray-800 bg-opacity-70 z-50 flex justify-center items-center">
+              <div className="flex flex-col items-center">
+                <div className="spinner"></div>
+                <p className="mt-4 text-lg text-white font-semibold animate-pulse">Loading, please wait...</p>
+              </div>
+            </div>
+          )}
           <Input
             clearable
             bordered
@@ -865,7 +881,7 @@ const UserProfile = ({ activities = [] }) => {
   };
 
   const handlePayBooking = async (booking) => {
-    console.log("bookings: ", booking);
+    // console.log("bookings: ", booking);
     const result = await Swal.fire({
       title: 'Are you sure?',
       text: 'Do you really want to pay for this booking?',

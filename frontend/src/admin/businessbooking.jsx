@@ -25,6 +25,7 @@ import { MdPeople, MdEmail, MdPhone, MdDateRange, MdHotel, MdRestaurant, MdDirec
 import Swal from 'sweetalert2';
 import axios from 'axios';
 import { Skeleton } from "@nextui-org/skeleton";
+import { TbCoinRupee } from 'react-icons/tb';
 
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
@@ -64,6 +65,7 @@ const showErrorAlert = (message) => {
 // Booking card component for displaying individual bookings
 const BookingCard = ({ booking, onOpenChatModal, onMarkAsCompleted, onAcceptBooking, refreshBookings }) => {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [loadingSpinning, setLoadingSpinning] = useState(false);
 
   const handleShowPaymentModal = () => {
     setShowPaymentModal(true);
@@ -71,6 +73,7 @@ const BookingCard = ({ booking, onOpenChatModal, onMarkAsCompleted, onAcceptBook
 
   const handleConfirmPayment = async (bookingId) => {
     if (bookingId) {
+      setLoadingSpinning(TbCoinRupee);
       try {
         const status = 1;
         const response = await fetch(`${BASE_URL}/update-payment-status/${bookingId}`, {
@@ -85,19 +88,23 @@ const BookingCard = ({ booking, onOpenChatModal, onMarkAsCompleted, onAcceptBook
     
         if (response.ok) {
           // Show success message
+          setLoadingSpinning(false);
           showSuccessAlert(data.message || 'Payment status updated successfully.');
           handleClosePaymentModal();
         } else {
           // Handle error response
+          setLoadingSpinning(false);
           showErrorAlert(data.message || 'Failed to update payment status.');
           handleClosePaymentModal();
         }
       } catch (error) {
+        setLoadingSpinning(false);
         console.error('Error confirming payment:', error);
         showErrorAlert('An error occurred while confirming payment. Please try again later.');
         handleClosePaymentModal();
       }
     }
+    setLoadingSpinning(false);
     refreshBookings();
   };
   
@@ -228,6 +235,14 @@ const BookingCard = ({ booking, onOpenChatModal, onMarkAsCompleted, onAcceptBook
                 <ModalBody style={{ padding: '1.5rem', color: '#555' }}>
                   {booking.paymentDetails ? (
                     <>
+                      {loadingSpinning && (
+                        <div className="fixed inset-0 bg-gray-800 bg-opacity-70 z-50 flex justify-center items-center">
+                          <div className="flex flex-col items-center">
+                            <div className="spinner"></div>
+                            <p className="mt-4 text-lg text-white font-semibold animate-pulse">Loading, please wait...</p>
+                          </div>
+                        </div>
+                      )}
                       <p><strong>Booking ID:</strong> {booking.booked_id}</p>
                       <p><strong>Account Name:</strong> {booking.paymentDetails.accountName}</p>
                       <p><strong>Account Number:</strong> {booking.paymentDetails.accountNumber}</p>
