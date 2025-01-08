@@ -1221,7 +1221,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
             {message.formDetails &&
               Object.keys(message.formDetails).some((key) => message.formDetails[key] !== null) && (
                 <>
-                  {["activityBooking", "accommodationBooking", "tableReservation"].includes(message.formType) && (
+                  {["activityBooking", "accommodationBooking", "tableReservation", "bookingAccepted"].includes(message.formType) && (
                     <BookingDetailsCard
                       message={message}
                       isSender={isSenderYou}
