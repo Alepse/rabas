@@ -132,86 +132,6 @@ const BusinessDashboard = ({ businessCounts }) => (
   </div>
 );
 
-const handleDelete = (productId) => {
-  if (!productId) {
-    console.error('Error: productId is undefined or invalid.');
-    return Swal.fire('Error!', 'Invalid product ID.', 'error');
-  }
-
-  Swal.fire({
-    title: 'Are you sure?',
-    text: "This action will permanently delete the product!",
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#d33',
-    cancelButtonColor: '#3085d6',
-    confirmButtonText: 'Yes, delete it!',
-  }).then((result) => {
-    if (result.isConfirmed) {
-      // Log the product ID being deleted
-      console.log('Deleting product with ID:', productId);
-
-      fetch(`${BASE_URL}/deleteProduct/${productId}`, {
-        method: 'DELETE',
-        credentials: 'include',
-      })
-        .then((response) => {
-          if (response.ok) {
-            Swal.fire('Deleted!', 'Your product has been deleted.', 'success');
-            setProducts((prevProducts) =>
-              prevProducts.filter((product) => product.id !== productId)
-            );
-          } else {
-            Swal.fire('Error!', 'There was an issue deleting the product.', 'error');
-          }
-        })
-        .catch(() => {
-          Swal.fire('Error!', 'Could not delete the product.', 'error');
-        });
-    }
-  });
-};
-
-
-const handleDeleteBusiness = (businessId) => {
-  Swal.fire({
-    title: 'Are you sure?',
-    text: "This action will permanently delete the business!",
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#d33',
-    cancelButtonColor: '#3085d6',
-    confirmButtonText: 'Yes, delete it!',
-  }).then((result) => {
-    if (result.isConfirmed) {
-      // Call your delete API or perform deletion logic here
-      fetch(`${BASE_URL}/deleteBusiness/${businessId}`, {
-        method: 'DELETE',
-        credentials: 'include',
-      })
-        .then((response) => {
-          if (response.ok) {
-            Swal.fire('Deleted!', 'The business has been deleted.', 'success');
-            // Optionally, refresh the business list or state here
-            setBusinessListings((prevListings) => {
-              const updatedListings = { ...prevListings };
-              for (const key in updatedListings) {
-                updatedListings[key] = updatedListings[key].filter(
-                  (business) => business.id !== businessId
-                );
-              }
-              return updatedListings;
-            });
-          } else {
-            Swal.fire('Error!', 'There was an issue deleting the business.', 'error');
-          }
-        })
-        .catch(() => {
-          Swal.fire('Error!', 'Could not delete the business.', 'error');
-        });
-    }
-  });
-};
 // Remove the Highlight import and add this custom component
 const Highlight = ({ content, match }) => {
   if (!match.trim() || !content) return content;
@@ -420,6 +340,7 @@ const SuperAdminProducts = () => {
         data.businesses.forEach(business => {
           // Create a standardized business object
           const enhancedBusiness = {
+            id: business.business_id,
             title: business.businessName,
             description: business.aboutUs || 'No description available',
             imageUrl: business.businessLogo ? `${BASE_URL}/${business.businessLogo}` : 'https://via.placeholder.com/200',
@@ -589,92 +510,183 @@ const SuperAdminProducts = () => {
     return sortedProducts.findIndex((p) => p.title === product.title) + 1;
   };
 
+  const handleDelete = (productId) => {
+    if (!productId) {
+      console.error('Error: productId is undefined or invalid.');
+      return Swal.fire('Error!', 'Invalid product ID.', 'error');
+    }
+  
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "This action will permanently delete the product!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Log the product ID being deleted
+        // console.log('Deleting product with ID:', productId);
+  
+        fetch(`${BASE_URL}/deleteProduct/${productId}`, {
+          method: 'DELETE',
+          credentials: 'include',
+        })
+          .then((response) => response.json())  // Ensure response is parsed as JSON
+          .then((data) => {
+            if (data.success) {
+              Swal.fire('Deleted!', 'Your product has been deleted.', 'success');
+              
+              // Update the products list after successful deletion
+              setProducts((prevProducts) =>
+                prevProducts.filter((product) => product.product_id !== productId)
+              );
+  
+            } else {
+              Swal.fire('Error!', 'There was an issue deleting the product.', 'error');
+              console.error('Error response:', data.message);
+            }
+          })
+          .catch((error) => {
+            Swal.fire('Error!', 'Could not delete the product.', 'error');
+            console.error('Fetch error:', error);  // Log the actual error to the console
+          });
+      }
+    });
+  };
+
+  const handleDeleteBusiness = (businessId) => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "This action will permanently delete the business!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Call your delete API or perform deletion logic here
+        fetch(`${BASE_URL}/deleteBusiness/${businessId}`, {
+          method: 'DELETE',
+          credentials: 'include',
+        })
+          .then((response) => response.json()) 
+          .then((response) => {
+            if (response.success) {
+              Swal.fire('Deleted!', 'The business has been deleted.', 'success');
+              // Optionally, refresh the business list or state here
+              setBusinessListings((prevListings) => {
+                const updatedListings = { ...prevListings };
+                for (const key in updatedListings) {
+                  updatedListings[key] = updatedListings[key].filter(
+                    (business) => business.id !== businessId
+                  );
+                }
+                return updatedListings;
+              });
+            } else {
+              Swal.fire('Error!', 'There was an issue deleting the business.', 'error');
+            }
+          })
+          .catch(() => {
+            Swal.fire('Error!', 'Could not delete the business.', 'error');
+          });
+      }
+    });
+  };
+  
+
   const renderProductCards = (productList) => (
-  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-    {productList.map((product) => (
-      <Card
-        key={product.product_id}
-        className="shadow-lg rounded-lg transition-transform hover:scale-105 flex flex-col"
-      >
-        {/* Product Image */}
-        <div className="relative h-40 md:h-48 overflow-hidden rounded-t-lg">
-          <img
-            src={product.imageUrl}
-            alt={product.title}
-            className="object-cover w-full h-full"
-          />
-        </div>
-
-        {/* Product Details */}
-        <CardBody className="p-4 flex flex-col justify-between flex-1">
-          <div className="mb-4">
-            {/* Title */}
-            <h3 className="font-semibold text-lg text-gray-800 truncate">
-              {product.title}
-            </h3>
-
-            {/* Description */}
-            <p className="text-sm text-gray-600 mt-2 line-clamp-2">
-              {product.description || 'No description available.'}
-            </p>
-          </div>
-
-          {/* Additional Info */}
-          <div className="mt-auto">
-            <p className="text-sm text-gray-500 mb-2">
-              <span className="font-semibold">Business:</span> {product.businessName || 'N/A'}
-            </p>
-            <p className="text-sm text-gray-500">
-              <span className="font-semibold">Owner:</span> {product.ownerName || 'N/A'}
-            </p>
-          </div>
-        </CardBody>
-
-        {/* Footer */}
-        <div className="p-4 flex justify-between items-center border-t border-gray-200">
-          {/* Price */}
-          <span className="text-lg font-semibold text-gray-800">
-            ₱{product.price.toFixed(2)}
-          </span>
-
-          {/* Delete Button */}
-          {/* <button
-            className="text-red-500 hover:text-red-700"
-            onClick={() => handleDelete(product.product_id)}
-          >
-            Delete
-          </button> */}
-        </div>
-      </Card>
-    ))}
-  </div>
-);
-
-  const renderBusinessCards = (businessList) => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {businessList.map((business) => (
-        <Card key={business.id} className="shadow-lg rounded-lg hover:scale-105 transition-transform">
-          <CardBody className="p-3 md:p-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {productList.map((product) => (
+        <Card
+          key={product.product_id}
+          className="shadow-lg rounded-lg transition-transform hover:scale-105 flex flex-col"
+        >
+          {/* Product Image */}
+          <div className="relative h-40 md:h-48 overflow-hidden rounded-t-lg">
             <img
-              src={business.imageUrl}
-              alt={business.title}
-              className="object-cover w-full h-32 md:h-40 rounded-lg mb-2"
+              src={product.imageUrl}
+              alt={product.title}
+              className="object-cover w-full h-full"
             />
-            <h3 className="font-bold text-base md:text-lg">{business.title}</h3>
-            <div className="flex justify-between items-center mt-2">
-              <span className="text-sm text-gray-600">{business.type}</span>
-              {/* <button
-                className="text-red-500 hover:text-red-700"
-                onClick={() => handleDeleteBusiness(business.id)}
-              >
-                Delete
-              </button> */}
+          </div>
+
+          {/* Product Details */}
+          <CardBody className="p-4 flex flex-col justify-between flex-1">
+            <div className="mb-4">
+              {/* Title */}
+              <h3 className="font-semibold text-lg text-gray-800 truncate">
+                {product.title}
+              </h3>
+
+              {/* Description */}
+              <p className="text-sm text-gray-600 mt-2 line-clamp-2">
+                {product.description || 'No description available.'}
+              </p>
+            </div>
+
+            {/* Additional Info */}
+            <div className="mt-auto">
+              <p className="text-sm text-gray-500 mb-2">
+                <span className="font-semibold">Business:</span> {product.businessName || 'N/A'}
+              </p>
+              <p className="text-sm text-gray-500">
+                <span className="font-semibold">Owner:</span> {product.ownerName || 'N/A'}
+              </p>
             </div>
           </CardBody>
+
+          {/* Footer */}
+          <div className="p-4 flex justify-between items-center border-t border-gray-200">
+            {/* Price */}
+            <span className="text-lg font-semibold text-gray-800">
+              ₱{product.price.toFixed(2)}
+            </span>
+
+            {/* Delete Button */}
+            <button
+              className="text-red-500 hover:text-red-700"
+              onClick={() => handleDelete(product.product_id)}
+            >
+              Delete
+            </button>
+          </div>
         </Card>
       ))}
     </div>
   );
+
+  const renderBusinessCards = (businessList) => {
+    console.log(businessList);
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {businessList.map((business) => (
+          <Card key={business.id} className="shadow-lg rounded-lg hover:scale-105 transition-transform">
+            <CardBody className="p-3 md:p-4">
+              <img
+                src={business.imageUrl}
+                alt={business.title}
+                className="object-cover w-full h-32 md:h-40 rounded-lg mb-2"
+              />
+              <h3 className="font-bold text-base md:text-lg">{business.title}</h3>
+              <div className="flex justify-between items-center mt-2">
+                <span className="text-sm text-gray-600">{business.type}</span>
+                <button
+                  className="text-red-500 hover:text-red-700"
+                  onClick={() => handleDeleteBusiness(business.id)}
+                >
+                  Delete
+                </button>
+              </div>
+            </CardBody>
+          </Card>
+        ))}
+      </div>
+    )
+  };
 
   // Combine all businesses into a single array
   const allBusinesses = [

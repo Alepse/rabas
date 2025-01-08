@@ -5041,7 +5041,7 @@ app.delete('/deleteProduct/:id', async (req, res) => {
 
   console.log('Received ID in request:', id);
 
-  if (!id || isNaN(id)) {
+  if (!id) {
     console.error('Invalid or missing product ID:', id);
     return res.status(400).json({ success: false, message: 'Invalid product ID.' });
   }
@@ -5057,6 +5057,33 @@ app.delete('/deleteProduct/:id', async (req, res) => {
 
     console.log('Product deleted successfully:', id);
     res.status(200).json({ success: true, message: 'Product deleted successfully.' });
+  } catch (error) {
+    console.error('Error deleting product:', error);
+    res.status(500).json({ success: false, message: 'An error occurred while deleting the product.' });
+  }
+});
+
+app.delete('/deleteBusiness/:id', async (req, res) => {
+  const { id } = req.params;
+
+  console.log('Received ID in request:', id);
+
+  if (!id) {
+    console.error('Invalid or missing product ID:', id);
+    return res.status(400).json({ success: false, message: 'Invalid product ID.' });
+  }
+
+  const sql = `DELETE FROM businesses WHERE business_id = ?`;
+
+  try {
+    const [result] = await pool.query(sql, [id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: 'Business not found.' });
+    }
+
+    console.log('Business deleted successfully:', id);
+    res.status(200).json({ success: true, message: 'Business deleted successfully.' });
   } catch (error) {
     console.error('Error deleting product:', error);
     res.status(500).json({ success: false, message: 'An error occurred while deleting the product.' });
