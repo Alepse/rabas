@@ -148,8 +148,7 @@ const renderLikedPages = (likedPages, handleUnlikePage) => {
   );
 };
 
-const PaymentModal = ({ booking, show, onClose }) => {
-  console.log(booking);
+const PaymentModal = ({ booking, show, onClose, refreshBookings }) => {
   const [paymentDetails, setPaymentDetails] = useState({
     accountName: '',
     accountNumber: '',
@@ -260,6 +259,7 @@ const PaymentModal = ({ booking, show, onClose }) => {
   
       // Clear payment details and close the form
       clearPaymentDetails();
+      refreshBookings();
       onClose();
   
     } catch (error) {
@@ -860,6 +860,10 @@ const UserProfile = ({ activities = [] }) => {
     setShowPaymentModal(false);
   };
 
+  const refreshBookings = () => {
+    fetchBookings();
+  };
+
   const handlePayBooking = async (booking) => {
     console.log("bookings: ", booking);
     const result = await Swal.fire({
@@ -943,6 +947,7 @@ const UserProfile = ({ activities = [] }) => {
         });
       }
     }
+    setLoadingSpinning(false);
   };
 
   const checkLoginStatus = useCallback(async () => {
@@ -1231,24 +1236,25 @@ const UserProfile = ({ activities = [] }) => {
     });
   };
 
-  useEffect(() => {
-    const fetchBookings = async () => {
-      try {
-        const response = await fetch(`${BASE_URL}/bookings`, {
-          credentials: 'include'
-        });
-        const data = await response.json();
-        
-        if (data.success) {
-          setBookings(data.bookings);
-        } else {
-          console.error('Failed to fetch bookings:', data.message);
-        }
-      } catch (error) {
-        console.error('Error fetching bookings:', error);
+  
+  const fetchBookings = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/bookings`, {
+        credentials: 'include'
+      });
+      const data = await response.json();
+      
+      if (data.success) {
+        setBookings(data.bookings);
+      } else {
+        console.error('Failed to fetch bookings:', data.message);
       }
-    };
+    } catch (error) {
+      console.error('Error fetching bookings:', error);
+    }
+  };
 
+  useEffect(() => {
     fetchBookings();
   }, []);
 
@@ -1553,6 +1559,7 @@ const UserProfile = ({ activities = [] }) => {
             booking={selectedBooking}
             show={showPaymentModal}
             onClose={closePaymentModal}
+            refreshBookings={refreshBookings}
           />
 
           <Footer />

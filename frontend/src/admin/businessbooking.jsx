@@ -62,7 +62,7 @@ const showErrorAlert = (message) => {
 };
 
 // Booking card component for displaying individual bookings
-const BookingCard = ({ booking, onOpenChatModal, onMarkAsCompleted, onAcceptBooking }) => {
+const BookingCard = ({ booking, onOpenChatModal, onMarkAsCompleted, onAcceptBooking, refreshBookings }) => {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   const handleShowPaymentModal = () => {
@@ -98,6 +98,7 @@ const BookingCard = ({ booking, onOpenChatModal, onMarkAsCompleted, onAcceptBook
         handleClosePaymentModal();
       }
     }
+    refreshBookings();
   };
   
 
@@ -809,6 +810,10 @@ const BusinessBooking = () => {
     dispatch(fetchBookings());
   }, [dispatch]);
 
+  const refreshBookings = () => {
+    dispatch(fetchBookings());
+  };
+
   const openChatModal = (booking) => {
     setCurrentBookingDetails(booking);
     setChatModalVisible(true);
@@ -1039,6 +1044,7 @@ const BusinessBooking = () => {
                   openChatModal={openChatModal}
                   filteredBookingsByType={filteredBookingsByType}
                   onAcceptBooking={handleAcceptBooking}
+                  refreshBookings={refreshBookings}
                 />
                 
               </Tab>
@@ -1052,6 +1058,7 @@ const BusinessBooking = () => {
                   openChatModal={openChatModal}
                   onMarkAsCompleted={handleMarkAsCompleted}
                   filteredBookingsByType={filteredBookingsByType}
+                  refreshBookings={refreshBookings}
                 />
               </Tab>
 
@@ -1064,6 +1071,7 @@ const BusinessBooking = () => {
                   openChatModal={openChatModal}
                   onMarkAsCompleted={handleMarkAsCompleted}
                   filteredBookingsByType={filteredBookingsByType}
+                  refreshBookings={refreshBookings}
                 />
               </Tab>
 
@@ -1161,7 +1169,7 @@ const BusinessBooking = () => {
 };
 
 // Booking section component
-const BookingSection = ({ title, bookings, openChatModal, onMarkAsCompleted, onAcceptBooking }) => {
+const BookingSection = ({ title, bookings, openChatModal, onMarkAsCompleted, onAcceptBooking, refreshBookings }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [businessType, setBusinessType] = useState('');
 
@@ -1207,6 +1215,7 @@ const BookingSection = ({ title, bookings, openChatModal, onMarkAsCompleted, onA
             openChatModal={openChatModal}
             onMarkAsCompleted={onMarkAsCompleted}
             onAcceptBooking={onAcceptBooking}
+            refreshBookings={refreshBookings}
           />
         )}
       </div>
@@ -1215,7 +1224,7 @@ const BookingSection = ({ title, bookings, openChatModal, onMarkAsCompleted, onA
 };
 
 // Booking type section component
-const BookingTypeSection = ({ type, bookings, searchQuery, setSearchQuery, openChatModal, onMarkAsCompleted, onAcceptBooking }) => {
+const BookingTypeSection = ({ type, bookings, searchQuery, setSearchQuery, openChatModal, onMarkAsCompleted, onAcceptBooking, refreshBookings }) => {
   // console.log(`${type} Section - Received bookings:`, bookings);
 
   // Map API types to display types
@@ -1270,6 +1279,7 @@ const BookingTypeSection = ({ type, bookings, searchQuery, setSearchQuery, openC
               onOpenChatModal={() => openChatModal(booking)}
               onMarkAsCompleted={() => onMarkAsCompleted(booking.id)}
               onAcceptBooking={() => onAcceptBooking(booking.id)}
+              refreshBookings={() => refreshBookings()}
             />
           ))
         ) : (
