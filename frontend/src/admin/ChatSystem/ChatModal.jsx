@@ -383,7 +383,7 @@ const BookingDetailsCard = ({ message, onCheckAvailability, isSenderYou }) => {
           <li><strong>Booking Status:</strong> {message.status || 'Pending'}</li>
 
         </ul>
-        {message.status === 'pending' && (
+        {message.status === 'Pending' && (
           <>
           {message.formType !== 'bookingAccepted' && message.formType !== 'bookingDeclined' && (
             <Button size='sm' auto color="primary" onClick={() => onCheckAvailability(message)} className="mt-2">
