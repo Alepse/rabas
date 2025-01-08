@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { TbMessageStar } from "react-icons/tb";
 import { TbListDetails } from "react-icons/tb";
 import { IoCheckmarkCircleOutline } from "react-icons/io5";
@@ -247,6 +247,10 @@ const ReviewModal = ({ isOpen, onClose, product, isLoggedIn, refreshProducts }) 
 
 // Product Card Component
 const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn, refreshProducts, businessData, userData, openLoginForm }) => {
+  const productSectionRef = useRef(null);
+  useEffect(() => {
+    productSectionRef.current.scrollIntoView({ behavior: 'smooth' });
+  }, [product]);
   const [isReviewModalOpen, setReviewModalOpen] = useState(false);
   const [isInclusionsModalOpen, setInclusionsModalOpen] = useState(false);
   const onModalOpen = () => {
@@ -351,7 +355,7 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn, refreshPro
 
   return (
     <div className="shadow-lg border  p-1 hover:shadow-slate-300 rounded-lg overflow-hidden mb-4">
-      <div className="flex flex-col md:flex-row md:flex-wrap">
+      <div ref={productSectionRef} className="flex flex-col md:flex-row md:flex-wrap">
         {/* Image Section */}
         <div className="relative w-full   h-[260px] md:w-[290px] md:h-[250px] flex-shrink-0">
           {product.images.length > 0 ? (
