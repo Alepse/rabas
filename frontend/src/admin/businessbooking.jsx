@@ -201,7 +201,16 @@ const BookingCard = ({ booking, onOpenChatModal, onMarkAsCompleted, onAcceptBook
             </Button>
 
             <Modal isOpen={showPaymentModal} isDismissable={false} onClose={handleClosePaymentModal}>
-              <ModalContent style={{ borderRadius: '8px', padding: '1rem', backgroundColor: '#f9f9f9' }}>
+              <ModalContent 
+                style={{ 
+                  borderRadius: '8px', 
+                  padding: '1rem', 
+                  backgroundColor: '#f9f9f9',
+                  margin: '0 auto',
+                  height: '90vh',
+                  overflowY: 'auto'
+                }}
+              >
                 <ModalHeader>
                   <h3
                     style={{
@@ -238,7 +247,7 @@ const BookingCard = ({ booking, onOpenChatModal, onMarkAsCompleted, onAcceptBook
                           alt="Payment image"
                           style={{
                             maxWidth: '100%',
-                            maxHeight: '200px',
+                            maxHeight: '100%',
                             borderRadius: '8px',
                             objectFit: 'contain',
                           }}

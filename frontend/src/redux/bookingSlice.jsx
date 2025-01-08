@@ -105,7 +105,7 @@ export const fetchBookings = createAsyncThunk(
           }
         };
 
-        console.log('Formatting booking:', formattedBooking);
+        // console.log('Formatting booking:', formattedBooking);
 
         if (formattedBooking.userId === 0) {
           if (formattedBooking.status === 'Active') {

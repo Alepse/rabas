@@ -348,7 +348,7 @@ const PaymentModal = ({ booking, show, onClose, refreshBookings }) => {
           />
           {preview && (
             <div style={{ marginTop: '1rem', textAlign: 'center' }}>
-              <img src={preview} alt="Preview" style={{ maxWidth: '100%', maxHeight: '200px' }} />
+              <img src={preview} alt="Preview" style={{ maxWidth: '100%', maxHeight: '100%' }} />
             </div>
           )}
         </ModalBody>
