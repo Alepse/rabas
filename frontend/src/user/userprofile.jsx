@@ -3,7 +3,7 @@ import Nav from '@/components/nav';
 import Footer from '@/components/Footer';
 import { Avatar } from '@nextui-org/react';
 import Search from '@/components/Search';
-import { Tabs, Tab, Card, CardBody, Button, useDisclosure } from "@nextui-org/react";
+import { Tabs, Tab, Card, CardBody, Button, useDisclosure, Input } from "@nextui-org/react";
 import BusinessApplicationModal from '@/businesspage/BusinessComponents/BusinessApplicationModal';
 import { GiPositionMarker } from 'react-icons/gi';
 import { Spinner } from "@nextui-org/react";
@@ -19,6 +19,7 @@ import { FaCalendarAlt, FaClock, FaUser, FaEnvelope, FaPhone, FaMoneyBillWave , 
 import { BsFillPersonLinesFill } from "react-icons/bs";
 import { MdOutlineKeyboardArrowRight } from 'react-icons/md';
 import { Skeleton } from "@nextui-org/skeleton";
+import { Modal, ModalContent, ModalHeader, ModalBody } from '@nextui-org/modal';
 
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
@@ -147,17 +148,247 @@ const renderLikedPages = (likedPages, handleUnlikePage) => {
   );
 };
 
+const PaymentModal = ({ booking, show, onClose }) => {
+  console.log(booking);
+  const [paymentDetails, setPaymentDetails] = useState({
+    accountName: '',
+    accountNumber: '',
+    referenceNumber: '',
+    picture: null,
+  });
+  const [preview, setPreview] = useState(null);
+
+  const clearPaymentDetails = () => {
+    setPaymentDetails({
+      accountName: '',
+      accountNumber: '',
+      referenceNumber: '',
+      picture: null,
+    });
+    setPreview(null);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setPaymentDetails({ ...paymentDetails, [name]: value });
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setPaymentDetails({ ...paymentDetails, picture: file });
+      const reader = new FileReader();
+      reader.onload = () => setPreview(reader.result);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handlePayment = async () => {
+    // Check if all payment details are provided
+    if (!paymentDetails.accountName || !paymentDetails.accountNumber || !paymentDetails.referenceNumber || !paymentDetails.picture) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Missing Information',
+        text: 'Please fill in all payment details and upload a picture.',
+      });
+      return;
+    }
+  
+    try {
+      // Prepare FormData for file upload (for /sendPayment)
+      const formData = new FormData();
+      formData.append('accountName', paymentDetails.accountName);
+      formData.append('accountNumber', paymentDetails.accountNumber);
+      formData.append('referenceNumber', paymentDetails.referenceNumber);
+      formData.append('payment', paymentDetails.picture);
+      formData.append('bookingId', booking.booking_id);
+  
+      // Send POST request to /sendPayment endpoint
+      const paymentResponse = await fetch(`${BASE_URL}/sendPayment`, {
+        method: 'POST',
+        body: formData,
+        credentials: 'include',
+      });
+  
+      if (!paymentResponse.ok) {
+        throw new Error('Failed to send payment details');
+      }
+  
+      const paymentResult = await paymentResponse.json();
+
+      const photoPath = paymentResult.photoPath;
+  
+      // Prepare the message to send after payment is successful
+      const message = {
+        sender_id: booking.user_id, // Assuming formData contains userId
+        sender_account: 'user', // Assuming formData contains userAccount
+        receiver_id: booking.businessOwnerId, // Assuming formData contains businessId
+        receiver_account: 'business', // Assuming formData contains businessAccount
+        text: `Payment for booking ID: ${booking.booked_id}`,
+        formType: 'payment',
+        form_details: JSON.stringify({
+          booked_id: booking.booked_id,
+          booking_id: booking.booking_id,
+          accountName: paymentDetails.accountName,
+          accountNumber: paymentDetails.accountNumber,
+          referenceNumber: paymentDetails.referenceNumber,
+        }),
+        photo: photoPath, // Include the payment image path
+      };
+  
+      // Send the message (to /sendMessage)
+      const messageResponse = await fetch(`${BASE_URL}/sendMessage`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(message),
+      });
+  
+      if (!messageResponse.ok) {
+        throw new Error('Failed to send message');
+      }
+  
+      const messageResult = await messageResponse.json();
+  
+      // Show success message
+      Swal.fire({
+        icon: 'success',
+        title: 'Payment Submitted',
+        text: `Payment for Booking ID ${booking.booked_id} has been submitted successfully!`,
+      });
+  
+      // Clear payment details and close the form
+      clearPaymentDetails();
+      onClose();
+  
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Submission Failed',
+        text: 'An error occurred while submitting payment details. Please try again.',
+      });
+    }
+  };
+  
+  return (
+    <Modal
+      isOpen={show}
+      isDismissable={false}
+      onClose={() => {
+        clearPaymentDetails();
+        onClose();
+      }}
+      closeButton
+    >
+      <ModalContent
+        style={{
+          margin: '0 auto',
+          height: '90vh',
+          overflowY: 'auto',
+          borderRadius: '8px',
+        }}
+        className="max-w-[90%] lg:max-w-[40%]"
+      >
+        <ModalHeader>Payment for Booking ID: {booking?.booked_id}</ModalHeader>
+        <ModalBody style={{ padding: '1rem' }}>
+          <Input
+            clearable
+            bordered
+            fullWidth
+            label={
+              <>
+                Account Name <span style={{ color: "red" }}>*</span>
+              </>
+            }
+            name="accountName"
+            value={paymentDetails.accountName}
+            onChange={handleInputChange}
+            required
+          />
+          <Input
+            clearable
+            bordered
+            fullWidth
+            label={
+              <>
+                Account Number <span style={{ color: "red" }}>*</span>
+              </>
+            }
+            name="accountNumber"
+            value={paymentDetails.accountNumber}
+            onChange={handleInputChange}
+            required
+          />
+          <Input
+            clearable
+            bordered
+            fullWidth
+            label={
+              <>
+                Reference Number <span style={{ color: "red" }}>*</span>
+              </>
+            }
+            name="referenceNumber"
+            value={paymentDetails.referenceNumber}
+            onChange={handleInputChange}
+            required
+          />
+          <Input
+            type="file"
+            bordered
+            fullWidth
+            label={
+              <>
+                Upload Receipt Picture <span style={{ color: "red" }}>*</span>
+              </>
+            }
+            onChange={handleImageUpload}
+            required
+          />
+          {preview && (
+            <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+              <img src={preview} alt="Preview" style={{ maxWidth: '100%', maxHeight: '200px' }} />
+            </div>
+          )}
+        </ModalBody>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '1rem' }}>
+          <Button
+            auto
+            flat
+            color="error"
+            onClick={() => {
+              clearPaymentDetails();
+              onClose();
+            }}
+          >
+            Cancel
+          </Button>
+          <Button auto color="success" onClick={handlePayment}>
+            Pay Now
+          </Button>
+        </div>
+      </ModalContent>
+    </Modal>
+  );
+};
+
+
 // Simplified component for the "My Booking" tab
-const MyBookingTab = ({ bookings, onCancelBooking }) => {
-  const [activeTab, setActiveTab] = useState("active");
+const MyBookingTab = ({ bookings, onCancelBooking, openPayBooking }) => {
+  const [activeTab, setActiveTab] = useState("pending");
+
+  console.log(bookings);
 
   const filterBookings = (status) => {
     if (!Array.isArray(bookings)) return [];
     
     return bookings.filter(booking => {
       switch(status) {
-        case "active":
-          return booking.status === 'confirmed' || booking.status === 'pending';
+        case "pending":
+          return booking.status === 'pending';
+        case "accepted":
+          return booking.status === 'confirmed';
         case "completed":
           return booking.status === 'completed';
         case "cancelled":
@@ -181,19 +412,20 @@ const MyBookingTab = ({ bookings, onCancelBooking }) => {
         onSelectionChange={setActiveTab}
         className="overflow-x-auto"
       >
-        {/* Active Tab */}
-        <Tab key="active" title="Active">
-          <div className="overflow-y-auto max-h-[500px] scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
-            {filterBookings('active').length === 0 ? (
-              <p className="text-gray-500 text-center">No active bookings at the moment.</p>
+        {/* Pending Tab */}
+        <Tab key="pending" title="Pending">
+          <div className="overflow-y-auto max-h-[600px] scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
+            {filterBookings('pending').length === 0 ? (
+              <p className="text-gray-500 text-center">No pending bookings at the moment.</p>
             ) : (
-              filterBookings('active').map((booking) => (
+              filterBookings('pending').map((booking) => (
                 <div
                   key={booking.booking_id}
                   className="bg-white shadow-lg rounded-lg p-4 border border-gray-200 mb-4"
                 >
                   {/* Booking Title */}
                   <h4 className="font-bold text-xl mb-2">{booking.productName}</h4>
+                  <h1 className='mb-3 flex items-center gap-3'><BsFillPersonLinesFill/><strong > BOOKING ID: </strong>{booking.booked_id}</h1>
                   <h1 className='mb-3 flex items-center gap-3'><BsFillPersonLinesFill/><strong > Name: </strong>{booking.customerName}</h1>
                   {/* Booking Details with Icons */}
 
@@ -238,19 +470,40 @@ const MyBookingTab = ({ bookings, onCancelBooking }) => {
                     </div>
 
                     <div className="flex items-center space-x-3">
-                    <FaComment className="text-gray-500" />
-                    <p>
-                      <strong>Special Requests:</strong> {booking.specialRequests ? booking.specialRequests : 'None'}
-                    </p>
-                  </div>
-                    
+                      <FaComment className="text-gray-500" />
+                      <p>
+                        <strong>Special Requests:</strong> {booking.specialRequests ? booking.specialRequests : 'None'}
+                      </p>
+                    </div>
+                      
                     <div className="flex items-center space-x-3">
                       <FaMoneyBillWave className="text-gray-500" />
                       <p>
-                        <strong>Amount:</strong> ₱{parseFloat(booking.priceDetails.discountedPrice).toLocaleString()}
+                        <strong>Amount:</strong> ₱{parseFloat(booking.priceDetails.amountToPay).toLocaleString()}
+                      </p>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <FaMoneyBillWave className="text-gray-500" />
+                      <p>
+                        <strong>Payment Status:</strong> {booking.paymentStatus}
                       </p>
                     </div>
                   </div>
+
+                  {/* Cancel Button */}
+                  {booking.paymentStatus === 'Pending' && (
+                    <div className="mt-6">
+                      <button
+                        onClick={() => openPayBooking(booking)}
+                        className="w-full bg-color1 text-white py-2 px-4 rounded-lg hover:bg-color2 transition"
+                      >
+                        Pay Now
+                      </button>
+                      <p className="text-xs text-gray-500 mt-2 text-center">
+                        No payment after 24 hours upon booking will be cancelled
+                      </p>
+                    </div>
+                  )}
 
                   {/* Cancel Button */}
                   {booking.status === 'pending' && (
@@ -261,9 +514,115 @@ const MyBookingTab = ({ bookings, onCancelBooking }) => {
                       >
                         Cancel Booking
                       </button>
-                      <p className="text-xs text-gray-500 mt-2 text-center">
-                        Cancellation is free up to 24 hours before the booking
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+        </Tab>
+
+        <Tab key="accepted" title="Accepted">
+          <div className="overflow-y-auto max-h-[500px] scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
+            {filterBookings('accepted').length === 0 ? (
+              <p className="text-gray-500 text-center">No accepted bookings at the moment.</p>
+            ) : (
+              filterBookings('accepted').map((booking) => (
+                <div
+                  key={booking.booking_id}
+                  className="bg-white shadow-lg rounded-lg p-4 border border-gray-200 mb-4"
+                >
+                  {/* Booking Title */}
+                  <h4 className="font-bold text-xl mb-2">{booking.productName}</h4>
+                  <h1 className='mb-3 flex items-center gap-3'><BsFillPersonLinesFill/><strong > BOOKING ID: </strong>{booking.booked_id}</h1>
+                  <h1 className='mb-3 flex items-center gap-3'><BsFillPersonLinesFill/><strong > Name: </strong>{booking.customerName}</h1>
+                  {/* Booking Details with Icons */}
+
+                  
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-3">
+                      <FaCalendarAlt className="text-gray-500" />
+                      <p>
+                        <strong>Date:</strong>{' '}
+                        {new Date(booking.dateIn).toLocaleDateString('en-US', {
+                          weekday: 'long',
+                          month: 'long',
+                          day: 'numeric',
+                          year: 'numeric',
+                          timeZone: 'Asia/Manila', 
+                        })}
                       </p>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <FaClock className="text-gray-500" />
+                      <p>
+                        <strong>Time:</strong> {new Date(booking.dateIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <FaUser className="text-gray-500" />
+                      <p>
+                        <strong>Guests:</strong> {booking.numberOfGuests}
+                      </p>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <FaEnvelope className="text-gray-500" />
+                      <p>
+                        <strong>Email:</strong> {booking.email}
+                      </p>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <FaPhone className="text-gray-500" />
+                      <p>
+                        <strong>Phone:</strong> {booking.phone}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center space-x-3">
+                      <FaComment className="text-gray-500" />
+                      <p>
+                        <strong>Special Requests:</strong> {booking.specialRequests ? booking.specialRequests : 'None'}
+                      </p>
+                    </div>
+                    
+                    <div className="flex items-center space-x-3">
+                      <FaMoneyBillWave className="text-gray-500" />
+                      <p>
+                        <strong>Amount:</strong> ₱{parseFloat(booking.priceDetails.amountToPay).toLocaleString()}
+                      </p>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <FaMoneyBillWave className="text-gray-500" />
+                      <p>
+                        <strong>Payment Status:</strong> {booking.paymentStatus}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Cancel Button */}
+                  {booking.paymentStatus === 'Pending' && (
+                    <div className="mt-6">
+                      <button
+                        onClick={() => openPayBooking(booking)}
+                        className="w-full bg-color1 text-white py-2 px-4 rounded-lg hover:bg-color2 transition"
+                      >
+                        Pay Now
+                      </button>
+                      <p className="text-xs text-gray-500 mt-2 text-center">
+                        No payment after 24 hours upon booking will be cancelled
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Cancel Button */}
+                  {booking.status === 'pending' && (
+                    <div className="mt-6">
+                      <button
+                        onClick={() => onCancelBooking(booking.booking_id)}
+                        className="w-full bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition"
+                      >
+                        Cancel Booking
+                      </button>
                     </div>
                   )}
                 </div>
@@ -285,6 +644,7 @@ const MyBookingTab = ({ bookings, onCancelBooking }) => {
                 >
                   {/* Booking Title */}
                   <h4 className="font-bold text-xl mb-2">{booking.productName}</h4>
+                  <h1 className='mb-3 flex items-center gap-3'><BsFillPersonLinesFill/><strong > BOOKING ID: </strong>{booking.booked_id}</h1>
                   <h1 className='mb-3 flex items-center gap-3'><BsFillPersonLinesFill/><strong > Name: </strong>{booking.customerName}</h1>
                   {/* Booking Details with Icons */}
                   <div className="space-y-3">
@@ -326,11 +686,11 @@ const MyBookingTab = ({ bookings, onCancelBooking }) => {
                     </div>
 
                     <div className="flex items-center space-x-3">
-                    <FaComment className="text-gray-500" />
-                    <p>
-                      <strong>Special Requests:</strong> {booking.specialRequests ? booking.specialRequests : 'None'}
-                    </p>
-                  </div>
+                      <FaComment className="text-gray-500" />
+                      <p>
+                        <strong>Special Requests:</strong> {booking.specialRequests ? booking.specialRequests : 'None'}
+                      </p>
+                    </div>
                     
                     <div className="flex items-center space-x-3">
                       <FaMoneyBillWave className="text-gray-500" />
@@ -338,8 +698,27 @@ const MyBookingTab = ({ bookings, onCancelBooking }) => {
                         <strong>Amount:</strong> ₱{parseFloat(booking.priceDetails.discountedPrice).toLocaleString()}
                       </p>
                     </div>
+                    <div className="flex items-center space-x-3">
+                      <FaMoneyBillWave className="text-gray-500" />
+                      <p>
+                        <strong>Payment Status:</strong> {booking.paymentStatus}
+                      </p>
+                    </div>
                   </div>
-
+                  {/* Cancel Button */}
+                  {booking.paymentStatus === 'Pending' && (
+                    <div className="mt-6">
+                      <button
+                        onClick={() => openPayBooking(booking)}
+                        className="w-full bg-color1 text-white py-2 px-4 rounded-lg hover:bg-color2 transition"
+                      >
+                        Pay Now
+                      </button>
+                      <p className="text-xs text-gray-500 mt-2 text-center">
+                        No payment after 24 hours upon booking will be cancelled
+                      </p>
+                    </div>
+                  )}
                 </div>
               ))
             )}
@@ -359,6 +738,7 @@ const MyBookingTab = ({ bookings, onCancelBooking }) => {
                 >
                   {/* Booking Title */}
                   <h4 className="font-bold text-xl mb-2">{booking.productName}</h4>
+                  <h1 className='mb-3 flex items-center gap-3'><BsFillPersonLinesFill/><strong > BOOKING ID: </strong>{booking.booked_id}</h1>
                   <h1 className='mb-3 flex items-center gap-3'><BsFillPersonLinesFill/><strong > Name: </strong>{booking.customerName}</h1>
 
                   {/* Booking Details with Icons */}
@@ -443,6 +823,11 @@ const UserProfile = ({ activities = [] }) => {
   const [showButton, setShowButton] = useState(false);
   const [bookings, setBookings] = useState([]);
   const [loadingSpinning, setLoadingSpinning] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState(null);
+
+
+  console.log("bookings:   ", bookings);
 
   useEffect(() => {
     document.title = 'RabaSorsogon | Profile';
@@ -463,6 +848,33 @@ const UserProfile = ({ activities = [] }) => {
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const openPaymentModal = (booking) => {
+    setSelectedBooking(booking);
+    setShowPaymentModal(true);
+  };
+
+  const closePaymentModal = () => {
+    setSelectedBooking(null);
+    setShowPaymentModal(false);
+  };
+
+  const handlePayBooking = async (booking) => {
+    console.log("bookings: ", booking);
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you really want to pay for this booking?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#0BDA51',
+      cancelButtonColor: '#D33736',
+      confirmButtonText: 'Yes, pay!',
+      cancelButtonText: 'Cancel'
+    });
+    if (result.isConfirmed) {
+      openPaymentModal(booking);
+    }
   };
 
   const handleCancelBooking = async (bookingId) => {
@@ -1124,7 +1536,7 @@ const UserProfile = ({ activities = [] }) => {
               <Tab key="myBookings" title="My Bookings">
                 <Card>
                   <CardBody className='p-6 min-h-[700px]'>
-                    <MyBookingTab bookings={bookings} onCancelBooking={handleCancelBooking} />
+                    <MyBookingTab bookings={bookings} onCancelBooking={handleCancelBooking} openPayBooking={handlePayBooking} />
                   </CardBody>
                 </Card>
               </Tab>
@@ -1135,6 +1547,12 @@ const UserProfile = ({ activities = [] }) => {
             isBusinessOpen={isBusinessOpen}
             onBusinessOpenChange={onBusinessOpenChange}
             userData={userData}
+          />
+
+          <PaymentModal
+            booking={selectedBooking}
+            show={showPaymentModal}
+            onClose={closePaymentModal}
           />
 
           <Footer />

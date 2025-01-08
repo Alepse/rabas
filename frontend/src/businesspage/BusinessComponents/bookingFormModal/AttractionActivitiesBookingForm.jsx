@@ -285,15 +285,17 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
 
       const responseData = await response.json(); // Parse the response to get the data
       const bookingId = responseData.booking_id; // Assuming the server returns the booking ID as 'booking_id'
+      const booked_id = responseData.booked_id; // Assuming the server returns the
 
       const message = {
         sender_id: userId, // Assuming formData contains userId
         sender_account: 'user', // Assuming formData contains userAccount
         receiver_id: product.user_id, // Assuming formData contains businessId
         receiver_account: 'business', // Assuming formData contains businessAccount
-        text: `You have successfully reserved: ${product.name} for ₱${Number(formData.discountedPrice).toFixed(2)}.`,
+        text: `Booking details for: ${product.name}`,
         formType: 'activityBooking',
         form_details: JSON.stringify({
+          booked_id: booked_id,
           product_id: product.product_id,
           booking_id: bookingId, // Use the extracted booking ID
           email: formData.email,
@@ -322,7 +324,7 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
 
       Swal.fire({
         title: 'Reservation Confirmed!',
-        text: `You have successfully reserved: ${product.name} for ₱${Number(formData.discountedPrice).toFixed(2)}.`,
+        text: `You have successfully reserved: ${product.name} for ₱${Number(formData.discountedPrice).toFixed(2)}.\n\nPlease proceed to your bookings for Payment`,
         icon: 'success',
         confirmButtonColor: '#0BDA51'
       }).then(() => {

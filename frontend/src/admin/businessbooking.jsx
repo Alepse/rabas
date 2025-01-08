@@ -25,6 +25,7 @@ import { MdPeople, MdEmail, MdPhone, MdDateRange, MdHotel, MdRestaurant, MdDirec
 import Swal from 'sweetalert2';
 import axios from 'axios';
 import { Skeleton } from "@nextui-org/skeleton";
+
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
@@ -61,114 +62,252 @@ const showErrorAlert = (message) => {
 };
 
 // Booking card component for displaying individual bookings
-const BookingCard = ({ booking, onOpenChatModal, onMarkAsCompleted, onAcceptBooking }) => (
-  <div className="p-3 bg-white shadow-md rounded-lg flex flex-col w-full gap-2 transition-shadow duration-300 ease-in-out hover:shadow-2xl">
-    <div className='flex justify-between items-center'>
-      <h2 className="text-lg font-semibold text-gray-800">{booking.customerName}</h2>
-      <div className='flex gap-2 cursor-pointer' onClick={onOpenChatModal}>
-        <Badge content="1" color="danger">
-          <PiChatCircleText className='text-2xl cursor-pointer hover:text-color2' />
-        </Badge>
+const BookingCard = ({ booking, onOpenChatModal, onMarkAsCompleted, onAcceptBooking }) => {
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+
+  const handleShowPaymentModal = () => {
+    setShowPaymentModal(true);
+  };
+
+  const handleConfirmPayment = async (bookingId) => {
+    if (bookingId) {
+      try {
+        const status = 1;
+        const response = await fetch(`${BASE_URL}/update-payment-status/${bookingId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ status }),
+        });
+    
+        const data = await response.json();
+    
+        if (response.ok) {
+          // Show success message
+          showSuccessAlert(data.message || 'Payment status updated successfully.');
+          handleClosePaymentModal();
+        } else {
+          // Handle error response
+          showErrorAlert(data.message || 'Failed to update payment status.');
+          handleClosePaymentModal();
+        }
+      } catch (error) {
+        console.error('Error confirming payment:', error);
+        showErrorAlert('An error occurred while confirming payment. Please try again later.');
+        handleClosePaymentModal();
+      }
+    }
+  };
+  
+
+  const handleClosePaymentModal = () => {
+    setShowPaymentModal(false);
+  };
+
+  return (
+    <div className="p-3 bg-white shadow-md rounded-lg flex flex-col w-full gap-2 transition-shadow duration-300 ease-in-out hover:shadow-2xl">
+      <div className="flex justify-between items-center">
+        <h2 className="text-lg font-semibold text-gray-800">{booking.customerName}</h2>
+        <div className="flex gap-2 cursor-pointer" onClick={onOpenChatModal}>
+          <Badge content="1" color="danger">
+            <PiChatCircleText className="text-2xl cursor-pointer hover:text-color2" />
+          </Badge>
+        </div>
       </div>
-    </div>
 
-    <p className="text-gray-500">
-      <strong>Product:</strong> {booking.productName || 'Sample Product'}
-    </p>
-    <p className="text-gray-500">
-      <MdPeople className="inline-block text-lg" /><strong> Guests:</strong> {booking.numberOfGuests || '2'}
-    </p>
-    <p className="text-gray-500">
-      <MdEmail className="inline-block text-lg" /><strong> Email:</strong> {booking.email || 'john.doe@example.com'}
-    </p>
-    <p className="text-gray-500">
-      <MdPhone className="inline-block text-lg" /><strong> Phone:</strong> {booking.phone || '123-456-7890'}
-    </p>
+      <p className="text-gray-500">
+        <strong>Booking ID:</strong> {booking.booked_id}
+      </p>
+      <p className="text-gray-500">
+        <strong>Product:</strong> {booking.productName || 'Product Name not Found'}
+      </p>
+      <p className="text-gray-500">
+        <MdPeople className="inline-block text-lg" />
+        <strong> Guests:</strong> {booking.numberOfGuests || '2'}
+      </p>
+      <p className="text-gray-500">
+        <MdEmail className="inline-block text-lg" />
+        <strong> Email:</strong> {booking.email || 'john.doe@example.com'}
+      </p>
+      <p className="text-gray-500">
+        <MdPhone className="inline-block text-lg" />
+        <strong> Phone:</strong> {booking.phone || '123-456-7890'}
+      </p>
 
-    {booking.type === 'Accommodation' && (
-      <>
-        <p className="text-gray-500">
-          <MdDateRange className="inline-block text-lg" /><strong> Check-in:</strong> {booking.checkInDate}
-        </p>
-        <p className="text-gray-500">
-          <MdDateRange className="inline-block text-lg" /><strong> Check-out:</strong> {booking.checkOutDate}
-        </p>
-      </>
-    )}
-    {booking.type === 'Table Reservation' && (
-      <>
-        <p className="text-gray-500">
-          <MdDateRange className="inline-block text-lg" /><strong> Reservation Date:</strong> {booking.reservationDate}
-        </p>
-        <p className="text-gray-500">
-          <strong>Reservation Time:</strong> {booking.reservationTime}
-        </p>
-      </>
-    )}
-    {booking.type === 'Attraction' && (
-      <>
-        <p className="text-gray-500">
-          <MdDateRange className="inline-block text-lg" /><strong> Activity Date:</strong> {booking.visitDate}
-        </p>
-        <p className="text-gray-500">
-          <strong>Activities:</strong> {booking.activities.join(', ')}
-        </p>
-      </>
-    )}
-
-    <p className="text-gray-500">
-      <strong>Special Requests:</strong> {booking.specialRequests || 'None'}
-    </p>
-    <p className="text-gray-500">
-      <strong>Total Amount:</strong> ₱{booking.amount || '0'}
-    </p>
-
-    <Badge color={booking.status === 'Pending' ? 'warning' : booking.status === 'Active' ? 'success' : 'default'}>
-    <p className="text-gray-500">
-      <strong>Status:</strong> {booking.status}
-    </p> 
-    </Badge>
-
-    <div className="flex justify-between items-center">
-      {booking.status === 'Pending' ? (
+      {booking.type === 'Accommodation' && (
         <>
-        {/* Nasira kaya tinanggal muna HAHHAHHAHAAAH */}
-        {/* <Button
-            auto
-            color="danger" // Red color for decline
-            onClick={() => onDeclineBooking(booking.id)} // Pass the booking ID for decline
-            className="px-4"
-          >
-            <div className="flex items-center gap-2">
-              Decline Booking
-            </div>
-          </Button>
+          <p className="text-gray-500">
+            <MdDateRange className="inline-block text-lg" />
+            <strong> Check-in:</strong> {booking.checkInDate}
+          </p>
+          <p className="text-gray-500">
+            <MdDateRange className="inline-block text-lg" />
+            <strong> Check-out:</strong> {booking.checkOutDate}
+          </p>
+        </>
+      )}
+      {booking.type === 'Table Reservation' && (
+        <>
+          <p className="text-gray-500">
+            <MdDateRange className="inline-block text-lg" />
+            <strong> Reservation Date:</strong> {booking.reservationDate}
+          </p>
+          <p className="text-gray-500">
+            <strong>Reservation Time:</strong> {booking.reservationTime}
+          </p>
+        </>
+      )}
+      {booking.type === 'Attraction' && (
+        <>
+          <p className="text-gray-500">
+            <MdDateRange className="inline-block text-lg" />
+            <strong> Activity Date:</strong> {booking.visitDate}
+          </p>
+          <p className="text-gray-500">
+            <strong>Activities:</strong> {booking.activities.join(', ')}
+          </p>
+        </>
+      )}
+
+      <p className="text-gray-500">
+        <strong>Special Requests:</strong> {booking.specialRequests || 'None'}
+      </p>
+      <p className="text-gray-500">
+        <strong>Total Amount:</strong> ₱{booking.amount || '0'}
+      </p>
+      <Badge color={booking.payment === 'Pending' ? 'warning' : booking.payment === 'Paid' ? 'success' : 'default'}>
+        <p className="text-gray-500">
+          <strong>Payment Status: </strong>{booking.payment}
+        </p>
+      </Badge>
+
+      <Badge color={booking.status === 'Pending' ? 'warning' : booking.status === 'Paid' ? 'success' : 'default'}>
+        <p className="text-gray-500">
+          <strong>Booking Status:</strong> {booking.status}
+        </p>
+      </Badge>
+
+      <div className="flex justify-between items-center">
+      {booking.payment === 'Processing' && (
+          <>
+            <Button
+              onClick={handleShowPaymentModal}
+              style={{ padding: '8px 16px', color: 'white', border: 'none', cursor: 'pointer' }}
+              className="bg-color1 hover:bg-color2"
+            >
+              Check Payment Status
+            </Button>
+
+            <Modal isOpen={showPaymentModal} isDismissable={false} onClose={handleClosePaymentModal}>
+              <ModalContent style={{ borderRadius: '8px', padding: '1rem', backgroundColor: '#f9f9f9' }}>
+                <ModalHeader>
+                  <h3
+                    style={{
+                      fontSize: '1.5rem',
+                      fontWeight: 'bold',
+                      color: '#333',
+                      textAlign: 'center',
+                      marginBottom: '0.5rem',
+                    }}
+                  >
+                    Check Payment
+                  </h3>
+                </ModalHeader>
+
+                <ModalBody style={{ padding: '1.5rem', color: '#555' }}>
+                  {booking.paymentDetails ? (
+                    <>
+                      <p><strong>Booking ID:</strong> {booking.booked_id}</p>
+                      <p><strong>Account Name:</strong> {booking.paymentDetails.accountName}</p>
+                      <p><strong>Account Number:</strong> {booking.paymentDetails.accountNumber}</p>
+                      <p><strong>Reference Number:</strong> {booking.paymentDetails.referenceNumber}</p>
+                      <div
+                        style={{
+                          marginTop: '1.5rem',
+                          textAlign: 'center',
+                          padding: '1rem',
+                          backgroundColor: '#fff',
+                          borderRadius: '8px',
+                          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                        }}
+                      >
+                        <img
+                          src={`${BASE_URL}/${booking.paymentDetails.picture}`}
+                          alt="Payment image"
+                          style={{
+                            maxWidth: '100%',
+                            maxHeight: '200px',
+                            borderRadius: '8px',
+                            objectFit: 'contain',
+                          }}
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <p>No payment details available.</p>
+                  )}
+                </ModalBody>
+
+                <ModalFooter style={{ justifyContent: 'space-between', marginTop: '1rem' }}>
+                  <Button
+                    auto
+                    flat
+                    color="error"
+                    style={{
+                      backgroundColor: '#ff6b6b',
+                      color: '#fff',
+                      padding: '0.5rem 1.25rem',
+                      borderRadius: '6px',
+                      fontWeight: 'bold',
+                    }}
+                    onClick={handleClosePaymentModal}
+                  >
+                    Close
+                  </Button>
+                  <Button
+                    auto
+                    flat
+                    color="success"
+                    style={{
+                      backgroundColor: '#51cf66',
+                      color: '#fff',
+                      padding: '0.5rem 1.25rem',
+                      borderRadius: '6px',
+                      fontWeight: 'bold',
+                    }}
+                    onClick={() => handleConfirmPayment(booking.id)} // Pass a function
+                  >
+                    Confirm
+                  </Button>
+                </ModalFooter>
+              </ModalContent>
+            </Modal>
+          </>
+        )}
+      </div>
+
+      <div className="flex justify-between items-center">
+        {booking.status === 'Pending' ? (
+          <>
+            {/* No action for Pending */}
+          </>
+        ) : booking.status === 'Active' && (
           <Button
             auto
             color="success"
-            onClick={() => onAcceptBooking(booking.id)}
+            onClick={() => onMarkAsCompleted(booking.id)}
             className="px-4 text-white"
           >
             <div className="flex items-center gap-2">
-              Accept Booking
+              Mark as Completed
             </div>
-          </Button> */}
-        </>
-      ) : booking.status === 'Active' && (
-        <Button
-          auto
-          color="success"
-          onClick={() => onMarkAsCompleted(booking.id)}
-          className="px-4 text-white"
-        >
-          <div className="flex items-center gap-2">
-            Mark as Completed
-          </div>
-        </Button>
-      )}
+          </Button>
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 // Form component
 const BookingForm = ({ isOpen, onClose, title, products, onSubmit, type }) => {

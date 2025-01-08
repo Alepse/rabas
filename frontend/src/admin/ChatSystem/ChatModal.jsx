@@ -288,17 +288,9 @@ const AvailabilityModalActivity = ({ isOpen, onClose, currentBookingDetails, onA
 const BookingDetailsCard = ({ message, onCheckAvailability, isSenderYou }) => {
   return (
     <div className={`bg-white shadow-md text-black p-4 rounded-lg border border-gray-200 ${isSenderYou ? 'ml-auto' : 'mr-auto'} max-w-full sm:max-w-sm break-words`}>
-      <p className="font-semibold mb-2 break-words">{message.text}</p>
-      {message.formDetails?.imageUrl && (
-        <img
-          src={message.formDetails.imageUrl}
-          alt={message.formDetails.productName}
-          className="w-full h-auto mt-2 rounded-lg max-h-40 object-cover"
-        />
-      )}
-      <div className="p-3 mt-3 bg-gray-50 rounded-lg text-sm text-black border border-gray-200 break-words">
-        <h4 className="font-semibold mb-2">Booking Details:</h4>
+        {/* <h4 className="font-semibold mb-2">Booking Details:</h4> */}
         <ul className="space-y-1">
+          <li><strong>Booking ID:</strong> {message.formDetails?.booked_id}</li>
           <li><strong>Product:</strong> {message.formDetails?.productName}</li>
           <li><MdPeople className="inline-block text-lg" /> <strong> Guests:</strong> {message.formDetails?.numberOfGuests}</li>
           <li><MdEmail className="inline-block text-lg" /> <strong> Email:</strong> {message.formDetails?.email}</li>
@@ -382,20 +374,52 @@ const BookingDetailsCard = ({ message, onCheckAvailability, isSenderYou }) => {
                   </li>
                 </>
               ) : null}
-             
             </>
           )}
           
           <li><strong>Special Requests:</strong> {message.formDetails?.specialRequests || 'None'}</li>
           <li><strong>Total Amount:</strong> ₱{message.formDetails?.amount || '0'}</li>
-        </ul>
+          <li><strong>Payment Status:</strong> {message.payment_status || 'Pending'}</li>
+          <li><strong>Booking Status:</strong> {message.status || 'Pending'}</li>
 
-        {message.formType !== 'bookingAccepted' && message.formType !== 'bookingDeclined' && (
-          <Button size='sm' auto color="primary" onClick={() => onCheckAvailability(message)} className="mt-2">
-            Check Availability
-          </Button>
+        </ul>
+        {message.status === 'pending' && (
+          <>
+          {message.formType !== 'bookingAccepted' && message.formType !== 'bookingDeclined' && (
+            <Button size='sm' auto color="primary" onClick={() => onCheckAvailability(message)} className="mt-2">
+              Check Availability
+            </Button>
+          )}
+          </>
         )}
-      </div>
+      {/* </div> */}
+    </div>
+  );
+};
+
+const PaymentDetailsCard = ({ message, onConfirmPayment, isSenderYou }) => {
+  // console.log(message);
+  return (
+    <div className={`bg-white shadow-md text-black p-4 rounded-lg border border-gray-200 ${isSenderYou ? 'ml-auto' : 'mr-auto'} max-w-full sm:max-w-sm break-words`}>
+        {/* <h4 className="font-semibold mb-2">Booking Details:</h4> */}
+        <ul className="space-y-1">
+          <li><strong>Booking ID: </strong>{message.formDetails?.booked_id}</li>
+          <li><strong>Account Name: </strong>{message.formDetails?.accountName}</li>
+          <li><strong>Account Number: </strong>{message.formDetails?.accountNumber}</li>
+          <li><strong>Reference Number: </strong>{message.formDetails?.referenceNumber}</li>
+          {message.payment_status === "Processing" ? (
+            <li>
+              <strong>Payment Status: </strong>
+              <Button size='md' auto color="primary" onClick={() => onConfirmPayment(message.formDetails?.booking_id)} className="mt-2">
+                Confirm
+              </Button>
+            </li>
+            
+          ) : (
+            <li><strong>Payment Status: </strong>{message.payment_status}</li>
+          )}
+        </ul>
+      {/* </div> */}
     </div>
   );
 };
@@ -747,6 +771,38 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
     setAvailabilityModalOpen(true);
   };
 
+  const handleConfirmPayment = async (bookingId) => {
+  
+    try {
+      // Prepare the status you want to update, for example, "completed"
+      const status = 1;  // Or any other status depending on your logic
+  
+      const response = await fetch(`${BASE_URL}/update-payment-status/${bookingId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status }), // Send status in the body
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to update payment status');
+      }
+  
+      const result = await response.json();
+      showSuccessAlert('Paymend Confirmed.')
+  
+      // You can perform additional actions here like updating the UI
+    } catch (error) {
+      console.error('Error confirming payment:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Payment Confirmation Failed',
+        text: 'An error occurred while confirming the payment. Please try again.',
+      });
+    }
+  };  
+
   // Formats the time in AM/PM format
   const formatTime = (date) => {
     let hours = date.getHours();
@@ -1079,7 +1135,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
   const renderUserList = () => {
     // Flatten the nested array structure
     const flattenedUsers = users.flat();  // Merge nested arrays into a single array
-    console.log('flattenedUsers', flattenedUsers);
+    // console.log('flattenedUsers', flattenedUsers);
     return flattenedUsers.map((user) => (
       <li key={user.user_id}
         className={`p-3 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-300 ${
@@ -1165,7 +1221,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
             {message.formDetails &&
               Object.keys(message.formDetails).some((key) => message.formDetails[key] !== null) && (
                 <>
-                  {message.formType !== "inquire" && (
+                  {["activityBooking", "accommodationBooking", "tableReservation"].includes(message.formType) && (
                     <BookingDetailsCard
                       message={message}
                       isSender={isSenderYou}
@@ -1174,6 +1230,13 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
                   )}
                   {message.formType === "inquire" && (
                     <ProductCard product={message.formDetails.selectedProduct} />
+                  )}
+                  {message.formType === "payment" && (
+                    <PaymentDetailsCard 
+                      message={message}
+                      isSender={isSenderYou}
+                      onConfirmPayment={handleConfirmPayment}
+                    />
                   )}
                 </>
               )
@@ -1215,7 +1278,7 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
   };
 
   return (
-    <Modal disableAnimation isOpen={isOpen} onClose={onClose} hideCloseButton={true} size="full"
+    <Modal disableAnimation isDismissable={false} isOpen={isOpen} onClose={onClose} hideCloseButton={true} size="full"
       className="bg-white transition-colors duration-300 w-full h-full">
       <ModalContent className="w-full h-full">
         <ModalHeader className="flex justify-between items-center px-6 py-4">

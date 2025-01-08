@@ -268,15 +268,17 @@ const TableReservationForm = ({ isOpen, onClose, product = {} }) => {
 
       const responseData = await response.json();
       const bookingId = responseData.booking_id;
+      const booked_id = responseData.booked_id;
 
       const message = {
         sender_id: userId,
         sender_account: 'user',
         receiver_id: product.user_id,
         receiver_account: 'business',
-        text: `You have successfully reserved: ${product.name} for ₱${Number(formData.discountedPrice).toFixed(2)}.`,
+        text: `Booking details for: ${product.name}`,
         formType: 'tableReservation',
         form_details: JSON.stringify({
+          booked_id: booked_id,
           product_id: product.product_id,
           booking_id: bookingId,
           email: formData.email,
@@ -305,7 +307,7 @@ const TableReservationForm = ({ isOpen, onClose, product = {} }) => {
 
       Swal.fire({
         title: 'Reservation Confirmed!',
-        text: `You have successfully reserved: ${product.name} for ₱${Number(formData.discountedPrice).toFixed(2)}.`,
+        text: `You have successfully reserved: ${product.name} for ₱${Number(formData.discountedPrice).toFixed(2)}.\n\nPlease proceed to your bookings for Payment`,
         icon: 'success',
         confirmButtonColor: '#0BDA51'
       }).then(() => {

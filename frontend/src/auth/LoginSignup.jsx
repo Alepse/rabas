@@ -73,16 +73,27 @@ const LoginSignup = () => {
       const data = await response.json();
       if (data.success) {
         setLoadingSpinning(false);
-        setOtpSession(data.sessionId); // Save OTP session ID
-        // console.log('OtpSession saved', data);
-        setView("loginotp"); // Redirect to OTP view
-        Swal.fire('OTP Sent!', 'Check your email for the OTP.', 'success');
-        setIsOtpSent(true); //
+        Swal.fire({
+          title: 'Login Successful!',
+          text: ' ',
+          icon: 'success',
+          showConfirmButton: false,
+          timer: 1500,
+        }).then(() => {         
+          window.location.href = '/'; // Redirect to home page after the alert is closed
+        });
       } else {
         setLoadingSpinning(false);
-        showErrorAlert('Login Failed!', data.message);
+        Swal.fire({
+          title: 'Login Failed!',
+          text: 'Invalid username or password',
+          icon: 'error',
+          showConfirmButton: false,
+          timer: 2000,
+        });
       }
     } catch (error) {
+      setLoadingSpinning(false);
       console.error('Error:', error); 
       alert('An error occurred while logging in. Please try again later.'); // Display a generic error message to the user      
     }

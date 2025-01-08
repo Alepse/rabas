@@ -23,7 +23,7 @@ export const fetchBookings = createAsyncThunk(
         credentials: 'include'
       });
       const data = await response.json();
-      // console.log('data', data);
+      console.log('data', data);
       if (!data.success) {
         throw new Error(data.message);
       }
@@ -48,10 +48,20 @@ export const fetchBookings = createAsyncThunk(
             default: return 'Pending';
           }
         };
+
+        const getPaymentString = (status) => {
+          switch(Number(status)) {
+            case 0: return 'Pending';
+            case 1: return 'Paid';
+            case 2: return 'Processing';
+            default: return 'Pending';
+          }
+        };
         
         const formattedBooking = {
           // IDs
           id: booking.booking_id,
+          booked_id: booking.booked_id,
           userId: booking.user_id,
           businessId: booking.business_id,
           productId: booking.product_id,
@@ -82,10 +92,20 @@ export const fetchBookings = createAsyncThunk(
           amount: booking.discountedPrice,
           
           // Status
-          status: getStatusString(booking.status)
+          status: getStatusString(booking.status),
+
+          payment: getPaymentString(booking.paymentStatus),
+
+          paymentDetails: {
+            accountName: booking.accountName,
+            accountNumber: booking.accountNumber,
+            referenceNumber: booking.referenceNumber,
+            picture: booking.image,
+            date: booking.paymentReceived
+          }
         };
 
-        // console.log('Formatting booking:', formattedBooking);
+        console.log('Formatting booking:', formattedBooking);
 
         if (formattedBooking.userId === 0) {
           if (formattedBooking.status === 'Active') {

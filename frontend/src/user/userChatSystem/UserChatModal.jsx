@@ -27,23 +27,24 @@ const BookingDetailsCard = ({ message, isSender }) => {
     <div className="bg-white shadow-md text-black p-4 rounded-lg border border-gray-200 mt-2 max-w-md mx-auto sm:max-w-lg md:max-w-xl">
       <h4 className="font-semibold mb-2 text-base sm:text-lg md:text-xl">Booking Details:</h4>
       <ul className="space-y-2 text-sm sm:text-base">
+        <li><strong>Booking ID: </strong> {message.formDetails?.booked_id}</li>
         <li>
-          <strong>Product:</strong> 
+          <strong>Product: </strong> 
           <span className="block sm:inline">{message.formDetails?.productName || 'No product provided'}</span>
         </li>
         <li>
           <MdPeople className="inline-block text-lg" /> 
-          <strong> Guests:</strong> 
+          <strong> Guests: </strong> 
           <span className="block sm:inline">{message.formDetails?.numberOfGuests || 'No guests provided'}</span>
         </li>
         <li>
           <MdEmail className="inline-block text-lg" /> 
-          <strong> Email:</strong> 
+          <strong> Email: </strong> 
           <span className="break-words">{message.formDetails?.email || 'No email provided'}</span>
         </li>
         <li>
           <MdPhone className="inline-block text-lg" /> 
-          <strong> Phone:</strong> 
+          <strong> Phone: </strong> 
           <span className="block sm:inline">{message.formDetails?.phone || 'No number provided'}</span>
         </li>
 
@@ -51,12 +52,12 @@ const BookingDetailsCard = ({ message, isSender }) => {
           <>
             <li>
               <MdDateRange className="inline-block text-lg" /> 
-              <strong> Check-in:</strong> 
+              <strong> Check-in: </strong> 
               <span className="block sm:inline">{`${message.formDetails?.checkInOutDates?.start?.day}-${message.formDetails?.checkInOutDates?.start?.month}-${message.formDetails?.checkInOutDates?.start?.year}`}</span>
             </li>
             <li>
               <MdDateRange className="inline-block text-lg" /> 
-              <strong> Check-out:</strong> 
+              <strong> Check-out: </strong> 
               <span className="block sm:inline">{`${message.formDetails?.checkInOutDates?.end?.day}-${message.formDetails?.checkInOutDates?.end?.month}-${message.formDetails?.checkInOutDates?.end?.year}`}</span>
             </li>
           </>
@@ -66,11 +67,11 @@ const BookingDetailsCard = ({ message, isSender }) => {
           <>
             <li>
               <MdDateRange className="inline-block text-lg" /> 
-              <strong> Reservation Date:</strong> 
+              <strong> Reservation Date: </strong> 
               <span className="block sm:inline">{`${message.formDetails?.reservationDate?.day}-${message.formDetails?.reservationDate?.month}-${message.formDetails?.reservationDate?.year}`}</span>
             </li>
             <li>
-              <strong> Reservation Time:</strong> 
+              <strong> Reservation Time: </strong> 
               <span className="block sm:inline">{new Date(`1970-01-01T${message.formDetails?.reservationTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</span>
             </li>
           </>
@@ -80,11 +81,11 @@ const BookingDetailsCard = ({ message, isSender }) => {
           <>
             <li>
               <MdDateRange className="inline-block text-lg" /> 
-              <strong> Activity Date:</strong> 
+              <strong> Activity Date: </strong> 
               <span className="block sm:inline">{`${message.formDetails?.visitDate?.day}-${message.formDetails?.visitDate?.month}-${message.formDetails?.visitDate?.year}`}</span>
             </li>
             <li>
-              <strong>Activity Time:</strong> 
+              <strong>Activity Time: </strong> 
               <span className="block sm:inline">{new Date(`1970-01-01T${message.formDetails?.activityTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</span>
             </li>
           </>
@@ -96,12 +97,12 @@ const BookingDetailsCard = ({ message, isSender }) => {
               <>
                 <li>
                   <MdDateRange className="inline-block text-lg" /> 
-                  <strong> Check-in:</strong> 
+                  <strong> Check-in: </strong> 
                   <span className="block sm:inline">{`${message.formDetails?.checkInOutDates?.start?.day}-${message.formDetails?.checkInOutDates?.start?.month}-${message.formDetails?.checkInOutDates?.start?.year}`}</span>
                 </li>
                 <li>
                   <MdDateRange className="inline-block text-lg" /> 
-                  <strong> Check-out:</strong> 
+                  <strong> Check-out: </strong> 
                   <span className="block sm:inline">{`${message.formDetails?.checkInOutDates?.end?.day}-${message.formDetails?.checkInOutDates?.end?.month}-${message.formDetails?.end?.year}`}</span>
                 </li>
               </>
@@ -109,11 +110,11 @@ const BookingDetailsCard = ({ message, isSender }) => {
               <>
                 <li>
                   <MdDateRange className="inline-block text-lg" /> 
-                  <strong> Reservation Date:</strong> 
+                  <strong> Reservation Date: </strong> 
                   <span className="block sm:inline">{`${message.formDetails?.reservationDate?.day}-${message.formDetails?.reservationDate?.month}-${message.formDetails?.reservationDate?.year}`}</span>
                 </li>
                 <li>
-                  <strong> Reservation Time:</strong> 
+                  <strong> Reservation Time: </strong> 
                   <span className="block sm:inline">{new Date(`1970-01-01T${message.formDetails?.reservationTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</span>
                 </li>
               </>
@@ -121,11 +122,11 @@ const BookingDetailsCard = ({ message, isSender }) => {
               <>
                 <li>
                   <MdDateRange className="inline-block text-lg" /> 
-                  <strong> Activity Date:</strong> 
+                  <strong> Activity Date: </strong> 
                   <span className="block sm:inline">{`${message.formDetails?.visitDate?.day}-${message.formDetails?.visitDate?.month}-${message.formDetails?.visitDate?.year}`}</span>
                 </li>
                 <li>
-                  <strong> Activity Time:</strong> 
+                  <strong> Activity Time: </strong> 
                   <span className="block sm:inline">{new Date(`1970-01-01T${message.formDetails?.activityTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</span>
                 </li>
               </>
@@ -133,13 +134,15 @@ const BookingDetailsCard = ({ message, isSender }) => {
           </>
         )}
         <li>
-          <strong>Special Requests:</strong> 
+          <strong>Special Requests: </strong> 
           <span className="block sm:inline">{message.formDetails?.specialRequests || 'None'}</span>
         </li>
         <li>
-          <strong>Total Amount:</strong> 
+          <strong>Total Amount: </strong> 
           <span className="block sm:inline">{message.formDetails?.amount || '₱0'}</span>
         </li>
+        <li><strong>Payment Status: </strong>{message.payment_status || 'Pending'}</li>
+        <li><strong>Booking Status: </strong>{message.status || 'Pending'}</li>
       </ul>
       </div>
   );
@@ -180,6 +183,21 @@ const ProductCard = ({ product }) => (
     </div>
   </div>
 );
+
+const PaymentDetailsCard = ({ message, isSenderYou }) => {
+  return (
+    <div className={`bg-white shadow-md text-black p-4 rounded-lg border border-gray-200 ${isSenderYou ? 'ml-auto' : 'mr-auto'} max-w-full sm:max-w-sm break-words`}>
+        {/* <h4 className="font-semibold mb-2">Booking Details:</h4> */}
+        <ul className="space-y-1">
+          <li><strong>Booking ID:</strong> {message.formDetails?.booked_id}</li>
+          <li><strong>Account Name:</strong> {message.formDetails?.accountName}</li>
+          <li><strong>Account Number:</strong> {message.formDetails?.accountNumber}</li>
+          <li><strong>Reference Number:</strong> {message.formDetails?.referenceNumber}</li>
+        </ul>
+      {/* </div> */}
+    </div>
+  );
+};
 
 // User Chat Modal Component
 const UserChatModal = ({ isOpen, onClose, onOpenChat }) => {
@@ -707,12 +725,18 @@ const UserChatModal = ({ isOpen, onClose, onOpenChat }) => {
               {message.formDetails &&
                 Object.keys(message.formDetails).some((key) => message.formDetails[key] !== null) && (
                   <>
-                    {message.formType !== "inquire" && (
+                    {["activityBooking", "accommodationBooking", "tableReservation"].includes(message.formType) && (
                       <BookingDetailsCard message={message} isSender={isSenderYou} />
                     )}
                     {message.formType === "inquire" && (
                       <ProductCard product={message.formDetails.selectedProduct} />
                     )}
+                    {message.formType === "payment" && (
+                    <PaymentDetailsCard 
+                      message={message}
+                      isSender={isSenderYou}
+                    />
+                  )}
                   </>
                 )
               }
@@ -843,44 +867,44 @@ const UserChatModal = ({ isOpen, onClose, onOpenChat }) => {
                   )}
 
                   <div className="flex items-center space-x-2 p-2 mt-2 h-14 rounded-lg  shadow-sm">
-  {/* Message Input */}
-  <textarea
-  value={messageInput}
-  onChange={(e) => setMessageInput(e.target.value)}
-  onKeyDown={handleKeyPress}
-  placeholder="Type a message..."
-  rows="1"
-  className="flex-grow text-sm h-full border border-gray-300 rounded-full px-4 py-1 focus:outline-none focus:ring-2 focus:ring-primary placeholder-gray-500 resize-none"
-/>
+                  {/* Message Input */}
+                    <textarea
+                      value={messageInput}
+                      onChange={(e) => setMessageInput(e.target.value)}
+                      onKeyDown={handleKeyPress}
+                      placeholder="Type a message..."
+                      rows="1"
+                      className="flex-grow text-sm h-full border border-gray-300 rounded-full px-4 py-1 focus:outline-none focus:ring-2 focus:ring-primary placeholder-gray-500 resize-none"
+                    />
 
 
-  {/* Image Upload */}
-  <div className="flex items-center">
-    <input
-      type="file"
-      accept="image/*"
-      onChange={handleImageChange}
-      className="hidden"
-      id="image-upload"
-    />
-    <label
-      htmlFor="image-upload"
-      className="cursor-pointer w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 transition"
-    >
-      <FiImage size={20} className="text-gray-500 hover:text-gray-700" />
-    </label>
-  </div>
+                  {/* Image Upload */}
+                  <div className="flex items-center">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="hidden"
+                      id="image-upload"
+                    />
+                    <label
+                      htmlFor="image-upload"
+                      className="cursor-pointer w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 transition"
+                    >
+                      <FiImage size={20} className="text-gray-500 hover:text-gray-700" />
+                    </label>
+                  </div>
 
-  {/* Send Button */}
-  <Button
-    color="primary"
-    onClick={handleSendMessage}
-    size="sm"
-    className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white hover:bg-primary-dark transition"
-  >
-    <FiSend size={18} />
-  </Button>
-</div>
+                  {/* Send Button */}
+                  <Button
+                    color="primary"
+                    onClick={handleSendMessage}
+                    size="sm"
+                    className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white hover:bg-primary-dark transition"
+                  >
+                    <FiSend size={18} />
+                  </Button>
+                </div>
 
 
                 {imagePreview && (

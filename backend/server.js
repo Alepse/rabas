@@ -271,41 +271,9 @@ app.post('/login', async (req, res) => {
       // Compare the provided password with the hashed password from the database
       const passwordMatch = await bcrypt.compare(password, user.password);
       if (passwordMatch) {
-
-        // Generate OTP and session ID
-        const otp = Math.floor(100000 + Math.random() * 900000); // 6-digit OTP
-        const sessionId = crypto.randomBytes(16).toString('hex'); // Unique session ID
-
-        // Save all user data along with OTP and session ID to the `otp_sessions` table
-        const otpSql = `
-          INSERT INTO otp_sessions (session_id, user_id, email, otp, expires_at)
-          VALUES (?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 10 MINUTE))
-        `;
-        await pool.query(otpSql, [sessionId, user.user_id, user.email, otp]);
-
-        // Send OTP to the user's email
-        const transporter = nodemailer.createTransport({
-          service: 'Gmail', // Replace with your email service provider
-          auth: {
-            user: process.env.GMAIL_USER, // Your email address
-            pass: process.env.GMAIL_PASS  // Your email password
-          }
-        });
-
-        await transporter.sendMail({
-          from: '"RabaSorsogon Support" <support@rabasorsogon.com>',
-          to: user.email,
-          subject: 'Your OTP Code for Login',
-          text: `Your OTP code is ${otp}. It will expire in 10 minutes.`
-        });
-
         // Set the user session
-        // req.session.user = { user_id: user.user_id };
-        return res.json({ 
-          success: true, 
-          message: 'Login successful. Please verify your OTP.',
-          sessionId: sessionId
-        });
+        req.session.user = { user_id: user.user_id };
+        return res.json({ success: true, message: 'Login successful' });
       } else {
         return res.status(401).json({ success: false, message: 'Invalid password' });
       }
@@ -2744,6 +2712,27 @@ app.post('/book-accommodation', async (req, res) => {
     return res.status(400).json({ success: false, message: 'Missing required fields' });
   }
 
+   // Function to generate a random 6-digit number for booked_id
+   const generateBookedId = () => {
+    return Math.floor(100000 + Math.random() * 900000); // Generates a number between 100000 and 999999
+  };
+
+  // Function to check if booked_id exists in the database
+  const isBookedIdUnique = async (booked_id) => {
+    const [rows] = await pool.query('SELECT COUNT(*) AS count FROM bookings WHERE booked_id = ?', [booked_id]);
+    return rows[0].count === 0; // Returns true if unique (count is 0)
+  };
+
+  // Generate a unique 6-digit booked_id
+  let booked_id;
+  let unique = false;
+
+  while (!unique) {
+    booked_id = generateBookedId();
+    unique = await isBookedIdUnique(booked_id);
+  }
+
+
   // Convert checkInOutDates to MySQL-compatible datetime format
   const formatDate = ({ year, month, day }) => 
     `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')} 00:00:00`;
@@ -2754,13 +2743,14 @@ app.post('/book-accommodation', async (req, res) => {
   try {
     const query = `
       INSERT INTO bookings (
-        user_id, business_id, product_id, customerName, productName, numberOfGuests, 
+        booked_id, user_id, business_id, product_id, customerName, productName, numberOfGuests, 
         email, phone, type, dateIn, dateOut, specialRequests, 
         originalPrice, discount, discountedPrice, amountToPay, status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
+      booked_id,       // Added unique booked_id
       user_id,
       business_id,
       product_id,
@@ -2787,6 +2777,7 @@ app.post('/book-accommodation', async (req, res) => {
       success: true,
       message: 'Booking added successfully',
       booking_id: result.insertId,
+      booked_id,
       user_id: user_id,
       business_id: business_id,
       customerName: `${firstName} ${lastName}`,
@@ -2851,6 +2842,26 @@ app.post('/book-table', async (req, res) => {
     return res.status(400).json({ success: false, message: 'Missing required fields' });
   }
 
+  // Function to generate a random 6-digit number for booked_id
+  const generateBookedId = () => {
+    return Math.floor(100000 + Math.random() * 900000); // Generates a number between 100000 and 999999
+  };
+
+  // Function to check if booked_id exists in the database
+  const isBookedIdUnique = async (booked_id) => {
+    const [rows] = await pool.query('SELECT COUNT(*) AS count FROM bookings WHERE booked_id = ?', [booked_id]);
+    return rows[0].count === 0; // Returns true if unique (count is 0)
+  };
+
+  // Generate a unique 6-digit booked_id
+  let booked_id;
+  let unique = false;
+
+  while (!unique) {
+    booked_id = generateBookedId();
+    unique = await isBookedIdUnique(booked_id);
+  }
+
   // Combine reservation date and time into a single datetime string
   const formatDate = ({ year, month, day }) => 
     `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
@@ -2861,13 +2872,14 @@ app.post('/book-table', async (req, res) => {
   try {
     const query = `
       INSERT INTO bookings (
-        user_id, business_id, product_id, customerName, productName, numberOfGuests, 
+        booked_id, user_id, business_id, product_id, customerName, productName, numberOfGuests, 
         email, phone, type, dateIn, dateOut, specialRequests, 
         originalPrice, discount, discountedPrice, amountToPay, status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
+      booked_id,
       user_id,
       business_id,
       product_id,
@@ -2894,6 +2906,7 @@ app.post('/book-table', async (req, res) => {
       success: true,
       message: 'Table booked successfully',
       booking_id: result.insertId,
+      booked_id,
       user_id,
       business_id,
       product_id,
@@ -2953,6 +2966,26 @@ app.post('/book-activity', async (req, res) => {
     return res.status(400).json({ success: false, message: 'Missing required fields' });
   }
 
+   // Function to generate a random 6-digit number for booked_id
+   const generateBookedId = () => {
+    return Math.floor(100000 + Math.random() * 900000); // Generates a number between 100000 and 999999
+  };
+
+  // Function to check if booked_id exists in the database
+  const isBookedIdUnique = async (booked_id) => {
+    const [rows] = await pool.query('SELECT COUNT(*) AS count FROM bookings WHERE booked_id = ?', [booked_id]);
+    return rows[0].count === 0; // Returns true if unique (count is 0)
+  };
+
+  // Generate a unique 6-digit booked_id
+  let booked_id;
+  let unique = false;
+
+  while (!unique) {
+    booked_id = generateBookedId();
+    unique = await isBookedIdUnique(booked_id);
+  }
+
   const formatDate = ({ year, month, day }) => 
     `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
   const dateIn = `${formatDate(visitDate)} ${activityTime}:00`;
@@ -2962,13 +2995,14 @@ app.post('/book-activity', async (req, res) => {
   try {
     const query = `
       INSERT INTO bookings (
-        user_id, business_id, product_id, customerName, productName, numberOfGuests, 
+        booked_id, user_id, business_id, product_id, customerName, productName, numberOfGuests, 
         email, phone, type, dateIn, dateOut, specialRequests, 
         originalPrice, discount, discountedPrice, amountToPay, status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
+      booked_id,
       user_id,
       business_id,
       product_id,
@@ -2995,6 +3029,7 @@ app.post('/book-activity', async (req, res) => {
       success: true,
       message: 'Activity booked successfully',
       booking_id: result.insertId,
+      booked_id,
       user_id,
       business_id,
       product_id,
@@ -3032,13 +3067,14 @@ app.get('/bookings', async (req, res) => {
       p.name AS product_name,
       p.images AS product_image,
       p.type AS product_type,
+      p.user_id AS businessOwnerId,
       bs.businessName,
       bs.businessLogo
     FROM bookings b
     LEFT JOIN products p ON b.product_id = p.product_id
     LEFT JOIN businesses bs ON b.business_id = bs.business_id
     WHERE b.user_id = ?
-    ORDER BY b.dateIn DESC
+    ORDER BY b.booking_id DESC
   `;
 
   try {
@@ -3066,9 +3102,26 @@ app.get('/bookings', async (req, res) => {
           statusText = 'pending';
       }
 
+      let paymentStatusText;
+      switch((booking.paymentStatus)) {
+        case 0:
+          paymentStatusText = 'Pending';
+          break;
+        case 1:
+          paymentStatusText = 'Paid';
+          break;
+        case 2:
+          paymentStatusText = 'Processing';
+          break;
+        default:
+          paymentStatusText = 'Pending';
+      }
+
       return {
         booking_id: booking.booking_id,
+        booked_id: booking.booked_id,
         user_id: booking.user_id,
+        businessOwnerId : booking.businessOwnerId,
         business_id: booking.business_id,
         product_id: booking.product_id,
         customerName: booking.customerName,
@@ -3083,9 +3136,11 @@ app.get('/bookings', async (req, res) => {
         priceDetails: {
           originalPrice: parseFloat(booking.originalPrice || 0).toFixed(2),
           discount: parseFloat(booking.discount || 0).toFixed(2),
-          discountedPrice: parseFloat(booking.discountedPrice || 0).toFixed(2)
+          discountedPrice: parseFloat(booking.discountedPrice || 0).toFixed(2),
+          amountToPay: parseFloat(booking.amountToPay || 0).toFixed(2)
         },
         status: statusText,
+        paymentStatus: paymentStatusText,
         // Additional product and business details
         product_name: booking.product_name,
         product_image: booking.product_image,
@@ -3229,9 +3284,11 @@ app.get('/business-bookings', async (req, res) => {
     // Query to fetch bookings for the business
     const bookingsQuery = `
       SELECT b.*, 
+        bp.*,
         p.product_category AS reservationType
       FROM bookings b
       LEFT JOIN products p ON b.product_id = p.product_id
+      LEFT JOIN booking_payment bp ON b.booking_id = bp.booking_id
       WHERE b.business_id = ?
       ORDER BY b.dateIn DESC
     `;
@@ -3380,6 +3437,81 @@ app.put('/update-booking-status/:id', async (req, res) => {
       success: false, 
       message: 'Failed to update booking status' 
     });
+  }
+});
+
+// Endpoint to handle payment submission
+app.post('/sendPayment', upload.single('payment'), async (req, res) => {
+  const userId = req.session?.user?.user_id;
+  const { bookingId, accountName, accountNumber, referenceNumber } = req.body;
+  const photoPath = req.file ? req.file.path : null;
+
+  // Validate input
+  if (!bookingId || !accountName || !accountNumber || !referenceNumber || !photoPath) {
+    return res.status(400).json({ message: 'All fields are required, including the image.' });
+  }
+
+  try {
+    // Begin transaction
+    await pool.query('START TRANSACTION');
+
+    // Insert payment details into the booking_payment table
+    const paymentQuery = `
+      INSERT INTO booking_payment (booking_id, accountName, accountNumber, referenceNumber, image)
+      VALUES (?, ?, ?, ?, ?)
+    `;
+    const paymentValues = [bookingId, accountName, accountNumber, referenceNumber, photoPath];
+    await pool.query(paymentQuery, paymentValues);
+
+    // Update the paymentStatus in the booking table
+    const statusQuery = `
+      UPDATE bookings
+      SET paymentStatus = 2
+      WHERE booking_id = ?
+    `;
+    await pool.query(statusQuery, [bookingId]);
+
+    // Commit transaction
+    await pool.query('COMMIT');
+
+    // Return success message and photoPath
+    res.status(201).json({
+      message: 'Payment submitted and status updated successfully.',
+      photoPath: photoPath, // Return the photo path in the response
+    });
+  } catch (error) {
+    // Rollback transaction on error
+    await pool.query('ROLLBACK');
+    console.error('Error saving payment details or updating status:', error);
+    res.status(500).json({ message: 'An error occurred while processing the payment.' });
+  }
+});
+
+app.put('/update-payment-status/:id', async (req, res) => {
+  const { status } = req.body;  // Extract status from request body
+  const { id } = req.params;     // Extract booking ID from the route parameter
+
+  console.log(id);
+
+  if (!status) {
+    return res.status(400).json({ message: 'Payment status is required.' });
+  }
+
+  try {
+    // Execute the UPDATE query
+    const result = await pool.query(
+      'UPDATE bookings SET paymentStatus = ? WHERE booking_id = ?',
+      [status, id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Booking not found.' });
+    }
+
+    return res.status(200).json({ message: 'Payment status updated successfully.' });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Server error. Please try again later.' });
   }
 });
 
@@ -4201,9 +4333,9 @@ const decryptedMessage = decrypt(encryptedMessage.encryptedData, encryptedMessag
 
 // Endpoint to send messages
 app.post('/sendMessage', upload.single('photo'), async (req, res) => {
-  const { sender_id, sender_account, receiver_id, receiver_account, text, formType, form_details } = req.body;
-  const photoPath = req.file ? req.file.path : null; // Get the uploaded photo path if it exists
-
+  const { sender_id, sender_account, receiver_id, receiver_account, text, formType, form_details, photo } = req.body;
+  const photoPath = req.file ? req.file.path : photo || null;  // Get the uploaded photo path if it exists
+  // console.log(photoPath);
   // Encrypt the message text
   const encryptedMessage = encrypt(text);
 
@@ -4240,7 +4372,16 @@ app.get('/userMessages/:userId', async (req, res) => {
   try {
     // Query the database for messages where either sender_id or receiver_id matches the userId
     const [results] = await pool.query(
-      'SELECT * FROM messages WHERE (sender_id = ? AND sender_account = ?) OR (receiver_id = ? AND receiver_account = ?) ORDER BY time ASC',
+      `SELECT 
+        messages.*,
+        bookings.booking_id,
+        bookings.paymentStatus,
+        bookings.status
+      FROM messages
+      LEFT JOIN bookings ON bookings.booking_id = JSON_UNQUOTE(JSON_EXTRACT(messages.form_details, '$.booking_id'))
+      WHERE
+        (sender_id = ? AND sender_account = ?) OR (receiver_id = ? AND receiver_account = ?) 
+      ORDER BY messages.time ASC`,
       [userId, account, userId, account]
     );
 
@@ -4252,6 +4393,41 @@ app.get('/userMessages/:userId', async (req, res) => {
       if (!acc[businessId]) {
         acc[businessId] = [];
       }
+
+      // Convert status number to string
+    let statusText;
+    switch(Number(message.status)) {
+      case 0:
+        statusText = 'Pending';
+        break;
+      case 1:
+        statusText = 'Confirmed';
+        break;
+      case 2:
+        statusText = 'Completed';
+        break;
+      case 3:
+        statusText = 'Cancelled';
+        break;
+      default:
+        statusText = 'Pending';
+    }
+
+    let paymentStatusText;
+    switch((message.paymentStatus)) {
+      case 0:
+        paymentStatusText = 'Pending';
+        break;
+      case 1:
+        paymentStatusText = 'Paid';
+        break;
+      case 2:
+        paymentStatusText = 'Processing';
+        break;
+      default:
+        paymentStatusText = 'Pending';
+    }
+
       acc[businessId].push({
         id: message.id,
         senderId: message.sender_id,
@@ -4264,7 +4440,9 @@ app.get('/userMessages/:userId', async (req, res) => {
         formType: message.formType,
         formDetails: message.form_details,
         additionalInfo: message.additionalInfo,
-        messageNote: message.messageNote
+        messageNote: message.messageNote,
+        payment_status: paymentStatusText,
+        status: statusText
       });
       return acc;
     }, {});
@@ -4290,7 +4468,17 @@ app.get('/businessMessages/:businessId', async (req, res) => {
   try {
     // Query the database for messages where either sender_id or receiver_id matches the businessId
     const [results] = await pool.query(
-      'SELECT * FROM messages WHERE (sender_id = ? AND sender_account = ?) OR (receiver_id = ? AND receiver_account = ?) ORDER BY time ASC',
+      `SELECT 
+        messages.*, 
+        bookings.booking_id, 
+        bookings.paymentStatus,
+        bookings.status
+      FROM messages
+      LEFT JOIN bookings ON bookings.booking_id = JSON_UNQUOTE(JSON_EXTRACT(messages.form_details, '$.booking_id'))
+      WHERE 
+        (sender_id = ? AND sender_account = ?) 
+        OR (receiver_id = ? AND receiver_account = ?)
+      ORDER BY messages.time ASC`,
       [businessId, account, businessId, account]
     );
 
@@ -4306,6 +4494,41 @@ app.get('/businessMessages/:businessId', async (req, res) => {
       if (!acc[userId]) {
         acc[userId] = [];
       }
+
+      // Convert status number to string
+      let statusText;
+      switch(Number(message.status)) {
+        case 0:
+          statusText = 'Pending';
+          break;
+        case 1:
+          statusText = 'Confirmed';
+          break;
+        case 2:
+          statusText = 'Completed';
+          break;
+        case 3:
+          statusText = 'Cancelled';
+          break;
+        default:
+          statusText = 'Pending';
+      }
+
+      let paymentStatusText;
+      switch((message.paymentStatus)) {
+        case 0:
+          paymentStatusText = 'Pending';
+          break;
+        case 1:
+          paymentStatusText = 'Paid';
+          break;
+        case 2:
+          paymentStatusText = 'Processing';
+          break;
+        default:
+          paymentStatusText = 'Pending';
+      }
+
       acc[userId].push({
         id: message.id,
         senderId: message.sender_id,
@@ -4318,7 +4541,9 @@ app.get('/businessMessages/:businessId', async (req, res) => {
         formType: message.formType,
         formDetails: message.form_details,
         additionalInfo: message.additionalInfo,
-        messageNote: message.messageNote
+        messageNote: message.messageNote,
+        payment_status: paymentStatusText,
+        status: statusText
       });
       return acc;
     }, {});
