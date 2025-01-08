@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { TbMessageStar } from "react-icons/tb";
 import { TbListDetails } from "react-icons/tb";
 import { IoCheckmarkCircleOutline } from "react-icons/io5";
@@ -248,9 +249,23 @@ const ReviewModal = ({ isOpen, onClose, product, isLoggedIn, refreshProducts }) 
 // Product Card Component
 const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn, refreshProducts, businessData, userData, openLoginForm }) => {
   const productSectionRef = useRef(null);
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const selectedId = queryParams.get('id');  // Extract selected product ID from the query string
+
+  // Ensure scroll only occurs when `product` changes and selectedId is valid.
   useEffect(() => {
-    productSectionRef.current.scrollIntoView({ behavior: 'smooth' });
-  }, [product]);
+    if (selectedId === product.product_id.toString()) {
+      const offset = 200; // Adjust the gap here
+      const topPosition = productSectionRef.current.getBoundingClientRect().top + window.pageYOffset - offset;
+  
+      window.scrollTo({
+        top: topPosition,
+        behavior: 'smooth',
+      });
+    }
+  }, [selectedId, product.product_id]);
+
   const [isReviewModalOpen, setReviewModalOpen] = useState(false);
   const [isInclusionsModalOpen, setInclusionsModalOpen] = useState(false);
   const onModalOpen = () => {
@@ -354,8 +369,8 @@ const ProductCard = ({ product, openBookingModal, onOpen, isLoggedIn, refreshPro
   
 
   return (
-    <div className="shadow-lg border  p-1 hover:shadow-slate-300 rounded-lg overflow-hidden mb-4">
-      <div ref={productSectionRef} className="flex flex-col md:flex-row md:flex-wrap">
+    <div ref={productSectionRef} className="shadow-lg border  p-1 hover:shadow-slate-300 rounded-lg overflow-hidden mb-4">
+      <div className="flex flex-col md:flex-row md:flex-wrap">
         {/* Image Section */}
         <div className="relative w-full   h-[260px] md:w-[290px] md:h-[250px] flex-shrink-0">
           {product.images.length > 0 ? (

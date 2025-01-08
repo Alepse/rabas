@@ -141,14 +141,14 @@ const Search = () => {
     }
 
     const results = [
-      ...businessListings.activitiesAndAttractions.filter((item) => matchesSearch(item.title)),
-      ...businessListings.accommodations.filter((item) => matchesSearch(item.title)),
-      ...businessListings.foodPlaces.filter((item) => matchesSearch(item.title)),
-      ...businessListings.shops.filter((item) => matchesSearch(item.title)),
-      ...allProducts.filter((item) => matchesSearch(item.name)),
-      ...allProducts.filter((item) => matchesSearch(item.description)),
-      ...allProducts.filter((item) => matchesSearch(item.type)),
-      ...locations.filter((location) => matchesSearch(location.name)),
+      ...businessListings.activitiesAndAttractions.filter((item) => matchesSearch(item.title || '')),
+      ...businessListings.accommodations.filter((item) => matchesSearch(item.title || '')),
+      ...businessListings.foodPlaces.filter((item) => matchesSearch(item.title || '')),
+      ...businessListings.shops.filter((item) => matchesSearch(item.title || '')),
+      ...allProducts.filter((item) => matchesSearch(item.name || '')),
+      ...allProducts.filter((item) => matchesSearch(item.description || '')),
+      ...allProducts.filter((item) => matchesSearch(item.type || '')),
+      ...locations.filter((location) => matchesSearch(location.name || '')),
     ];
 
     setSearchResults(results);
@@ -193,7 +193,7 @@ const Search = () => {
                 result.businessInfo
                   ? `/business/${encryptId(result.businessInfo.id)}`
                   : result.product_category
-                  ? `/business/${encryptId(result.business_id)}?name=${result.product_id}`
+                  ? `/business/${encryptId(result.business_id)}?id=${result.product_id}`
                   : `/destinations?name=${result.value}`
               }
               onClick={() => setSearchQuery('')}
