@@ -19,7 +19,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
-import { FaHome, FaBars, FaTimes, FaSearch, FaHiking, FaBed, FaUtensils, FaShoppingBag, FaMapMarkerAlt } from 'react-icons/fa';
+import { FaImage, FaHome, FaBars, FaTimes, FaSearch, FaHiking, FaBed, FaUtensils, FaShoppingBag, FaMapMarkerAlt } from 'react-icons/fa';
 import { GiPositionMarker } from "react-icons/gi";
 import { FaRegCircleUser } from "react-icons/fa6";
 import { Modal, ModalContent, ModalBody, useDisclosure } from "@nextui-org/react";
@@ -74,6 +74,7 @@ const Search = (handleCloseMenu) => {
     foodPlaces: [],
     shops: []
   });
+  const [allProducts, setAllProducts] = useState([]);
 
   const fetchBusinessListings = async () => {
     try {
@@ -151,6 +152,31 @@ const Search = (handleCloseMenu) => {
     fetchBusinessListings();
   }, []);
 
+  const fetchAllProducts = async (category) => {
+    try {
+      const response = await fetch(`${BASE_URL}/getAllBusinessProduct`);
+      const contentType = response.headers.get("content-type");
+
+      if (contentType && contentType.includes("application/json")) {
+        const data = await response.json();
+
+        if (data.success) {
+          setAllProducts(data.businessProducts);
+        } else {
+          console.error(`Failed to fetch ${category} data:`, data.message);
+        }
+      } else {
+        console.error(`Unexpected response format for ${category}:`, response);
+      }
+    } catch (error) {
+      console.error(`Error fetching ${category} data:`, error);
+    }
+  };
+
+  useEffect(() => {
+    fetchAllProducts();
+  }, []);
+
   const locations = [
     { name: 'Bulusan', value: "Bulusan" },
     { name: 'Bulan', value: "Bulan" },
@@ -181,55 +207,21 @@ const Search = (handleCloseMenu) => {
   };
 
   const performSearch = (query) => {
-    let results = [];
     const searchInput = query.toLowerCase();
   
     // const matchesSearch = (str) => new RegExp(`^${searchInput}`).test(str.toLowerCase()); // Matches from the start  
     const matchesSearch = (str) => str.toLowerCase().includes(searchInput);
     
-    switch (activeTab) {
-      case 'all':
-        results = [
-          ...businessListings.activitiesAndAttractions.filter((activity) => 
-            matchesSearch(activity.title)
-          ),
-          ...businessListings.accommodations.filter((accommodation) => 
-            matchesSearch(accommodation.title)
-          ),
-          ...businessListings.foodPlaces.filter((food) => 
-            matchesSearch(food.title)
-          ),
-          ...businessListings.shops.filter((shop) => 
-            matchesSearch(shop.title)
-          ),
-          ...locations.filter((location) => 
-            matchesSearch(location.name)
-          ),
-        ];
-        break;
-      case 'activities':
-        results = businessListings.activitiesAndAttractions.filter((activity) =>
-          matchesSearch(activity.title)
-        );
-        break;
-      case 'accommodation':
-        results = businessListings.accommodations.filter((accommodation) =>
-          matchesSearch(accommodation.title)
-        );
-        break;
-      case 'food':
-        results = businessListings.foodPlaces.filter((food) =>
-          matchesSearch(food.title)
-        );
-        break;
-      case 'shops':
-        results = businessListings.shops.filter((shop) =>
-          matchesSearch(shop.title)
-        );
-        break;
-      default:
-        break;
-    }
+    const results = [
+      ...businessListings.activitiesAndAttractions.filter((item) => matchesSearch(item.title || '')),
+      ...businessListings.accommodations.filter((item) => matchesSearch(item.title || '')),
+      ...businessListings.foodPlaces.filter((item) => matchesSearch(item.title || '')),
+      ...businessListings.shops.filter((item) => matchesSearch(item.title || '')),
+      ...allProducts.filter((item) => matchesSearch(item.name || '')),
+      ...allProducts.filter((item) => matchesSearch(item.description || '')),
+      ...allProducts.filter((item) => matchesSearch(item.type || '')),
+      ...locations.filter((location) => matchesSearch(location.name || '')),
+    ];
 
     setSearchResults(results);
   };
@@ -238,6 +230,13 @@ const Search = (handleCloseMenu) => {
     setSearchQuery('');
     setSearchResults([]);
   };
+
+  const handleClick = () => {
+    setSearchQuery('');
+    setSearchResults([]); // Clear the search results
+    handleCloseMenu();
+  };
+  
 
   return (
     <>
@@ -264,65 +263,67 @@ const Search = (handleCloseMenu) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
           >
-            {searchResults.map((result, index) => {
-              const handleClick = () => {
-                setSearchQuery(''); 
-                setSearchResults([]);
-                handleCloseMenu();
-              };
-              const content = (
-                <div className="flex p-2 hover:bg-gray-200 cursor-pointer">
-                  {result.title && (
-                    <div className="w-full flex items-center">
-                      <img
-                        src={result.imageUrl}
-                        alt={result.imageUrl}
-                        className="w-12 h-12 rounded-full mr-3 object-cover"
-                      />
-                      <h3 className="text-md">
-                        <Highlight
-                          content={result.title}
-                          match={searchQuery}
-                        />
-                      </h3>
-                    </div>
-                  )}
-                  {result.name && (
-                    <div className="w-full flex items-center">
-                      <FaMapMarkerAlt className="w-12 h-12 text-gray-500 mr-3" />
-                      <div>
-                        <p className="text-md">
-                          <Highlight
-                            content={result.name}
-                            match={searchQuery}
+            {searchResults.map((result, index) => (
+              <Link
+                key={index}
+                to={
+                  result.businessInfo
+                    ? `/business/${encryptId(result.businessInfo.id)}`
+                    : result.product_category
+                    ? `/business/${encryptId(result.business_id)}?id=${result.product_id}`
+                    : `/destinations?name=${result.value}`
+                }
+                onClick={handleClick}
+                className="block p-2 hover:bg-gray-200"
+              >
+                <div className="flex items-center">
+                  {result.imageUrl ? (
+                    <>
+                      <img src={result.imageUrl} alt="" className="w-12 h-12 rounded-full mr-3" />
+                      <Highlight content={result.title || result.name} match={searchQuery} />
+                    </>
+                  ) : result.product_category && result.product_category.length > 0 ? (
+                    <>
+                      <div className="flex items-center">
+                        {result.images.length > 0 ? (
+                          <img
+                            src={`${BASE_URL}/${result.images[0].path}`}
+                            alt={result.images[0].title}
+                            className="w-12 h-12 rounded-full mr-3"
                           />
-                        </p>
+                        ) : (
+                          <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center mr-3">
+                            <FaImage className="text-gray-500 w-6 h-6" />
+                          </div>
+                        )}
+                        <div>
+                          {/* Highlight the title or name */}
+                          <Highlight content={result.title || result.name} match={searchQuery} />
+                          {result.description && (
+                            <div className="text-sm text-gray-500 mt-1">
+                              {/* Highlight the description */}
+                              <Highlight
+                                content={
+                                  result.description.length > 100
+                                    ? result.description.substring(0, 100) + '...'
+                                    : result.description
+                                }
+                                match={searchQuery}
+                              />
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    </>                
+                  ) : (
+                    <>
+                      <FaMapMarkerAlt className="w-12 h-12 text-gray-500 mr-3" />
+                      <Highlight content={result.title || result.name} match={searchQuery} />
+                    </>
+                  )}                
                 </div>
-              );
-
-              return result.title ? (
-                <Link
-                  key={index}
-                  to={`/business/${encryptId(result.businessInfo.id)}`}
-                  className="block"
-                  onClick={handleClick} 
-                > 
-                  {content}
-                </Link>
-              ) : (
-                <Link
-                  key={index}
-                  to={`/destinations?name=${result.value}`}
-                  className="block"
-                  onClick={handleClick} 
-                >
-                  {content}
-                </Link>
-              );
-            })}
+              </Link>
+            ))}
           </motion.div>
         )}
       </div>

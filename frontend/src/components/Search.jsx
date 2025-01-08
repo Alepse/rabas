@@ -104,30 +104,30 @@ const Search = () => {
   }, []);
 
   // Fetch data for each category from the backend
-    const fetchAllProducts = async (category) => {
-      try {
-        const response = await fetch(`${BASE_URL}/getAllBusinessProduct`);
-        const contentType = response.headers.get("content-type");
-  
-        if (contentType && contentType.includes("application/json")) {
-          const data = await response.json();
-  
-          if (data.success) {
-            setAllProducts(data.businessProducts);
-          } else {
-            console.error(`Failed to fetch ${category} data:`, data.message);
-          }
+  const fetchAllProducts = async (category) => {
+    try {
+      const response = await fetch(`${BASE_URL}/getAllBusinessProduct`);
+      const contentType = response.headers.get("content-type");
+
+      if (contentType && contentType.includes("application/json")) {
+        const data = await response.json();
+
+        if (data.success) {
+          setAllProducts(data.businessProducts);
         } else {
-          console.error(`Unexpected response format for ${category}:`, response);
+          console.error(`Failed to fetch ${category} data:`, data.message);
         }
-      } catch (error) {
-        console.error(`Error fetching ${category} data:`, error);
+      } else {
+        console.error(`Unexpected response format for ${category}:`, response);
       }
-    };
-  
-    useEffect(() => {
-      fetchAllProducts();
-    }, []);
+    } catch (error) {
+      console.error(`Error fetching ${category} data:`, error);
+    }
+  };
+
+  useEffect(() => {
+    fetchAllProducts();
+  }, []);
 
 
   const matchesSearch = useMemo(() => {

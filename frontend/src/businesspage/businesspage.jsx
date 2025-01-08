@@ -243,8 +243,26 @@ const BusinessPage = () => {
   }
 
   if (!businessData) {
-    return <p className="text-center mt-10">Business not found.</p>;
-  }
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
+        <div className="bg-white shadow-lg rounded-lg p-6 max-w-lg w-full text-center">
+          <p className="text-xl font-semibold text-gray-700 mb-4">Business not found</p>
+          <p className="text-gray-500 mb-6">It seems that the business you are looking for does not exist. You can return to the homepage or explore other destinations.</p>
+          
+          <div className="flex justify-center space-x-4">
+            <Link to="/" className="px-6 py-2 bg-color1 text-white rounded-full hover:bg-color2 transition duration-300">Go to Home</Link>
+            <Link to="/destinations" className="px-6 py-2 bg-gray-300 text-gray-700 rounded-full hover:bg-gray-400 transition duration-300">Explore Destinations</Link>
+          </div>
+        </div>
+  
+        <ul className="flex items-center mt-6">
+          <Link to="/" className="text-color1 hover:text-color2 text-lg font-medium">Home</Link>
+          <span className="mx-2 text-gray-400"><MdOutlineKeyboardArrowRight /></span>
+          <li className="text-gray-600 text-lg">Business Not Found</li>
+        </ul>
+      </div>
+    );
+  }  
 
   const renderStars = (rating) => {
     const stars = [];
