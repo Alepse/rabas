@@ -49,7 +49,7 @@ const MapSection = ({ businesses, initialCenter, currentZoom, setCurrentZoom }) 
   }, [businesses]);
 
   return (
-    <div className="mt-8 z-10 bg-color1 rounded-lg shadow-md p-1 w-full bg-gradient-to-r from-color1 to-color2">
+    <div className="z-10 bg-color1 rounded-lg shadow-md p-1 w-full bg-gradient-to-r from-color1 to-color2">
       <MapContainer center={initialCenter} zoom={currentZoom} className="w-full h-96 lg:h-[600px]">
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

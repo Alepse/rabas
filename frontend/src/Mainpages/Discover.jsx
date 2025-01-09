@@ -20,6 +20,7 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 import CryptoJS from 'crypto-js';
 import { Skeleton } from "@nextui-org/skeleton";
 import { MdOutlineKeyboardArrowRight } from 'react-icons/md';
+import { stringify } from 'uuid';
 
 // Animation Variants
 const containerVariants = {
@@ -74,6 +75,7 @@ const Discover = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [showButton, setShowButton] = useState(false); // State to show/hide button
 
+  console.log(JSON.stringify(businesses));
     
   const businesscategories = ['activity', 'accommodation', 'restaurant', 'shop'];
 

@@ -3,6 +3,7 @@ import Nav from '@/components/nav';
 import Search from '@/components/Search';
 import Footer from '@/components/Footer';
 import { FaPlus, FaTimes,FaWalking,FaBed,FaUtensils,FaShoppingBag } from 'react-icons/fa';
+import { Select, Switch, SelectItem } from "@nextui-org/react";
 import {
   Modal,
   ModalContent,
@@ -27,12 +28,13 @@ import { motion } from 'framer-motion';
 import MapFeature from '@/LeafletMap/MapFeature'; 
 import {today, getLocalTimeZone} from "@internationalized/date";
 import Planner from '@/Mainpages/PlanATripComponents/SchedulesPlan'; // Ensure this path is correct
+import SidePanel from '@/Mainpages/PlanATripComponents/SidePanel'; // Ensure this path is correct
 import Swal from 'sweetalert2';
 import TripDetailsModal from './PlanATripComponents/TripDetailsModal';
 import wave from '@/assets/wave2.webp'
 import axios from 'axios';
 import { MdOutlineKeyboardArrowRight } from 'react-icons/md';
-
+import MapSection from '@/components/mapsection';
 
 import { Link } from 'react-router-dom';
 
@@ -64,6 +66,12 @@ const showErrorAlert = (title, message) => {
   });
 };
 
+const municipalities = [
+  "Barcelona", "Bulan", "Bulusan", "Casiguran", "Castilla", "Donsol",
+  "Gubat", "Irosin", "Juban", "Magallanes", "Matnog", "Pilar",
+  "Prieto Diaz", "Sta. Magdalena", "Sorsogon City"
+];
+
 const Trip = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [step, setStep] = useState(1);
@@ -76,7 +84,6 @@ const Trip = () => {
   const [trips, setTrips] = useState([]); // Initialize with an empty array
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedTrip, setSelectedTrip] = useState(null);
-  const [itinerary, setItinerary] = useState({});
   const [isLoggedIn, setIsLoggedIn] = useState(false); // State to track login status
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -87,21 +94,23 @@ const Trip = () => {
 
   const [time, setTime] = useState("");
 
-  ///variable for trip dates
-  let [tripDate, setTripDate] = useState({
-    start: today(getLocalTimeZone()),
-    end: today(getLocalTimeZone()).add({ days: 0 }),
-  });
-  console.log("Starting and end date\n", tripDate);
-  
-  // second variable trip name
   const [tripName, setTripName] = useState('');
   console.log("Trip name:\n", tripName);
+
+  const [tripDate, setTripDate] = useState(null);
+  console.log("Starting and end date\n", tripDate);
 
   // third variable destination name
   const [destinationName, setDestinationName] = useState('');
   console.log("Destination name:\n", destinationName);
-  
+
+  // 4th variable iteneraryo
+  const [itinerary, setItinerary] = useState({});
+  console.log("Itinerary:\n", itinerary)
+
+  // 5th ata
+  const [selectedBusiness, setSelectedBusiness] = useState([{"business_id":31,"user_id":32,"businessName":"Asika-su","businessType":"attraction","category":["adventure"],"businessLogo":"uploads\\businessLogo-1731733539189.png","coverPhotos":null,"destination":"Sta. Magdalena","defaultAddress":"Sta. Magdalena","pin_location":{"latitude":13.002922323322425,"longitude":124.05075073242188},"contactInfo":null,"openingHours":null,"facilities":[{"id":1734618928266,"icon":null,"name":"Table 1","items":[{"icon":"Wi-Fi","name":"WIFI"},{"icon":"Music","name":"Live Music"}]}],"policies":null,"dateOrigin":"2024-10-19T12:13:02.000Z","description":"Best attraction","cardImage":"uploads\\businessCardImage-1731934470224.jpg","completeAddress":"Kahit saan","aboutUs":"Pagparaluhayluhay, manaaaaa na bayaaaa","lowest_price":"800","highest_price":"1200","likes":2,"rating":5,"rateCount":1,"raw_amenities":["[\"Table 1\"]","[\"Table 1\"]"],"amenities":["Table 1"]},{"business_id":32,"user_id":46,"businessName":"Tanaw","businessType":"attraction","category":["adventure","relaxation"],"businessLogo":"uploads\\businessLogo-1732068525839.png","coverPhotos":null,"destination":"Barcelona","defaultAddress":"Barcelona","pin_location":{"latitude":12.944069665457144,"longitude":123.84805297013374},"contactInfo":null,"openingHours":null,"facilities":null,"policies":null,"dateOrigin":"2024-12-19T12:13:02.000Z","description":null,"cardImage":null,"completeAddress":"Castilla","aboutUs":null,"lowest_price":null,"highest_price":null,"likes":2,"rating":5,"rateCount":1,"raw_amenities":[null],"amenities":[]},{"business_id":42,"user_id":47,"businessName":"sff","businessType":"attraction","category":["relaxation","asdasdas"],"businessLogo":"uploads\\businessLogo-1734583133157.png","coverPhotos":[{"id":"0364f4f2-3855-4489-a7ec-95da75477a39","path":"uploads\\heroImages-1734979617980.jpg","title":""}],"destination":"dfgsd","defaultAddress":"Albay","pin_location":{"latitude":12.953381785933615,"longitude":123.87505531311037},"contactInfo":null,"openingHours":null,"facilities":null,"policies":null,"dateOrigin":"2024-06-19T12:13:02.000Z","description":"Ahh ehh ihhh ohh uhh","cardImage":"uploads\\businessCardImage-1734582104865.jpg","completeAddress":"Donsol","aboutUs":null,"lowest_price":null,"highest_price":null,"likes":2,"rating":5,"rateCount":1,"raw_amenities":[null],"amenities":[]},{"business_id":27,"user_id":28,"businessName":"Di-ret-so","businessType":"accommodation","category":["hotel","inn","adventure"],"businessLogo":"uploads\\businessLogo-1731734673684.avif","coverPhotos":null,"destination":"Barcelona","defaultAddress":"Sta. Magdalena","pin_location":{"latitude":12.864020841931762,"longitude":124.12353515625},"contactInfo":null,"openingHours":null,"facilities":null,"policies":null,"dateOrigin":"2024-02-19T12:13:02.000Z","description":"Kung diretso, diretso sana","cardImage":"uploads\\businessCardImage-1731735230514.avif","completeAddress":"Venus","aboutUs":"Masain ka pa man?","lowest_price":"12","highest_price":"12","likes":2,"rating":null,"rateCount":0,"raw_amenities":[null],"amenities":[]},{"business_id":1,"user_id":1,"businessName":"Shabyuuu","businessType":"restaurant","category":["cafe"],"businessLogo":"uploads\\businessLogo-1735953331961.jpg","coverPhotos":[{"id":"8b287a90-3827-4395-b310-5a18698e5193","path":"uploads\\heroImages-1734975538759.jpg"},{"id":"6972a3f0-b1ea-4259-83d5-98e7d8752e62","path":"uploads\\heroImages-1734975581231.jpg","title":""},{"id":"2e935bcb-280e-481d-b5b6-34795fd57ae5","path":"uploads\\heroImages-1734977589785.jpg","title":""},{"id":"a0bbceac-3759-4a25-875c-dc423ffd0475","path":"uploads\\heroImages-1734977652071.jpg","title":""},{"id":"a3cca1c5-1420-4ac1-8d5a-83c9fe016d05","path":"uploads\\heroImages-1734977676929.jpg","title":""},{"id":"2fa4513f-894c-4ddb-a88b-24c8012acba1","path":"uploads\\heroImages-1736108433758.jpg","title":""}],"destination":"Castilla","defaultAddress":"Sta. Magdalena","pin_location":{"latitude":12.965215406517004,"longitude":123.8721187568021},"contactInfo":[{"id":1729178938412,"icon":"Email","label":"shabyuuu@gmail.com","value":""},{"id":1736041081583,"icon":"Facebook","label":"Jestoni Vargas","value":"https://www.facebook.com/jessstoni"}],"openingHours":[{"day":"Monday","open":"08:00","close":"17:00"},{"day":"Tuesday","open":"08:00","close":"17:00"},{"day":"Wednesday","open":"08:00","close":"17:00"},{"day":"Thursday","open":"08:00","close":"18:00"},{"day":"Friday","open":"08:00","close":"18:00"},{"day":"Saturday","open":"10:00","close":"15:00"},{"day":"Sunday","open":"10:00","close":"15:00"}],"facilities":[{"id":1734618928266,"icon":null,"name":"Table 1","items":[{"icon":"Wi-Fi","name":"WIFI"},{"icon":"Music","name":"Live Music"}]}],"policies":[{"items":["No cancellation","item 2"],"title":"Reservation"}],"dateOrigin":"2024-01-19T12:13:02.000Z","description":"A cozy cafe with a great ambiance.","cardImage":"uploads\\businessCardImage-1736108398239.jpg","completeAddress":"Castilla","aboutUs":"Good shit na mga inumin!","lowest_price":"1500","highest_price":"1500","likes":3,"rating":4.666666666666667,"rateCount":3,"raw_amenities":["[\"Table 1\"]","[\"Table 1\"]","[\"Table 1\"]"],"amenities":["Table 1"]},{"business_id":44,"user_id":56,"businessName":"kreyziiiiiiii","businessType":"restaurant","category":["cafe"],"businessLogo":"uploads\\businessLogo-1735630303819.jpg","coverPhotos":null,"destination":"Prieto Diaz","defaultAddress":"123 123 123","pin_location":{"latitude":13.03474609061505,"longitude":124.17985396101945},"contactInfo":null,"openingHours":null,"facilities":[{"id":1735630551826,"icon":null,"name":"Table 1","items":[{"icon":null,"name":"Tissue hahaha"},{"icon":null,"name":"Tissue hahaha"}]},{"id":1735631639293,"icon":null,"name":"Table 2","items":[{"icon":"Cafe","name":"Item 1"},{"icon":"Restaurant","name":"Item 2"}]},{"id":1735631755868,"icon":null,"name":"Table 3","items":[{"icon":null,"name":"Tissue hahaha"}]}],"policies":null,"dateOrigin":"2024-12-31T07:31:12.000Z","description":"Try it and love the outcome","cardImage":"uploads\\businessCardImage-1735630311262.jpg","completeAddress":"Prieto Diaz","aboutUs":null,"lowest_price":null,"highest_price":null,"likes":0,"rating":null,"rateCount":0,"raw_amenities":["[\"Table 1\", \"Table 2\", \"Table 3\"]"],"amenities":["Table 1","Table 2","Table 3"]}]
+);
 
   const checkLoginStatus = useCallback(async () => {
     try {
@@ -267,11 +276,12 @@ const Trip = () => {
   const resetForm = () => {
     setStep(1);
     setProgress(10);
+    setTripDate(null);
     setTripName('');
+    setDestinationName('')
     setIsDetailsOpen(false);
     setSelectedTrip(null);
     setItinerary({});
-    setTripDate({ start: today(getLocalTimeZone()), end: today(getLocalTimeZone()).add({ days: 0 }) });
   }
 
   const deleteTrip = (index, tripId) => {
@@ -468,10 +478,32 @@ const Trip = () => {
               transition={{ duration: 0.5 }}
               className="p-4 "
             >
-             {step === 1 && (
+
+            {step === 1 && (
               <>
-               
-                <div className="mt-6 h-[70vh] flex flex-col items-center justify-center ">
+              <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-4 p-5 bg-gray-100">
+              <SidePanel tripName={tripName} tripDate={tripDate} firstDestination={destinationName} itinerary={itinerary}/>
+             
+                <div className="flex flex-col bg-white p-8 justify-start h-full items-center rounded-lg">
+                  <h1 className="md:text-4xl text-2xl font-medium text-primary">Enter Your trip Name</h1>
+                  <p className="text-gray-500 text-sm mt-1">Make it memorable with a personalized name!</p>
+                    <Input
+                      placeholder="e.g., Summer Adventure 2025"
+                      value={tripName}
+                      onChange={(e) => setTripName(e.target.value)}
+                      className="mt-4 max-w-md rounded-2xl  border-2 border-gray-300 text-center"
+                      style={{ fontSize: '12px' }}
+                    />
+                </div>
+              </div>
+              </>
+            )}
+
+             {step === 2 && (
+              <>
+              <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-4 p-5 bg-gray-100">
+                <SidePanel tripName={tripName} tripDate={tripDate} firstDestination={destinationName} itinerary={itinerary}/>
+                <div className="h-full flex flex-col items-center justify-center bg-white rounded-lg p-8 ">
                   <h1 className=" text-xl md:text-4xl font-semibold text-primary text-center mb-3">How Many Days Is Your Trip?</h1>
                   <p className="text-center text-sm font-small text-gray-500 mb-4">Select your start and end trip dates below:</p>
                   <div className="flex justify-center overflow-x-auto w-full p-1 ">
@@ -491,555 +523,549 @@ const Trip = () => {
                   <Button onClick={nextStep} size='sm' className='bg-color2 text-white hover:bg-color1 '>Here ⇢ </Button>
                  </div>
                 </div>
-              </>
-            )}
-
-            {step === 2 && (
-              <>
-           
-             
-                <div className="flex flex-col justify-center h-[50vh] items-center mt-6">
-                <h1 className="md:text-4xl text-2xl font-medium text-primary">Enter Your trip Name</h1>
-                <p className="text-gray-500 text-sm mt-1">Make it memorable with a personalized name!</p>
-                  <Input
-                    placeholder="e.g., Summer Adventure 2025"
-                    value={tripName}
-                    onChange={(e) => setTripName(e.target.value)}
-                    className="mt-4 max-w-md rounded-2xl  border-2 border-gray-300 text-center"
-                    style={{ fontSize: '12px' }}
-                  />
-                </div>
+              </div>
               </>
             )}
 
             {step === 3 && (
               <>
-                
-              <div className="flex flex-col justify-center h-[50vh] items-center mt-6">
-                <h1 className="md:text-4xl text-2xl font-medium text-primary">Where Do you want To Go?</h1>
-                <p className="text-gray-500 text-sm mt-1">Type your Trip Destination</p>
-                  <Input
-                    placeholder="Enter preffered destination..."
-                    className="mt-4 max-w-md rounded-2xl  border-2 border-gray-300 text-center"
-                    style={{ fontSize: '12px' }}
-                    value={destinationName}
-                    onChange={(e) => setDestinationName(e.target.value)}
-                  />
-                   <h1 onClick={nextStep} className='underline cursor-pointer mt-6 hover:text-color2'>prefer not to say</h1>
+              <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-4 p-5 bg-gray-100">
+                <SidePanel tripName={tripName} tripDate={tripDate} firstDestination={destinationName} itinerary={itinerary}/>
+                <div className="flex flex-col justify-start p-8 items-center bg-white rounded-lg">
+                  <h1 className="md:text-4xl text-2xl font-medium text-primary">Where Do you want To Go?</h1>
+                  <p className="text-gray-500 text-sm mt-1">Select your first destination</p>
+                    <Select
+                      label="Destination Name"
+                      placeholder="Select your destination"
+                      className="mt-4 max-w-md rounded-2xl  border-2 border-gray-300 text-center"
+                      selectedKeys={new Set([destinationName])} // Use `selectedKeys` for controlled selection
+                      onSelectionChange={(key) => setDestinationName(key.currentKey)} // Update state with the selected key
+                    >
+                      {municipalities.map((municipality) => (
+                        <SelectItem key={municipality} value={municipality}>
+                          {municipality}
+                        </SelectItem>
+                      ))}
+                    </Select>
+                    <h1 onClick={nextStep} className='underline cursor-pointer mt-6 hover:text-color2'>prefer not to say</h1>
                 </div>
-               
+              </div>
               </>
             )}
 
-              {step === 4 && (
-                <>
-                 
-                <div className="flex flex-col justify-center  items-center mt-6 ">
-                <h1 className="md:text-4xl text-2xl font-medium text-primary">What Do You Want To Do?</h1>
-                <PlanATripSearch/> 
-                <DatePicker   className=" max-w-md rounded-2xl  border-1 border-gray-300 "/>  
-                </div>      
+            {step === 4 && (
+              <>
+              <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-4 p-5 bg-gray-100">
+                <SidePanel tripName={tripName} tripDate={tripDate} firstDestination={destinationName} itinerary={itinerary}/>
+                <div className="flex flex-col justify-center bg-white rounded-lg items-center p-8 ">
+                  <h1 className="md:text-4xl text-2xl font-medium text-primary">What Do You Want To Do?</h1>
+                  <PlanATripSearch/> 
+                  <DatePicker   className=" max-w-md rounded-2xl  border-1 border-gray-300 "/>  
+                    
                 
-                 <div className="flex flex-col justify-center mt-6">
-                 <Tabs 
-                    aria-label="Business Information" 
-                    className="max-w-full overflow-x-auto" 
-                    variant="underlined"  
-                    classNames={{
-                      base: "w-full overflow-x-auto mb-4",
-                      tabList: "gap-6 flex md:justify-center w-full p-2 container",
-                      tab: "max-w-fit px-0 h-12",
-                      tabContent: "text-color1 flex items-center"
-                    }}
-                  >
-                    <Tab key="Activity" title={<><FaWalking className="mr-2" />Do Some Activities</>}>
+                  <div className="flex flex-col justify-center mt-6">
+                    <Tabs 
+                      aria-label="Business Information" 
+                      className="max-w-full overflow-x-auto" 
+                      variant="underlined"  
+                      classNames={{
+                        base: "w-full overflow-x-auto mb-4",
+                        tabList: "gap-6 flex md:justify-center w-full p-2 container",
+                        tab: "max-w-fit px-0 h-12",
+                        tabContent: "text-color1 flex items-center"
+                      }}
+                    >
+                      <Tab key="Activity" title={<><FaWalking className="mr-2" />Do Some Activities</>}>
+                      
+                          <div>
+                            <div className='w-full mb-2 flex items-center justify-between'>
+                            <h1>Nearby</h1>
+                                <h1 className='text-sm font-semibold text-color1 hover:tracking-wide duration-300 hover:underline cursor-pointer'>
+                                See More ⥬
+                              </h1>
+                          </div>
+
+                          <div className=' flex w-full flex-wrap gap-3 items-center  h-full justify-center md:justify-start '>
+                          <div className="border h-[360px] w-[280px] rounded-lg shadow-lg p-3 bg-white">
+                            {/* Image Section */}
+                            <div className="w-full h-32 mb-3">
+                              <img
+                                src="https://via.placeholder.com/260x128" // Replace with your image URL
+                                alt="Example Activity"
+                                className="w-full h-full object-cover rounded-lg"
+                              />
+                            </div>
+
+                            {/* Content Section */}
+                            <div className="flex flex-col gap-1">
+                              {/* Tags Section */}
+                              <div className="flex gap-1 flex-wrap">
+                                <span className="px-2 py-1 bg-gray-200 rounded-full text-xs text-gray-600">
+                                  Tag1
+                                </span>
+                                <span className="px-2 py-1 bg-gray-200 rounded-full text-xs text-gray-600">
+                                  Tag2
+                                </span>
+                              </div>
+
+                              {/* Title */}
+                              <h3 className="text-base font-semibold text-gray-800 truncate">Example Activity </h3>
+                              <div className="text-xs text-gray-500 mb-2 flex items-center"> <GiPositionMarker className="mr-1" />Sorsogon</div>
+
+                              <div className='flex items-center justify-between'>
+                              {/* Rating Section */}
+                              <div className="flex items-center text-xs gap-1">
+                                <span className="">4.5</span>
+                                <span className='text-yellow-500 '>★★★★☆</span>
+                              </div>
+
+                              {/* Price Section */}
+                              <div className="text-gray-800 font-medium text-xs">
+                                ₱500 - ₱1000
+                              </div>
+                              </div>
+                            </div>
+
+                            {/* Buttons Section */}
+                            <div className="mt-3 flex flex-col gap-1">
+                              <Button onClick={openDrawer}    color='primary' className="w-full  text-white rounded-md text-sm">
+                                Add
+                              </Button>
+                              <Button color='primary' className="w-full  text-white rounded-md text-sm">
+                                View
+                              </Button>
+                            </div>
+                          </div>
+
+                          <div className="border h-[360px] w-[280px] rounded-lg shadow-lg p-3 bg-white">
+                            {/* Image Section */}
+                            <div className="w-full h-32 mb-3">
+                              <img
+                                src="https://via.placeholder.com/260x128" // Replace with your image URL
+                                alt="Example Activity"
+                                className="w-full h-full object-cover rounded-lg"
+                              />
+                            </div>
+
+                            {/* Content Section */}
+                            <div className="flex flex-col gap-1">
+                              {/* Tags Section */}
+                              <div className="flex gap-1 flex-wrap">
+                                <span className="px-2 py-1 bg-gray-200 rounded-full text-xs text-gray-600">
+                                  Tag1
+                                </span>
+                                <span className="px-2 py-1 bg-gray-200 rounded-full text-xs text-gray-600">
+                                  Tag2
+                                </span>
+                              </div>
+
+                              {/* Title */}
+                              <h3 className="text-base font-semibold text-gray-800">Example Activity</h3>
+                              <div className="text-xs text-gray-500 mb-2 flex items-center"> <GiPositionMarker className="mr-1" />Sorsogon</div>
+
+                              <div className='flex items-center justify-between'>
+                              {/* Rating Section */}
+                              <div className="flex items-center text-xs gap-1">
+                                <span classNams="">4.5</span>
+                                <span className='text-yellow-500 '>★★★★☆</span>
+                              </div>
+
+                              {/* Price Section */}
+                              <div className="text-gray-800 font-medium text-xs">
+                                ₱500 - ₱1000
+                              </div>
+                              </div>
+                            </div>
+
+                            {/* Buttons Section */}
+                            <div className="mt-3 flex flex-col gap-1">
+                              <Button onClick={openDrawer}   color='primary' className="w-full  text-white rounded-md text-sm">
+                                Add
+                              </Button>
+                              <Button color='primary' className="w-full  text-white rounded-md text-sm">
+                                View
+                              </Button>
+                            </div>
+                          </div>
+
+                          </div>
+
+                          
+                          </div>
+                      
+                      </Tab>
+        
+                      <Tab key="Accomodation" title={<><FaBed className="mr-2" />Stay Somewhere</>}>
+                      <div>
+                            <div className='w-full mb-2 flex items-center justify-between'>
+                            <h1>Nearby</h1>
+                                <h1 className='text-sm font-semibold text-color1 hover:tracking-wide duration-300 hover:underline cursor-pointer'>
+                                See More ⥬
+                              </h1>
+                          </div>
+
+                          <div className=' flex w-full flex-wrap gap-3 items-center  h-full justify-center md:justify-start '>
+                          <div className="border h-[360px] w-[280px] rounded-lg shadow-lg p-3 bg-white">
+                            {/* Image Section */}
+                            <div className="w-full h-32 mb-3">
+                              <img
+                                src="https://via.placeholder.com/260x128" // Replace with your image URL
+                                alt="Example Activity"
+                                className="w-full h-full object-cover rounded-lg"
+                              />
+                            </div>
+
+                            {/* Content Section */}
+                            <div className="flex flex-col gap-1">
+                              {/* Tags Section */}
+                              <div className="flex gap-1 flex-wrap">
+                                <span className="px-2 py-1 bg-gray-200 rounded-full text-xs text-gray-600">
+                                  Tag1
+                                </span>
+                                <span className="px-2 py-1 bg-gray-200 rounded-full text-xs text-gray-600">
+                                  Tag2
+                                </span>
+                              </div>
+
+                              {/* Title */}
+                              <h3 className="text-base font-semibold text-gray-800 truncate">Example Activity </h3>
+                              <div className="text-xs text-gray-500 mb-2 flex items-center"> <GiPositionMarker className="mr-1" />Sorsogon</div>
+
+                              <div className='flex items-center justify-between'>
+                              {/* Rating Section */}
+                              <div className="flex items-center text-xs gap-1">
+                                <span classNams="">4.5</span>
+                                <span className='text-yellow-500 '>★★★★☆</span>
+                              </div>
+
+                              {/* Price Section */}
+                              <div className="text-gray-800 font-medium text-xs">
+                                ₱500 - ₱1000
+                              </div>
+                              </div>
+                            </div>
+
+                            {/* Buttons Section */}
+                            <div className="mt-3 flex flex-col gap-1">
+                              <Button onClick={openDrawer}   color='primary' className="w-full  text-white rounded-md text-sm">
+                                Add
+                              </Button>
+                              <Button color='primary' className="w-full  text-white rounded-md text-sm">
+                                View
+                              </Button>
+                            </div>
+                          </div>
+
+                          <div className="border h-[360px] w-[280px] rounded-lg shadow-lg p-3 bg-white">
+                            {/* Image Section */}
+                            <div className="w-full h-32 mb-3">
+                              <img
+                                src="https://via.placeholder.com/260x128" // Replace with your image URL
+                                alt="Example Activity"
+                                className="w-full h-full object-cover rounded-lg"
+                              />
+                            </div>
+
+                            {/* Content Section */}
+                            <div className="flex flex-col gap-1">
+                              {/* Tags Section */}
+                              <div className="flex gap-1 flex-wrap">
+                                <span className="px-2 py-1 bg-gray-200 rounded-full text-xs text-gray-600">
+                                  Tag1
+                                </span>
+                                <span className="px-2 py-1 bg-gray-200 rounded-full text-xs text-gray-600">
+                                  Tag2
+                                </span>
+                              </div>
+
+                              {/* Title */}
+                              <h3 className="text-base font-semibold text-gray-800">Example Activity</h3>
+                              <div className="text-xs text-gray-500 mb-2 flex items-center"> <GiPositionMarker className="mr-1" />Sorsogon</div>
+
+                              <div className='flex items-center justify-between'>
+                              {/* Rating Section */}
+                              <div className="flex items-center text-xs gap-1">
+                                <span classNams="">4.5</span>
+                                <span className='text-yellow-500 '>★★★★☆</span>
+                              </div>
+
+                              {/* Price Section */}
+                              <div className="text-gray-800 font-medium text-xs">
+                                ₱500 - ₱1000
+                              </div>
+                              </div>
+                            </div>
+
+                            {/* Buttons Section */}
+                            <div className="mt-3 flex flex-col gap-1">
+                              <Button onClick={openDrawer}   color='primary' className="w-full  text-white rounded-md text-sm">
+                                Add
+                              </Button>
+                              <Button color='primary' className="w-full  text-white rounded-md text-sm">
+                                View
+                              </Button>
+                            </div>
+                          </div>
+
+                          </div>
+
+                          
+                          </div>
+                      </Tab>
+                      <Tab key="Food" title={<><FaUtensils className="mr-2" />Eat Something</>}>
+                      <div>
+                            <div className='w-full mb-2 flex items-center justify-between'>
+                            <h1>Nearby</h1>
+                                <h1 className='text-sm font-semibold text-color1 hover:tracking-wide duration-300 hover:underline cursor-pointer'>
+                                See More ⥬
+                              </h1>
+                          </div>
+
+                          <div className=' flex w-full overflow-x-auto scrollbar-custom  flex-wrap md:flex gap-3 items-center  h-full justify-center md:justify-start '>
+                          <div className="border h-[360px] w-[280px] rounded-lg shadow-lg p-3 bg-white">
+                            {/* Image Section */}
+                            <div className="w-full h-32 mb-3">
+                              <img
+                                src="https://via.placeholder.com/260x128" // Replace with your image URL
+                                alt="Example Activity"
+                                className="w-full h-full object-cover rounded-lg"
+                              />
+                            </div>
+
+                            {/* Content Section */}
+                            <div className="flex flex-col gap-1">
+                              {/* Tags Section */}
+                              <div className="flex gap-1 flex-wrap">
+                                <span className="px-2 py-1 bg-gray-200 rounded-full text-xs text-gray-600">
+                                  Tag1
+                                </span>
+                                <span className="px-2 py-1 bg-gray-200 rounded-full text-xs text-gray-600">
+                                  Tag2
+                                </span>
+                              </div>
+
+                              {/* Title */}
+                              <h3 className="text-base font-semibold text-gray-800 truncate">Example Activity </h3>
+                              <div className="text-xs text-gray-500 mb-2 flex items-center"> <GiPositionMarker className="mr-1" />Sorsogon</div>
+
+                              <div className='flex items-center justify-between'>
+                              {/* Rating Section */}
+                              <div className="flex items-center text-xs gap-1">
+                                <span classNams="">4.5</span>
+                                <span className='text-yellow-500 '>★★★★☆</span>
+                              </div>
+
+                              {/* Price Section */}
+                              <div className="text-gray-800 font-medium text-xs">
+                                ₱500 - ₱1000
+                              </div>
+                              </div>
+                            </div>
+
+                            {/* Buttons Section */}
+                            <div className="mt-3 flex flex-col gap-1">
+                              <Button onClick={openDrawer}   color='primary' className="w-full  text-white rounded-md text-sm">
+                                Add
+                              </Button>
+                              <Button color='primary' className="w-full  text-white rounded-md text-sm">
+                                View
+                              </Button>
+                            </div>
+                          </div>
+
+                          <div className="border h-[360px] w-[280px] rounded-lg shadow-lg p-3 bg-white">
+                            {/* Image Section */}
+                            <div className="w-full h-32 mb-3">
+                              <img
+                                src="https://via.placeholder.com/260x128" // Replace with your image URL
+                                alt="Example Activity"
+                                className="w-full h-full object-cover rounded-lg"
+                              />
+                            </div>
+
+                            {/* Content Section */}
+                            <div className="flex flex-col gap-1">
+                              {/* Tags Section */}
+                              <div className="flex gap-1 flex-wrap">
+                                <span className="px-2 py-1 bg-gray-200 rounded-full text-xs text-gray-600">
+                                  Tag1
+                                </span>
+                                <span className="px-2 py-1 bg-gray-200 rounded-full text-xs text-gray-600">
+                                  Tag2
+                                </span>
+                              </div>
+
+                              {/* Title */}
+                              <h3 className="text-base font-semibold text-gray-800">Example Activity</h3>
+                              <div className="text-xs text-gray-500 mb-2 flex items-center"> <GiPositionMarker className="mr-1" />Sorsogon</div>
+
+                              <div className='flex items-center justify-between'>
+                              {/* Rating Section */}
+                              <div className="flex items-center text-xs gap-1">
+                                <span classNams="">4.5</span>
+                                <span className='text-yellow-500 '>★★★★☆</span>
+                              </div>
+
+                              {/* Price Section */}
+                              <div className="text-gray-800 font-medium text-xs">
+                                ₱500 - ₱1000
+                              </div>
+                              </div>
+                            </div>
+
+                            {/* Buttons Section */}
+                            <div className="mt-3 flex flex-col gap-1">
+                              <Button onClick={openDrawer}   color='primary' className="w-full  text-white rounded-md text-sm">
+                                Add
+                              </Button>
+                              <Button color='primary' className="w-full  text-white rounded-md text-sm">
+                                View
+                              </Button>
+                            </div>
+                          </div>
+
+                          </div>
+
+                          
+                          </div>
+                      </Tab>
+                      <Tab key="Shop" title={<><FaShoppingBag className="mr-2" />Visit Local Shops</>}>
+                      <div>
+                            <div className='w-full mb-2 flex items-center justify-between'>
+                            <h1>Nearby</h1>
+                                <h1 className='text-sm font-semibold text-color1 hover:tracking-wide duration-300 hover:underline cursor-pointer'>
+                                See More ⥬
+                              </h1>
+                          </div>
+
+                          <div className=' flex w-full flex-wrap gap-3 items-center  h-full justify-center md:justify-start '>
+                          <div className="border h-[360px] w-[280px] rounded-lg shadow-lg p-3 bg-white">
+                            {/* Image Section */}
+                            <div className="w-full h-32 mb-3">
+                              <img
+                                src="https://via.placeholder.com/260x128" // Replace with your image URL
+                                alt="Example Activity"
+                                className="w-full h-full object-cover rounded-lg"
+                              />
+                            </div>
+
+                            {/* Content Section */}
+                            <div className="flex flex-col gap-1">
+                              {/* Tags Section */}
+                              <div className="flex gap-1 flex-wrap">
+                                <span className="px-2 py-1 bg-gray-200 rounded-full text-xs text-gray-600">
+                                  Tag1
+                                </span>
+                                <span className="px-2 py-1 bg-gray-200 rounded-full text-xs text-gray-600">
+                                  Tag2
+                                </span>
+                              </div>
+
+                              {/* Title */}
+                              <h3 className="text-base font-semibold text-gray-800 truncate">Example Activity </h3>
+                              <div className="text-xs text-gray-500 mb-2 flex items-center"> <GiPositionMarker className="mr-1" />Sorsogon</div>
+
+                              <div className='flex items-center justify-between'>
+                              {/* Rating Section */}
+                              <div className="flex items-center text-xs gap-1">
+                                <span classNams="">4.5</span>
+                                <span className='text-yellow-500 '>★★★★☆</span>
+                              </div>
+
+                              {/* Price Section */}
+                              <div className="text-gray-800 font-medium text-xs">
+                                ₱500 - ₱1000
+                              </div>
+                              </div>
+                            </div>
+
+                            {/* Buttons Section */}
+                            <div className="mt-3 flex flex-col gap-1">
+                              <Button onClick={openDrawer}   color='primary' className="w-full  text-white rounded-md text-sm">
+                                Add
+                              </Button>
+                              <Button color='primary' className="w-full  text-white rounded-md text-sm">
+                                View
+                              </Button>
+                            </div>
+                          </div>
+
+                          <div className="border h-[360px] w-[280px] rounded-lg shadow-lg p-3 bg-white">
+                            {/* Image Section */}
+                            <div className="w-full h-32 mb-3">
+                              <img
+                                src="https://via.placeholder.com/260x128" // Replace with your image URL
+                                alt="Example Activity"
+                                className="w-full h-full object-cover rounded-lg"
+                              />
+                            </div>
+
+                            {/* Content Section */}
+                            <div className="flex flex-col gap-1">
+                              {/* Tags Section */}
+                              <div className="flex gap-1 flex-wrap">
+                                <span className="px-2 py-1 bg-gray-200 rounded-full text-xs text-gray-600">
+                                  Tag1
+                                </span>
+                                <span className="px-2 py-1 bg-gray-200 rounded-full text-xs text-gray-600">
+                                  Tag2
+                                </span>
+                              </div>
+
+                              {/* Title */}
+                              <h3 className="text-base font-semibold text-gray-800">Example Activity</h3>
+                              <div className="text-xs text-gray-500 mb-2 flex items-center"> <GiPositionMarker className="mr-1" />Sorsogon</div>
+
+                              <div className='flex items-center justify-between'>
+                              {/* Rating Section */}
+                              <div className="flex items-center text-xs gap-1">
+                                <span classNams="">4.5</span>
+                                <span className='text-yellow-500 '>★★★★☆</span>
+                              </div>
+
+                              {/* Price Section */}
+                              <div className="text-gray-800 font-medium text-xs">
+                                ₱500 - ₱1000
+                              </div>
+                              </div>
+                            </div>
+
+                            {/* Buttons Section */}
+                            <div className="mt-3 flex flex-col gap-1">
+                              <Button onClick={openDrawer}   color='primary' className="w-full  text-white rounded-md text-sm">
+                                Add
+                              </Button>
+                              <Button color='primary' className="w-full  text-white rounded-md text-sm">
+                                View
+                              </Button>
+                            </div>
+                          </div>
+
+                          </div>
+
+                          
+                          </div>
+                      </Tab>
+                    </Tabs>
+
                     
-                        <div>
-                         <div className='w-full mb-2 flex items-center justify-between'>
-                          <h1>Nearby</h1>
-                             <h1 className='text-sm font-semibold text-color1 hover:tracking-wide duration-300 hover:underline cursor-pointer'>
-                              See More ⥬
-                            </h1>
-                        </div>
+                  </div>
+                </div>  
+              </div>
+              </>
+            )}
 
-                        <div className=' flex w-full flex-wrap gap-3 items-center  h-full justify-center md:justify-start '>
-                        <div className="border h-[360px] w-[280px] rounded-lg shadow-lg p-3 bg-white">
-                          {/* Image Section */}
-                          <div className="w-full h-32 mb-3">
-                            <img
-                              src="https://via.placeholder.com/260x128" // Replace with your image URL
-                              alt="Example Activity"
-                              className="w-full h-full object-cover rounded-lg"
-                            />
-                          </div>
-
-                          {/* Content Section */}
-                          <div className="flex flex-col gap-1">
-                            {/* Tags Section */}
-                            <div className="flex gap-1 flex-wrap">
-                              <span className="px-2 py-1 bg-gray-200 rounded-full text-xs text-gray-600">
-                                Tag1
-                              </span>
-                              <span className="px-2 py-1 bg-gray-200 rounded-full text-xs text-gray-600">
-                                Tag2
-                              </span>
-                            </div>
-
-                            {/* Title */}
-                            <h3 className="text-base font-semibold text-gray-800 truncate">Example Activity </h3>
-                            <div className="text-xs text-gray-500 mb-2 flex items-center"> <GiPositionMarker className="mr-1" />Sorsogon</div>
-
-                            <div className='flex items-center justify-between'>
-                            {/* Rating Section */}
-                            <div className="flex items-center text-xs gap-1">
-                              <span className="">4.5</span>
-                              <span className='text-yellow-500 '>★★★★☆</span>
-                            </div>
-
-                            {/* Price Section */}
-                            <div className="text-gray-800 font-medium text-xs">
-                              ₱500 - ₱1000
-                            </div>
-                            </div>
-                          </div>
-
-                          {/* Buttons Section */}
-                          <div className="mt-3 flex flex-col gap-1">
-                            <Button onClick={openDrawer}    color='primary' className="w-full  text-white rounded-md text-sm">
-                              Add
-                            </Button>
-                            <Button color='primary' className="w-full  text-white rounded-md text-sm">
-                              View
-                            </Button>
-                          </div>
-                        </div>
-
-                        <div className="border h-[360px] w-[280px] rounded-lg shadow-lg p-3 bg-white">
-                          {/* Image Section */}
-                          <div className="w-full h-32 mb-3">
-                            <img
-                              src="https://via.placeholder.com/260x128" // Replace with your image URL
-                              alt="Example Activity"
-                              className="w-full h-full object-cover rounded-lg"
-                            />
-                          </div>
-
-                          {/* Content Section */}
-                          <div className="flex flex-col gap-1">
-                            {/* Tags Section */}
-                            <div className="flex gap-1 flex-wrap">
-                              <span className="px-2 py-1 bg-gray-200 rounded-full text-xs text-gray-600">
-                                Tag1
-                              </span>
-                              <span className="px-2 py-1 bg-gray-200 rounded-full text-xs text-gray-600">
-                                Tag2
-                              </span>
-                            </div>
-
-                            {/* Title */}
-                            <h3 className="text-base font-semibold text-gray-800">Example Activity</h3>
-                            <div className="text-xs text-gray-500 mb-2 flex items-center"> <GiPositionMarker className="mr-1" />Sorsogon</div>
-
-                            <div className='flex items-center justify-between'>
-                            {/* Rating Section */}
-                            <div className="flex items-center text-xs gap-1">
-                              <span classNams="">4.5</span>
-                              <span className='text-yellow-500 '>★★★★☆</span>
-                            </div>
-
-                            {/* Price Section */}
-                            <div className="text-gray-800 font-medium text-xs">
-                              ₱500 - ₱1000
-                            </div>
-                            </div>
-                          </div>
-
-                          {/* Buttons Section */}
-                          <div className="mt-3 flex flex-col gap-1">
-                            <Button onClick={openDrawer}   color='primary' className="w-full  text-white rounded-md text-sm">
-                              Add
-                            </Button>
-                            <Button color='primary' className="w-full  text-white rounded-md text-sm">
-                              View
-                            </Button>
-                          </div>
-                        </div>
-
-                        </div>
-
-                       
-                        </div>
-                    
-                    </Tab>
-     
-                    <Tab key="Accomodation" title={<><FaBed className="mr-2" />Stay Somewhere</>}>
-                    <div>
-                         <div className='w-full mb-2 flex items-center justify-between'>
-                          <h1>Nearby</h1>
-                             <h1 className='text-sm font-semibold text-color1 hover:tracking-wide duration-300 hover:underline cursor-pointer'>
-                              See More ⥬
-                            </h1>
-                        </div>
-
-                        <div className=' flex w-full flex-wrap gap-3 items-center  h-full justify-center md:justify-start '>
-                        <div className="border h-[360px] w-[280px] rounded-lg shadow-lg p-3 bg-white">
-                          {/* Image Section */}
-                          <div className="w-full h-32 mb-3">
-                            <img
-                              src="https://via.placeholder.com/260x128" // Replace with your image URL
-                              alt="Example Activity"
-                              className="w-full h-full object-cover rounded-lg"
-                            />
-                          </div>
-
-                          {/* Content Section */}
-                          <div className="flex flex-col gap-1">
-                            {/* Tags Section */}
-                            <div className="flex gap-1 flex-wrap">
-                              <span className="px-2 py-1 bg-gray-200 rounded-full text-xs text-gray-600">
-                                Tag1
-                              </span>
-                              <span className="px-2 py-1 bg-gray-200 rounded-full text-xs text-gray-600">
-                                Tag2
-                              </span>
-                            </div>
-
-                            {/* Title */}
-                            <h3 className="text-base font-semibold text-gray-800 truncate">Example Activity </h3>
-                            <div className="text-xs text-gray-500 mb-2 flex items-center"> <GiPositionMarker className="mr-1" />Sorsogon</div>
-
-                            <div className='flex items-center justify-between'>
-                            {/* Rating Section */}
-                            <div className="flex items-center text-xs gap-1">
-                              <span classNams="">4.5</span>
-                              <span className='text-yellow-500 '>★★★★☆</span>
-                            </div>
-
-                            {/* Price Section */}
-                            <div className="text-gray-800 font-medium text-xs">
-                              ₱500 - ₱1000
-                            </div>
-                            </div>
-                          </div>
-
-                          {/* Buttons Section */}
-                          <div className="mt-3 flex flex-col gap-1">
-                            <Button onClick={openDrawer}   color='primary' className="w-full  text-white rounded-md text-sm">
-                              Add
-                            </Button>
-                            <Button color='primary' className="w-full  text-white rounded-md text-sm">
-                              View
-                            </Button>
-                          </div>
-                        </div>
-
-                        <div className="border h-[360px] w-[280px] rounded-lg shadow-lg p-3 bg-white">
-                          {/* Image Section */}
-                          <div className="w-full h-32 mb-3">
-                            <img
-                              src="https://via.placeholder.com/260x128" // Replace with your image URL
-                              alt="Example Activity"
-                              className="w-full h-full object-cover rounded-lg"
-                            />
-                          </div>
-
-                          {/* Content Section */}
-                          <div className="flex flex-col gap-1">
-                            {/* Tags Section */}
-                            <div className="flex gap-1 flex-wrap">
-                              <span className="px-2 py-1 bg-gray-200 rounded-full text-xs text-gray-600">
-                                Tag1
-                              </span>
-                              <span className="px-2 py-1 bg-gray-200 rounded-full text-xs text-gray-600">
-                                Tag2
-                              </span>
-                            </div>
-
-                            {/* Title */}
-                            <h3 className="text-base font-semibold text-gray-800">Example Activity</h3>
-                            <div className="text-xs text-gray-500 mb-2 flex items-center"> <GiPositionMarker className="mr-1" />Sorsogon</div>
-
-                            <div className='flex items-center justify-between'>
-                            {/* Rating Section */}
-                            <div className="flex items-center text-xs gap-1">
-                              <span classNams="">4.5</span>
-                              <span className='text-yellow-500 '>★★★★☆</span>
-                            </div>
-
-                            {/* Price Section */}
-                            <div className="text-gray-800 font-medium text-xs">
-                              ₱500 - ₱1000
-                            </div>
-                            </div>
-                          </div>
-
-                          {/* Buttons Section */}
-                          <div className="mt-3 flex flex-col gap-1">
-                            <Button onClick={openDrawer}   color='primary' className="w-full  text-white rounded-md text-sm">
-                              Add
-                            </Button>
-                            <Button color='primary' className="w-full  text-white rounded-md text-sm">
-                              View
-                            </Button>
-                          </div>
-                        </div>
-
-                        </div>
-
-                       
-                        </div>
-                    </Tab>
-                    <Tab key="Food" title={<><FaUtensils className="mr-2" />Eat Something</>}>
-                    <div>
-                         <div className='w-full mb-2 flex items-center justify-between'>
-                          <h1>Nearby</h1>
-                             <h1 className='text-sm font-semibold text-color1 hover:tracking-wide duration-300 hover:underline cursor-pointer'>
-                              See More ⥬
-                            </h1>
-                        </div>
-
-                        <div className=' flex w-full overflow-x-auto scrollbar-custom  flex-wrap md:flex gap-3 items-center  h-full justify-center md:justify-start '>
-                        <div className="border h-[360px] w-[280px] rounded-lg shadow-lg p-3 bg-white">
-                          {/* Image Section */}
-                          <div className="w-full h-32 mb-3">
-                            <img
-                              src="https://via.placeholder.com/260x128" // Replace with your image URL
-                              alt="Example Activity"
-                              className="w-full h-full object-cover rounded-lg"
-                            />
-                          </div>
-
-                          {/* Content Section */}
-                          <div className="flex flex-col gap-1">
-                            {/* Tags Section */}
-                            <div className="flex gap-1 flex-wrap">
-                              <span className="px-2 py-1 bg-gray-200 rounded-full text-xs text-gray-600">
-                                Tag1
-                              </span>
-                              <span className="px-2 py-1 bg-gray-200 rounded-full text-xs text-gray-600">
-                                Tag2
-                              </span>
-                            </div>
-
-                            {/* Title */}
-                            <h3 className="text-base font-semibold text-gray-800 truncate">Example Activity </h3>
-                            <div className="text-xs text-gray-500 mb-2 flex items-center"> <GiPositionMarker className="mr-1" />Sorsogon</div>
-
-                            <div className='flex items-center justify-between'>
-                            {/* Rating Section */}
-                            <div className="flex items-center text-xs gap-1">
-                              <span classNams="">4.5</span>
-                              <span className='text-yellow-500 '>★★★★☆</span>
-                            </div>
-
-                            {/* Price Section */}
-                            <div className="text-gray-800 font-medium text-xs">
-                              ₱500 - ₱1000
-                            </div>
-                            </div>
-                          </div>
-
-                          {/* Buttons Section */}
-                          <div className="mt-3 flex flex-col gap-1">
-                            <Button onClick={openDrawer}   color='primary' className="w-full  text-white rounded-md text-sm">
-                              Add
-                            </Button>
-                            <Button color='primary' className="w-full  text-white rounded-md text-sm">
-                              View
-                            </Button>
-                          </div>
-                        </div>
-
-                        <div className="border h-[360px] w-[280px] rounded-lg shadow-lg p-3 bg-white">
-                          {/* Image Section */}
-                          <div className="w-full h-32 mb-3">
-                            <img
-                              src="https://via.placeholder.com/260x128" // Replace with your image URL
-                              alt="Example Activity"
-                              className="w-full h-full object-cover rounded-lg"
-                            />
-                          </div>
-
-                          {/* Content Section */}
-                          <div className="flex flex-col gap-1">
-                            {/* Tags Section */}
-                            <div className="flex gap-1 flex-wrap">
-                              <span className="px-2 py-1 bg-gray-200 rounded-full text-xs text-gray-600">
-                                Tag1
-                              </span>
-                              <span className="px-2 py-1 bg-gray-200 rounded-full text-xs text-gray-600">
-                                Tag2
-                              </span>
-                            </div>
-
-                            {/* Title */}
-                            <h3 className="text-base font-semibold text-gray-800">Example Activity</h3>
-                            <div className="text-xs text-gray-500 mb-2 flex items-center"> <GiPositionMarker className="mr-1" />Sorsogon</div>
-
-                            <div className='flex items-center justify-between'>
-                            {/* Rating Section */}
-                            <div className="flex items-center text-xs gap-1">
-                              <span classNams="">4.5</span>
-                              <span className='text-yellow-500 '>★★★★☆</span>
-                            </div>
-
-                            {/* Price Section */}
-                            <div className="text-gray-800 font-medium text-xs">
-                              ₱500 - ₱1000
-                            </div>
-                            </div>
-                          </div>
-
-                          {/* Buttons Section */}
-                          <div className="mt-3 flex flex-col gap-1">
-                            <Button onClick={openDrawer}   color='primary' className="w-full  text-white rounded-md text-sm">
-                              Add
-                            </Button>
-                            <Button color='primary' className="w-full  text-white rounded-md text-sm">
-                              View
-                            </Button>
-                          </div>
-                        </div>
-
-                        </div>
-
-                       
-                        </div>
-                    </Tab>
-                    <Tab key="Shop" title={<><FaShoppingBag className="mr-2" />Visit Local Shops</>}>
-                    <div>
-                         <div className='w-full mb-2 flex items-center justify-between'>
-                          <h1>Nearby</h1>
-                             <h1 className='text-sm font-semibold text-color1 hover:tracking-wide duration-300 hover:underline cursor-pointer'>
-                              See More ⥬
-                            </h1>
-                        </div>
-
-                        <div className=' flex w-full flex-wrap gap-3 items-center  h-full justify-center md:justify-start '>
-                        <div className="border h-[360px] w-[280px] rounded-lg shadow-lg p-3 bg-white">
-                          {/* Image Section */}
-                          <div className="w-full h-32 mb-3">
-                            <img
-                              src="https://via.placeholder.com/260x128" // Replace with your image URL
-                              alt="Example Activity"
-                              className="w-full h-full object-cover rounded-lg"
-                            />
-                          </div>
-
-                          {/* Content Section */}
-                          <div className="flex flex-col gap-1">
-                            {/* Tags Section */}
-                            <div className="flex gap-1 flex-wrap">
-                              <span className="px-2 py-1 bg-gray-200 rounded-full text-xs text-gray-600">
-                                Tag1
-                              </span>
-                              <span className="px-2 py-1 bg-gray-200 rounded-full text-xs text-gray-600">
-                                Tag2
-                              </span>
-                            </div>
-
-                            {/* Title */}
-                            <h3 className="text-base font-semibold text-gray-800 truncate">Example Activity </h3>
-                            <div className="text-xs text-gray-500 mb-2 flex items-center"> <GiPositionMarker className="mr-1" />Sorsogon</div>
-
-                            <div className='flex items-center justify-between'>
-                            {/* Rating Section */}
-                            <div className="flex items-center text-xs gap-1">
-                              <span classNams="">4.5</span>
-                              <span className='text-yellow-500 '>★★★★☆</span>
-                            </div>
-
-                            {/* Price Section */}
-                            <div className="text-gray-800 font-medium text-xs">
-                              ₱500 - ₱1000
-                            </div>
-                            </div>
-                          </div>
-
-                          {/* Buttons Section */}
-                          <div className="mt-3 flex flex-col gap-1">
-                            <Button onClick={openDrawer}   color='primary' className="w-full  text-white rounded-md text-sm">
-                              Add
-                            </Button>
-                            <Button color='primary' className="w-full  text-white rounded-md text-sm">
-                              View
-                            </Button>
-                          </div>
-                        </div>
-
-                        <div className="border h-[360px] w-[280px] rounded-lg shadow-lg p-3 bg-white">
-                          {/* Image Section */}
-                          <div className="w-full h-32 mb-3">
-                            <img
-                              src="https://via.placeholder.com/260x128" // Replace with your image URL
-                              alt="Example Activity"
-                              className="w-full h-full object-cover rounded-lg"
-                            />
-                          </div>
-
-                          {/* Content Section */}
-                          <div className="flex flex-col gap-1">
-                            {/* Tags Section */}
-                            <div className="flex gap-1 flex-wrap">
-                              <span className="px-2 py-1 bg-gray-200 rounded-full text-xs text-gray-600">
-                                Tag1
-                              </span>
-                              <span className="px-2 py-1 bg-gray-200 rounded-full text-xs text-gray-600">
-                                Tag2
-                              </span>
-                            </div>
-
-                            {/* Title */}
-                            <h3 className="text-base font-semibold text-gray-800">Example Activity</h3>
-                            <div className="text-xs text-gray-500 mb-2 flex items-center"> <GiPositionMarker className="mr-1" />Sorsogon</div>
-
-                            <div className='flex items-center justify-between'>
-                            {/* Rating Section */}
-                            <div className="flex items-center text-xs gap-1">
-                              <span classNams="">4.5</span>
-                              <span className='text-yellow-500 '>★★★★☆</span>
-                            </div>
-
-                            {/* Price Section */}
-                            <div className="text-gray-800 font-medium text-xs">
-                              ₱500 - ₱1000
-                            </div>
-                            </div>
-                          </div>
-
-                          {/* Buttons Section */}
-                          <div className="mt-3 flex flex-col gap-1">
-                            <Button onClick={openDrawer}   color='primary' className="w-full  text-white rounded-md text-sm">
-                              Add
-                            </Button>
-                            <Button color='primary' className="w-full  text-white rounded-md text-sm">
-                              View
-                            </Button>
-                          </div>
-                        </div>
-
-                        </div>
-
-                       
-                        </div>
-                    </Tab>
-                  </Tabs>
-
-                    
-                 </div>
-                
-                </>
-              )}
-
-              {step === 5 && (
-                <>
-                <div className="mt-6 ">
+            {step === 5 && (
+              <>
+              <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-4 p-5 bg-gray-100">
+                <SidePanel tripName={tripName} tripDate={tripDate} firstDestination={destinationName} itinerary={itinerary}/>
+                <div className="bg-white reounded-lg p-8 ">
                   <h1 className="text-xl font-semibold text-primary mb-2">Plan Your Trip</h1>
                   <p className="text-sm text-gray-500 mb-4">
                     Use the itinerary trip planner below to map out your activities for each selected date.
                   </p>
                   <p className="text-lg font-medium text-center text-gray-700">Create a  itinerary for your journey!</p>
-  
+
                   <Planner
                     startDate={tripDate?.start}
                     endDate={tripDate?.end}
@@ -1048,156 +1074,102 @@ const Trip = () => {
                     onItineraryChange={handleItineraryChange}
                   />
                 </div>
-
-                </>
-              )}
-              {step === 6 && (
-                <>
-                <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-4 p-5 bg-gray-100">
-                  {/* Left Side: Trip Details */}
-                  <div className="bg-white shadow-lg rounded-lg p-5 overflow-y-auto max-h-[800px]">
-                    <h2 className="text-lg font-semibold">Trip Details : Review & Submit</h2>
-                    <p><strong>Trip Name:</strong> Business name</p>
-                    <p><strong>Trip Date:</strong> January 7, 2025</p>
-
-                    {/* Stops List */}
-                    <div className="mt-4">
-                      <div className="relative border-l-4 border-gray-300 pl-4">
-                        {[
-                          { id: 1, text: "1st Stop - 10km away | (30min)" },
-                          { id: 2, text: "2nd Stop - 10km away | (30min)" },
-                          { id: 3, text: "3rd Stop - 10km away | (30min)" },
-                          { id: 4, text: "Final Destination - 10km away | (30min)" },
-                        ].map((stop, index) => (
-                          <div key={index} className="mb-5 relative">
-                            {/* Numbered Circle */}
-                            <span className="absolute -left-7 top-1 bg-gray-800 text-white w-6 h-6 flex items-center justify-center rounded-full text-sm">
-                              {stop.id}
-                            </span>
-
-                            <p className="text-sm font-semibold">{stop.text}</p>
-
-                            {/* Business Card */}
-                            <div className="mt-2 bg-white shadow-md rounded-lg border p-3 flex items-center gap-3">
-                              <img
-                                src="https://via.placeholder.com/80"
-                                alt="Business"
-                                className="w-20 h-14 object-cover rounded-md"
-                              />
-                              <div>
-                                <h3 className="text-sm font-semibold">Business Name</h3>
-                                <p className="text-xs text-gray-500">Location | Business Category</p>
-                                <p className="text-yellow-500 text-sm">★★★★☆ 4.5</p>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Travel Time Total */}
-                    <p className="text-sm font-semibold mt-4">Travel Time Total: 3hrs 22mins</p>
-                  </div>
-
+              </div>
+              </>
+            )}
+            {step === 6 && (
+              <>
+              <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-4 p-5 bg-gray-100">
+                  <SidePanel tripName={tripName} tripDate={tripDate} firstDestination={destinationName} itinerary={itinerary}/>
                   {/* Right Side: Map Section */}
-                  <div className="relative bg-white shadow-lg rounded-lg p-5 flex justify-center items-center">
-                    {/* Map Placeholder */}
-                    <img
-                      src="https://via.placeholder.com/800x400"
-                      alt="Map"
-                      className="w-full h-auto rounded-md"
-                    />
-                    <button className="absolute bottom-3 bg-black text-white px-4 py-2 text-sm rounded-md">
-                      Show Direction
-                    </button>
-                  </div>
-                  </div>
-                </>
-              )}
-              {step === 7 && (
-                <>
-                  <div className="bg-gray-100 flex items-center h-full justify-center py-10">
-                    <div className="bg-white shadow-md rounded-lg p-6 w-full ">
-                      {/* Header */}
-                      <h1 className="text-2xl font-bold mb-4 text-gray-800">Trip Details : Review & Submit</h1>
-                        <div className="grid grid-cols-1 md:grid-cols-2 items-center p-4 border-b">
-                      {/* Trip Details */}
-                      <div className="mb-6">
-                        <p className="text-gray-700">
-                          <strong>Trip Name:</strong> Pokémon Journey
-                        </p>
-                        <p className="text-gray-700">
-                          <strong>Trip Date:</strong> Start: January 7, 2025 - End: January 10, 2025
-                        </p>
-                        <p className="text-gray-700">
-                          <strong>Total Days:</strong> 3
-                        </p>
-                        <p className="text-gray-700">
-                          <strong>Booked Services:</strong> 2
-                        </p>
-                      </div>
-
-                        {/* Budget & Travel Time */}
-                        <div className="mb-6">
-                        <p className="text-gray-600">
-                          <strong>Budget Estimation per person:</strong> 5,000-10,000
-                        </p>
-                        <p className="text-gray-600">
-                          <strong>Travel Time Total:</strong> 3hrs 22mins
-                        </p>
-                      </div>
-                      </div>
-
-                      {/* Highlights Summary */}
+                  <MapSection businesses={selectedBusiness} initialCenter={[12.901505084198375,123.94763219213431]} currentZoom={10} setCurrentZoom={12} />
+                </div>
+              </>
+            )}
+            {step === 7 && (
+              <>
+                <div className="bg-gray-100 flex items-center h-full justify-center py-10">
+                  <div className="bg-white shadow-md rounded-lg p-6 w-full ">
+                    {/* Header */}
+                    <h1 className="text-2xl font-bold mb-4 text-gray-800">Trip Details : Review & Submit</h1>
                       <div className="grid grid-cols-1 md:grid-cols-2 items-center p-4 border-b">
-                        <div>
-                          <p className="text-gray-600">
-                            <strong>Accommodations to Visit:</strong> 1
-                          </p>
-                          <p className="text-gray-600">
-                            <strong>Attractions to Visit:</strong> 1
-                          </p>
-                          <p className="text-gray-600">
-                            <strong>Food Places to Visit:</strong> 10
-                          </p>
-                          <p className="text-gray-600">
-                            <strong>Shops to Visit:</strong> 0
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-gray-600">
-                            <strong>Municipalities to Travel:</strong> 8
-                          </p>
-                          <p className="text-gray-600">
-                            <strong>To Visits:</strong> 12
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Map Section */}
-                      <div className="mb-6">
-                        <h2 className="text-lg font-semibold text-gray-800 mb-2">Map Overview</h2>
-                        <div className="border rounded-lg overflow-hidden shadow-md">
-                          <img
-                            src="https://via.placeholder.com/600x300"
-                            alt="Map Preview"
-                            className="w-full h-[25rem] object-cover"
-                          />
-                        </div>
-                      </div>
-
-
-                    
+                    {/* Trip Details */}
+                    <div className="mb-6">
+                      <p className="text-gray-700">
+                        <strong>Trip Name:</strong> Pokémon Journey
+                      </p>
+                      <p className="text-gray-700">
+                        <strong>Trip Date:</strong> Start: January 7, 2025 - End: January 10, 2025
+                      </p>
+                      <p className="text-gray-700">
+                        <strong>Total Days:</strong> 3
+                      </p>
+                      <p className="text-gray-700">
+                        <strong>Booked Services:</strong> 2
+                      </p>
                     </div>
+
+                      {/* Budget & Travel Time */}
+                      <div className="mb-6">
+                      <p className="text-gray-600">
+                        <strong>Budget Estimation per person:</strong> 5,000-10,000
+                      </p>
+                      <p className="text-gray-600">
+                        <strong>Travel Time Total:</strong> 3hrs 22mins
+                      </p>
+                    </div>
+                    </div>
+
+                    {/* Highlights Summary */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 items-center p-4 border-b">
+                      <div>
+                        <p className="text-gray-600">
+                          <strong>Accommodations to Visit:</strong> 1
+                        </p>
+                        <p className="text-gray-600">
+                          <strong>Attractions to Visit:</strong> 1
+                        </p>
+                        <p className="text-gray-600">
+                          <strong>Food Places to Visit:</strong> 10
+                        </p>
+                        <p className="text-gray-600">
+                          <strong>Shops to Visit:</strong> 0
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600">
+                          <strong>Municipalities to Travel:</strong> 8
+                        </p>
+                        <p className="text-gray-600">
+                          <strong>To Visits:</strong> 12
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Map Section */}
+                    <div className="mb-6">
+                      <h2 className="text-lg font-semibold text-gray-800 mb-2">Map Overview</h2>
+                      <div className="border rounded-lg overflow-hidden shadow-md">
+                        <img
+                          src="https://via.placeholder.com/600x300"
+                          alt="Map Preview"
+                          className="w-full h-[25rem] object-cover"
+                        />
+                      </div>
+                    </div>
+
+
+                  
                   </div>
-                            
-                </>
-              )}
-              {step === 8 && (
-                <>
-               
-                </>
-              )}
+                </div>
+                          
+              </>
+            )}
+            {step === 8 && (
+              <>
+              
+              </>
+            )}
             </MotionBox>
           </ModalBody>
           <ModalFooter className="bg-gray-100 p-4 z-50 sticky bottom-[-10px] rounded-b-lg">
