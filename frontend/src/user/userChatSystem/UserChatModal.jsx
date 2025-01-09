@@ -25,9 +25,8 @@ const encryptId = (id) => {
 const BookingDetailsCard = ({ message, isSender }) => {
   return (
     <div className="bg-white shadow-md text-black p-4 rounded-lg border border-gray-200 mt-2 max-w-md mx-auto sm:max-w-lg md:max-w-xl">
-      <h4 className="font-semibold mb-2 text-base sm:text-lg md:text-xl">Booking Details:</h4>
-      <ul className="space-y-2 text-sm sm:text-base">
-        <li><strong>Booking ID: </strong> {message.formDetails?.booked_id}</li>
+      <ul className="  flex  flex-wrap max-w-[270px] h-[250px] overflow-x-auto scrollbar-custom">
+        <li><strong>Booking ID: </strong> {message.formDetails?.booked_id} </li>
         <li>
           <strong>Product: </strong> 
           <span className="block sm:inline">{message.formDetails?.productName || 'No product provided'}</span>
@@ -186,10 +185,10 @@ const ProductCard = ({ product }) => (
 
 const PaymentDetailsCard = ({ message, isSenderYou }) => {
   return (
-    <div className={`bg-white shadow-md text-black p-4 rounded-lg border border-gray-200 ${isSenderYou ? 'ml-auto' : 'mr-auto'} max-w-full sm:max-w-sm break-words`}>
+    <div className={`bg-white  text-black p-4  border border-gray-200 ${isSenderYou ? 'ml-auto' : 'mr-auto'} max-w-full sm:max-w-sm break-words`}>
         {/* <h4 className="font-semibold mb-2">Booking Details:</h4> */}
-        <ul className="space-y-1">
-          <li><strong>Booking ID:</strong> {message.formDetails?.booked_id}</li>
+        <ul className="  flex  flex-wrap max-w-[260px] h-full  overflow-x-auto scrollbar-custom">
+          <li><strong>Booking ID:</strong>  {message.formDetails?.booked_id}</li>
           <li><strong>Account Name:</strong> {message.formDetails?.accountName}</li>
           <li><strong>Account Number:</strong> {message.formDetails?.accountNumber}</li>
           <li><strong>Reference Number:</strong> {message.formDetails?.referenceNumber}</li>
@@ -688,7 +687,7 @@ const UserChatModal = ({ isOpen, onClose, onOpenChat }) => {
           <div className={`flex ${isSenderYou ? 'justify-end' : 'justify-start'} mb-4`}>
             <div className={`p-4 rounded-lg max-w-[70%] ${isSenderYou ? 'bg-gray-200 text-black' : 'bg-color1 text-white'} shadow-md`}>
               {/* Message Text */}
-              {message.text && <p className="break-words mb-2">{message.text}</p>}
+              {message.text && <p className="max-w-[300px] mb-2">{message.text}</p>}
 
               {/* Image Handling */}
               {imageUrl && (
@@ -696,8 +695,8 @@ const UserChatModal = ({ isOpen, onClose, onOpenChat }) => {
                   <img
                     src={imageUrl}
                     alt="Sent"
-                    className="mt-2 rounded-md max-w-full cursor-pointer"
-                    style={{ maxHeight: '400px', objectFit: 'cover' }}
+                    className="mt-2  w-[300px] h-[300px]  object-cover object-center cursor-pointer"
+                  
                     onClick={() => handleImageClick(imageUrl)}
                   />
                   <button
