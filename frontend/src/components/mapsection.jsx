@@ -56,14 +56,14 @@ const MapSection = ({ businesses, initialCenter, currentZoom, setCurrentZoom }) 
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
         <MapEvents setCurrentZoom={setCurrentZoom} />
-
+{/* 
         {lines.map((line, index) => (
           <Polyline key={index} positions={line.map(([lng, lat]) => [lat, lng])} color="blue">
             <Popup>
               <span>{`Distance: ${distances[index]} km`}</span>
             </Popup>
           </Polyline>
-        ))}
+        ))} */}
 
         {businesses.map((business, index) => {
           const { pin_location } = business;

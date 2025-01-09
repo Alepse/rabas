@@ -10,7 +10,7 @@ const SidePanel = ({tripName, tripDate, firstDestination, itinerary, onItinerary
         return null; 
       };
 
-      console.log(itinerary);
+    //   console.log(itinerary);
 
     const startDate = tripDate?.start ? formatTripDate(tripDate.start) : null;
     const endDate = tripDate?.end ? formatTripDate(tripDate.end) : null;

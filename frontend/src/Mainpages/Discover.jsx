@@ -75,7 +75,7 @@ const Discover = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [showButton, setShowButton] = useState(false); // State to show/hide button
 
-  console.log(JSON.stringify(businesses));
+  // console.log(JSON.stringify(businesses));
     
   const businesscategories = ['activity', 'accommodation', 'restaurant', 'shop'];
 
