@@ -17,13 +17,13 @@ const SidePanel = ({tripName, tripDate, firstDestination, itinerary, onItinerary
     return (
         <div className="bg-white shadow-lg rounded-lg px-4 py-8 overflow-y-auto max-h-[800px]">
             <h2 className="text-lg font-semibold">Trip Details Overview</h2>
-            <p><strong>Trip Name:</strong> {tripName || "Your trip name will display here"}</p>
-            <p><strong>First Destination:</strong> {firstDestination || "Your first selected destination will display here"}</p>
+            <p><strong>Trip Name:</strong> {tripName || ""}</p>
+            <p><strong>Destination:</strong> {firstDestination || "No selected destination"}</p>
             <p>
                 <strong>Trip Date:</strong>{" "}
                 {startDate && endDate
                 ? `${startDate} - ${endDate}`
-                : "Your selected dates will display here"}
+                : "Selected dates"}
             </p>
             
 
@@ -36,7 +36,7 @@ const SidePanel = ({tripName, tripDate, firstDestination, itinerary, onItinerary
 
 
             {/* Travel Time Total */}
-            <p className="text-sm font-semibold mt-4">Travel Time Total: 3hrs 22mins</p>
+            {/* <p className="text-sm font-semibold mt-4">Travel Time Total: 3hrs 22mins</p> */}
         </div>
     );
 };

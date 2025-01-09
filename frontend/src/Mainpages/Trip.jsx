@@ -499,7 +499,7 @@ const Trip = () => {
 
             {step === 1 && (
               <>
-              <div className="grid grid-cols-1 gap-4 p-5 bg-gray-100">
+              {/* <div className="grid grid-cols-1 gap-4 p-5 bg-gray-100"> */}
               {/* <SidePanel 
                 tripName={tripName} 
                 tripDate={tripDate} 
@@ -519,7 +519,7 @@ const Trip = () => {
                       style={{ fontSize: '12px' }}
                     />
                 </div>
-              </div>
+              {/* </div> */}
               </>
             )}
 
@@ -573,6 +573,7 @@ const Trip = () => {
                       visibleMonths={3}
                       aria-label="Select trip dates"
                       value={tripDate}
+                      minValue={today(getLocalTimeZone()).add({ days: 1 })}
                       onChange={(newValue) => {
                         setTripDate(newValue);
                         // console.log('Selected Dates:', newValue); // Log the selected dates
