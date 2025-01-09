@@ -607,7 +607,7 @@ const Trip = () => {
                   {/* <DatePicker   className=" max-w-md rounded-2xl  border-1 border-gray-300 "/>   */}
                     
                 
-                  <WantToDoSection />
+                  {/* <WantToDoSection /> */}
                 </div>  
               </div>
               </>

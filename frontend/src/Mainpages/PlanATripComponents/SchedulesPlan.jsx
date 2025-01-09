@@ -12,10 +12,10 @@ const SchedulesPlan = ({ startDate, endDate, itinerary, onItineraryChange }) => 
     console.log("initial item ", itinerary);
     const { isOpen: isAddOpen, onOpen: onAddOpen, onClose: onAddClose } = useDisclosure();
 
-    useEffect(() => {
-        // Sync itinerary from parent when the component mounts or itinerary changes
-        setItineraryItems(itinerary);
-    }, [itinerary]);
+    // useEffect(() => {
+    //     // Sync itinerary from parent when the component mounts or itinerary changes
+    //     setItineraryItems(itinerary);
+    // }, [itinerary]);
 
     const addItemToItinerary = (date, item) => {
         setItineraryItems((prevItems) => {
