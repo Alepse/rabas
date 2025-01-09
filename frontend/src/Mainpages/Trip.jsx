@@ -637,12 +637,29 @@ const Trip = () => {
                   onItineraryChange={handleItineraryChange}
                 />
                 <div className="flex flex-col justify-start bg-white rounded-lg items-center p-8 ">
-                  <h1 className="md:text-4xl text-2xl font-medium text-primary py-4">What Do You Want To Do?</h1>
+                  {/* <h1 className="md:text-4xl text-2xl font-medium text-primary py-4">What Do You Want To Do?</h1> */}
                   {/* <PlanATripSearch/>  */}
                   {/* <DatePicker   className=" max-w-md rounded-2xl  border-1 border-gray-300 "/>   */}
-                    
+                  <h1 className="text-xl font-semibold text-primary mb-2">Plan Your Trip</h1>
+                  <p className="text-sm text-gray-500 mb-4">
+                    Use the itinerary trip planner below to map out your activities for each selected date.
+                  </p>
+                  <p className="text-lg font-medium text-center text-gray-700">Create a  itinerary for your journey!</p>
+  
+                  <Planner
+                    startDate={tripDate?.start}
+                    endDate={tripDate?.end}
+                    itinerary={itinerary}
+                    setItinerary={setItinerary}
+                    onItineraryChange={handleItineraryChange}
+                  />
                 
-                  {/* <WantToDoSection /> */}
+                  {/* <WantToDoSection 
+                    startDate={tripDate?.start}
+                    endDate={tripDate?.end}
+                    itinerary={itinerary}
+                    onItineraryChange={handleItineraryChange} 
+                  /> */}
                 </div>  
               </div>
               </>

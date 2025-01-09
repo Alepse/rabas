@@ -71,81 +71,89 @@ const MapSection = ({ itinerary, currentZoom, setCurrentZoom }) => {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
         <MapEvents setCurrentZoom={setCurrentZoom} />
-        {Object.keys(itinerary || {}).map(date =>
-            itinerary[date].map((item, index) => {
-            const { pin_location, title, imageUrl, id } = item;
-            console.log("itemsss", item);
-            if (pin_location) {
-                destinationOrder += 1;  // Count the destinations
-                const position = [pin_location.latitude, pin_location.longitude];
-                const locationName = title;
-                const showName = currentZoom >= 10;
-                const fontSize = currentZoom >= 12 ? '1rem' : '0.85rem';
+        {Object.keys(itinerary || {}).map((date) => {
+            const stops = [...(itinerary[date] || [])]; // Clone the array to avoid mutation
 
-                const customDivIcon = L.divIcon({
-                className: 'custom-icon',
-                html: `
-                    <div class="custom-popup flex items-center whitespace-nowrap font-bold text-color1" style="font-size: ${fontSize};">
-                    ${showName ? `
-                        <div class="pin-container">
-                        <div class="pin-head">
-                            <img src="${BASE_URL}/${imageUrl}" alt="${title}" class="pin-logo" />
-                        </div>
-                        <div class="pin-point"></div>
-                        </div><span>${locationName}</span>
-                    ` : `<div class="pin-container">
-                        <div class="pin-head">
-                            <img src="${BASE_URL}/${imageUrl}" alt="${title}" class="pin-logo" />
-                        </div>
-                        <div class="pin-point"></div>`}
-                    </div>
-                `,
-                iconSize: [50, 70],
-                iconAnchor: [25, 70],
-                });
+            // Sort stops by time
+            stops.sort((a, b) => {
+                if (!a.time) return 1; // Items without time come last
+                if (!b.time) return -1;
+                const [hourA, minuteA] = a.time.split(':').map(Number);
+                const [hourB, minuteB] = b.time.split(':').map(Number);
+                return hourA * 60 + minuteA - (hourB * 60 + minuteB); // Compare in minutes
+            });
 
-                return (
-                <Marker
-                    key={`${date}-${index}`}
-                    position={position}
-                    icon={customDivIcon}
-                    className="custom-marker-class"
-                >
-                    <Popup closeButton={false}>
-                    {/* Enhanced details inside the popup */}
-                    <div className="popup-content relative bg-white rounded-lg py-4 w-full sm:w-64 md:w-72 max-w-xs">
-                        {/* Destination order badge */}
-                        <span className="absolute top-2 left-2 text-white text-sm font-bold bg-color2 -translate-x-[45px] -translate-y-[15px] rounded-full px-3 py-1 z-10">
-                            {`${destinationOrder}${getOrdinalSuffix(destinationOrder)}`}
-                        </span>
-                        <div className="mb-2 text-gray-500 text-xs text-center sm:text-left">{date}</div>
-                        <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
-                            {/* Image Section */}
-                            <div className="flex-shrink-0">
-                                <img 
-                                src={`${BASE_URL}/${imageUrl}`} 
-                                alt={title} 
-                                className="w-32 max-h-32 md:max-h-40 rounded-md object-cover border border-gray-200"
-                                />
+            return stops.map((item, index) => {
+                const { pin_location, title, imageUrl, id } = item;
+
+                if (pin_location) {
+                    destinationOrder += 1; // Count the destinations
+                    const position = [pin_location.latitude, pin_location.longitude];
+                    const locationName = title;
+                    const showName = currentZoom >= 10;
+                    const fontSize = currentZoom >= 12 ? '1rem' : '0.85rem';
+
+                    const customDivIcon = L.divIcon({
+                        className: 'custom-icon',
+                        html: `
+                            <div class="custom-popup flex items-center whitespace-nowrap font-bold text-color1" style="font-size: ${fontSize};">
+                            ${showName ? `
+                                <div class="pin-container">
+                                <div class="pin-head">
+                                    <img src="${BASE_URL}/${imageUrl}" alt="${title}" class="pin-logo" />
+                                </div>
+                                <div class="pin-point"></div>
+                                </div><span>${locationName}</span>
+                            ` : `<div class="pin-container">
+                                <div class="pin-head">
+                                    <img src="${BASE_URL}/${imageUrl}" alt="${title}" class="pin-logo" />
+                                </div>
+                                <div class="pin-point"></div>`}
                             </div>
-                            {/* Details Section */}
-                            <div className="flex-1 flex flex-col justify-between items-center sm:items-start text-center sm:text-left">
-                                <h3 className="font-bold text-sm md:text-base text-gray-800 mb-2">{title}</h3>
-                                <Link to={`/business/${encryptId(id)}`}>
-                                <Button className="w-full bg-color1 text-color3 text-xs md:text-sm py-2 rounded-md hover:bg-color2 transition">
-                                    Visit page
-                                </Button>
-                                </Link>
-                            </div>
-                        </div>
-                    </div>
-                    </Popup>
-                </Marker>
-                );
-            }
-            return null;
-            })
-        )}
+                        `,
+                        iconSize: [50, 70],
+                        iconAnchor: [25, 70],
+                    });
+
+                    return (
+                        <Marker
+                            key={`${date}-${index}`}
+                            position={position}
+                            icon={customDivIcon}
+                            className="custom-marker-class"
+                        >
+                            <Popup closeButton={false}>
+                                <div className="popup-content relative bg-white rounded-lg py-4 w-full sm:w-64 md:w-72 max-w-xs">
+                                    <span className="absolute top-2 left-2 text-white text-sm font-bold bg-color2 -translate-x-[45px] -translate-y-[15px] rounded-full px-3 py-1 z-10">
+                                        {`${destinationOrder}${getOrdinalSuffix(destinationOrder)}`}
+                                    </span>
+                                    <div className="mb-2 text-gray-500 text-xs text-center sm:text-left">{date}</div>
+                                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
+                                        <div className="flex-shrink-0">
+                                            <img
+                                                src={`${BASE_URL}/${imageUrl}`}
+                                                alt={title}
+                                                className="w-32 max-h-32 md:max-h-40 rounded-md object-cover border border-gray-200"
+                                            />
+                                        </div>
+                                        <div className="flex-1 flex flex-col justify-between items-center sm:items-start text-center sm:text-left">
+                                            <h3 className="font-bold text-sm md:text-base text-gray-800 mb-2">{title}</h3>
+                                            <Link to={`/business/${encryptId(id)}`}>
+                                                <Button className="w-full bg-color1 text-color3 text-xs md:text-sm py-2 rounded-md hover:bg-color2 transition">
+                                                    Visit page
+                                                </Button>
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </div>
+                            </Popup>
+                        </Marker>
+                    );
+                }
+                return null;
+            });
+        })}
+
         {/* Button to show directions for all pins */}
         <div style={{
             position: 'absolute',

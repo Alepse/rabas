@@ -30,6 +30,7 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
         selectedAmenities: [],
         selectedRatings: [],
         selectedDestination: 'All',
+        searchQuery: '', 
     };
     const [allFilters, setAllFilters] = useState(initialState);
     const [activitiesFilters, setActivitiesFilters] = useState(initialState);
@@ -194,9 +195,31 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
 
     const [searchQuery, setSearchQuery] = useState('');
 
-    const handleSearchChange = (event) => {
-        setSearchQuery(event.target.value.toLowerCase());
+    const handleSearchChange = (e) => {
+        const { value } = e.target;
+        setAllFilters((prevFilters) => ({
+            ...prevFilters,
+            searchQuery: value,  // Update the searchQuery for all filters
+        }));
+        // Optionally, if you want to apply filters to other categories individually, you can update them as well.
+        setActivitiesFilters((prevFilters) => ({
+            ...prevFilters,
+            searchQuery: value,
+        }));
+        setAccommodationsFilters((prevFilters) => ({
+            ...prevFilters,
+            searchQuery: value,
+        }));
+        setFoodFilters((prevFilters) => ({
+            ...prevFilters,
+            searchQuery: value,
+        }));
+        setShopFilters((prevFilters) => ({
+            ...prevFilters,
+            searchQuery: value,
+        }));
     };
+    
 
     // Functions from Discover.jsx
     const handleRatingClick = (rating, setFilters) => {
@@ -215,44 +238,60 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
 
     const filterData = (data, filters) => {
         return data.filter(item => {
-          const matchesType = filters.selectedType.length === 0 || 
-            filters.selectedType.every(type => 
-              item.category.map(cat => cat.toLowerCase().replace(/s$/, '')).includes(type.toLowerCase().replace(/s$/, ''))
-            );
-         
-          const matchesCategory = filters.selectedCategory?.length === 0 || 
-            filters.selectedCategory.every(category => 
-              item.category.map(cat => cat.toLowerCase().replace(/s$/, '')).includes(category.toLowerCase().replace(/s$/, ''))
-            );
-          
-          const matchesCuisine = filters.selectedCuisine?.length === 0 || 
-            filters.selectedCuisine.every(cuisine => 
-              item.category.map(cat => cat.toLowerCase().replace(/s$/, '')).includes(cuisine.toLowerCase().replace(/s$/, ''))
-            );
+            // Check for search query match with fallback to empty string if name or description is undefined
+            console.log(item);
+            const matchesSearchQuery = filters.searchQuery ? 
+            (item.businessName?.toLowerCase().includes(filters.searchQuery.toLowerCase()) || 
+             item.businessType?.toLowerCase().includes(filters.searchQuery.toLowerCase()) ||
+             item.aboutUs?.toLowerCase().includes(filters.searchQuery.toLowerCase()) ||
+             item.destination?.toLowerCase().includes(filters.searchQuery.toLowerCase()) ||
+             item.completeAddress?.toLowerCase().includes(filters.searchQuery.toLowerCase()) ||
+             item.description?.toLowerCase().includes(filters.searchQuery.toLowerCase()) ||
+             item.facilities?.some(facility =>
+                facility.items?.some(a => a.name?.toLowerCase().includes(filters.searchQuery.toLowerCase())) // Match amenities
+             )
+            ) : true;
+
     
-          // console.log('selectedCuisine', filters.selectedCuisine);
-          // console.log('item.category', item.category);
+            // Check other filters like type, amenities, etc.
     
-          const matchesAmenities =
-            filters.selectedAmenities.length === 0 ||
-            filters.selectedAmenities.every((amenity) =>
-            item.facilities
-                ?.flatMap((facility) =>
-                facility.items.map((a) => a.name.toLowerCase().replace(/s$/, '')) // Normalize item facilities
-                )
-                .includes(amenity.toLowerCase().replace(/s$/, '')) // Normalize selected amenities
-            );
+            const matchesType = filters.selectedType.length === 0 || 
+                filters.selectedType.every(type => 
+                    item.category?.map(cat => cat.toLowerCase().replace(/s$/, '')).includes(type.toLowerCase().replace(/s$/, ''))
+                );
     
-          const matchesRatings = filters.selectedRatings.length === 0 || 
-            filters.selectedRatings.includes(Math.floor(item.rating || 0));
+            const matchesCategory = filters.selectedCategory?.length === 0 || 
+                filters.selectedCategory.every(category => 
+                    item.category?.map(cat => cat.toLowerCase().replace(/s$/, '')).includes(category.toLowerCase().replace(/s$/, ''))
+                );
     
-          const matchesDestination = filters.selectedDestination === 'All' || filters.selectedDestination === item.destination;
-          
-          const matchesPriceRange = item.lowest_price <= filters.priceRange[1] && item.highest_price >= filters.priceRange[0];
+            const matchesCuisine = filters.selectedCuisine?.length === 0 || 
+                filters.selectedCuisine.every(cuisine => 
+                    item.category?.map(cat => cat.toLowerCase().replace(/s$/, '')).includes(cuisine.toLowerCase().replace(/s$/, ''))
+                );
     
-          return matchesType && matchesCategory && matchesCuisine && matchesAmenities && matchesRatings && matchesDestination && matchesPriceRange;
+            const matchesAmenities =
+                filters.selectedAmenities.length === 0 ||
+                filters.selectedAmenities.every((amenity) =>
+                    item.facilities
+                        ?.flatMap((facility) =>
+                            facility.items.map((a) => a.name?.toLowerCase().replace(/s$/, '')) // Ensure name is defined
+                        )
+                        .includes(amenity.toLowerCase().replace(/s$/, '')) // Normalize selected amenities
+                );
+    
+            const matchesRatings = filters.selectedRatings.length === 0 || 
+                filters.selectedRatings.includes(Math.floor(item.rating || 0));
+    
+            const matchesDestination = filters.selectedDestination === 'All' || filters.selectedDestination === item.destination;
+    
+            const matchesPriceRange = item.lowest_price <= filters.priceRange[1] && item.highest_price >= filters.priceRange[0];
+    
+            return matchesSearchQuery && matchesType && matchesCategory && matchesCuisine && matchesAmenities && matchesRatings && matchesDestination && matchesPriceRange;
         });
     };
+    
+    
     
 
     const renderFilters = (filters, setFilters, types, additionalFilters = null, isAllTab = false) => {
@@ -454,55 +493,53 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
     const [isBookingConfirmed, setIsBookingConfirmed] = useState(false);
     const [notes, setNotes] = useState('');
     const [isTagsModalVisible, setIsTagsModalVisible] = useState(false);
-     const [selectedFilters, setSelectedFilters] = useState([]);
+    const [selectedFilters, setSelectedFilters] = useState([]);
 
   
-            const renderTags = (tags = [], selectedFilters = []) => {
-                const maxVisibleTags = 3;
-                const visibleTags = tags.slice(0, maxVisibleTags);
-                const hiddenTags = tags.slice(maxVisibleTags);
-            
-                // Helper function to check if a tag matches any selected filter
-                const isTagHighlighted = (tag) => 
-                    selectedFilters.some(filter =>
-                        tag.toLowerCase().replace(/s$/, '') === filter.toLowerCase().replace(/s$/, '')
-                    );
-            
-                return (
-                    <div className="flex flex-wrap gap-2">
-                        {/* Render visible tags */}
-                        {visibleTags.map((tag, idx) => (
-                            <span
-                                key={idx}
-                                className={`text-xs px-2 py-1 rounded-full ${
-                                    isTagHighlighted(tag)
-                                        ? 'bg-color2 text-white' // Highlighted style
-                                        : 'bg-gray-200 text-gray-700' // Default style
-                                }`}
-                            >
-                                {tag}
-                            </span>
-                        ))}
-            
-                        {/* Render "See More" button for hidden tags */}
-                        {hiddenTags.length > 0 && (
-                            <span
-                                className="text-xs underline cursor-pointer text-color2"
-                                onClick={() => {
-                                    setCurrentTags(tags); // Set all tags (visible + hidden) to `currentTags`
-                                    setIsTagsModalVisible(true); // Open the modal
-                                }}
-                            >
-                                See More
-                            </span>
-                        )}
-                    </div>
-                );
-            };
-            
-            
+    const renderTags = (tags = [], selectedFilters = []) => {
+        const maxVisibleTags = 3;
+        const visibleTags = tags.slice(0, maxVisibleTags);
+        const hiddenTags = tags.slice(maxVisibleTags);
     
+        // Helper function to check if a tag matches any selected filter
+        const isTagHighlighted = (tag) => 
+            selectedFilters.some(filter =>
+                tag.toLowerCase().replace(/s$/, '') === filter.toLowerCase().replace(/s$/, '')
+            );
     
+        return (
+            <div className="flex flex-wrap gap-2">
+                {/* Render visible tags */}
+                {visibleTags.map((tag, idx) => (
+                    <span
+                        key={idx}
+                        className={`text-xs px-2 py-1 rounded-full ${
+                            isTagHighlighted(tag)
+                                ? 'bg-color2 text-white' // Highlighted style
+                                : 'bg-gray-200 text-gray-700' // Default style
+                        }`}
+                    >
+                        {tag}
+                    </span>
+                ))}
+    
+                {/* Render "See More" button for hidden tags */}
+                {hiddenTags.length > 0 && (
+                    <span
+                        className="text-xs underline cursor-pointer text-color2"
+                        onClick={() => {
+                            setCurrentTags(tags); // Set all tags (visible + hidden) to `currentTags`
+                            setIsTagsModalVisible(true); // Open the modal
+                        }}
+                    >
+                        See More
+                    </span>
+                )}
+            </div>
+        );
+    };
+            
+            
 
     const handleAddItemClick = (item) => {
         setSelectedItem(item);
@@ -535,6 +572,7 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                     imageUrl: selectedItem.cardImage,
                     location: selectedItem.destination,
                     pin_location: selectedItem.pin_location,
+                    rating: selectedItem.rating,
                     time: itineraryTime || '',
                     isBooked: isBookingConfirmed,
                     notes: notes || 'No additional notes',
@@ -580,20 +618,20 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                     </button>
                 </ModalHeader>
                 <ModalBody className='bg-light'>
-                <h1 className="text-center text-lg md:text-xl lg:text-2xl flex-grow">
+                <h1 className="text-center text-lg md:text-xl lg:text-2xl px-4 py-8">
                         Your Travel Itinerary: Must-Do Activities, Stay Options, Food Spots & Shopping Spots
                     </h1>
                     {/* Search Input */}
-                    {/* <div className="mb-4 relative">
+                    <div className="relative">
                         <input
                             type="text"
                             placeholder="Search..."
-                            value={searchQuery}
-                            onChange={handleSearchChange}
+                            value={allFilters.searchQuery}
+                            onChange={handleSearchChange}  // Call handleSearchChange on change
                             className="w-full p-2 pl-10 border border-gray-300 rounded"
                         />
                         <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                    </div> */}
+                    </div>
 
                     {/* Tabs and Filters */}
                     <Tabs
@@ -624,7 +662,7 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                                 {activeTab === 'all' && renderFilters(allFilters, setAllFilters, [...activityTypes, ...accommodationTypes, ...foodTypes, ...shopTypes], null, true)}
 
                                 {activeTab === 'activities' && renderFilters(activitiesFilters, setActivitiesFilters, activityTypes, (
-                                    <div className="mb-6 max-h-[230px] overflow-auto scrollbar-custom">
+                                    <div className="mb-4 max-h-[230px] overflow-auto scrollbar-custom">
                                         <h3 className="text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2">Activity Type</h3>
                                         <CheckboxGroup
                                             value={activitiesFilters.selectedType}
@@ -732,6 +770,7 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                                             activeTab === 'accommodations' ? accommodationsFilters.priceRange :
                                             allFilters.priceRange,
                                 selectedCuisine: activeTab === 'restaurant' ? foodFilters.selectedCuisine : [],
+                                searchQuery: allFilters.searchQuery // Assuming search query is stored here
                                 };
 
                                 const filteredItems = filterData(mockData[category], filters);
@@ -894,6 +933,7 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                                                     activeTab === 'accommodations' ? accommodationsFilters.priceRange :
                                                     allFilters.priceRange,
                                         selectedCuisine: activeTab === 'restaurant' ? foodFilters.selectedCuisine : [],
+                                        searchQuery: allFilters.searchQuery 
                                     }).length === 0
                                 ) && (
                                     <div className="flex text-center text-gray-500 italic">

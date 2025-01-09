@@ -141,11 +141,11 @@ const SchedulesPlan = ({ startDate, endDate, itinerary, onItineraryChange }) => 
         localStorage.setItem('itineraryItems', JSON.stringify(itineraryItems));
     }, [itineraryItems]);
 
-    // useEffect(() => {
-    //     if (onItineraryChange) {
-    //       onItineraryChange(itineraryItems);
-    //     }
-    //   }, [itineraryItems, onItineraryChange]);
+    useEffect(() => {
+        if (onItineraryChange) {
+          onItineraryChange(itineraryItems);
+        }
+      }, [itineraryItems, onItineraryChange]);
 
     const handleAdd = (date) => {
         onAddOpen();
