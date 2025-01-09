@@ -36,7 +36,7 @@ import TripDetailsModal from './PlanATripComponents/TripDetailsModal';
 import wave from '@/assets/wave2.webp'
 import axios from 'axios';
 import { MdOutlineKeyboardArrowRight } from 'react-icons/md';
-import MapSection from '@/components/mapsection';
+import TripMapSection from '@/Mainpages/PlanATripComponents/TripMapSection'; 
 
 import { Link } from 'react-router-dom';
 
@@ -77,9 +77,10 @@ const municipalities = [
 const Trip = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [step, setStep] = useState(1);
-  const [progress, setProgress] = useState(10);
-  const totalSteps = 6;
+  const [progress, setProgress] = useState(20);
+  const totalSteps = 5;
   const [currentLocation, setCurrentLocation] = useState(null);
+  const [currentZoom, setCurrentZoom] = useState(10); //for maps
   
   const [loading, setLoading] = useState(true);
   const [showButton, setShowButton] = useState(false); // State to show/hide button
@@ -102,13 +103,48 @@ const Trip = () => {
   const [tripDate, setTripDate] = useState(null);
   // console.log("Starting and end date\n", tripDate);
 
+  const formatTripDate = (date) => {
+    if (date && date.calendar) {
+      const { day, month, year } = date;
+      return new Date(year, month - 1, day); // Create a Date object
+    }
+    return null; 
+  };
+
+  const startDate = tripDate?.start ? formatTripDate(tripDate.start) : null;
+  const endDate = tripDate?.end ? formatTripDate(tripDate.end) : null;
+
+  const totalDays = startDate && endDate 
+    ? Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) 
+    : 0;
+
+    console.log(`Trip Date: Start: ${startDate?.toLocaleDateString()} - End: ${endDate?.toLocaleDateString()}`);
+    // console.log(`Total Days: ${totalDays}`)
+
   // third variable destination name
   const [destinationName, setDestinationName] = useState('');
   // console.log("Destination name:\n", destinationName);
 
   // 4th variable iteneraryo
   const [itinerary, setItinerary] = useState({});
-  console.log("Itinerary asdasdsasdasda:\n", itinerary)
+  // console.log("Itinerary asdasdsasdasda:\n", itinerary)
+
+  // Helper function to count items by type
+  const countItemsByType = (type) => {
+    return Object.values(itinerary).reduce((count, dayItems) => {
+      return count + dayItems.filter((item) => item.type === type).length;
+    }, 0);
+  };
+
+  const accommodationsCount = countItemsByType("accommodation");
+  const attractionsCount = countItemsByType("attraction");
+  const foodPlacesCount = countItemsByType("restaurant");
+  const shopsCount = countItemsByType("shop");
+  const municipalitiesCount = new Set(
+    Object.values(itinerary).flatMap((dayItems) => dayItems.map((item) => item.location))
+  ).size;
+  const totalVisits = accommodationsCount + attractionsCount + foodPlacesCount + shopsCount;
+
 
   const { isOpen: isAddOpen, onOpen: onAddOpen, onClose: onAddClose } = useDisclosure();
   const [isSideUIVisible, setIsSideUIVisible] = useState(false);
@@ -612,23 +648,7 @@ const Trip = () => {
               </div>
               </>
             )}
-
             {step === 5 && (
-              <>
-              <div className="grid grid-cols-1 lg:grid-cols-[1fr_3fr] gap-4 p-5 bg-gray-100">
-                  <SidePanel 
-                    tripName={tripName} 
-                    tripDate={tripDate} 
-                    firstDestination={destinationName} 
-                    itinerary={itinerary}
-                    onItineraryChange={handleItineraryChange}
-                  />
-                  {/* Right Side: Map Section */}
-                  <MapSection businesses={selectedBusiness} initialCenter={[12.901505084198375,123.94763219213431]} currentZoom={10} setCurrentZoom={12} />
-                </div>
-              </>
-            )}
-            {step === 6 && (
               <>
                 <div className="bg-gray-100 flex items-center h-full justify-center py-10">
                   <div className="bg-white shadow-md rounded-lg p-6 w-full ">
@@ -638,52 +658,49 @@ const Trip = () => {
                     {/* Trip Details */}
                     <div className="mb-6">
                       <p className="text-gray-700">
-                        <strong>Trip Name:</strong> Pokémon Journey
+                        <strong>Trip Name:</strong> {tripName}
                       </p>
                       <p className="text-gray-700">
-                        <strong>Trip Date:</strong> Start: January 7, 2025 - End: January 10, 2025
+                        <strong>Trip Date:</strong> Start: {startDate ? startDate.toLocaleDateString() : "N/A"} - End: {endDate ? endDate.toLocaleDateString() : "N/A"}
                       </p>
                       <p className="text-gray-700">
-                        <strong>Total Days:</strong> 3
-                      </p>
-                      <p className="text-gray-700">
-                        <strong>Booked Services:</strong> 2
+                        <strong>Total Days:</strong> {totalDays}
                       </p>
                     </div>
 
                       {/* Budget & Travel Time */}
-                      <div className="mb-6">
-                      <p className="text-gray-600">
-                        <strong>Budget Estimation per person:</strong> 5,000-10,000
-                      </p>
-                      <p className="text-gray-600">
-                        <strong>Travel Time Total:</strong> 3hrs 22mins
-                      </p>
-                    </div>
+                      {/* <div className="mb-6">
+                        <p className="text-gray-600">
+                          <strong>Budget Estimation per person:</strong> 5,000-10,000
+                        </p>
+                        <p className="text-gray-600">
+                          <strong>Travel Time Total:</strong> 3hrs 22mins
+                        </p>
+                      </div> */}
                     </div>
 
                     {/* Highlights Summary */}
                     <div className="grid grid-cols-1 md:grid-cols-2 items-center p-4 border-b">
                       <div>
                         <p className="text-gray-600">
-                          <strong>Accommodations to Visit:</strong> 1
+                          <strong>Accommodations to Visit:</strong> {accommodationsCount}
                         </p>
                         <p className="text-gray-600">
-                          <strong>Attractions to Visit:</strong> 1
+                          <strong>Attractions to Visit:</strong> {attractionsCount}
                         </p>
                         <p className="text-gray-600">
-                          <strong>Food Places to Visit:</strong> 10
+                          <strong>Food Places to Visit:</strong> {foodPlacesCount}
                         </p>
                         <p className="text-gray-600">
-                          <strong>Shops to Visit:</strong> 0
+                          <strong>Shops to Visit:</strong> {shopsCount}
                         </p>
                       </div>
                       <div>
                         <p className="text-gray-600">
-                          <strong>Municipalities to Travel:</strong> 8
+                          <strong>Municipalities to Travel:</strong> {municipalitiesCount}
                         </p>
                         <p className="text-gray-600">
-                          <strong>To Visits:</strong> 12
+                          <strong>To Visits:</strong> {totalVisits}
                         </p>
                       </div>
                     </div>
@@ -691,13 +708,12 @@ const Trip = () => {
                     {/* Map Section */}
                     <div className="mb-6">
                       <h2 className="text-lg font-semibold text-gray-800 mb-2">Map Overview</h2>
-                      <div className="border rounded-lg overflow-hidden shadow-md">
-                        <img
-                          src="https://via.placeholder.com/600x300"
-                          alt="Map Preview"
-                          className="w-full h-[25rem] object-cover"
-                        />
-                      </div>
+                      {/* Right Side: Map Section */}
+                      <TripMapSection 
+                        itinerary={itinerary}  
+                        currentZoom={currentZoom}
+                        setCurrentZoom={setCurrentZoom}
+                      />
                     </div>
 
 

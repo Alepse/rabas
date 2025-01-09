@@ -275,7 +275,7 @@ const SchedulesPlan = ({ startDate, endDate, itinerary, onItineraryChange }) => 
 
     return (
         <div className='w-full p-1'>
-            <Accordion selectionMode="multiple">
+            <Accordion selectionMode="multiple" >
                 {Object.keys(itineraryItems).map(date => (
                     <AccordionItem 
                       className='max-h-[700px] p-2 h-full overflow-auto scrollbar-custom'

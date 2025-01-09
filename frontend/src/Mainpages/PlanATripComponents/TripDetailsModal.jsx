@@ -7,7 +7,7 @@ import AddItemModal from './AddItemModal';
 import { Link } from 'react-router-dom';
 import CryptoJS from 'crypto-js';
 import axios from 'axios';
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
+import TripMapSection from '@/Mainpages/PlanATripComponents/TripMapSection'; 
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
@@ -48,7 +48,6 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
   const [currentZoom, setCurrentZoom] = useState(10);
   const [selectedLocation, setSelectedLocation] = useState(null); // State to hold the selected location details
 
-  let destinationOrder = 0;
 
   const handleMarkerClick = (item) => {
     setSelectedLocation(item); // Store clicked location details
@@ -246,12 +245,6 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
       alert("Geolocation is not supported by this browser.");
     }
   };
-
-  const getOrdinalSuffix = (n) => {
-    const s = ["th", "st", "nd", "rd"];
-    const v = n % 100;
-    return s[(v - 20) % 10] || s[v] || s[0];
-  };
   
 
   return (
@@ -306,108 +299,11 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
             <AccordionItem title="Selected Destinations">
               <div className="p-4">
                 <h3 className="font-semibold text-lg">Locations Navigation:</h3>
-                <MapContainer center={[12.9738, 123.9807]} zoom={10} className="w-full h-96">
-                  <TileLayer
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  <TripMapSection 
+                    itinerary={itinerary}  
+                    currentZoom={currentZoom}
+                    setCurrentZoom={setCurrentZoom}
                   />
-                  <MapEvents setCurrentZoom={setCurrentZoom} />
-                  {Object.keys(itinerary || {}).map(date =>
-                    itinerary[date].map((item, index) => {
-                      const { pin_location, title, imageUrl, id } = item;
-                      console.log("itemsss", item);
-                      if (pin_location) {
-                        destinationOrder += 1;  // Count the destinations
-                        const position = [pin_location.latitude, pin_location.longitude];
-                        const locationName = title;
-                        const showName = currentZoom >= 10;
-                        const fontSize = currentZoom >= 12 ? '1rem' : '0.85rem';
-
-                        const customDivIcon = L.divIcon({
-                          className: 'custom-icon',
-                          html: `
-                            <div class="custom-popup flex items-center whitespace-nowrap font-bold text-color1" style="font-size: ${fontSize};">
-                              ${showName ? `
-                                <div class="pin-container">
-                                  <div class="pin-head">
-                                    <img src="${BASE_URL}/${imageUrl}" alt="${title}" class="pin-logo" />
-                                  </div>
-                                  <div class="pin-point"></div>
-                                </div><span>${locationName}${index+1}</span>
-                              ` : `<div class="pin-container">
-                                  <div class="pin-head">
-                                    <img src="${BASE_URL}/${imageUrl}" alt="${title}" class="pin-logo" />
-                                  </div>
-                                  <div class="pin-point"></div>`}
-                            </div>
-                          `,
-                          iconSize: [50, 70],
-                          iconAnchor: [25, 70],
-                        });
-
-                        return (
-                          <Marker
-                            key={`${date}-${index}`}
-                            position={position}
-                            icon={customDivIcon}
-                            className="custom-marker-class"
-                          >
-                            <Popup closeButton={false}>
-                              {/* Enhanced details inside the popup */}
-                              <div className="popup-content relative bg-white rounded-lg py-4 w-full sm:w-64 md:w-72 max-w-xs">
-                                {/* Destination order badge */}
-                                <div className="mb-2 text-gray-500 text-xs text-center sm:text-left">{date}</div>
-                                <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
-                                  {/* Image Section */}
-                                  <div className="flex-shrink-0">
-                                    <img 
-                                      src={`${BASE_URL}/${imageUrl}`} 
-                                      alt={title} 
-                                      className="w-full max-h-32 md:max-h-40 rounded-md object-cover border border-gray-200"
-                                    />
-                                  </div>
-                                  {/* Details Section */}
-                                  <div className="flex-1 flex flex-col justify-between items-center sm:items-start text-center sm:text-left">
-                                    <h3 className="font-bold text-sm md:text-base text-gray-800 mb-2">{title}</h3>
-                                    <Link to={`/business/${encryptId(id)}`}>
-                                      <Button className="w-full bg-color1 text-color3 text-xs md:text-sm py-2 rounded-md hover:bg-color2 transition">
-                                        Visit page
-                                      </Button>
-                                    </Link>
-                                  </div>
-                                </div>
-                              </div>
-                            </Popup>
-                          </Marker>
-                        );
-                      }
-                      return null;
-                    })
-                  )}
-                  {/* Button to show directions for all pins */}
-                  <div style={{
-                    position: 'absolute',
-                    bottom: '10px',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    zIndex: 1000,
-                  }}>
-                    <button
-                      className="bg-color1 hover:bg-color2"
-                      onClick={handleShowDirection}
-                      style={{
-                        padding: '10px 20px',
-                        color: '#fff',
-                        border: 'none',
-                        borderRadius: '5px',
-                        cursor: 'pointer',
-                        fontSize: '16px',
-                      }}
-                    >
-                      Show direction
-                    </button>
-                  </div>
-                </MapContainer>
               </div>
             </AccordionItem>
             <AccordionItem title="Itinerary">
