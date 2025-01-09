@@ -23,7 +23,9 @@ const SidePanel = ({tripName, tripDate, firstDestination, itinerary, onItinerary
         const ampm = hour >= 12 ? "PM" : "AM";
         const formattedHour = hour % 12 || 12; // Convert 0 to 12 for midnight
         return `${formattedHour}:${minute.toString().padStart(2, "0")} ${ampm}`;
-    }
+    };
+
+    let destinationOrder = 1;
     
     return (
         <div className="bg-white shadow-lg rounded-lg px-4 py-8 overflow-y-auto max-h-[800px]">
@@ -51,6 +53,8 @@ const SidePanel = ({tripName, tripDate, firstDestination, itinerary, onItinerary
                                 return timeA.localeCompare(timeB);
                             });
 
+                            
+
                             return (
                                 <div key={index} className="mb-5">
                                     <p className="text-lg font-bold mb-2">{date}</p>
@@ -58,9 +62,9 @@ const SidePanel = ({tripName, tripDate, firstDestination, itinerary, onItinerary
                                         sortedStops.map((stop, stopIndex) => (
                                             <div key={stopIndex} className="relative">
                                                 <span className="absolute -left-7 top-1 bg-gray-800 text-white w-6 h-6 flex items-center justify-center rounded-full text-sm">
-                                                    {stopIndex + 1}
+                                                    {destinationOrder++}
                                                 </span>
-                                                <h3 className="text-sm font-semibold">
+                                                <h3 className="text-sm font-semibold py-2">
                                                     {convertTo12HourFormat(stop?.time)}
                                                 </h3>
                                                 <div className="mt-2 bg-white shadow-md rounded-lg border p-3 flex flex-col items-center gap-3">

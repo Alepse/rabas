@@ -279,12 +279,22 @@ const Trip = () => {
         const userId = response.data.userData.user_id;
         // console.log('userId', userId);
         const firstItineraryItem = Object.values(itinerary).flat()[0] || {};
-        const { imageUrl, location } = firstItineraryItem;
+        const { imageUrl } = firstItineraryItem;
+
+        // Extract all unique locations from the itinerary
+        const uniqueLocations = Array.from(
+          new Set(
+              Object.values(itinerary)
+                  .flat()
+                  .map(item => item.location) // Get the location field
+                  .filter(location => location) // Remove undefined or null values
+          )
+        ).join(", "); // Join them with a space
       
         const newTrip = {
           tripName,
           imageUrl: imageUrl,
-          destination: location,
+          destination: uniqueLocations,
           startDate: tripDate.start.toString(),
           endDate: tripDate.end.toString(),
           itinerary,
@@ -584,7 +594,7 @@ const Trip = () => {
                         </SelectItem>
                       ))}
                     </Select>
-                    <h1 onClick={nextStep} className='underline cursor-pointer mt-6 hover:text-color2'>prefer not to say</h1>
+                    <h1 onClick={nextStep} className='underline cursor-pointer mt-6 hover:text-color2'>Skip</h1>
                 </div>
               </div>
               </>

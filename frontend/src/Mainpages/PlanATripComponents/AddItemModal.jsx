@@ -584,6 +584,8 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                 setCheckOutTime('');
                 setIsBookingConfirmed(false);
                 setNotes('');
+                setSearchQuery('');
+                setAllFilters(initialState);
 
                 Swal.fire({
                     title: 'Added!',
