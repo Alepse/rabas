@@ -296,7 +296,7 @@ const PaymentModal = ({ booking, show, onClose, refreshBookings }) => {
           overflowY: 'auto',
           borderRadius: '8px',
         }}
-        className="max-w-[90%] lg:max-w-[40%]"
+        className="max-w-[90%] lg:max-w-[40%] "
       >
         <ModalHeader>Payment for Booking ID: {booking?.booked_id}</ModalHeader>
         <ModalBody style={{ padding: '1rem' }}>
@@ -363,16 +363,16 @@ const PaymentModal = ({ booking, show, onClose, refreshBookings }) => {
             required
           />
           {preview && (
-            <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+            <div className='flex justify-center'>
               <img src={preview} alt="Preview" style={{ maxWidth: '100%', maxHeight: '100%' }} />
             </div>
           )}
         </ModalBody>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '1rem' }}>
+        <div className='flex justify-between p-2'>
           <Button
             auto
             flat
-            color="error"
+            color="danger"
             onClick={() => {
               clearPaymentDetails();
               onClose();
@@ -380,7 +380,7 @@ const PaymentModal = ({ booking, show, onClose, refreshBookings }) => {
           >
             Cancel
           </Button>
-          <Button auto color="success" onClick={handlePayment}>
+          <Button auto className='text-white' color="success" onClick={handlePayment}>
             Pay Now
           </Button>
         </div>
@@ -416,7 +416,7 @@ const MyBookingTab = ({ bookings, onCancelBooking, openPayBooking }) => {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-2">
       {/* Page Title */}
       <h3 className="text-4xl font-bold mb-4">My Bookings</h3>
       <div className="bg-gray-300 h-[1px] mb-8"></div>
@@ -426,7 +426,7 @@ const MyBookingTab = ({ bookings, onCancelBooking, openPayBooking }) => {
         aria-label="Booking Status"
         selectedKey={activeTab}
         onSelectionChange={setActiveTab}
-        className="overflow-x-auto"
+        className="overflow-x-auto w-full"
       >
         {/* Pending Tab */}
         <Tab key="pending" title="Pending">
@@ -505,7 +505,7 @@ const MyBookingTab = ({ bookings, onCancelBooking, openPayBooking }) => {
                       </p>
                     </div>
                   </div>
-
+                    
                   {/* Cancel Button */}
                   {booking.paymentStatus === 'Pending' && (
                     <div className="mt-6">
@@ -515,22 +515,23 @@ const MyBookingTab = ({ bookings, onCancelBooking, openPayBooking }) => {
                       >
                         Pay Now
                       </button>
-                      <p className="text-xs text-gray-500 mt-2 text-center">
-                        No payment after 24 hours upon booking will be cancelled
-                      </p>
                     </div>
                   )}
 
                   {/* Cancel Button */}
                   {booking.status === 'pending' && (
-                    <div className="mt-6">
+                    <div className="mt-2">
                       <button
                         onClick={() => onCancelBooking(booking.booking_id)}
                         className="w-full bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition"
                       >
                         Cancel Booking
                       </button>
+                      <p className="text-xs text-gray-500 mt-2 text-center">
+                        No payment after 24 hours upon booking will be cancelled
+                      </p>
                     </div>
+                    
                   )}
                 </div>
               ))

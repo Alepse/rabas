@@ -287,9 +287,9 @@ const AvailabilityModalActivity = ({ isOpen, onClose, currentBookingDetails, onA
 // Component for rendering booking details
 const BookingDetailsCard = ({ message, onCheckAvailability, isSenderYou }) => {
   return (
-    <div className={`bg-white shadow-md text-black p-4 rounded-lg border border-gray-200 ${isSenderYou ? 'ml-auto' : 'mr-auto'} max-w-full sm:max-w-sm break-words`}>
+    <div className={`bg-white shadow-md text-black p-4 rounded-lg border border-gray-200 ${isSenderYou ? 'ml-auto' : 'mr-auto'} max-w-full sm:max-w-sm break-words`} >
         {/* <h4 className="font-semibold mb-2">Booking Details:</h4> */}
-        <ul className="space-y-1">
+        <ul className="  flex  flex-wrap max-w-[260px] h-[250px] overflow-x-auto scrollbar-custom">
           <li><strong>Booking ID:</strong> {message.formDetails?.booked_id}</li>
           <li><strong>Product:</strong> {message.formDetails?.productName}</li>
           <li><MdPeople className="inline-block text-lg" /> <strong> Guests:</strong> {message.formDetails?.numberOfGuests}</li>
@@ -400,9 +400,9 @@ const BookingDetailsCard = ({ message, onCheckAvailability, isSenderYou }) => {
 const PaymentDetailsCard = ({ message, onConfirmPayment, isSenderYou }) => {
   // console.log(message);
   return (
-    <div className={`bg-white shadow-md text-black p-4 rounded-lg border border-gray-200 ${isSenderYou ? 'ml-auto' : 'mr-auto'} max-w-full sm:max-w-sm break-words`}>
+    <div className={`bg-white  text-black p-4  border border-gray-200 ${isSenderYou ? 'ml-auto' : 'mr-auto'} max-w-full sm:max-w-sm break-words`}>
         {/* <h4 className="font-semibold mb-2">Booking Details:</h4> */}
-        <ul className="space-y-1">
+        <ul className="  flex  flex-wrap max-w-[260px] max-h-[250px] overflow-x-auto scrollbar-custom">
           <li><strong>Booking ID: </strong>{message.formDetails?.booked_id}</li>
           <li><strong>Account Name: </strong>{message.formDetails?.accountName}</li>
           <li><strong>Account Number: </strong>{message.formDetails?.accountNumber}</li>
@@ -1192,14 +1192,13 @@ const ChatModal = ({ isOpen, onClose, selectedBooking, selectedUserId }) => {
           <div className={`flex ${isSenderYou ? 'justify-end' : 'justify-start'} mb-4`}>
             <div className={`p-4 rounded-lg max-w-[70%] ${isSenderYou ? 'bg-gray-200 text-black' : 'bg-color1 text-white'} shadow-md`}>
            
-            {message.text && <p className="break-words mb-2">{message.text}</p>}
+            {message.text && <p className="max-w-[300px] mb-2">{message.text} </p>}
             {imageUrl && (
               <div className="relative">
                 <img
                   src={imageUrl}
                   alt="Sent"
-                  className="mt-2 rounded-md max-w-full cursor-pointer"
-                  style={{ maxHeight: '400px', objectFit: 'cover' }}
+                    className="mt-2 max-w-[300px] max-h-[300px]  object-cover object-center cursor-pointer"
                   onClick={() => handleImageClick(imageUrl)}
                 />
                 <button
