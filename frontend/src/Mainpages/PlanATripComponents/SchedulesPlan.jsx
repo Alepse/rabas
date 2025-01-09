@@ -7,11 +7,30 @@ import Swal from 'sweetalert2';
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
-const SchedulesPlan = ({ startDate, endDate, onItineraryChange }) => {
+const SchedulesPlan = ({ startDate, endDate, itinerary, onItineraryChange }) => {
     // console.log('SchedulesPlan Dates:', startDate, endDate);
-
+    console.log("initial item ", itinerary);
     const { isOpen: isAddOpen, onOpen: onAddOpen, onClose: onAddClose } = useDisclosure();
-    
+
+    useEffect(() => {
+        // Sync itinerary from parent when the component mounts or itinerary changes
+        setItineraryItems(itinerary);
+    }, [itinerary]);
+
+    const addItemToItinerary = (date, item) => {
+        setItineraryItems((prevItems) => {
+            const updatedItems = {
+                ...prevItems,
+                [date]: [...(prevItems[date] || []), item],
+            };
+            // Notify parent about changes
+            if (onItineraryChange) {
+                onItineraryChange(updatedItems);
+            }
+            return updatedItems;
+        });
+    };
+
     // Utility function to generate dates between startDate and endDate
     const generateDateRange = (start, end) => {
         const dateArray = [];
@@ -26,16 +45,59 @@ const SchedulesPlan = ({ startDate, endDate, onItineraryChange }) => {
         return dateArray;
     };
 
-    // Initialize itineraryItems with dates between startDate and endDate
+    useEffect(() => {
+        if (startDate && endDate) {
+            const dates = generateDateRange(startDate, endDate);
+            const validDates = new Set(
+                dates.map((date) =>
+                    date.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })
+                )
+            );
+    
+            setItineraryItems((prevItems) => {
+                // Filter out dates outside the new range
+                const filteredItems = Object.keys(prevItems)
+                    .filter((date) => validDates.has(date))
+                    .reduce((acc, date) => {
+                        acc[date] = prevItems[date];
+                        return acc;
+                    }, {});
+    
+                // Add new dates if not present
+                let isChanged = false;
+                validDates.forEach((date) => {
+                    if (!filteredItems[date]) {
+                        isChanged = true; // Detect if we need to update
+                        filteredItems[date] = [];
+                    }
+                });
+    
+                // Only update if the new state is different
+                if (
+                    Object.keys(filteredItems).length !== Object.keys(prevItems).length ||
+                    isChanged
+                ) {
+                    return filteredItems;
+                }
+    
+                return prevItems; // No update required
+            });
+        }
+    }, [startDate, endDate, generateDateRange]);
+    
+
     const [itineraryItems, setItineraryItems] = useState(() => {
         const dates = generateDateRange(startDate, endDate);
-        const initialItems = {};
-        dates.forEach(date => {
-            const formattedDate = date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
-            initialItems[formattedDate] = []; // Initialize with empty array or default items
+        const initialItems = { ...itinerary }; // Use the existing itinerary as the base
+        dates.forEach((date) => {
+            const formattedDate = date.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" });
+            if (!initialItems[formattedDate]) {
+                // Only add an empty array for dates not already present in the itinerary
+                initialItems[formattedDate] = [];
+            }
         });
         return initialItems;
-    });
+    });    
 
     const [currentDate, setCurrentDate] = useState(null);
     const [selectedItem, setSelectedItem] = useState(null);
@@ -84,13 +146,11 @@ const SchedulesPlan = ({ startDate, endDate, onItineraryChange }) => {
         localStorage.setItem('itineraryItems', JSON.stringify(itineraryItems));
     }, [itineraryItems]);
 
-    const addItemToItinerary = (date, item) => {
-        setItineraryItems((prevItems) => ({
-            ...prevItems,
-            [date]: [...prevItems[date], item],
-        }));
-        // console.log('Item added to itinerary:', date, item);
-    };
+    // useEffect(() => {
+    //     if (onItineraryChange) {
+    //       onItineraryChange(itineraryItems);
+    //     }
+    //   }, [itineraryItems, onItineraryChange]);
 
     const handleAdd = (date) => {
         onAddOpen();
@@ -214,7 +274,7 @@ const SchedulesPlan = ({ startDate, endDate, onItineraryChange }) => {
     }, [itineraryItems, onItineraryChange]);
 
     return (
-        <div className='w-full p-4'>
+        <div className='w-full p-1'>
             <Accordion selectionMode="multiple">
                 {Object.keys(itineraryItems).map(date => (
                     <AccordionItem 
@@ -222,21 +282,21 @@ const SchedulesPlan = ({ startDate, endDate, onItineraryChange }) => {
                       key={date} 
                       title={date}
                     >
-                        <div className='flex justify-end mb-4'>
-                            <Button className='border-1 m-2 border-color1 rounded-full text-lg p-3 hover:bg-color2 bg-white hover:text-white duration-300 min-w-11' onClick={() => handleAdd(date)}>
+                        <div className='flex justify-end'>
+                            <Button className='border-1 border-color1 rounded-full text-sm p-3 hover:bg-color2 bg-white hover:text-white duration-300 min-w-6' onClick={() => handleAdd(date)}>
                                 <FaPlus/> Add Trip
                             </Button>
                         </div>
-                        <div className='mx-auto max-h-screen'>
+                        <div className='mx-auto m-0 py-6 max-h-screen'>
                             {itineraryItems[date].map((item, index) => (
-                                <div key={index} className="flex flex-col sm:flex-row items-start mb-6  border p-2 rounded-lg shadow-lg w-full sm:w-3/4 lg:w-2/3 mx-auto">
-                                    <div className="flex-shrink-0 w-12 text-center">
-                                        <div className="bg-color1 text-white rounded-full w-10 h-10 flex items-center justify-center mb-2">
+                                <div key={index} className="flex flex-col items-start border p-4 rounded-lg shadow-lg w-full mx-auto">
+                                    <div className="flex-shrink-0 w-auto text-center">
+                                        <div className="bg-color1 text-white rounded-full w-10 h-10 flex items-center justify-center">
                                             {index + 1}
                                         </div>
-                                        <div className="h-full border-l-2 border-gray-300"></div>
+                                        {/* <div className="h-full border-l-2 border-gray-300"></div> */}
                                     </div>
-                                    <div className="ml-0 sm:ml-6 w-full">
+                                    <div className="ml-0 w-full">
                                         {editItemIndex === index ? (
                                             <div className="space-y-4">
                                                 <input type="time" name="time" value={editItemDetails.time} onChange={handleEditInputChange} className="w-full p-2 border rounded-md" />
@@ -261,22 +321,22 @@ const SchedulesPlan = ({ startDate, endDate, onItineraryChange }) => {
                                             </div>
                                         ) : (
                                             <div>
-                                                <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
-                                                    <h3 className="font-semibold text-xl">{item.title}</h3>
+                                                <div className="flex flex-col sm:flex-col justify-start items-start mb-4">
+                                                    <h3 className="font-semibold text-sm">{item.title}</h3>
                                                     <span className="text-sm text-gray-500"> <span className='text-black font-medium'>Time of Visit:</span> {formatTime(item.time)}</span>
                                                 </div>
                                                 {item.imageUrl ? (
-                                                    <img src={`${BASE_URL}/${item.imageUrl}` || 'https://via.placeholder.com/300'} alt={item.title} className="w-full h-56 object-cover rounded-md mb-4" />                                    
+                                                    <img src={`${BASE_URL}/${item.imageUrl}` || 'https://via.placeholder.com/300'} alt={item.title} className="w-full h-30 object-cover rounded-md mb-4" />                                    
                                                 ) : (
-                                                    <div className="w-full h-56 flex items-center justify-center text-gray-500 p-4">
-                                                        <div className="w-full h-full flex items-center justify-center text-gray-500 bg-gray-200 rounded-lg">
+                                                    <div className="w-full h-30 flex items-center justify-center text-gray-500 p-2">
+                                                        <div className="w-full h-full flex items-center justify-center text-sm text-gray-500 bg-gray-200 p-2 rounded-lg">
                                                             No images available
                                                         </div>
                                                     </div>
                                                 )}
                                                 <p className="text-sm mb-2"><strong>Booked:</strong> {item.isBooked ? 'Yes' : 'No'}</p>
                                                 <p className="text-sm mb-4"><strong>Notes:</strong> {item.notes}</p>
-                                                <div className="flex space-x-2">
+                                                <div className="flex flex-col gap-2 items-center">
                                                     <Button size="sm" color="danger" className="w-full" onClick={() => handleDelete(date, index)}>Delete</Button>
                                                     <Button size="sm" color='primary' className="w-full" onClick={() => handleEdit(date, index)}>Edit</Button>
                                                 </div>
@@ -290,7 +350,7 @@ const SchedulesPlan = ({ startDate, endDate, onItineraryChange }) => {
                 ))}
             </Accordion>
 
-            <AddItemModal 
+            <AddItemModal   
                 isOpen={isAddOpen || isSideUIVisible} 
                 onClose={() => { onAddClose(); setIsSideUIVisible(false); }} 
                 onAddItem={(item) => {
