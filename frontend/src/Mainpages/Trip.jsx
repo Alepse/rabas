@@ -70,8 +70,7 @@ const Trip = () => {
   const [progress, setProgress] = useState(10);
   const totalSteps = 8;
   const [currentLocation, setCurrentLocation] = useState(null);
-  const [destination, setDestination] = useState(null);
-  const [tripName, setTripName] = useState('');
+  
   const [loading, setLoading] = useState(true);
   const [showButton, setShowButton] = useState(false); // State to show/hide button
   const [trips, setTrips] = useState([]); // Initialize with an empty array
@@ -88,7 +87,20 @@ const Trip = () => {
 
   const [time, setTime] = useState("");
 
+  ///variable for trip dates
+  let [tripDate, setTripDate] = useState({
+    start: today(getLocalTimeZone()),
+    end: today(getLocalTimeZone()).add({ days: 0 }),
+  });
+  console.log("Starting and end date\n", tripDate);
   
+  // second variable trip name
+  const [tripName, setTripName] = useState('');
+  console.log("Trip name:\n", tripName);
+
+  // third variable destination name
+  const [destinationName, setDestinationName] = useState('');
+  console.log("Destination name:\n", destinationName);
   
 
   const checkLoginStatus = useCallback(async () => {
@@ -148,14 +160,6 @@ const Trip = () => {
     document.title = 'RabaSorsogon | Trip';
   });
 
-  const [selectedLocations, setSelectedLocations] = useState('');
-
-
-  let [value, setValue] = useState({
-    start: today(getLocalTimeZone()),
-    end: today(getLocalTimeZone()).add({ days: 0 }),
-  });
-  
 
   useEffect(() => {
 
@@ -228,8 +232,8 @@ const Trip = () => {
           tripName,
           imageUrl: imageUrl,
           destination: location,
-          startDate: value.start.toString(),
-          endDate: value.end.toString(),
+          startDate: tripDate.start.toString(),
+          endDate: tripDate.end.toString(),
           itinerary,
           userId, // Include user_id in the newTrip object
         };
@@ -267,7 +271,7 @@ const Trip = () => {
     setIsDetailsOpen(false);
     setSelectedTrip(null);
     setItinerary({});
-    setValue({ start: today(getLocalTimeZone()), end: today(getLocalTimeZone()).add({ days: 0 }) });
+    setTripDate({ start: today(getLocalTimeZone()), end: today(getLocalTimeZone()).add({ days: 0 }) });
   }
 
   const deleteTrip = (index, tripId) => {
@@ -474,9 +478,9 @@ const Trip = () => {
                     <RangeCalendar
                       visibleMonths={3}
                       aria-label="Select trip dates"
-                      value={value}
+                      value={tripDate}
                       onChange={(newValue) => {
-                        setValue(newValue);
+                        setTripDate(newValue);
                         // console.log('Selected Dates:', newValue); // Log the selected dates
                       }}
                     />
@@ -518,6 +522,8 @@ const Trip = () => {
                     placeholder="Enter preffered destination..."
                     className="mt-4 max-w-md rounded-2xl  border-2 border-gray-300 text-center"
                     style={{ fontSize: '12px' }}
+                    value={destinationName}
+                    onChange={(e) => setDestinationName(e.target.value)}
                   />
                    <h1 onClick={nextStep} className='underline cursor-pointer mt-6 hover:text-color2'>prefer not to say</h1>
                 </div>
@@ -1035,8 +1041,8 @@ const Trip = () => {
                   <p className="text-lg font-medium text-center text-gray-700">Create a  itinerary for your journey!</p>
   
                   <Planner
-                    startDate={value?.start}
-                    endDate={value?.end}
+                    startDate={tripDate?.start}
+                    endDate={tripDate?.end}
                     itinerary={itinerary}
                     setItinerary={setItinerary}
                     onItineraryChange={handleItineraryChange}
@@ -1048,143 +1054,143 @@ const Trip = () => {
               {step === 6 && (
                 <>
                 <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-4 p-5 bg-gray-100">
-            {/* Left Side: Trip Details */}
-            <div className="bg-white shadow-lg rounded-lg p-5 overflow-y-auto max-h-[800px]">
-              <h2 className="text-lg font-semibold">Trip Details : Review & Submit</h2>
-              <p><strong>Trip Name:</strong> Business name</p>
-              <p><strong>Trip Date:</strong> January 7, 2025</p>
+                  {/* Left Side: Trip Details */}
+                  <div className="bg-white shadow-lg rounded-lg p-5 overflow-y-auto max-h-[800px]">
+                    <h2 className="text-lg font-semibold">Trip Details : Review & Submit</h2>
+                    <p><strong>Trip Name:</strong> Business name</p>
+                    <p><strong>Trip Date:</strong> January 7, 2025</p>
 
-              {/* Stops List */}
-              <div className="mt-4">
-                <div className="relative border-l-4 border-gray-300 pl-4">
-                  {[
-                    { id: 1, text: "1st Stop - 10km away | (30min)" },
-                    { id: 2, text: "2nd Stop - 10km away | (30min)" },
-                    { id: 3, text: "3rd Stop - 10km away | (30min)" },
-                    { id: 4, text: "Final Destination - 10km away | (30min)" },
-                  ].map((stop, index) => (
-                    <div key={index} className="mb-5 relative">
-                      {/* Numbered Circle */}
-                      <span className="absolute -left-7 top-1 bg-gray-800 text-white w-6 h-6 flex items-center justify-center rounded-full text-sm">
-                        {stop.id}
-                      </span>
+                    {/* Stops List */}
+                    <div className="mt-4">
+                      <div className="relative border-l-4 border-gray-300 pl-4">
+                        {[
+                          { id: 1, text: "1st Stop - 10km away | (30min)" },
+                          { id: 2, text: "2nd Stop - 10km away | (30min)" },
+                          { id: 3, text: "3rd Stop - 10km away | (30min)" },
+                          { id: 4, text: "Final Destination - 10km away | (30min)" },
+                        ].map((stop, index) => (
+                          <div key={index} className="mb-5 relative">
+                            {/* Numbered Circle */}
+                            <span className="absolute -left-7 top-1 bg-gray-800 text-white w-6 h-6 flex items-center justify-center rounded-full text-sm">
+                              {stop.id}
+                            </span>
 
-                      <p className="text-sm font-semibold">{stop.text}</p>
+                            <p className="text-sm font-semibold">{stop.text}</p>
 
-                      {/* Business Card */}
-                      <div className="mt-2 bg-white shadow-md rounded-lg border p-3 flex items-center gap-3">
-                        <img
-                          src="https://via.placeholder.com/80"
-                          alt="Business"
-                          className="w-20 h-14 object-cover rounded-md"
-                        />
-                        <div>
-                          <h3 className="text-sm font-semibold">Business Name</h3>
-                          <p className="text-xs text-gray-500">Location | Business Category</p>
-                          <p className="text-yellow-500 text-sm">★★★★☆ 4.5</p>
-                        </div>
+                            {/* Business Card */}
+                            <div className="mt-2 bg-white shadow-md rounded-lg border p-3 flex items-center gap-3">
+                              <img
+                                src="https://via.placeholder.com/80"
+                                alt="Business"
+                                className="w-20 h-14 object-cover rounded-md"
+                              />
+                              <div>
+                                <h3 className="text-sm font-semibold">Business Name</h3>
+                                <p className="text-xs text-gray-500">Location | Business Category</p>
+                                <p className="text-yellow-500 text-sm">★★★★☆ 4.5</p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
-                  ))}
-                </div>
-              </div>
 
-              {/* Travel Time Total */}
-              <p className="text-sm font-semibold mt-4">Travel Time Total: 3hrs 22mins</p>
-            </div>
+                    {/* Travel Time Total */}
+                    <p className="text-sm font-semibold mt-4">Travel Time Total: 3hrs 22mins</p>
+                  </div>
 
-            {/* Right Side: Map Section */}
-            <div className="relative bg-white shadow-lg rounded-lg p-5 flex justify-center items-center">
-              {/* Map Placeholder */}
-              <img
-                src="https://via.placeholder.com/800x400"
-                alt="Map"
-                className="w-full h-auto rounded-md"
-              />
-              <button className="absolute bottom-3 bg-black text-white px-4 py-2 text-sm rounded-md">
-                Show Direction
-              </button>
-            </div>
-            </div>
+                  {/* Right Side: Map Section */}
+                  <div className="relative bg-white shadow-lg rounded-lg p-5 flex justify-center items-center">
+                    {/* Map Placeholder */}
+                    <img
+                      src="https://via.placeholder.com/800x400"
+                      alt="Map"
+                      className="w-full h-auto rounded-md"
+                    />
+                    <button className="absolute bottom-3 bg-black text-white px-4 py-2 text-sm rounded-md">
+                      Show Direction
+                    </button>
+                  </div>
+                  </div>
                 </>
               )}
               {step === 7 && (
                 <>
-        <div className="bg-gray-100 flex items-center h-full justify-center py-10">
-      <div className="bg-white shadow-md rounded-lg p-6 w-full ">
-        {/* Header */}
-        <h1 className="text-2xl font-bold mb-4 text-gray-800">Trip Details : Review & Submit</h1>
-          <div className="grid grid-cols-1 md:grid-cols-2 items-center p-4 border-b">
-        {/* Trip Details */}
-        <div className="mb-6">
-          <p className="text-gray-700">
-            <strong>Trip Name:</strong> Pokémon Journey
-          </p>
-          <p className="text-gray-700">
-            <strong>Trip Date:</strong> Start: January 7, 2025 - End: January 10, 2025
-          </p>
-          <p className="text-gray-700">
-            <strong>Total Days:</strong> 3
-          </p>
-          <p className="text-gray-700">
-            <strong>Booked Services:</strong> 2
-          </p>
-        </div>
+                  <div className="bg-gray-100 flex items-center h-full justify-center py-10">
+                    <div className="bg-white shadow-md rounded-lg p-6 w-full ">
+                      {/* Header */}
+                      <h1 className="text-2xl font-bold mb-4 text-gray-800">Trip Details : Review & Submit</h1>
+                        <div className="grid grid-cols-1 md:grid-cols-2 items-center p-4 border-b">
+                      {/* Trip Details */}
+                      <div className="mb-6">
+                        <p className="text-gray-700">
+                          <strong>Trip Name:</strong> Pokémon Journey
+                        </p>
+                        <p className="text-gray-700">
+                          <strong>Trip Date:</strong> Start: January 7, 2025 - End: January 10, 2025
+                        </p>
+                        <p className="text-gray-700">
+                          <strong>Total Days:</strong> 3
+                        </p>
+                        <p className="text-gray-700">
+                          <strong>Booked Services:</strong> 2
+                        </p>
+                      </div>
 
-          {/* Budget & Travel Time */}
-          <div className="mb-6">
-          <p className="text-gray-600">
-            <strong>Budget Estimation per person:</strong> 5,000-10,000
-          </p>
-          <p className="text-gray-600">
-            <strong>Travel Time Total:</strong> 3hrs 22mins
-          </p>
-        </div>
-        </div>
+                        {/* Budget & Travel Time */}
+                        <div className="mb-6">
+                        <p className="text-gray-600">
+                          <strong>Budget Estimation per person:</strong> 5,000-10,000
+                        </p>
+                        <p className="text-gray-600">
+                          <strong>Travel Time Total:</strong> 3hrs 22mins
+                        </p>
+                      </div>
+                      </div>
 
-        {/* Highlights Summary */}
-        <div className="grid grid-cols-1 md:grid-cols-2 items-center p-4 border-b">
-          <div>
-            <p className="text-gray-600">
-              <strong>Accommodations to Visit:</strong> 1
-            </p>
-            <p className="text-gray-600">
-              <strong>Attractions to Visit:</strong> 1
-            </p>
-            <p className="text-gray-600">
-              <strong>Food Places to Visit:</strong> 10
-            </p>
-            <p className="text-gray-600">
-              <strong>Shops to Visit:</strong> 0
-            </p>
-          </div>
-          <div>
-            <p className="text-gray-600">
-              <strong>Municipalities to Travel:</strong> 8
-            </p>
-            <p className="text-gray-600">
-              <strong>To Visits:</strong> 12
-            </p>
-          </div>
-        </div>
+                      {/* Highlights Summary */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 items-center p-4 border-b">
+                        <div>
+                          <p className="text-gray-600">
+                            <strong>Accommodations to Visit:</strong> 1
+                          </p>
+                          <p className="text-gray-600">
+                            <strong>Attractions to Visit:</strong> 1
+                          </p>
+                          <p className="text-gray-600">
+                            <strong>Food Places to Visit:</strong> 10
+                          </p>
+                          <p className="text-gray-600">
+                            <strong>Shops to Visit:</strong> 0
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-gray-600">
+                            <strong>Municipalities to Travel:</strong> 8
+                          </p>
+                          <p className="text-gray-600">
+                            <strong>To Visits:</strong> 12
+                          </p>
+                        </div>
+                      </div>
 
-        {/* Map Section */}
-        <div className="mb-6">
-          <h2 className="text-lg font-semibold text-gray-800 mb-2">Map Overview</h2>
-          <div className="border rounded-lg overflow-hidden shadow-md">
-            <img
-              src="https://via.placeholder.com/600x300"
-              alt="Map Preview"
-              className="w-full h-[25rem] object-cover"
-            />
-          </div>
-        </div>
+                      {/* Map Section */}
+                      <div className="mb-6">
+                        <h2 className="text-lg font-semibold text-gray-800 mb-2">Map Overview</h2>
+                        <div className="border rounded-lg overflow-hidden shadow-md">
+                          <img
+                            src="https://via.placeholder.com/600x300"
+                            alt="Map Preview"
+                            className="w-full h-[25rem] object-cover"
+                          />
+                        </div>
+                      </div>
 
 
-       
-      </div>
-    </div>
-               
+                    
+                    </div>
+                  </div>
+                            
                 </>
               )}
               {step === 8 && (

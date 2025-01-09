@@ -47,7 +47,7 @@ const Search = () => {
     shops: []
   });
   const [allProducts, setAllProducts] = useState([]);
-  console.log(allProducts);
+  // console.log(allProducts);
   const locations = useMemo(() => [
     { name: 'Bulusan', value: "Bulusan" },
     { name: 'Bulan', value: "Bulan" },

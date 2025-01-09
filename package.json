@@ -3,5 +3,9 @@
     "rollup-plugin-visualizer": "^5.13.1",
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-purgecss": "^0.2.12"
+  },
+  "dependencies": {
+    "@turf/turf": "^7.2.0",
+    "leaflet-routing-machine": "^3.2.12"
   }
 }
