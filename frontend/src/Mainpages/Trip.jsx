@@ -118,7 +118,7 @@ const Trip = () => {
     ? Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) 
     : 0;
 
-    console.log(`Trip Date: Start: ${startDate?.toLocaleDateString()} - End: ${endDate?.toLocaleDateString()}`);
+    // console.log(`Trip Date: Start: ${startDate?.toLocaleDateString()} - End: ${endDate?.toLocaleDateString()}`);
     // console.log(`Total Days: ${totalDays}`)
 
   // third variable destination name
@@ -155,13 +155,6 @@ const Trip = () => {
     setCurrentDate(date);
     setSelectedItem(null);
   };
-
-  // 5th ata
-  const [selectedBusiness, setSelectedBusiness] = useState(
-    [
-      {"business_id":31,"user_id":32,"businessName":"Asika-su","businessType":"attraction","category":["adventure"],"businessLogo":"uploads\\businessLogo-1731733539189.png","coverPhotos":null,"destination":"Sta. Magdalena","defaultAddress":"Sta. Magdalena","pin_location":{"latitude":13.002922323322425,"longitude":124.05075073242188},"contactInfo":null,"openingHours":null,"facilities":[{"id":1734618928266,"icon":null,"name":"Table 1","items":[{"icon":"Wi-Fi","name":"WIFI"},{"icon":"Music","name":"Live Music"}]}],"policies":null,"dateOrigin":"2024-10-19T12:13:02.000Z","description":"Best attraction","cardImage":"uploads\\businessCardImage-1731934470224.jpg","completeAddress":"Kahit saan","aboutUs":"Pagparaluhayluhay, manaaaaa na bayaaaa","lowest_price":"800","highest_price":"1200","likes":2,"rating":5,"rateCount":1,"raw_amenities":["[\"Table 1\"]","[\"Table 1\"]"],"amenities":["Table 1"]},{"business_id":32,"user_id":46,"businessName":"Tanaw","businessType":"attraction","category":["adventure","relaxation"],"businessLogo":"uploads\\businessLogo-1732068525839.png","coverPhotos":null,"destination":"Barcelona","defaultAddress":"Barcelona","pin_location":{"latitude":12.944069665457144,"longitude":123.84805297013374},"contactInfo":null,"openingHours":null,"facilities":null,"policies":null,"dateOrigin":"2024-12-19T12:13:02.000Z","description":null,"cardImage":null,"completeAddress":"Castilla","aboutUs":null,"lowest_price":null,"highest_price":null,"likes":2,"rating":5,"rateCount":1,"raw_amenities":[null],"amenities":[]},{"business_id":42,"user_id":47,"businessName":"sff","businessType":"attraction","category":["relaxation","asdasdas"],"businessLogo":"uploads\\businessLogo-1734583133157.png","coverPhotos":[{"id":"0364f4f2-3855-4489-a7ec-95da75477a39","path":"uploads\\heroImages-1734979617980.jpg","title":""}],"destination":"dfgsd","defaultAddress":"Albay","pin_location":{"latitude":12.953381785933615,"longitude":123.87505531311037},"contactInfo":null,"openingHours":null,"facilities":null,"policies":null,"dateOrigin":"2024-06-19T12:13:02.000Z","description":"Ahh ehh ihhh ohh uhh","cardImage":"uploads\\businessCardImage-1734582104865.jpg","completeAddress":"Donsol","aboutUs":null,"lowest_price":null,"highest_price":null,"likes":2,"rating":5,"rateCount":1,"raw_amenities":[null],"amenities":[]},{"business_id":27,"user_id":28,"businessName":"Di-ret-so","businessType":"accommodation","category":["hotel","inn","adventure"],"businessLogo":"uploads\\businessLogo-1731734673684.avif","coverPhotos":null,"destination":"Barcelona","defaultAddress":"Sta. Magdalena","pin_location":{"latitude":12.864020841931762,"longitude":124.12353515625},"contactInfo":null,"openingHours":null,"facilities":null,"policies":null,"dateOrigin":"2024-02-19T12:13:02.000Z","description":"Kung diretso, diretso sana","cardImage":"uploads\\businessCardImage-1731735230514.avif","completeAddress":"Venus","aboutUs":"Masain ka pa man?","lowest_price":"12","highest_price":"12","likes":2,"rating":null,"rateCount":0,"raw_amenities":[null],"amenities":[]},{"business_id":1,"user_id":1,"businessName":"Shabyuuu","businessType":"restaurant","category":["cafe"],"businessLogo":"uploads\\businessLogo-1735953331961.jpg","coverPhotos":[{"id":"8b287a90-3827-4395-b310-5a18698e5193","path":"uploads\\heroImages-1734975538759.jpg"},{"id":"6972a3f0-b1ea-4259-83d5-98e7d8752e62","path":"uploads\\heroImages-1734975581231.jpg","title":""},{"id":"2e935bcb-280e-481d-b5b6-34795fd57ae5","path":"uploads\\heroImages-1734977589785.jpg","title":""},{"id":"a0bbceac-3759-4a25-875c-dc423ffd0475","path":"uploads\\heroImages-1734977652071.jpg","title":""},{"id":"a3cca1c5-1420-4ac1-8d5a-83c9fe016d05","path":"uploads\\heroImages-1734977676929.jpg","title":""},{"id":"2fa4513f-894c-4ddb-a88b-24c8012acba1","path":"uploads\\heroImages-1736108433758.jpg","title":""}],"destination":"Castilla","defaultAddress":"Sta. Magdalena","pin_location":{"latitude":12.965215406517004,"longitude":123.8721187568021},"contactInfo":[{"id":1729178938412,"icon":"Email","label":"shabyuuu@gmail.com","value":""},{"id":1736041081583,"icon":"Facebook","label":"Jestoni Vargas","value":"https://www.facebook.com/jessstoni"}],"openingHours":[{"day":"Monday","open":"08:00","close":"17:00"},{"day":"Tuesday","open":"08:00","close":"17:00"},{"day":"Wednesday","open":"08:00","close":"17:00"},{"day":"Thursday","open":"08:00","close":"18:00"},{"day":"Friday","open":"08:00","close":"18:00"},{"day":"Saturday","open":"10:00","close":"15:00"},{"day":"Sunday","open":"10:00","close":"15:00"}],"facilities":[{"id":1734618928266,"icon":null,"name":"Table 1","items":[{"icon":"Wi-Fi","name":"WIFI"},{"icon":"Music","name":"Live Music"}]}],"policies":[{"items":["No cancellation","item 2"],"title":"Reservation"}],"dateOrigin":"2024-01-19T12:13:02.000Z","description":"A cozy cafe with a great ambiance.","cardImage":"uploads\\businessCardImage-1736108398239.jpg","completeAddress":"Castilla","aboutUs":"Good shit na mga inumin!","lowest_price":"1500","highest_price":"1500","likes":3,"rating":4.666666666666667,"rateCount":3,"raw_amenities":["[\"Table 1\"]","[\"Table 1\"]","[\"Table 1\"]"],"amenities":["Table 1"]},{"business_id":44,"user_id":56,"businessName":"kreyziiiiiiii","businessType":"restaurant","category":["cafe"],"businessLogo":"uploads\\businessLogo-1735630303819.jpg","coverPhotos":null,"destination":"Prieto Diaz","defaultAddress":"123 123 123","pin_location":{"latitude":13.03474609061505,"longitude":124.17985396101945},"contactInfo":null,"openingHours":null,"facilities":[{"id":1735630551826,"icon":null,"name":"Table 1","items":[{"icon":null,"name":"Tissue hahaha"},{"icon":null,"name":"Tissue hahaha"}]},{"id":1735631639293,"icon":null,"name":"Table 2","items":[{"icon":"Cafe","name":"Item 1"},{"icon":"Restaurant","name":"Item 2"}]},{"id":1735631755868,"icon":null,"name":"Table 3","items":[{"icon":null,"name":"Tissue hahaha"}]}],"policies":null,"dateOrigin":"2024-12-31T07:31:12.000Z","description":"Try it and love the outcome","cardImage":"uploads\\businessCardImage-1735630311262.jpg","completeAddress":"Prieto Diaz","aboutUs":null,"lowest_price":null,"highest_price":null,"likes":0,"rating":null,"rateCount":0,"raw_amenities":["[\"Table 1\", \"Table 2\", \"Table 3\"]"],"amenities":["Table 1","Table 2","Table 3"]}
-    ]
-  );
 
   const checkLoginStatus = useCallback(async () => {
     try {
@@ -334,6 +327,12 @@ const Trip = () => {
     setSelectedTrip(null);
     setItinerary({});
   }
+
+  const clearState = () => {
+    // setSelectedTrip(null);
+    setItinerary({});  // Clear itinerary
+    setIsDetailsOpen(false);
+  };
 
   const deleteTrip = (index, tripId) => {
     Swal.fire({
@@ -880,14 +879,14 @@ const Trip = () => {
      
 
       {isDetailsOpen && selectedTrip && (
-          <TripDetailsModal
-              disableAnimation
-              isOpen={isDetailsOpen}
-              onClose={() => setIsDetailsOpen(false)}
-              trip={selectedTrip}
-              onUpdateTrip={updateTripDetails}
-              itinerary={itinerary}
-          />
+        <TripDetailsModal
+            disableAnimation
+            isOpen={isDetailsOpen}
+            onClose={clearState}
+            trip={selectedTrip}
+            onUpdateTrip={updateTripDetails}
+            itinerary={itinerary}
+        />
       )}
     </div>
   );

@@ -38,7 +38,6 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
   const [originalTripDetails, setOriginalTripDetails] = useState(trip);
   const [originalItinerary, setOriginalItinerary] = useState(itinerary); // Store original itinerary
 
-  const [currentLocation, setCurrentLocation] = useState(null);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [currentDate, setCurrentDate] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -208,44 +207,7 @@ const TripDetailsModal = ({ isOpen, onClose, trip = {}, onUpdateTrip = () => {},
       ...prevDetails,
       [name]: type === 'checkbox' ? checked : value
     }));
-  };
-
-  const handleShowDirection = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const userLat = position.coords.latitude;
-          const userLng = position.coords.longitude;
-
-          // Collect all pin locations (destinations)
-          const destinations = [];
-          Object.keys(itinerary || {}).forEach(date => {
-            itinerary[date].forEach(item => {
-              const { pin_location } = item;
-              if (pin_location) {
-                destinations.push(`${pin_location.latitude},${pin_location.longitude}`);
-              }
-            });
-          });
-
-          // Prepare the directions URL for Google Maps with multiple destinations
-          const origin = `${userLat},${userLng}`;
-          const route = [origin, ...destinations].join('/'); // Join the origin and destinations with "/"
-          
-          const directionsUrl = `https://www.google.com/maps/dir/${route}/@${userLat},${userLng},11z/data=!3e9`;
-
-          // Open the directions URL in a new tab
-          window.open(directionsUrl, '_blank');
-        },
-        (error) => {
-          alert("Error getting current location: " + error.message);
-        }
-      );
-    } else {
-      alert("Geolocation is not supported by this browser.");
-    }
-  };
-  
+  };  
 
   return (
     <Modal disableAnimation isOpen={isOpen} onClose={onClose} isDismissable={false} hideCloseButton className="rounded-lg shadow-lg mx-auto p-3 max-h-screen max-w-[1200px]">
@@ -421,16 +383,6 @@ TripDetailsModal.propTypes = {
   onClose: PropTypes.func.isRequired,
   trip: PropTypes.object.isRequired,
   onUpdateTrip: PropTypes.func,
-};
-
-// Component to handle map events
-const MapEvents = ({ setCurrentZoom }) => {
-  useMapEvents({
-    zoomend: (e) => {
-      setCurrentZoom(e.target.getZoom());
-    },
-  });
-  return null;
 };
 
 export default TripDetailsModal;
