@@ -398,7 +398,7 @@ const Trip = () => {
     if (newItinerary){
       setItinerary(newItinerary);
     }
-    console.log("Updated itinerary:", newItinerary);
+    // console.log("Updated itinerary:", newItinerary);
   };
   
   const formatTime = (time) => {

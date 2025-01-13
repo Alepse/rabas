@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { FaSearch, FaPlus, FaTimes } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 import CryptoJS from 'crypto-js';
+import AddItemMaps from '@/Mainpages/PlanATripComponents/AddItemMaps';
 // Use the environment variable for the base URL
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
@@ -21,6 +22,7 @@ const encryptId = (id) => {
   };
 
 const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
+    const [currentZoom, setCurrentZoom] = useState(10); // Initial zoom level
     // State and mock data from Discover.jsx
     const [activeTab, setActiveTab] = useState('all');
     const [showFilters, setShowFilters] = useState(false);
@@ -239,7 +241,7 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
     const filterData = (data, filters) => {
         return data.filter(item => {
             // Check for search query match with fallback to empty string if name or description is undefined
-            console.log(item);
+            // console.log(item);
             const matchesSearchQuery = filters.searchQuery ? 
             (item.businessName?.toLowerCase().includes(filters.searchQuery.toLowerCase()) || 
              item.businessType?.toLowerCase().includes(filters.searchQuery.toLowerCase()) ||
@@ -648,6 +650,7 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                         <Tab key="accommodations" title="Accommodations" />
                         <Tab key="restaurant" title="Food Places" />
                         <Tab key="shop" title="Shops" />
+                        <Tab key="maps" title="Maps" />
                     </Tabs>
 
                     {/* Toggle Button for Filters */}
@@ -655,6 +658,19 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                         <Button onClick={toggleFilters} className="w-full bg-color1 text-color3">
                             {showFilters ? 'Hide Filters' : 'Show Filters'}
                         </Button>
+                    </div>
+
+                    <div className="w-full">
+                        {activeTab === 'maps' && (
+                            <AddItemMaps 
+                                key="maps" // Optional: Ensure a unique key if using a map
+                                businesses={businesses} 
+                                initialCenter={[12.901505084198375, 123.94763219213431]} 
+                                currentZoom={currentZoom} 
+                                setCurrentZoom={setCurrentZoom} 
+                                handleAddItemClick={handleAddItemClick}
+                            />
+                        )}
                     </div>
 
                     <div className="flex flex-col lg:flex-row gap-8">
@@ -726,6 +742,14 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                                         </CheckboxGroup>
                                     </div>
                                 ))}
+
+                                {activeTab === 'maps' && (
+                                    <>
+                                        
+                                        
+                                    </>
+                                )}
+
                             </div>
                         )}
 
@@ -741,6 +765,18 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                                 // console.log('Category:', category);
                                 // console.log('Active Tab:', activeTab);
                                 // console.log('mockData:', mockData[category]);
+
+                                // if (activeTab === "maps") {
+                                //     return (
+                                //         <AddItemMaps 
+                                //             key="maps" // Optional: Ensure a unique key if using a map
+                                //             businesses={businesses} 
+                                //             initialCenter={[12.901505084198375, 123.94763219213431]} 
+                                //             currentZoom={currentZoom} 
+                                //             setCurrentZoom={setCurrentZoom} 
+                                //         />
+                                //     );
+                                // }
 
                                 if (activeTab !== 'all' && activeTab !== category) return null;
 
@@ -772,7 +808,8 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                                             activeTab === 'accommodations' ? accommodationsFilters.priceRange :
                                             allFilters.priceRange,
                                 selectedCuisine: activeTab === 'restaurant' ? foodFilters.selectedCuisine : [],
-                                searchQuery: allFilters.searchQuery // Assuming search query is stored here
+                                searchQuery: allFilters.searchQuery, // Assuming search query is stored here
+
                                 };
 
                                 const filteredItems = filterData(mockData[category], filters);
@@ -785,6 +822,8 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                                             className="bg-white rounded-lg shadow-lg relative p-2"
                                             variants={cardVariants}
                                         >
+                                       
+                                           
                                             {item.cardImage ? (
                                             <div className="w-full h-48 p-4">
                                                 <img
