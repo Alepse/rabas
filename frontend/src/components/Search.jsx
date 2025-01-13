@@ -54,7 +54,7 @@ const Search = () => {
     { name: 'Barcelona', value: "Barcelona" },
     { name: 'Casiguran', value: "Casiguran" },
     { name: 'Castilla', value: "Castilla" },
-    { name: 'Donsol', value: "Donsol" },
+    { name: 'Donsol', value: "Donsol", key: "butanding" },
     { name: 'Gubat', value: "Gubat" },
     { name: 'Irosin', value: "Irosin" },
     { name: 'Juban', value: "Juban" },
@@ -149,6 +149,7 @@ const Search = () => {
       ...allProducts.filter((item) => matchesSearch(item.description || '')),
       ...allProducts.filter((item) => matchesSearch(item.type || '')),
       ...locations.filter((location) => matchesSearch(location.name || '')),
+      ...locations.filter((location) => matchesSearch(location.key || '')),
     ];
 
     setSearchResults(results);
