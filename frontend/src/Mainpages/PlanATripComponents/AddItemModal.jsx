@@ -831,6 +831,7 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                                                     alt={item.businessName}
                                                     className="w-full h-full object-cover rounded-t-lg"
                                                 />
+                                            
                                             </div>
                                             ) : (
                                                 <div className="w-full h-48 flex items-center justify-center text-gray-500 p-4">
@@ -841,6 +842,7 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                                             )}
                                             
                                             <div className="p-2">
+                                            <p className='text-color2 absolute top-1 right-2 text-xs font-semibold'>Already Booked ✓</p>
                                                 <div className="flex justify-between items-center mb-2">
                                                 <div className="flex justify-between  items-center mb-2">
                                                     {renderTags(item.category, filters.selectedType)}
