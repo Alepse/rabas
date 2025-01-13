@@ -4026,6 +4026,7 @@ app.get('/superAdmin-fetchAllBusinessListings', async (req, res) => {
       owner_name: business.owner_name,
       owner_email: business.owner_email,
       application_status: business.application_status,
+      aboutUs: business.aboutUs || '',
 
       // Handle JSON fields
       category: handleJSONField(business.category),

@@ -75,6 +75,7 @@ const Search = (handleCloseMenu) => {
     shops: []
   });
   const [allProducts, setAllProducts] = useState([]);
+  console.log(businessListings);
 
   const fetchBusinessListings = async () => {
     try {
@@ -217,6 +218,11 @@ const Search = (handleCloseMenu) => {
       ...businessListings.accommodations.filter((item) => matchesSearch(item.title || '')),
       ...businessListings.foodPlaces.filter((item) => matchesSearch(item.title || '')),
       ...businessListings.shops.filter((item) => matchesSearch(item.title || '')),
+      ...allProducts.filter((item) => matchesSearch(item.name || '')),
+      ...businessListings.activitiesAndAttractions.filter((item) => matchesSearch(item.aboutUs || '')),
+      ...businessListings.accommodations.filter((item) => matchesSearch(item.aboutUs || '')),
+      ...businessListings.foodPlaces.filter((item) => matchesSearch(item.aboutUs || '')),
+      ...businessListings.shops.filter((item) => matchesSearch(item.aboutUs || '')),
       ...allProducts.filter((item) => matchesSearch(item.name || '')),
       ...allProducts.filter((item) => matchesSearch(item.description || '')),
       ...allProducts.filter((item) => matchesSearch(item.type || '')),
