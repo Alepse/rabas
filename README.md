@@ -74,7 +74,9 @@ This project is a web-based platform designed to connect tourists with tourism b
 - npm or yarn
 - MySQL (for backend)
 
-### Frontend Setup
+### Setup and Running
+
+#### Frontend
 1. Navigate to the frontend directory:
    ```bash
    cd frontend
@@ -93,7 +95,7 @@ This project is a web-based platform designed to connect tourists with tourism b
    npm run dev
    ```
 
-### Backend Setup
+#### Backend
 1. Navigate to the backend directory:
    ```bash
    cd backend
@@ -128,7 +130,7 @@ This project is a web-based platform designed to connect tourists with tourism b
    > **Note:** Do not include sensitive information in your `.env` file if sharing it publicly.
 4. Start the server:
    ```bash
-   npm run dev
+   npm start
    ```
 
 ## Authors
